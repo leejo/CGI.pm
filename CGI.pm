@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.61 2002-04-03 21:05:34 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.62 2002-04-10 19:36:01 lstein Exp $';
 $CGI::VERSION='2.81';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -552,6 +552,7 @@ sub parse_params {
     my($param,$value);
     foreach (@pairs) {
 	($param,$value) = split('=',$_,2);
+	next unless defined $param;
 	next if $NO_UNDEF_PARAMS and not defined $value;
 	$value = '' unless defined $value;
 	$param = unescape($param);
@@ -1335,7 +1336,7 @@ sub start_html {
         $target,$meta,$head,$style,$dtd,$lang,$encoding,@other) = 
 	rearrange([TITLE,AUTHOR,BASE,XBASE,SCRIPT,NOSCRIPT,TARGET,META,HEAD,STYLE,DTD,LANG,ENCODING],@p);
 
-    $encoding = 'utf-8' unless defined $encoding;
+    $encoding = 'iso-8859-1' unless defined $encoding;
 
     # strangely enough, the title needs to be escaped as HTML
     # while the author needs to be escaped as a URL
@@ -1358,7 +1359,7 @@ sub start_html {
     push @result,qq(<?xml version="1.0" encoding="$encoding"?>) if $xml_dtd; 
 
     if (ref($dtd) && ref($dtd) eq 'ARRAY') {
-        push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd->[0]"\n\tSYSTEM "$dtd->[1]">));
+        push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd->[0]"\n\t "$dtd->[1]">));
     } else {
         push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd">));
     }
@@ -1616,7 +1617,7 @@ sub _textfield {
     # and WebTV -- not sure it won't break stuff
     my($value) = $current ne '' ? qq(value="$current") : '';
     return $XHTML ? qq(<input type="$tag" name="$name" $value$s$m$other />) 
-                  : qq/<input type="$tag" name="$name" $value$s$m$other>/;
+                  : qq(<input type="$tag" name="$name" $value$s$m$other>);
 }
 END_OF_FUNC
 
@@ -1731,7 +1732,7 @@ sub button {
     $script = qq/ onclick="$script"/ if $script;
     my($other) = @other ? " @other" : '';
     return $XHTML ? qq(<input type="button"$name$val$script$other />)
-                  : qq/<input type="button"$name$val$script$other>/;
+                  : qq(<input type="button"$name$val$script$other>);
 }
 END_OF_FUNC
 
@@ -1761,7 +1762,7 @@ sub submit {
     $val = qq/ value="$value"/ if defined($value);
     my($other) = @other ? " @other" : '';
     return $XHTML ? qq(<input type="submit"$name$val$other />)
-                  : qq/<input type="submit"$name$val$other>/;
+                  : qq(<input type="submit"$name$val$other>);
 }
 END_OF_FUNC
 
@@ -1781,7 +1782,7 @@ sub reset {
     my($value) = defined($label) ? qq/ value="$label"/ : '';
     my($other) = @other ? " @other" : '';
     return $XHTML ? qq(<input type="reset"$value$other />)
-                  : qq/<input type="reset"$value$other>/;
+                  : qq(<input type="reset"$value$other>);
 }
 END_OF_FUNC
 
@@ -4427,7 +4428,7 @@ English.  For example:
     print $q->start_html(-lang=>'fr-CA');
 
 The B<-encoding> argument can be used to specify the character set for
-XHTML.  It defaults to UTF-8 if not specified.
+XHTML.  It defaults to iso-8859-1 if not specified.
 
 You can place other arbitrary HTML elements to the <head> section with the
 B<-head> tag.  For example, to place the rarely-used <link> element in the
@@ -6686,9 +6687,7 @@ warnings when programs are run with the B<-w> switch.
 
 =head1 SEE ALSO
 
-L<CGI::Carp>, L<URI::URL>, L<CGI::Request>, L<CGI::MiniSvr>,
-L<CGI::Base>, L<CGI::Form>, L<CGI::Push>, L<CGI::Fast>,
-L<CGI::Pretty>
+L<CGI::Carp>, L<CGI::Fast>, L<CGI::Pretty>
 
 =cut
 
