@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.65 2002-06-26 14:54:56 lstein Exp $';
-$CGI::VERSION='2.82';
+$CGI::revision = '$Id: CGI.pm,v 1.66 2002-07-01 01:42:21 lstein Exp $';
+$CGI::VERSION='2.83';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -219,7 +219,7 @@ if ($needs_binmode) {
 sub import {
     my $self = shift;
 
-# This causes modules to clash.  
+    # This causes modules to clash.
     undef %EXPORT_OK;
     undef %EXPORT;
 
@@ -992,7 +992,9 @@ EOF
 'autoEscape' => <<'END_OF_FUNC',
 sub autoEscape {
     my($self,$escape) = self_or_default(@_);
-    $self->{'dontescape'}=!$escape;
+    my $d = $self->{'dontescape'};
+    $self->{'dontescape'} = $escape;
+    $d;
 }
 END_OF_FUNC
 
@@ -1363,7 +1365,7 @@ sub start_html {
     } else {
         push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd">));
     }
-    push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang"><head><title>$title</title>)
+    push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang" xml:lang="$lang"><head><title>$title</title>)
                         : qq(<html lang="$lang"><head><title>$title</title>));
 	if (defined $author) {
     push(@result,$XHTML ? "<link rev=\"made\" href=\"mailto:$author\" />"
@@ -1504,14 +1506,14 @@ END_OF_FUNC
 # Parameters:
 #  $action -> optional URL of script to run
 # Returns:
-#   A string containing a <ISINDEX> tag
+#   A string containing a <isindex> tag
 'isindex' => <<'END_OF_FUNC',
 sub isindex {
     my($self,@p) = self_or_default(@_);
     my($action,@other) = rearrange([ACTION],@p);
-    $action = qq/action="$action"/ if $action;
+    $action = qq/ action="$action"/ if $action;
     my($other) = @other ? " @other" : '';
-    return $XHTML ? "<isindex $action$other />" : "<isindex $action$other>";
+    return $XHTML ? "<isindex$action$other />" : "<isindex$action$other>";
 }
 END_OF_FUNC
 
@@ -1629,7 +1631,7 @@ END_OF_FUNC
 #   $size ->  Optional width of field in characaters.
 #   $maxlength -> Optional maximum number of characters.
 # Returns:
-#   A string containing a <INPUT TYPE="text"> field
+#   A string containing a <input type="text"> field
 #
 'textfield' => <<'END_OF_FUNC',
 sub textfield {
@@ -1645,7 +1647,7 @@ END_OF_FUNC
 #   $size ->  Optional width of field in characaters.
 #   $maxlength -> Optional maximum number of characters.
 # Returns:
-#   A string containing a <INPUT TYPE="text"> field
+#   A string containing a <input type="file"> field
 #
 'filefield' => <<'END_OF_FUNC',
 sub filefield {
@@ -1664,7 +1666,7 @@ END_OF_FUNC
 #   $size ->  Optional width of field in characters.
 #   $maxlength -> Optional maximum characters that can be entered.
 # Returns:
-#   A string containing a <INPUT TYPE="password"> field
+#   A string containing a <input type="password"> field
 #
 'password_field' => <<'END_OF_FUNC',
 sub password_field {
@@ -1711,7 +1713,7 @@ END_OF_FUNC
 #   $onclick -> (optional) Text of the JavaScript to run when the button is
 #                clicked.
 # Returns:
-#   A string containing a <INPUT TYPE="button"> tag
+#   A string containing a <input type="button"> tag
 ####
 'button' => <<'END_OF_FUNC',
 sub button {
@@ -1744,7 +1746,7 @@ END_OF_FUNC
 #   $value -> (optional) Value of the button when selected (also doubles as label).
 #   $label -> (optional) Label printed on the button(also doubles as the value).
 # Returns:
-#   A string containing a <INPUT TYPE="submit"> tag
+#   A string containing a <input type="submit"> tag
 ####
 'submit' => <<'END_OF_FUNC',
 sub submit {
@@ -1772,7 +1774,7 @@ END_OF_FUNC
 # Parameters:
 #   $name -> (optional) Name for the button.
 # Returns:
-#   A string containing a <INPUT TYPE="reset"> tag
+#   A string containing a <input type="reset"> tag
 ####
 'reset' => <<'END_OF_FUNC',
 sub reset {
@@ -1792,7 +1794,7 @@ END_OF_FUNC
 # Parameters:
 #   $name -> (optional) Name for the button.
 # Returns:
-#   A string containing a <INPUT TYPE="submit" NAME=".defaults"> tag
+#   A string containing a <input type="submit" name=".defaults"> tag
 #
 # Note: this button has a special meaning to the initialization script,
 # and tells it to ERASE the current query string so that your defaults
@@ -1834,7 +1836,7 @@ END_OF_FUNC
 #   $label -> (optional) a user-readable label printed next to the box.
 #             Otherwise the checkbox name is used.
 # Returns:
-#   A string containing a <INPUT TYPE="checkbox"> field
+#   A string containing a <input type="checkbox"> field
 ####
 'checkbox' => <<'END_OF_FUNC',
 sub checkbox {
@@ -1882,7 +1884,7 @@ END_OF_FUNC
 #             in the form $label{'value'}="Long explanatory label".
 #             Otherwise the provided values are used as the labels.
 # Returns:
-#   An ARRAY containing a series of <INPUT TYPE="checkbox"> fields
+#   An ARRAY containing a series of <input type="checkbox"> fields
 ####
 'checkbox_group' => <<'END_OF_FUNC',
 sub checkbox_group {
@@ -2035,7 +2037,7 @@ END_OF_FUNC
 #             in the form $label{'value'}="Long explanatory label".
 #             Otherwise the provided values are used as the labels.
 # Returns:
-#   An ARRAY containing a series of <INPUT TYPE="radio"> fields
+#   An ARRAY containing a series of <input type="radio"> fields
 ####
 'radio_group' => <<'END_OF_FUNC',
 sub radio_group {
@@ -2272,7 +2274,7 @@ END_OF_FUNC
 #      or
 #   $default->[initial values of field]
 # Returns:
-#   A string containing a <INPUT TYPE="hidden" NAME="name" VALUE="value">
+#   A string containing a <input type="hidden" name="name" value="value">
 ####
 'hidden' => <<'END_OF_FUNC',
 sub hidden {
@@ -2315,7 +2317,7 @@ END_OF_FUNC
 #   $src ->  URL of the image source
 #   $align -> Alignment style (TOP, BOTTOM or MIDDLE)
 # Returns:
-#   A string containing a <INPUT TYPE="image" NAME="name" SRC="url" ALIGN="alignment">
+#   A string containing a <input type="image" name="name" src="url" align="alignment">
 ####
 'image_button' => <<'END_OF_FUNC',
 sub image_button {
@@ -3664,10 +3666,10 @@ this:
    ----                           --------------
    h1()                           <h1>
    h1('some','contents');         <h1>some contents</h1>
-   h1({-align=>left});            <h1 ALIGN="LEFT">
-   h1({-align=>left},'contents'); <h1 ALIGN="LEFT">contents</h1>
+   h1({-align=>left});            <h1 align="LEFT">
+   h1({-align=>left},'contents'); <h1 align="LEFT">contents</h1>
 
-HTML tags are described in more detail later.  
+HTML tags are described in more detail later.
 
 Many newcomers to CGI.pm are puzzled by the difference between the
 calling conventions for the HTML shortcuts, which require curly braces
@@ -4680,9 +4682,9 @@ internal anchors but you don't want to disrupt the current contents
 of the form(s).  Something like this will do the trick.
 
      $myself = $query->self_url;
-     print "<a href=$myself#table1>See table 1</a>";
-     print "<a href=$myself#table2>See table 2</a>";
-     print "<a href=$myself#yourself>See for yourself</a>";
+     print "<a href=\"$myself#table1\">See table 1</a>";
+     print "<a href=\"$myself#table2\">See table 2</a>";
+     print "<a href=\"$myself#yourself\">See for yourself</a>";
 
 If you want more control over what's returned, using the B<url()>
 method instead.
@@ -4965,7 +4967,7 @@ The automatic escaping does not apply to other shortcuts, such as
 h1().  You should call escapeHTML() yourself on untrusted data in
 order to protect your pages against nasty tricks that people may enter
 into guestbooks, etc..  To change the character set, use charset().
-To turn autoescaping off completely, use autoescape():
+To turn autoescaping off completely, use autoEscape(0):
 
 =over 4
 
