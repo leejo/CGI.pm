@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.67 2002-08-28 20:18:40 lstein Exp $';
-$CGI::VERSION='2.83';
+$CGI::revision = '$Id: CGI.pm,v 1.68 2002-09-11 12:26:36 lstein Exp $';
+$CGI::VERSION='2.84';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -129,12 +129,14 @@ if ($OS =~ /^MSWin/i) {
     $OS = 'OS2';
 } elsif ($OS =~ /^epoc/i) {
     $OS = 'EPOC';
+} elsif ($OS =~ /^cygwin/i) {
+    $OS = 'CYGWIN';
 } else {
     $OS = 'UNIX';
 }
 
 # Some OS logic.  Binary mode enabled on DOS, NT and VMS
-$needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin)/;
+$needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin|CYGWIN)/;
 
 # This is the default class for the CGI object to use when all else fails.
 $DefaultClass = 'CGI' unless defined $CGI::DefaultClass;
