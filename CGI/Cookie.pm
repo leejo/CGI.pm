@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.20';
+$CGI::Cookie::VERSION='1.21';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string,
@@ -128,7 +128,10 @@ sub as_string {
 
     push(@constant_values,"domain=$domain") if $domain = $self->domain;
     push(@constant_values,"path=$path") if $path = $self->path;
-    push(@constant_values,"expires=$expires") if $expires = $self->expires;
+    if ($expires = $self->expires) {
+      push(@constant_values,"expires=$expires");
+      push(@constant_values,"max-age=$expires");
+    }
     push(@constant_values,"secure") if $secure = $self->secure;
 
     my($key) = escape($self->name);
