@@ -406,6 +406,21 @@ This form also allows you to create a CGI object that is initially empty:
 $empty_query = new CGI('');
 </pre></blockquote>
 
+<p>
+
+If you are using mod_perl, you can initialize a CGI object at any
+stage of the request by passing the request object to CGI->new:
+
+<blockquote><pre>
+$q = CGI->new($r);
+</pre></blockquote>
+
+<p>
+
+To do this with the function-oriented interface, set
+Apache-&gt;request($r) before calling the first CGI function.
+<p>
+
 See <A HREF="#advanced">advanced techniques</A> for more information.
 
 
@@ -5807,6 +5822,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Apr 14 15:14:32 EDT 2003
+Last modified: Tue Apr 15 18:45:05 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.22';
+$CGI::Cookie::VERSION='1.23';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string,
@@ -25,7 +25,13 @@ use overload '""' => \&as_string,
 # escaped URL data.
 sub fetch {
     my $class = shift;
-    my $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
+    my $r     = shift;
+    my $raw_cookie;
+    if ($r && ref($r) && $r->isa('Apache')) {
+      $raw_cookie = $r->header_in('Cookie');
+    } else {
+      $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
+    }
     return () unless $raw_cookie;
     return $class->parse($raw_cookie);
 }
@@ -384,6 +390,11 @@ form using the parse() class method:
 
        $COOKIES = `cat /usr/tmp/Cookie_stash`;
        %cookies = parse CGI::Cookie($COOKIES);
+
+If you are in a mod_perl environment, you can save some overhead by
+passing the request object to fetch() like this:
+
+   CGI::Cookie->fetch($r);
 
 =head2 Manipulating Cookies
 
