@@ -490,7 +490,8 @@ END
       $r->custom_response(500,$mess);
     }
   } else {
-    if (eval{tell STDOUT} > 0) {
+    my $bytes_written = eval{tell STDOUT};
+    if (defined $bytes_written & $bytes_written > 0) {
         print STDOUT $mess;
     }
     else {
