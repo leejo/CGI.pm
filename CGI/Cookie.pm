@@ -27,7 +27,7 @@ sub fetch {
     my $class = shift;
     my $r     = shift;
     my $raw_cookie;
-    if ($r && ref($r) && $r->isa('Apache')) {
+    if ($r && ref($r) && ($r->isa('Apache') || $r->isa('Apache::RequestRec'))) {
       $raw_cookie = $r->headers_in->get('Cookie');
     } else {
       $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.106 2003-04-15 22:53:00 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.107 2003-04-17 14:44:57 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -294,28 +294,32 @@ sub expand_tags {
 # for an existing query string, and initialize itself, if so.
 ####
 sub new {
-    my($class,@initializer) = @_;
-    my $self = {};
-    bless $self,ref $class || $class || $DefaultClass;
-    $self->r($r) = shift(@initializer)
-      if ref($initializer[0])
-	&& UNIVERSAL::isa($initializer[0],'Apache');
-    if ($MOD_PERL) {
-      $self->r(Apache->request) unless $self->r;
-      if ($MOD_PERL == 1) {
-	$r->register_cleanup(\&CGI::_reset_globals);
-      }
-      else {
-	# XXX: once we have the new API
-	# will do a real PerlOptions -SetupEnv check
-	$r->subprocess_env unless exists $ENV{REQUEST_METHOD};
-	$r->pool->cleanup_register(\&CGI::_reset_globals);
-      }
-      undef $NPH;
+  my($class,@initializer) = @_;
+  my $self = {};
+  bless $self,ref $class || $class || $DefaultClass;
+  if (ref($initializer[0])
+      && (UNIVERSAL::isa($initializer[0],'Apache')
+	  ||
+	  UNIVERSAL::isa($initializer[0],'Apache::RequestRec')
+	 )) {
+    $self->r(shift @initializer);
+  }
+  if (my $r = ($self->r || $MOD_PERL)) {
+    $self->r($r) unless $self->r;
+    if ($MOD_PERL == 1) {
+      $r->register_cleanup(\&CGI::_reset_globals);
     }
-    $self->_reset_globals if $PERLEX;
-    $self->init(@initializer);
-    return $self;
+    else {
+      # XXX: once we have the new API
+      # will do a real PerlOptions -SetupEnv check
+      $r->subprocess_env unless exists $ENV{REQUEST_METHOD};
+      $r->pool->cleanup_register(\&CGI::_reset_globals);
+    }
+    undef $NPH;
+  }
+  $self->_reset_globals if $PERLEX;
+  $self->init(@initializer);
+  return $self;
 }
 
 # We provide a DESTROY method so that the autoloader
