@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.13 1999-03-19 03:49:40 lstein Exp $';
-$CGI::VERSION='2.50';
+$CGI::revision = '$Id: CGI.pm,v 1.14 1999-03-31 15:30:13 lstein Exp $';
+$CGI::VERSION='2.51';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -400,7 +400,11 @@ sub init {
       # If method is GET or HEAD, fetch the query from
       # the environment.
       if ($meth=~/^(GET|HEAD)$/) {
-	  $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	  if ($MOD_PERL) {
+	      $query_string = Apache->request->args;
+	  } else {
+	      $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	  }
 	  last METHOD;
       }
 
@@ -501,7 +505,8 @@ sub escape {
     shift() if ref($_[0]) || $_[0] eq $DefaultClass;
     my $toencode = shift;
     return undef unless defined($toencode);
-    $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
+    $toencode=~s/ /+/g;
+    $toencode=~s/([^a-zA-Z0-9_.+-])/uc sprintf("%%%02x",ord($1))/eg;
     return $toencode;
 }
 
@@ -1089,7 +1094,7 @@ sub save {
 	my($escaped_param) = escape($param);
 	my($value);
 	foreach $value ($self->param($param)) {
-	    print $filehandle "$escaped_param=",escape($value),"\n";
+	    print $filehandle "$escaped_param=",escape("$value"),"\n";
 	}
     }
     print $filehandle "=\n";    # end of record
