@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.75 2002-10-16 17:48:37 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.76 2002-11-04 16:31:42 lstein Exp $';
 $CGI::VERSION='2.89';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -150,7 +150,8 @@ $AutoloadClass = $DefaultClass unless defined $CGI::AutoloadClass;
 # on the paltform.
 $SL = {
        UNIX=>'/', OS2=>'\\', EPOC=>'/',
-       WINDOWS=>'\\', DOS=>'\\', MACINTOSH=>':', VMS=>'/'
+       WINDOWS=>'\\', DOS=>'\\', MACINTOSH=>':', VMS=>'/',
+       CYGWIN=>'/',
     }->{$OS};
 
 # This no longer seems to be necessary
