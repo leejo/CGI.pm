@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.94 2003-03-13 19:47:03 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.95 2003-03-13 19:51:31 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -172,31 +172,19 @@ $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for Doug MacEachern's modperl
 if (exists $ENV{MOD_PERL}) {
-  require mod_perl;
-  if (defined $mod_perl::VERSION && ($mod_perl::VERSION >= 1.99)) {
-    $MOD_PERL = 2;
-    require Apache::RequestRec;
-    require Apache::RequestUtil;
-    require APR::Pool;
-  } else {
-    $MOD_PERL = 1;
-    require Apache;
+  eval "require mod_perl";
+  if (defined $mod_perl::VERSION) {
+    if ($mod_perl::VERSION >= 1.99) {
+      $MOD_PERL = 2;
+      require Apache::RequestRec;
+      require Apache::RequestUtil;
+      require APR::Pool;
+    } else {
+      $MOD_PERL = 1;
+      require Apache;
+    }
   }
 }
-
-if (exists $ENV{'GATEWAY_INTERFACE'}
-    &&
-    ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//))
-  {
-    $| = 1;
-    eval "require mod_perl";
-    if (defined $mod_perl::VERSION && ($mod_perl::VERSION >= 1.99)) {
-      eval "require Apache::compat";
-    } else {
-      eval "require Apache";
-    }
-    defined &Apache::request or undef $MOD_PERL;
-  }
 
 # Turn on special checking for ActiveState's PerlEx
 $PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
