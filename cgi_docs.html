@@ -4526,7 +4526,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
-
+<h3>Version 2.50</h3>
+<ol>
+  <li>Untainted tainted tempfile name so that script doesn't fail on terminal unlink
+  <li>Made picking of upload tempfile name more intelligent so that doesn't fail in case of name collision.
+  <li>Fixed handling of expire times when passed an absolute timestamp.
+</ol>
 <h3>Version 2.49</h3>
 <ol>
   <li>Fixes for FastCGI (globals not getting reset)
@@ -5194,6 +5199,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Mar  9 10:31:49 EST 1999
+Last modified: Thu Mar 11 16:18:45 EST 1999
 <!-- hhmts end -->
 </BODY> </HTML>

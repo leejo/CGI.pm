@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.10 1999-03-11 04:16:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.11 1999-03-18 01:36:22 lstein Exp $';
 $CGI::VERSION='2.50';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2261,6 +2261,9 @@ sub expire_calc {
     my($offset);
     if (!$time || (lc($time) eq 'now')) {
         $offset = 0;
+    } elsif ($time=~/^\d+/)
+        return $time;
+    }
     } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([mhdMy]?)/) {
         $offset = ($mult{$2} || 1)*$1;
     } else {
@@ -2377,8 +2380,8 @@ sub query_string {
     foreach $param ($self->param) {
 	my($eparam) = escape($param);
 	foreach $value ($self->param($param)) {
-            next unless defined $value;
 	    $value = escape($value);
+            next unless defined $value;
 	    push(@pairs,"$eparam=$value");
 	}
     }
