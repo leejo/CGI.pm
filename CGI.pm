@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.112 2003-04-28 13:35:56 lstein Exp $';
-$CGI::VERSION='2.93';
+$CGI::revision = '$Id: CGI.pm,v 1.113 2003-05-11 22:53:25 lstein Exp $';
+$CGI::VERSION='2.95';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1632,6 +1632,7 @@ sub startform {
            $action .= "?$ENV{QUERY_STRING}";
        }
     }
+    $action =~ s/\"/%22/g;  # fix cross-site scripting bug reported by obscure
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
@@ -1875,7 +1876,6 @@ END_OF_FUNC
 sub reset {
     my($self,@p) = self_or_default(@_);
     my($label,$value,@other) = rearrange(['NAME',['VALUE','LABEL']],@p);
-    warn "label = $label, value = $value";
     $label=$self->escapeHTML($label);
     $value=$self->escapeHTML($value,1);
     my ($name) = ' name=".reset"';
