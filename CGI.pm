@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.72 2002-10-05 20:45:07 lstein Exp $';
-$CGI::VERSION='2.87';
+$CGI::revision = '$Id: CGI.pm,v 1.73 2002-10-11 15:07:05 lstein Exp $';
+$CGI::VERSION='2.88';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -32,7 +32,7 @@ use CGI::Util qw(rearrange make_attributes unescape escape expires);
 use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
 
-$TAINTED = substr($ENV{REQUEST_METHOD}.'',0,0);
+$TAINTED = substr("$0$^X",0,0);
 
 my @SAVED_SYMBOLS;
 
@@ -3182,7 +3182,8 @@ sub new {
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
     my $fv = ++$FH . $safename;
     my $ref = \*{"Fh::$fv"};
-    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
+    $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
+    sysopen($ref,$1,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
     CORE::delete $Fh::{$fv};
     return bless $ref,$pack;
