@@ -1,6 +1,6 @@
 WHAT IS THIS?
 
-This is CGI.pm 2.46, an easy-to-use Perl5 library for writing World
+This is CGI.pm 2.47, an easy-to-use Perl5 library for writing World
 Wide Web CGI scripts.
 
 HOW DO I INSTALL IT?
@@ -78,4 +78,4 @@ Have fun, and let me know how it turns out!
 
 Lincoln D. Stein
 lstein@cshl.org
-
+2/17/99

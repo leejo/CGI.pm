@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.7 1999-01-22 14:24:37 lstein Exp $';
-$CGI::VERSION='2.46';
+$CGI::revision = '$Id: CGI.pm,v 1.8 1999-02-18 03:42:05 lstein Exp $';
+$CGI::VERSION='2.47';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -164,12 +164,13 @@ if ($needs_binmode) {
 			  submit reset defaults radio_group popup_menu button autoEscape
 			  scrolling_list image_button start_form end_form startform endform
 			  start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
-		':cgi'=>[qw/param path_info path_translated url self_url script_name cookie Dump
+		':cgi'=>[qw/param upload path_info path_translated url self_url script_name cookie Dump
 			 raw_cookie request_method query_string Accept user_agent remote_host 
 			 remote_addr referer server_name server_software server_port server_protocol
 			 virtual_host remote_ident auth_type http use_named_parameters 
 			 save_parameters restore_parameters param_fetch
-			 remote_user user_name header redirect import_names put Delete Delete_all url_param/],
+			 remote_user user_name header redirect import_names put 
+			 Delete Delete_all url_param cgi_error/],
 		':ssl' => [qw/https/],
 		':imagemap' => [qw/Area Map/],
 		':cgi-lib' => [qw/ReadParse PrintHeader HtmlTop HtmlBot SplitParam/],
@@ -337,11 +338,16 @@ sub init {
 
     $meth=$ENV{'REQUEST_METHOD'} if defined($ENV{'REQUEST_METHOD'});
     $content_length = defined($ENV{'CONTENT_LENGTH'}) ? $ENV{'CONTENT_LENGTH'} : 0;
-    die "Client attempted to POST $content_length bytes, but POSTs are limited to $POST_MAX"
-	if ($POST_MAX > 0) && ($content_length > $POST_MAX);
+
     $fh = to_filehandle($initializer) if $initializer;
 
   METHOD: {
+
+      # avoid unreasonably large postings
+      if (($POST_MAX > 0) && ($content_length > $POST_MAX)) {
+	  $self->cgi_error("413 Request entity too large");
+	  last METHOD;
+      }
 
       # Process multipart postings, but only if the initializer is
       # not defined.
@@ -473,6 +479,13 @@ sub print {
     CORE::print(@_);
 }
 
+# get/set last cgi_error
+sub cgi_error {
+    my ($self,$err) = self_or_default(@_);
+    $self->{'.cgi_error'} = $err if defined $err;
+    return $self->{'.cgi_error'};
+}
+
 # unescape URL-encoded data
 sub unescape {
     shift() if ref($_[0]);
@@ -536,10 +549,10 @@ sub binmode {
 
 sub _make_tag_func {
     my ($self,$tagname) = @_;
-    my $func = qq#
+    my $func = qq(
 	sub $tagname { 
 	    shift if \$_[0] && 
-		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
+#		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
 		    (ref(\$_[0]) &&
 		     (substr(ref(\$_[0]),0,3) eq 'CGI' ||
 		    UNIVERSAL::isa(\$_[0],'CGI')));
@@ -549,7 +562,7 @@ sub _make_tag_func {
 		my(\@attr) = make_attributes( '',shift() );
 		\$attr = " \@attr" if \@attr;
 	    }
-	#;
+	);
     if ($tagname=~/start_(\w+)/i) {
 	$func .= qq! return "<\U$1\E\$attr>";} !;
     } elsif ($tagname=~/end_(\w+)/i) {
@@ -2763,7 +2776,11 @@ sub read_multipart {
     my $filenumber = 0;
     while (!$buffer->eof) {
 	%header = $buffer->readHeader;
-	die "Malformed multipart POST\n" unless %header;
+
+	unless (%header) {
+	    $self->cgi_error("400 Bad request (malformed multipart POST)");
+	    return;
+	}
 
 	my($param)= $header{'Content-Disposition'}=~/ name="?([^\";]*)"?/;
 
@@ -2793,13 +2810,12 @@ sub read_multipart {
 	      last UPLOADS;
 	  }
 
-	  $tmpfile = new TempFile;
+	  # choose a relatively unpredictable tmpfile sequence number
+	  $tmpfile = new TempFile(unpack("%16C*",join('',localtime,values %ENV)));
 	  $tmp = $tmpfile->as_string;
 	  
 	  $filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES);
-
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
-	  chmod 0600,$tmp;    # only the owner can tamper with it
 
 	  my ($data);
 	  local($\) = '';
@@ -2820,6 +2836,16 @@ sub read_multipart {
 	  push(@{$self->{$param}},$filehandle);
       }
     }
+}
+END_OF_FUNC
+
+'upload' =><<'END_OF_FUNC',
+sub upload {
+    my($self,$param_name) = self_or_default(@_);
+    my $param = $self->param($param_name);
+    return unless $param;
+    return unless ref($param) && fileno($param);
+    return $param;
 }
 END_OF_FUNC
 
@@ -2915,7 +2941,7 @@ sub new {
     require Fcntl unless defined &Fcntl::O_RDWR;
     ++$FH;
     my $ref = \*{'Fh::' . quotemeta($name)}; 
-    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL()) 
+    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) 
 	|| die "CGI open of $file: $!\n";
     unlink($file) if $delete;
     delete $Fh::{$FH};
@@ -3184,15 +3210,18 @@ $MAC = $CGI::OS eq 'MACINTOSH';
 my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
 unless ($TMPDIRECTORY) {
     @TEMP=("${SL}usr${SL}tmp","${SL}var${SL}tmp",
-	   "C:${SL}temp","${SL}tmp","${SL}temp","${vol}${SL}Temporary Items",
+	   "C:${SL}temp","${SL}tmp","${SL}temp",
+	   "${vol}${SL}Temporary Items",
 	   "${SL}WWW_ROOT");
+    unshift(@TEMP,$ENV{'TMPDIR'}) if exists $ENV{'TMPDIR'};
+    unshift(@TEMP,(getpwuid($<))[7].'/tmp') if $CGI::OS eq 'UNIX';
+
     foreach (@TEMP) {
 	do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
     }
 }
 
 $TMPDIRECTORY  = $MAC ? "" : "." unless $TMPDIRECTORY;
-$SEQUENCE=0;
 $MAXTRIES = 5000;
 
 # cute feature, but overload implementation broke it
@@ -3208,11 +3237,11 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 
 'new' => <<'END_OF_FUNC',
 sub new {
-    my($package) = @_;
+    my($package,$sequence) = @_;
     my $directory;
     my $i;
     for ($i = 0; $i < $MAXTRIES; $i++) {
-	$directory = sprintf("${TMPDIRECTORY}${SL}CGItemp%d%04d",${$},++$SEQUENCE);
+	$directory = sprintf("${TMPDIRECTORY}${SL}CGItemp%d",$sequence++);
 	last if ! -f $directory;
     }
     return bless \$directory;
@@ -3249,7 +3278,6 @@ if ($^W) {
     $MultipartBuffer::CRLF;
     $MultipartBuffer::TIMEOUT;
     $MultipartBuffer::INITIAL_FILLUNIT;
-    $TempFile::SEQUENCE;
 EOF
     ;
 }
@@ -3696,12 +3724,35 @@ The file format used for save/restore is identical to that used by the
 Whitehead Genome Center's data exchange format "Boulderio", and can be
 manipulated and even databased using Boulderio utilities.  See
 	
-  http://www.genome.wi.mit.edu/genome_software/other/boulder.html
+  http://stein.cshl.org/boulder/
 
 for further details.
 
 If you wish to use this method from the function-oriented (non-OO)
 interface, the exported name for this method is B<save_parameters()>.
+
+=head2 RETRIEVING CGI ERRORS
+
+Errors can occur while processing user input, particularly when
+processing uploaded files.  When these errors occur, CGI will stop
+processing and return an empty parameter list.  You can test for
+the existence and nature of errors using the I<cgi_error()> function.
+The error messages are formatted as HTTP status codes. You can either
+incorporate the error text into an HTML page, or use it as the value
+of the HTTP status:
+
+    my $error = $q->cgi_error;
+    if ($error) {
+	print $q->header(-status=>$error),
+	      $q->start_html('Problems'),
+              $q->h2('Request not processed'),
+	      $q->strong($error);
+        exit 0;
+    }
+
+When using the function-oriented interface (see the next section),
+errors may only occur the first time you call I<param()>. Be ready
+for this!
 
 =head2 USING THE FUNCTION-ORIENTED INTERFACE
 
@@ -3916,15 +3967,35 @@ See the section on debugging for more details.
 
 =item -private_tempfiles
 
-CGI.pm can process uploaded file. Ordinarily it spools the
-uploaded file to a temporary directory, then deletes the file
-when done.  However, this opens the risk of eavesdropping as
-described in the file upload section.
-Another CGI script author could peek at this data during the
-upload, even if it is confidential information. On Unix systems,
-the -private_tempfiles pragma will cause the temporary file to be unlinked as soon
-as it is opened and before any data is written into it,
-eliminating the risk of eavesdropping.
+CGI.pm can process uploaded file. Ordinarily it spools the uploaded
+file to a temporary directory, then deletes the file when done.
+However, this opens the risk of eavesdropping as described in the file
+upload section.  Another CGI script author could peek at this data
+during the upload, even if it is confidential information. On Unix
+systems, the -private_tempfiles pragma will cause the temporary file
+to be unlinked as soon as it is opened and before any data is written
+into it, reducing, but not eliminating the risk of eavesdropping
+(there is still a potential race condition).  To make life harder for
+the attacker, the program chooses tempfile names by calculating a 32
+bit checksum of the incoming HTTP headers.
+
+To ensure that the temporary file cannot be read by other CGI scripts,
+use suEXEC or a CGI wrapper program to run your script.  The temporary
+file is created with mode 0600 (neither world nor group readable).
+
+The temporary directory is selected using the following algorithm:
+
+    1. if the current user (e.g. "nobody") has a directory named
+    "tmp" in its home directory, use that (Unix systems only).
+
+    2. if the environment variable TMPDIR exists, use the location
+    indicated.
+
+    3. Otherwise try the locations /usr/tmp, /var/tmp, C:\temp,
+    /tmp, /temp, ::Temporary Items, and \WWW_ROOT.
+
+Each of these locations is checked that it is a directory and is
+writable.  If not, the algorithm tries the next choice.
 
 =back
 
@@ -4829,23 +4900,16 @@ field will accept (-maxlength).
 =back
 
 When the form is processed, you can retrieve the entered filename
-by calling param().
+by calling param():
 
        $filename = $query->param('uploaded_file');
 
-In Netscape Navigator 2.0, the filename that gets returned is the full
-local filename on the B<remote user's> machine.  If the remote user is
-on a Unix machine, the filename will follow Unix conventions:
-
-	/path/to/the/file
-
-On an MS-DOS/Windows and OS/2 machines, the filename will follow DOS conventions:
-
-	C:\PATH\TO\THE\FILE.MSW
-
-On a Macintosh machine, the filename will follow Mac conventions:
-
-	HD 40:Desktop Folder:Sort Through:Reminders
+Different browsers will return slightly different things for the
+name.  Some browsers return the filename only.  Others return the full
+path to the file, using the path conventions of the user's machine.
+Regardless, the name returned is always the name of the file on the
+I<user's> machine, and is unrelated to the name of the temporary file
+that CGI.pm creates during upload spooling (see below).
 
 The filename returned is also a file handle.  You can read the contents
 of the file using standard Perl file reading calls:
@@ -4860,6 +4924,25 @@ of the file using standard Perl file reading calls:
 	while ($bytesread=read($filename,$buffer,1024)) {
 	   print OUTFILE $buffer;
 	}
+
+However, there are problems with the dual nature of the upload fields.
+If you C<use strict>, then Perl will complain when you try to use a
+string as a filehandle.  You can get around this by placing the file
+reading code in a block containing the C<no strict> pragma.  More
+seriously, it is possible for the remote user to type garbage into the
+upload field, in which case what you get from param() is not a
+filehandle at all, but a string.
+
+To be safe, use the I<upload()> function (new in version 2.47).  When
+called with the name of an upload field, I<upload()> returns a
+filehandle, or undef if the parameter is not a valid filehandle.
+
+     $fh = $query->upload('uploaded_file');
+     while (<$fh>) {
+	   print;
+     }
+
+This is the recommended idiom.
 
 When a file is uploaded the browser usually sends along some
 information along with it in the format of headers.  The information
@@ -4876,7 +4959,25 @@ an associative array containing all the document headers.
 
 If you are using a machine that recognizes "text" and "binary" data
 modes, be sure to understand when and how to use them (see the Camel book).  
-Otherwise you may find that binary files are corrupted during file uploads.
+Otherwise you may find that binary files are corrupted during file
+uploads.
+
+There are occasionally problems involving parsing the uploaded file.
+This usually happens when the user presses "Stop" before the upload is
+finished.  In this case, CGI.pm will return undef for the name of the
+uploaded file and set I<cgi_error()> to the string "400 Bad request
+(malformed multipart POST)".  This error message is designed so that
+you can incorporate it into a status code to be sent to the browser.
+Example:
+
+   $file = $query->upload('uploaded_file');
+   if (!$file && $query->cgi_error) {
+      print $query->header(-status->$query->cgi_error);
+      exit 0;
+   }
+
+You are free to create a custom HTML page to complain about the error,
+if you wish.
 
 JAVASCRIPTING: The B<-onChange>, B<-onFocus>, B<-onBlur>,
 B<-onMouseOver>, B<-onMouseOut> and B<-onSelect> parameters are
@@ -6023,12 +6124,26 @@ initialize_globals().
 
 =back
 
-Since an attempt to send a POST larger than $POST_MAX bytes
-will cause a fatal error, you might want to use CGI::Carp to echo the
-fatal error message to the browser window as shown in the example
-above.  Otherwise the remote user will see only a generic "Internal
-Server" error message.  See the L<CGI::Carp> manual page for more
-details.
+An attempt to send a POST larger than $POST_MAX bytes will cause
+I<param()> to return an empty CGI parameter list.  You can test for
+this event by checking I<cgi_error()>, either after you create the CGI
+object or, if you are using the function-oriented interface, call
+<param()> for the first time.  If the POST was intercepted, then
+cgi_error() will return the message "413 POST too large".
+
+This error message is actually defined by the HTTP protocol, and is
+designed to be returned to the browser as the CGI script's status
+ code.  For example:
+
+   $uploaded_file = param('upload');
+   if (!$uploaded_file && cgi_error()) {
+      print header(-status=>cgi_error());
+      exit 0;
+   }
+
+However it isn't clear that any browser currently knows what to do
+with this status code.  It might be better just to create an
+HTML page that warns the user of the problem.
 
 =head1 COMPATIBILITY WITH CGI-LIB.PL
 

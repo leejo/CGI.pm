@@ -1,37 +1,29 @@
-CGI.pm version 2.46 is now available for your fun and edification.
+CGI.pm version 2.47 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
-In 2.45:
+1. Patch to fix file upload bug appearing in IE 3.01 for Macintosh/PowerPC.
 
-1. Fixed leaking file descriptor during uploads (thanks to Gerald
-Richter and Doug MacEachern for pointing this one out.)
+2.Replaced use of $ENV{SCRIPT_NAME} with $ENV{REQUEST_URI} when running
+  under Apache, to fix self-referencing URIs.
 
-2. Added Brian Paulsen's CGI::Pretty for pretty-printing the emitted
-HTML.
+3. Fixed bug in escapeHTML() which caused certain constructs, such as
+   CGI->image_button(), to fail.
 
-3. Fixed conflicts between sub() and the Perl sub operator, which caused
-warnings during perl 5.005 regression tests.
+4. Fixed bug which caused strong('CGI') to fail.  Be careful to use
+   CGI::strong('CGI') and not CGI->strong('CGI').  The latter will
+   produce confusing results.
 
-4. Generated start_* shortcuts so that start_table(), end_table(),
-start_ol(), end_ol(), and so forth now work (see the docs on how to
-enable this feature).
+5. Added upload() function, as a preferred replacement for
+   the "filehandle as string" feature.
 
-5.  Fixed bug in header() that prevented fields from containing double
-quotes.
+6. Added cgi_error() error-reporting function.
 
-6. Removed some dead packages, including CGI::Apache and CGI::Switch.
-You don't need them any more.  Trust me!
-
-7. Fixed CGI::Carp to run better under mod_perl (somewhat -- it will never
-be perfect because some faults are untrappable).
-
-In 2.46:
-
-8. Fixed qw(-compile :all) problems.
-
-9. Fixed failure of mod_perl "include" tests.
+7. Rewrote file upload handling to return undef rather than dieing
+   when an error is encountered.  Be sure to call
+   cgi_error() to find out what went wrong.
 
 Lincoln Stein
+2/17/99
 
 ========================================================================
 Lincoln D. Stein

@@ -28,7 +28,7 @@ sub _make_tag_func {
 	    # handle various cases in which we're called
 	    # most of this bizarre stuff is to avoid -w errors
 	    shift if \$_[0] && 
-		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
+#		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
 		    (ref(\$_[0]) &&
 		     (substr(ref(\$_[0]),0,3) eq 'CGI' ||
 		    UNIVERSAL::isa(\$_[0],'CGI')));
