@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.97 2003-04-07 03:11:11 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.98 2003-04-07 03:15:47 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -112,7 +112,6 @@ sub initialize_globals {
     undef %EXPORT;
     undef $QUERY_CHARSET;
     undef %QUERY_FIELDNAMES;
-    undef $QUERY_ESCAPE;
 
     # prevent complaints by mod_perl
     1;
@@ -394,6 +393,9 @@ sub init {
     my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
     local($/) = "\n";
 
+    # set autoescaping on by default
+    $self->{'escape'} = 1;
+
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
     # if it was read from STDIN originally.)
@@ -403,7 +405,6 @@ sub init {
 	}
 	$self->charset($QUERY_CHARSET);
 	$self->{'.fieldnames'} = {%QUERY_FIELDNAMES};
-	$self->{'escape'} = $QUERY_ESCAPE;
 	return;
     }
 
@@ -414,9 +415,6 @@ sub init {
 
     # set charset to the safe ISO-8859-1
     $self->charset('ISO-8859-1');
-
-    # set autoescaping to on
-    $self->{'escape'} = 1;
 
   METHOD: {
 
@@ -581,7 +579,6 @@ sub save_request {
     }
     $QUERY_CHARSET = $self->charset;
     %QUERY_FIELDNAMES = %{$self->{'.fieldnames'}};
-    $QUERY_ESCAPE = $self->{'escape'};
 }
 
 sub parse_params {
