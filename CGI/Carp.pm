@@ -254,7 +254,7 @@ sub _longmess {
 
 sub die {
   realdie @_ if ineval;
-  my $message = shift;
+  my ($message) = @_;
   my $time = scalar(localtime);
   my($file,$line,$id) = id(1);
   $message .= " at $file line $line." unless $message=~/\n$/;

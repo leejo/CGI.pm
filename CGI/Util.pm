@@ -64,7 +64,7 @@ sub rearrange {
 	}
     }
 
-    push (@result,make_attributes(\%leftover)) if %leftover;
+    push (@result,make_attributes(\%leftover,1)) if %leftover;
     @result;
 }
 

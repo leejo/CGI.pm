@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.34 2000-05-25 11:48:04 lstein Exp $';
-$CGI::VERSION='2.68';
+$CGI::revision = '$Id: CGI.pm,v 1.35 2000-05-28 16:52:36 lstein Exp $';
+$CGI::VERSION='2.69';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1159,7 +1159,7 @@ sub header {
     # need to fix it up a little.
     foreach (@other) {
         next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
-	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ": $value"/e;
+	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.unescapeHTML($value)/e;
     }
 
     $type ||= 'text/html' unless defined($type);
@@ -1828,20 +1828,16 @@ sub escapeHTML {
     my ($self,$toencode) = self_or_default(@_);
     return undef unless defined($toencode);
     return $toencode if ref($self) && $self->{'dontescape'};
-    if (uc $self->{'.charset'} eq 'ISO-8859-1') {
-       # fix non-compliant bug in IE and Netscape
-       $toencode =~ s{(.)}{
+    my $latin = uc($self->{'.charset'}) eq 'ISO-8859-1';
+    $toencode =~ s{(.)}{
               if    ($1 eq '<')                            { '&lt;'    }
               elsif ($1 eq '>')                            { '&gt;'    }
               elsif ($1 eq '&')                            { '&amp;'   }
               elsif ($1 eq '"')                            { '&quot;'  }
-              elsif ($1 eq "\x8b")                         { '&#139;'  }
-              elsif ($1 eq "\x9b")                         { '&#155;'  }
+              elsif ($latin && $1 eq "\x8b")               { '&#139;'  }
+              elsif ($latin && $1 eq "\x9b")               { '&#155;'  }
               else                                         { $1        }
-       }gsex;
-     } else {
-        $toencode =~ s/(.)/'&#'.ord($1).';'/gsex;
-     }
+     }gsex;
     return $toencode;
 }
 END_OF_FUNC
