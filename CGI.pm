@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.82 2002-12-03 15:22:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.83 2002-12-03 15:25:03 lstein Exp $';
 $CGI::VERSION='2.90';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1252,8 +1252,7 @@ sub header {
     # need to fix it up a little.
     foreach (@other) {
         next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
-	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.$self->unescapeHTML($value)/e;
-        $header = ucfirst($header);
+        ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 
     $type ||= 'text/html' unless defined($type);
