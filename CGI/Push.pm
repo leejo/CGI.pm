@@ -53,7 +53,7 @@ sub do_push {
     push(@o,'-nph'=>1);
     print $self->header(@o);
     print "${boundary}$CGI::CRLF";
-    
+
     # now we enter a little loop
     my @contents;
     while (1) {
@@ -142,6 +142,9 @@ page.  The contents of the page will be transmitted to the browser
 in such a way that it will replace what was there beforehand.  The
 technique will work with HTML pages as well as with graphics files, 
 allowing you to create animated GIFs.
+
+Only Netscape Navigator supports server push.  Internet Explorer
+browsers do not.
 
 =head1 USING CGI::Push
 
@@ -257,7 +260,7 @@ as shown below:
                h1('testing'),
 	       "This page called $counter times";
     }
-   
+
     sub my_last_page {
 	header(-refresh=>'5; URL=http://somewhere.else/finished.html',
 	       -type=>'text/html'),

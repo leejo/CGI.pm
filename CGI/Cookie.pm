@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.13';
+$CGI::Cookie::VERSION='1.14';
 
 use CGI::Util 'rearrange';
 use overload '""' => \&as_string,
@@ -100,8 +100,7 @@ sub new {
 	},$class;
 
     # IE requires the path and domain to be present for some reason.
-    $path   = $ENV{REQUEST_URI} || $ENV{PATH_INFO} unless defined $path;
-    $path =~ s/\?.*//;
+    $path   ||= '/';
 # however, this breaks networks which use host tables without fully qualified
 # names, so we comment it out.
 #    $domain = CGI::virtual_host()    unless defined $domain;
@@ -256,8 +255,8 @@ against your script's URL before returning the cookie.  For example,
 if you specify the path "/cgi-bin", then the cookie will be returned
 to each of the scripts "/cgi-bin/tally.pl", "/cgi-bin/order.pl", and
 "/cgi-bin/customer_service/complain.pl", but not to the script
-"/cgi-private/site_admin.pl".  By default, the path is set to your
-script, so that only it will receive the cookie.
+"/cgi-private/site_admin.pl".  By default, the path is set to "/", so
+that all scripts at your site will receive the cookie.
 
 =item B<4. secure flag>
 
@@ -347,7 +346,7 @@ can iterate through the cookies this way:
 
 In a scalar context, fetch() returns a hash reference, which may be more
 efficient if you are manipulating multiple cookies.
-    
+
 CGI.pm uses the URL escaping methods to save and restore reserved characters
 in its cookies.  If you are trying to retrieve a cookie set by a foreign server,
 this escaping method may trip you up.  Use raw_fetch() instead, which has the
@@ -418,5 +417,5 @@ This section intentionally left blank.
 =head1 SEE ALSO
 
 L<CGI::Carp>, L<CGI>
- 
+
 =cut

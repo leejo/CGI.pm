@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.57, 2/15/1999, L. Stein
+Version 2.58, 3/23/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -839,6 +839,7 @@ contrived example that uses them all:
                         -status=&gt;'402 Payment Required',
                         -expires=&gt;'+3d',
                         -cookie=&gt;$my_cookie,
+                        -charset=&gt;'UTF-7',
                         -Cost=&gt;'$0.02');
 </PRE>
 
@@ -909,6 +910,13 @@ You will need to use this if:
 </ol>
 
 See <a href="#nph">Using NPH Scripts</a> for more information.
+
+<h4>-charset</h4>
+
+The <b>-charset</b> parameter can be used to control the character set
+sent to the browser.  If not provided, defaults to ISO-8859-1.  As a
+side effect, this calls the charset() method to set the behavior for
+escapeHTML().
 
 <h4>Other header fields</h4>
 
@@ -1336,7 +1344,7 @@ You can take advantage of this to create HTML tables easily and
 naturally.  Here is some code and the HTML it outputs:
 
 <blockquote><pre>
-use CGI qw/:standard :html3 -no_debug/;
+use CGI qw/:standard :html3/;
 print table({-border=&gt;undef},
         caption(strong('When Should You Eat Your Vegetables?')),
         Tr({-align=&gt;CENTER,-valign=&gt;TOP},
@@ -1358,15 +1366,10 @@ print table({-border=&gt;undef},
 </TABLE>
 <P>
 
-Notice the use of <b>-no_debug</b> in a program that we intend to call
-from the command line.
-
-<p>
-
 If you want to produce tables programatically, you can do it this way:
 
 <blockquote><pre>
-use CGI qw/:standard :html3 -no_debug/;
+use CGI qw/:standard :html3/;
 @values = (1..5);
 
 @headings = ('N','N'.sup('2'),'N'.sup('3'));
@@ -2579,11 +2582,18 @@ dashes.
   <dt><b>-no_debug</b>
   <dd>This turns off the command-line processing features.  If you
       want to run a CGI.pm script from the command line to produce
-      HTML, and you don't want it pausing to request CGI parameters
-      from standard input, then use this pragma:
+      HTML, and you don't want it interpreting arguments on the command
+      line as CGI name=value arguments, then use this pragma:
       <blockquote><pre>
       use CGI qw(-no_debug :standard);
       </pre></blockquote>
+      <p>
+  <dt><b>-debug</b>
+  <dd>This turns on full debugging.  In addition to reading CGI arguments
+      from the command-line processing, CGI.pm will pause and try to read
+      arguments from STDIN, producing the message "(offline mode: enter
+      name=value pairs on standard input)" features.
+      <p>
       See <a href="#debugging">debugging</a> for more details.
       <p>
   <dt><b>-private_tempfiles</b>
@@ -2648,6 +2658,41 @@ the standard ones:
   <li><code>start_ul()</code> (generates a &lt;UL&gt; tag)
   <li><code>end_ul()</code> (generates a &lt;/UL&gt; tag)
 </ol>
+
+<h3>AUTOESCAPING HTML</h3>
+
+By default, all HTML that is emitted by the shortcut functions is
+passed through a function called escapeHTML():
+
+<blockquote><pre>
+$encoded_string = escapeHTML("unencoded string");
+</pre></blockquote>
+
+Provided that you have specified a character set of ISO-8859-1 (the
+default), the standard HTML escaping rules will be used.  The "&lt;"
+character becomes "&amp;lt;", "&gt;" becomes "&amp;gt;", "&amp;"
+becomes "&amp;amp;", and the quote character becomes "&amp;quot;".  In
+addition, the hexadecimal 0x8b and 0x9b characters, which many
+windows-based browsers interpret as the left and right angle-bracket
+characters, are replaced by their numeric HTML entities ("&amp;#139"
+and "&amp;#155;").  If you manually change the charset, either by
+calling the charset() method explicitly or by passing a -charset
+argument to header(), then <b>all</b> characters will be replaced by
+their numeric entities, since CGI.pm has no lookup table for all the
+possible encodings.
+
+<p>
+
+You may call escapeHTML() yourself in order to protect your pages
+against nasty tricks that people may enter into guestbooks.  To change
+the character set, use charset().  To turn autoescaping off
+completely, use autoescape():
+
+<blockquote><pre>
+$charset = charset([$charset]);  # Get or set the current character set.
+
+$flag = autoEscape([$flag]);     # Get or set the value of the autoescape flag.
+</pre></blockquote>
 
 <h3>PRETTY-PRINTING HTML</h3>
 
@@ -2730,7 +2775,9 @@ You can pass keywords like this:
 <PRE>
    my_script.pl name1=value1&amp;name2=value2
 </PRE>
-or even by sending newline-delimited parameters to standard input:
+
+If you pass the <b>-debug</b> pragma to CGI.pm, you can send CGI
+name-value pairs as newline-delimited parameters on standard input:
 <PRE>
    % my_script.pl
    first_name=fred
@@ -2738,6 +2785,7 @@ or even by sending newline-delimited parameters to standard input:
    occupation='granite miner'
    ^D
 </PRE>
+
 <P>When debugging, you can use quotation marks and the backslash
 character to escape spaces and other funny characters in exactly
 the way you would in the shell (which isn't surprising since CGI.pm
@@ -4571,8 +4619,16 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.58</h3>
+This is the release version of 2.57.
+
 <h3>Version 2.57</h3>
 <ol>
+  <li>Added -debug pragma and turned off auto reading of STDIN.
+  <li>Default DTD updated to HTML 4.01 transitional.
+  <li>Added charset() method and the -charset argument to header().
+  <li>Fixed behavior of escapeHTML() to respect charset() and to escape nasty
+      Windows characters (thanks to Tom Christiansen).
   <li>Handle REDIRECT_QUERY_STRING correctly.
   <li>Removed use_named_parameters() because of dependency problems
       and general lameness.
@@ -5309,6 +5365,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Mar 17 12:42:33 EST 2000
+Last modified: Thu Mar 23 17:37:08 EST 2000
 <!-- hhmts end -->
 </BODY> </HTML>

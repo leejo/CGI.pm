@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.25 2000-03-20 03:29:44 lstein Exp $';
-$CGI::VERSION='2.574';
+$CGI::revision = '$Id: CGI.pm,v 1.26 2000-03-23 22:52:03 lstein Exp $';
+$CGI::VERSION='2.58';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -48,9 +48,9 @@ sub initialize_globals {
     #    3) print header(-nph=>1)
     $NPH = 0;
 
-    # Set this to 1 to disable debugging from the
-    # command line
-    $NO_DEBUG = 0;
+    # Set this to 1 to enable debugging from @ARGV
+    # Set to 2 to enable debugging from STDIN
+    $DEBUG = 1;
 
     # Set this to 1 to make the temporary files created
     # during file uploads safe from prying eyes
@@ -192,7 +192,7 @@ if ($needs_binmode) {
 		':html2'=>['h1'..'h6',qw/p br hr ol ul li dl dt dd menu code var strong em
 			   tt u i b blockquote pre img a address cite samp dfn html head
 			   base body Link nextid title meta kbd start_html end_html
-			   input Select option comment/],
+			   input Select option comment charset escapeHTML/],
 		':html3'=>[qw/div table caption th td TR Tr sup Sub strike applet Param 
 			   embed basefont style span layer ilayer font frameset frame script small big/],
 		':netscape'=>[qw/blink fontsize center/],
@@ -267,10 +267,9 @@ sub new {
     my($class,$initializer) = @_;
     my $self = {};
     bless $self,ref $class || $class || $DefaultClass;
-    if ($MOD_PERL) {
-	Apache->request->register_cleanup(\&CGI::_reset_globals)
-	  if defined(Apache->request);
-	undef $NPH;
+    if ($MOD_PERL && defined Apache->request) {
+      Apache->request->register_cleanup(\&CGI::_reset_globals);
+      undef $NPH;
     }
     $self->_reset_globals if $PERLEX;
     $self->init($initializer);
@@ -331,7 +330,7 @@ sub self_or_default {
 	$Q = $CGI::DefaultClass->new unless defined($Q);
 	unshift(@_,$Q);
     }
-    return @_;
+    return wantarray ? @_ : $Q;
 }
 
 sub self_or_CGI {
@@ -366,7 +365,7 @@ sub init {
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
     # if it was read from STDIN originally.)
-    if (defined(@QUERY_PARAM) && !defined($initializer)) {
+    if (@QUERY_PARAM && !defined($initializer)) {
 	foreach (@QUERY_PARAM) {
 	    $self->param('-name'=>$_,'-value'=>$QUERY_PARAM{$_});
 	}
@@ -460,7 +459,7 @@ sub init {
       # Check the command line and then the standard input for data.
       # We use the shellwords package in order to behave the way that
       # UN*X programmers expect.
-      $query_string = read_from_cmdline() unless $NO_DEBUG;
+      $query_string = read_from_cmdline() if $DEBUG;
   }
 
     # We now have the query string in hand.  We do slightly
@@ -489,6 +488,9 @@ sub init {
     # Clear out our default submission button flag if present
     $self->delete('.submit');
     $self->delete('.cgifields');
+
+    # set charset to the safe ISO-8859-1
+    $self->charset('ISO-8859-1');
     $self->save_request unless $initializer;
 }
 
@@ -535,9 +537,9 @@ sub unescape {
   return undef unless defined($todecode);
   $todecode =~ tr/+/ /;       # pluses become spaces
     if ($EBCDIC) {
-      $todecode =~ s/%([0-9a-fA-F]{2})/pack("c",$A2E[hex($1)])/ge;
+      $todecode =~ s/%([0-9a-fA-F]{2})/chr $A2E[hex($1)]/ge;
     } else {
-      $todecode =~ s/%([0-9a-fA-F]{2})/pack("c",hex($1))/ge;
+      $todecode =~ s/%([0-9a-fA-F]{2})/chr hex($1)/ge;
     }
   return $todecode;
 }
@@ -598,13 +600,8 @@ sub binmode {
 sub _make_tag_func {
     my ($self,$tagname) = @_;
     my $func = qq(
-	sub $tagname { 
-	    shift if \$_[0] && 
-#		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
-		    (ref(\$_[0]) &&
-		     (substr(ref(\$_[0]),0,3) eq 'CGI' ||
-		    UNIVERSAL::isa(\$_[0],'CGI')));
-	    
+	sub $tagname {
+	    my \$self = self_or_default(\@_);
 	    my(\$attr) = '';
 	    if (ref(\$_[0]) && ref(\$_[0]) eq 'HASH') {
 		my(\@attr) = make_attributes(shift() );
@@ -619,7 +616,8 @@ sub _make_tag_func {
 	$func .= qq#
 	    my(\$tag,\$untag) = ("\U<$tagname\E\$attr>","\U</$tagname>\E");
 	    return \$tag unless \@_;
-	    my \@result = map { "\$tag\$_\$untag" } (ref(\$_[0]) eq 'ARRAY') ? \@{\$_[0]} : "\@_";
+	    my \@result = map { "\$tag".\$self->escapeHTML(\$_)."\$untag" } 
+                              (ref(\$_[0]) eq 'ARRAY') ? \@{\$_[0]} : "\@_";
 	    return "\@result";
             }#;
     }
@@ -683,7 +681,8 @@ sub _setup_symbols {
 	$HEADERS_ONCE++,         next if /^[:-]unique_headers$/;
 	$NPH++,                  next if /^[:-]nph$/;
 	$NOSTICKY++,             next if /^[:-]nosticky$/;
-	$NO_DEBUG++,             next if /^[:-]no_?[Dd]ebug$/;
+	$DEBUG=0,                next if /^[:-]no_?[Dd]ebug$/;
+	$DEBUG=2,                next if /^[:-][Dd]ebug$/;
 	$USE_PARAM_SEMICOLONS++, next if /^[:-]newstyle_urls$/;
 	$PRIVATE_TEMPFILES++,    next if /^[:-]private_tempfiles$/;
 	$EXPORT{$_}++,           next if /^[:-]any$/;
@@ -706,6 +705,12 @@ sub _setup_symbols {
 	}
     }
     _compile_all(keys %EXPORT) if $compile;
+}
+
+sub charset {
+  my ($self,$charset) = self_or_default(@_);
+  $self->{'.charset'} = $charset if defined $charset;
+  $self->{'.charset'};
 }
 
 ###############################################################################
@@ -799,7 +804,7 @@ END_OF_FUNC
 sub keywords {
     my($self,@values) = self_or_default(@_);
     # If values is provided, then we set it.
-    $self->{'keywords'}=[@values] if defined(@values);
+    $self->{'keywords'}=[@values] if @values;
     my(@result) = defined($self->{'keywords'}) ? @{$self->{'keywords'}} : ();
     @result;
 }
@@ -1166,11 +1171,18 @@ sub header {
 
     return undef if $self->{'.header_printed'}++ and $HEADERS_ONCE;
 
-    my($type,$status,$cookie,$target,$expires,$nph,@other) = 
+    my($type,$status,$cookie,$target,$expires,$nph,$charset,@other) = 
 	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
-			  STATUS,[COOKIE,COOKIES],TARGET,EXPIRES,NPH],@p);
+			    'STATUS',['COOKIE','COOKIES'],'TARGET',
+                            'EXPIRES','NPH','CHARSET'],@p);
 
-    $nph ||= $NPH;
+    $nph     ||= $NPH;
+    if (defined $charset) {
+      $self->charset($charset);
+    } else {
+      $charset = $self->charset;
+    }
+
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.
     foreach (@other) {
@@ -1179,6 +1191,7 @@ sub header {
     }
 
     $type ||= 'text/html' unless defined($type);
+    $type .= "; charset=$charset" unless $type=~/\bcharset\b/;
 
     # Maybe future compatibility.  Maybe not.
     my $protocol = $ENV{SERVER_PROTOCOL} || 'HTTP/1.0';
@@ -1833,11 +1846,20 @@ sub escapeHTML {
     my ($self,$toencode) = self_or_default(@_);
     return undef unless defined($toencode);
     return $toencode if ref($self) && $self->{'dontescape'};
-
-    $toencode=~s/&/&amp;/g;
-    $toencode=~s/\"/&quot;/g;
-    $toencode=~s/>/&gt;/g;
-    $toencode=~s/</&lt;/g;
+    if (uc $self->{'.charset'} eq 'ISO-8859-1') {
+       # fix non-compliant bug in IE and Netscape
+       $toencode =~ s{(.)}{
+              if    ($1 eq '<')                            { '&lt;'    }
+              elsif ($1 eq '>')                            { '&gt;'    }
+              elsif ($1 eq '&')                            { '&amp;'   }
+              elsif ($1 eq '"')                            { '&quot;'  }
+              elsif ($1 eq "\x8b")                         { '&#139;'  }
+              elsif ($1 eq "\x9b")                         { '&#155;'  }
+              else                                         { $1        }
+       }gsex;
+     } else {
+        $toencode =~ s/(.)/'&#'.ord($1).';'/gsex;
+     }
     return $toencode;
 }
 END_OF_FUNC
@@ -1878,14 +1900,14 @@ sub _tableize {
     # rearrange into a pretty table
     $result = "<TABLE>";
     my($row,$column);
-    unshift(@$colheaders,'') if defined(@$colheaders) && defined(@$rowheaders);
-    $result .= "<TR>" if defined(@{$colheaders});
+    unshift(@$colheaders,'') if @$colheaders && @$rowheaders;
+    $result .= "<TR>" if @{$colheaders};
     foreach (@{$colheaders}) {
 	$result .= "<TH>$_</TH>";
     }
     for ($row=0;$row<$rows;$row++) {
 	$result .= "<TR>";
-	$result .= "<TH>$rowheaders->[$row]</TH>" if defined(@$rowheaders);
+	$result .= "<TH>$rowheaders->[$row]</TH>" if @$rowheaders;
 	for ($column=0;$column<$columns;$column++) {
 	    $result .= "<TD>" . $elements[$column*$rows + $row] . "</TD>"
 		if defined($elements[$column*$rows + $row]);
@@ -2054,7 +2076,7 @@ sub scrolling_list {
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	$label=$self->escapeHTML($label);
 	my($value)=$self->escapeHTML($_);
-	$result .= "<OPTION $selectit VALUE=\"$value\">$label\n";
+	$result .= "<OPTION $selectit VALUE=\"$value\">$label</OPTION>\n";
     }
     $result .= "</SELECT>\n";
     $self->register_parameter($name);
@@ -2790,9 +2812,9 @@ END_OF_FUNC
 sub read_from_cmdline {
     my($input,@words);
     my($query_string);
-    if (@ARGV) {
+    if ($DEBUG && @ARGV) {
 	@words = @ARGV;
-    } else {
+    } elsif ($DEBUG > 1) {
 	require "shellwords.pl";
 	print STDERR "(offline mode: enter name=value pairs on standard input)\n";
 	chomp(@lines = <STDIN>); # remove newlines
@@ -3809,7 +3831,7 @@ a short example of creating multiple session records:
 The file format used for save/restore is identical to that used by the
 Whitehead Genome Center's data exchange format "Boulderio", and can be
 manipulated and even databased using Boulderio utilities.  See
-	
+
   http://stein.cshl.org/boulder/
 
 for further details.
@@ -3961,10 +3983,10 @@ you can import.  Pragmas, which are always preceded by a hyphen,
 change the way that CGI.pm functions in various ways.  Pragmas,
 function sets, and individual functions can all be imported in the
 same use() line.  For example, the following use statement imports the
-standard set of functions and disables debugging mode (pragma
--no_debug):
+standard set of functions and enables debugging mode (pragma
+-debug):
 
-   use CGI qw/:standard -no_debug/;
+   use CGI qw/:standard -debug/;
 
 The current list of pragmas is as follows:
 
@@ -4046,17 +4068,18 @@ to the top of your script.
 
 This turns off the command-line processing features.  If you want to
 run a CGI.pm script from the command line to produce HTML, and you
-don't want it pausing to request CGI parameters from standard input or
-the command line, then use this pragma:
+don't want it to read CGI parameters from the command line or STDIN,
+then use this pragma:
 
    use CGI qw(-no_debug :standard);
 
-If you'd like to process the command-line parameters but not standard
-input, this should work:
+=item -debug
 
-   use CGI qw(-no_debug :standard);
-   restore_parameters(join('&',@ARGV));
-  
+This turns on full debugging.  In addition to reading CGI arguments
+from the command-line processing, CGI.pm will pause and try to read
+arguments from STDIN, producing the message "(offline mode: enter
+name=value pairs on standard input)" features.
+
 See the section on debugging for more details.
 
 =item -private_tempfiles
@@ -4175,6 +4198,7 @@ pages.
 			     -status=>'402 Payment required',
 			     -expires=>'+3d',
 			     -cookie=>$cookie,
+                             -charset=>'utf-7',
 			     -Cost=>'$2.00');
 
 header() returns the Content-type: header.  You can provide your own
@@ -4218,6 +4242,10 @@ session cookies.
 The B<-nph> parameter, if set to a true value, will issue the correct
 headers to work with a NPH (no-parse-header) script.  This is important
 to use with certain servers that expect all their scripts to be NPH.
+
+The B<-charset> parameter can be used to control the character set
+sent to the browser.  If not provided, defaults to ISO-8859-1.  As a
+side effect, this sets the charset() method as well.
 
 =head2 GENERATING A REDIRECTION HEADER
 
@@ -4296,10 +4324,10 @@ into a series of header <META> tags that look something like this:
     <META NAME="keywords" CONTENT="pharaoh secret mummy">
     <META NAME="description" CONTENT="copyright 1996 King Tut">
 
-There is no support for the HTTP-EQUIV type of <META> tag.  This is
-because you can modify the HTTP header directly with the B<header()>
-method.  For example, if you want to send the Refresh: header, do it
-in the header() method:
+There is no direct support for the HTTP-EQUIV type of <META> tag.
+This is because you can modify the HTTP header directly with the
+B<header()> method.  For example, if you want to send the Refresh:
+header, do it in the header() method:
 
     print $q->header(-Refresh=>'10; URL=http://www.capricorn.com');
 
@@ -4604,7 +4632,7 @@ and values of the associative array become the HTML tag's attributes:
       "Open a new frame");
 
 	    <A HREF="fred.html",TARGET="_new">Open a new frame</A>
-   
+
 You may dispense with the dashes in front of the attribute names if
 you prefer:
 
@@ -4622,7 +4650,7 @@ Prior to CGI.pm version 2.41, providing an empty ('') string as an
 attribute argument was the same as providing undef.  However, this has
 changed in order to accommodate those who want to create tags of the form 
 <IMG ALT="">.  The difference is shown in these two pieces of code:
-  
+
    CODE                   RESULT
    img({alt=>undef})      <IMG ALT>
    img({alt=>''})         <IMT ALT="">
@@ -4712,6 +4740,48 @@ In addition, start_html(), end_html(), start_form(), end_form(),
 start_multipart_form() and all the fill-out form tags are special.
 See their respective sections.
 
+=head2 AUTOESCAPING HTML
+
+By default, all HTML that is emitted by the shortcut functions is
+passed through a function called escapeHTML():
+
+=over 4
+
+=item $encoded_string = escapeHTML("unencoded string");
+
+Escape HTML formatting characters in a string.
+
+=back
+
+Provided that you have specified a character set of ISO-8859-1 (the
+default), the standard HTML escaping rules will be used.  The "<"
+character becomes "&lt;", ">" becomes "&gt;", "&" becomes "&amp;", and
+the quote character becomes "&quot;".  In addition, the hexadecimal
+0x8b and 0x9b characters, which many windows-based browsers interpret
+as the left and right angle-bracket characters, are replaced by their
+numeric HTML entities ("&#139" and "&#155;").  If you manually change
+the charset, either by calling the charset() method explicitly or by
+passing a -charset argument to header(), then B<all> characters will
+be replaced by their numeric entities, since CGI.pm has no lookup
+table for all the possible encodings.
+
+You may call escapeHTML() yourself in order to protect your pages
+against nasty tricks that people may enter into guestbooks.  To change
+the character set, use charset().  To turn autoescaping off
+completely, use autoescape():
+
+=over 4
+
+=item $charset = charset([$charset]);
+
+Get or set the current character set.
+
+=item $flag = autoEscape([$flag]);
+
+Get or set the value of the autoescape flag.
+
+=back
+
 =head2 PRETTY-PRINTING HTML
 
 By default, all the HTML produced by these functions comes out as one
@@ -4756,7 +4826,6 @@ autoEscape() method with a false value immediately after creating the CGI object
 
    $query = new CGI;
    $query->autoEscape(undef);
-			     
 
 =head2 CREATING AN ISINDEX TAG
 
@@ -4786,7 +4855,7 @@ default is to process the query with the current script.
 
 start_form() will return a <FORM> tag with the optional method,
 action and form encoding that you specify.  The defaults are:
-	
+
     method: POST
     action: this script
     enctype: application/x-www-form-urlencoded
@@ -5233,7 +5302,7 @@ handlers are called.
    print $query->checkbox_group(-name=>'group_name',
 				-values=>['eenie','meenie','minie','moe'],
 				-rows=2,-columns=>2);
-    
+
 
 checkbox_group() creates a list of checkboxes that are related
 by the same name.
@@ -5771,7 +5840,7 @@ documentation in Netscape's home pages for details
 =item 2. Specify the destination for the document in the HTTP header
 
 You may provide a B<-target> parameter to the header() method:
-   
+
     print $q->header(-target=>'ResultsWindow');
 
 This will tell the browser to load the output of your script into the
@@ -5871,12 +5940,11 @@ http://www.w3.org/pub/WWW/TR/Wd-css-1.html for more information.
 
 =head1 DEBUGGING
 
-If you are running the script
-from the command line or in the perl debugger, you can pass the script
-a list of keywords or parameter=value pairs on the command line or 
-from standard input (you don't have to worry about tricking your
-script into reading from environment variables).
-You can pass keywords like this:
+If you are running the script from the command line or in the perl
+debugger, you can pass the script a list of keywords or
+parameter=value pairs on the command line or from standard input (you
+don't have to worry about tricking your script into reading from
+environment variables).  You can pass keywords like this:
 
     your_script.pl keyword1 keyword2 keyword3
 
@@ -5892,7 +5960,11 @@ or this:
 
     your_script.pl name1=value1&name2=value2
 
-or even as newline-delimited parameters on standard input.
+To turn off this feature, use the -no_debug pragma.
+
+To test the POST method, you may enable full debugging with the -debug
+pragma.  This will allow you to feed newline-delimited name=value
+pairs to the script on standard input.
 
 When debugging, you can use quotes and backslashes to escape 
 characters in the familiar shell manner, letting you place
@@ -5908,7 +5980,7 @@ name/value pairs formatted nicely as a nested list.  This is useful
 for debugging purposes:
 
     print $query->Dump
-    
+
 
 Produces something that looks like:
 
@@ -6153,7 +6225,7 @@ a second, and begins again.
 =over 4
 
 =item multipart_init()
-     
+
   multipart_init(-boundary=>$boundary);
 
 Initialize the multipart system.  The -boundary argument specifies
@@ -6370,9 +6442,9 @@ for suggestions and bug fixes.
 
 
 	#!/usr/local/bin/perl
-     
+
 	use CGI;
- 
+
 	$query = new CGI;
 
 	print $query->header;
@@ -6382,35 +6454,35 @@ for suggestions and bug fixes.
 	&do_work($query);
 	&print_tail;
 	print $query->end_html;
- 
+
 	sub print_prompt {
 	   my($query) = @_;
- 
+
 	   print $query->start_form;
 	   print "<EM>What's your name?</EM><BR>";
 	   print $query->textfield('name');
 	   print $query->checkbox('Not my real name');
- 
+
 	   print "<P><EM>Where can you find English Sparrows?</EM><BR>";
 	   print $query->checkbox_group(
 				 -name=>'Sparrow locations',
 				 -values=>[England,France,Spain,Asia,Hoboken],
 				 -linebreak=>'yes',
 				 -defaults=>[England,Asia]);
- 
+
 	   print "<P><EM>How far can they fly?</EM><BR>",
 		$query->radio_group(
 			-name=>'how far',
 			-values=>['10 ft','1 mile','10 miles','real far'],
 			-default=>'1 mile');
- 
+
 	   print "<P><EM>What's your favorite color?</EM>  ";
 	   print $query->popup_menu(-name=>'Color',
 				    -values=>['black','brown','red','yellow'],
 				    -default=>'red');
- 
+
 	   print $query->hidden('Reference','Monty Python and the Holy Grail');
- 
+
 	   print "<P><EM>What have you got there?</EM><BR>";
 	   print $query->scrolling_list(
 			 -name=>'possessions',
@@ -6418,19 +6490,19 @@ for suggestions and bug fixes.
 				   'A Sword','A Ticket'],
 			 -size=>5,
 			 -multiple=>'true');
- 
+
 	   print "<P><EM>Any parting comments?</EM><BR>";
 	   print $query->textarea(-name=>'Comments',
 				  -rows=>10,
 				  -columns=>50);
- 
+
 	   print "<P>",$query->reset;
 	   print $query->submit('Action','Shout');
 	   print $query->submit('Action','Scream');
 	   print $query->endform;
 	   print "<HR>\n";
 	}
- 
+
 	sub do_work {
 	   my($query) = @_;
 	   my(@values,$key);
@@ -6443,7 +6515,7 @@ for suggestions and bug fixes.
 	      print join(", ",@values),"<BR>\n";
 	  }
 	}
- 
+
 	sub print_tail {
 	   print <<END;
 	<HR>

@@ -4,7 +4,7 @@
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..20\n"; }
+BEGIN {$| = 1; print "1..22\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use CGI (':standard','-no_debug','*h3','start_table');
 $loaded = 1;
@@ -32,10 +32,10 @@ test(7,h1({-align=>'CENTER'},['fred','agnes']) eq
     local($") = '-'; 
     test(8,h1('fred','agnes','maura') eq '<H1>fred-agnes-maura</H1>',"open/close tag \$\" interpolation");
 }
-test(9,header() eq "Content-Type: text/html\015\012\015\012","header()");
-test(10,header(-type=>'image/gif') eq "Content-Type: image/gif\015\012\015\012","header()");
-test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif\015\012\015\012","header()");
-test(12,header(-nph=>1) eq "HTTP/1.0 200 OK\015\012Content-Type: text/html\015\012\015\012","header()");
+test(9,header() eq "Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
+test(10,header(-type=>'image/gif') eq "Content-Type: image/gif; charset=ISO-8859-1\015\012\015\012","header()");
+test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif; charset=ISO-8859-1\015\012\015\012","header()");
+test(12,header(-nph=>1) eq "HTTP/1.0 200 OK\015\012Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
 test(13,start_html() ."\n" eq <<END,"start_html()");
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
@@ -63,3 +63,6 @@ test(17,header(-Cookie=>$cookie) =~ m!^Set-Cookie: fred=chocolate&chip\; path=/\
 test(18,start_h3 eq '<H3>');
 test(19,end_h3 eq '</H3>');
 test(20,start_table({-border=>undef}) eq '<TABLE BORDER>');
+test(21,h1("this is <not> \x8bright\x9b") eq '<H1>this is &lt;not&gt; &#139;right&#155;</H1>');
+charset('utf-8');
+test(22,h1("this is <not> \x8bright\x9b") eq '<H1>&#116;&#104;&#105;&#115;&#32;&#105;&#115;&#32;&#60;&#110;&#111;&#116;&#62;&#32;&#139;&#114;&#105;&#103;&#104;&#116;&#155;</H1>');
