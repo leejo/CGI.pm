@@ -629,7 +629,7 @@ the keys are the names of the CGI parameters, and the values are the
 parameters' values.  The <B>Vars()</B> method does this.  Called in a
 scalar context, it returns the parameter list as a tied hash
 reference.  Changing a key changes the value of the parameter in the
-underlying CGI parameter list.  Called in an array context, it returns
+underlying CGI parameter list.  Called in an list context, it returns
 the parameter list as an ordinary hash.  This allows you to read the
 contents of the parameter list, but not to change it.
 
@@ -637,7 +637,7 @@ contents of the parameter list, but not to change it.
 
 When using this, the thing you must watch out for are multivalued CGI
 parameters.  Because a hash cannot distinguish between scalar and
-array context, multivalued parameters will be returned as a packed
+list context, multivalued parameters will be returned as a packed
 string, separated by the "\0" (null) character.  You must split this
 packed string in order to get at the individual values.  This is the
 convention introduced long ago by Steve Brenner in his cgi-lib.pl
@@ -1568,6 +1568,24 @@ method with a false value immediately after creating the CGI object:
 
 You can turn autoescaping back on at any time with <CODE>$query-&gt;autoEscape(1)</CODE>
 
+<p>
+
+<EM>General note 5.</EM> Some of the form-element generating methods
+return multiple tags.  In a scalar context, the tags will be
+concatenated together with spaces, or whatever is the current value of
+the $" global.  In a list context, the methods will return a list of
+elements, allowing you to modify them if you wish.  Usually you will
+not notice this behavior, but beware of this:
+
+<pre>
+    printf("%s\n",$query-&gt;end_form())
+</pre>
+
+end_form() produces several tags, and only the first of them will be
+printed because the format only expects one value.
+
+<p>
+
 <H3>Form Elements</H3>
 <MENU>
   <LI><A HREF="#startform">Opening a form</A>
@@ -1851,7 +1869,7 @@ filehandle, or undef if the parameter is not a valid filehandle.
 
 <p>
 
-In an array context, upload() will return an array of filehandles.
+In an list context, upload() will return an array of filehandles.
 This makes it possible to create forms that use the same name for
 multiple upload fields.
 
@@ -4881,6 +4899,8 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.05</h3>
 <ol>
+  <li>Fixed documentation to discuss list context behavior of form-element generators
+      explicitly.
   <li>Fixed incorrect results from end_form() when called in OO manner.
   <li>Fixed query string stripping in order to handle URLs containing escaped newlines.
   <li>During server push, set NPH to 0 rather than 1.  This is supposed to fix problems
@@ -6027,6 +6047,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Mar  9 10:40:02 EST 2004
+Last modified: Thu Mar 11 14:58:22 EST 2004
 <!-- hhmts end -->
 </BODY> </HTML>

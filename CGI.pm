@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.155 2004-03-09 15:40:15 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.156 2004-03-11 19:59:44 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -907,7 +907,7 @@ sub delete {
         $to_delete{$name}++;
     }
     @{$self->{'.parameters'}}=grep { !exists($to_delete{$_}) } $self->param();
-    return wantarray ? () : undef;
+    return;
 }
 END_OF_FUNC
 
@@ -2095,7 +2095,7 @@ sub checkbox_group {
                               : qq/<input type="checkbox" name="$name" value="$_"$checked$other$attribs>${label}${break}/);
     }
     $self->register_parameter($name);
-    return wantarray ? @elements : join(' ',@elements)            
+    return wantarray ? @elements : join(' ',@elements)
         unless defined($columns) || defined($rows);
     $rows = 1 if $rows && $rows < 1;
     $cols = 1 if $cols && $cols < 1;
@@ -5334,6 +5334,21 @@ autoEscape() method with a false value immediately after creating the CGI object
    $query = new CGI;
    $query->autoEscape(undef);
 
+I<A Lurking Trap!> Some of the form-element generating methods return
+multiple tags.  In a scalar context, the tags will be concatenated
+together with spaces, or whatever is the current value of the $"
+global.  In a list context, the methods will return a list of
+elements, allowing you to modify them if you wish.  Usually you will
+not notice this behavior, but beware of this:
+
+    printf("%s\n",$query->end_form())
+
+end_form() produces several tags, and only the first of them will be
+printed because the format only expects one value.
+
+<p>
+
+
 =head2 CREATING AN ISINDEX TAG
 
    print $query->isindex(-action=>$action);
@@ -5616,7 +5631,7 @@ filehandle, or undef if the parameter is not a valid filehandle.
 	   print;
      }
 
-In an array context, upload() will return an array of filehandles.
+In an list context, upload() will return an array of filehandles.
 This makes it possible to create forms that use the same name for
 multiple upload fields.
 
