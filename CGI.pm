@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.161 2004-03-18 22:30:46 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.162 2004-03-25 17:51:29 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -37,9 +37,8 @@ use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
   $TAINTED = substr("$0$^X",0,0);
 }
 
-my @SAVED_SYMBOLS;
-
 $MOD_PERL = 0; # no mod_perl by default
+@SAVED_SYMBOLS = ();
 
 # >>>>> Here are some globals that you might want to adjust <<<<<<
 sub initialize_globals {
@@ -822,7 +821,7 @@ sub _setup_symbols {
 	$XHTML=0,                next if /^[:-]no_?xhtml$/;
 	$USE_PARAM_SEMICOLONS=0, next if /^[:-]oldstyle_urls$/;
 	$PRIVATE_TEMPFILES++,    next if /^[:-]private_tempfiles$/;
-    $CLOSE_UPLOAD_FILES++,   next if /^[:-]close_upload_files$/;
+	$CLOSE_UPLOAD_FILES++,   next if /^[:-]close_upload_files$/;
 	$EXPORT{$_}++,           next if /^[:-]any$/;
 	$compile++,              next if /^[:-]compile$/;
 	$NO_UNDEF_PARAMS++,      next if /^[:-]no_undef_params$/;
