@@ -1,0 +1,805 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Quick Reference (V.2.8.1) </title>
+  <style type="text/css">
+pre.required {color: #B20000; font: bold}
+span.optional {color: #0066E5; font: bold}
+span.normal {color: #000000; font-weight: normal}
+body {
+   font-size: 10pt;
+  }</style>
+</head>
+
+<body>
+<h1>Perl CGI Module Quick Reference (V 2.81)</h1>
+<pre class="required">  Required syntax.
+<span class="optional">  Optional syntax.</span></pre>
+
+<h2>Load CGI Module</h2>
+<pre class="required">use CGI <span class="optional">qw(method :function_set -pragma tag tag* start_tag end_tag)</span>;</pre>
+<pre>  All parameter types may occur several times
+
+  <strong>method</strong>:
+    any public method to be imported
+
+  <strong>function_set:</strong>
+    <strong>all:</strong> import all public methods
+    <strong>cgi:</strong> import CGI-handling methods
+    <strong>form:</strong> import fill-out form generating methods
+    <strong>push:</strong> import server push relatetd methods
+    <strong>html:</strong> the union of html2, html3, and netscape
+    <strong>html2:</strong> import all methods that generate HTML 2 shortcuts
+    <strong>html3:</strong> import all methods that generate HTML 3.2 standard elements
+    <strong>html4:</strong> import all methods that generate HTML 4.0 proposed elements
+    <strong>netscape:</strong> import all methods that generate Netscape-specific HTML extensions
+    <strong>standard:</strong> the union of html2, html3, html4, form, and cgi
+    <strong>multipart:</strong> import multipart MIME types features
+
+  <strong>pragma:</strong>
+    <strong>any:</strong> any method that the query object doesn't recognize will be interpreted
+         as a new HTML tag
+    <strong>nph:</strong> produce a no parsed header
+    <strong>debug:</strong> turns on full debugging
+    <strong>compile:</strong> causes the indicated autoloaded methods to be compiled up first
+    <strong>nosticky:</strong> makes CGI.pm not generating the hidden fields .submit and .cgifields
+    <strong>no_xhtml:</strong> do not emit XHTML
+    <strong>autoload:</strong> overrides the autoloader so that any function in your program that
+              is not recognized is referred to CGI.pm for possible evaluation
+    <strong>no_debug:</strong> turns off the command-line processing features
+    <strong>newstyle_urls:</strong> separate the name=value pairs in CGI parameter query strings
+                   with semicolons rather than ampersands (the default)
+    <strong>oldstyle_urls:</strong> separate the name=value pairs in CGI parameter query strings
+                   with ampersands rather than semicolons
+    <strong>private_tempfiles:</strong> causes the temporary uploaded file to be unlinked as soon
+                       as it is opened and before any data is written into it
+
+  <strong>tag:</strong> create tag-generating subroutine
+       using the element <em>tag</em>: print $query-&gt;tag({-param =&gt; 'val', ...});
+
+  <strong>tag*:</strong> produce start-tag and end-tag of element <em>tag</em>
+
+  <strong>start_tag:</strong> produce start-tag of element <em>tag</em>
+
+  <strong>end_tag:</strong> produce end-tag of element <em>tag</em></pre>
+
+<h2>Object Handling</h2>
+
+<h3>Create New CGI Object</h3>
+<pre class="required">$query = CGI-&gt;new<span class="optional">()</span>;</pre>
+
+<h3>Create New Empty CGI Object</h3>
+<pre class="required">$empty = CGI-&gt;new('');</pre>
+
+<h3>Restore Saved CGI Object</h3>
+<pre class="required">$query = CGI-&gt;new(\*FILEHANDLE);</pre>
+<pre>   The file can contain a URL-encoded query string,
+   or a series of newline delimited <em>tag=value</em> pairs</pre>
+
+<h3>Iinitialize New CGI Object</h3>
+<pre class="required">$query = CGI-&gt;new({'keyword1' =&gt; 'value',
+                   <span class="optional">'keyword2' =&gt; [qw(val1 val2)], ...</span>},
+                  );</pre>
+<pre class="required">$query = CGI-&gt;new('keyword1=value<span class="optional">;keyword2=val1+val2'...</span>);</pre>
+
+<h3>Clone Parameter List of Existing CGI Object</h3>
+<pre class="required">$clone = CGI-&gt;new($query);</pre>
+
+<h2>Parameter Handling</h2>
+
+<h3>Get Parameter Names</h3>
+<pre class="required">@names = $query-&gt;param<span class="optional">()</span><span class="required">;</span></pre>
+
+<h3>Get Parameter Value</h3>
+<pre class="required">$value = $query-&gt;param('name');</pre>
+
+<h3>Get Parameter Values</h3>
+<pre class="required">@values = $query-&gt;param('name');</pre>
+
+<h3>Get Keywords from  &lt;isindex&gt; Search</h3>
+<pre class="required">@keywords = $query-&gt;keywords<span class="optional">()</span>;</pre>
+
+<h3>Set  Parameter Value</h3>
+<pre class="required">$query-&gt;param(-name =&gt; 'name', -value =&gt; 'value');</pre>
+
+<h3>Set Parameter Values</h3>
+<pre class="required">$query-&gt;param(-name =&gt; 'name', -values =&gt; ['val', ...]);</pre>
+
+<h3>Append Parameter</h3>
+<pre class="required">$query-&gt;append(-name =&gt; 'name', -values =&gt; ['val', ...]);</pre>
+
+<h3>Import Parameter Names into Name Space</h3>
+<pre class="required">$query-&gt;import_names<span class="optional">('name_space', 'delete')</span>; <span class="normal"># default name space: 'Q'
+  print "the content of parameter 'name' is $Q::name\n";</span></pre>
+
+<h3>Delete Parameter</h3>
+<pre class="required">$query-&gt;delete('name');</pre>
+
+<h3>Delete All Parameters</h3>
+<pre class="required">$query-&gt;delete_all<span class="optional">()</span>;</pre>
+
+<h3>Access Parameter List Directly</h3>
+<pre class="required">$query-&gt;param_fetch('name')-&gt;[1] = 'value';
+$value = $query-&gt;param_fetch('name'-&gt;[0]);</pre>
+<pre>  unshift @{$query-&gt;param_fetch(-name =&gt; 'name')}, 'value';
+  $value = shift(@{$query-&gt;param_fetch(-name =&gt; 'name')});</pre>
+
+<h3>Get Reference to Parameter List</h3>
+<pre class="required">$params = $query-&gt;Vars<span class="optional">()</span>;</pre>
+<pre>  @values = split("\0", $params-&gt;{'name'});</pre>
+
+<h3>Get Parameter List</h3>
+<pre class="required">%params = $query-&gt;Vars<span class="optional">()</span>;
+  <span class="normal">@values = $params{'name'};</span></pre>
+
+<h3>Save Parameter List to File</h3>
+<pre class="required">$status = $query-&gt;save(\*FILEHANDLE);</pre>
+
+<h3>Create Self-Referencing URL and Save State</h3>
+<pre class="required">$myself = $query-&gt;self_url<span class="optional">()</span>;</pre>
+<pre>  print q(&lt;A HREF="$myself"&gt;talk to myself&lt;/A&gt;);
+  print q(&lt;A HREF="$myself#yourself"&gt;See for yourself&lt;/A&gt;);</pre>
+
+<h3>Get URL</h3>
+<pre class="required">$url = $query-&gt;url<span class="optional">(-absolute     =&gt; 1, <span class="normal"># absolute path of script</span>
+                   -relative     =&gt; 1, <span class="normal"># relative path of script</span>
+                   -full         =&gt; 1, <span class="normal"># full path of script</span>
+                   -path         =&gt; 1, <span class="normal"># append path info to url</span>
+                   -path_info    =&gt; 1, <span class="normal"># as -path</span>
+                   -query        =&gt; 1, <span class="normal"># append query info to url</span>
+                   -query_string =&gt; 1, <span class="normal"># as -query</span>
+                   -base         =&gt; 1, <span class="normal"># protocol and net info</span>
+                   )</span>;                  <span class="normal"><span># default: all parameter</span></span></pre>
+
+<h3>Get URL Parameter</h3>
+<pre class="required">$par = $query-&gt;url_param('name');</pre>
+
+<h3>Get or Set Default DTD</h3>
+<pre class="required">$dtd = $query-&gt;default_dtd<span class="optional">('dtd_string')</span>;</pre>
+
+<h2>HTTP Header</h2>
+
+<h3>Create HTTP Header</h3>
+<pre class="required">$string = $query-&gt;header<span class="optional">(-type       =&gt; 'mime_type',  <span class="normal">   # default: text/html</span>
+                         -nph        =&gt; 1,               <span class="normal"><span class="normal"># default: 0</span></span>
+                         -status     =&gt; 'http status',
+                         -expires    =&gt; 'time',          <span class="normal"># valid values: see below</span>
+                         -cookie     =&gt; [$cookie, ...] <span class="normal">  # created by cookie()</span>
+                         -charset    =&gt; 'set',         <span class="normal">  # default: ISO-8859-1</span>
+                         -attachment =&gt; 'name_of_file',  <span class="normal"># turn document into an attachment</span>
+                         -whatever   =&gt; 'you want',      <span class="normal"># any other HTTP header field</span>
+                         )</span>;</pre>
+<pre>  valid time values: +/-n<strong>s</strong> for seconds
+                     +/-n<strong>m</strong> for minutes
+                     +/-n<strong>h</strong> for hours
+                     +/-n<strong>d</strong> for days
+                     +/-n<strong>M</strong> for months
+                     +/-n<strong>y</strong> for years
+                     <strong>now</strong>
+                     <strong>weekday</strong>
+                     <strong>dd-month-yyyy hh:mm:ss TZ</strong></pre>
+
+<h3>Create Redirection HTTP Header</h3>
+<pre class="required">$string = $query-&gt;redirect(-location =&gt; 'url',
+                           <span class="optional">-nph      =&gt; 1,
+                           -method   =&gt; 'method' <span class="normal"># GET, POST, ...</span></span>
+                           );</pre>
+
+<h2>HTML Elements</h2>
+
+<h3>Create HTML Header</h3>
+<pre class="required">$string = $query-&gt;start_html<span class="optional">(-title       =&gt; 'title',  <span class="normal"># default: 'Untitled Document'</span>
+                             -author      =&gt; 'author',
+                             -base        =&gt; 'true',
+                             -xbase       =&gt; 'url',
+                             -target      =&gt; 'frame target',
+                             -meta        =&gt; {'keyword' =&gt; 'value', ...},
+                             -style       =&gt; $style,
+                                          =&gt; {-src  =&gt; 'path/style1.css',
+                                              -code =&gt; $style,
+                                              -type =&gt; 'type'},
+
+                             -dtd         =&gt; 'dtd',  <span class="normal"># default: default_dtd()</span>
+                             -encoding    =&gt; 'code set',  <span class="normal"># default: iso-8859-1</span>
+                             -lang        =&gt; 'language',  <span class="normal"># default: en-US</span>
+                             -head        =&gt; [Link({-rel  =&gt; 'value',  
+                                                    -rev  =&gt; 'value',
+                                                    -href =&gt; 'url'}, ...), ...],
+                                              meta({-http_equiv =&gt; 'Content-Type',
+                                                    -content    =&gt; 'text/html',...}),
+                             -script      =&gt; $script,
+                                          =&gt; {-language =&gt; 'JavaScript',  <span class="normal"># default</span>
+                                              -src      =&gt; 'path_to/script.js',
+                                              -type     =&gt; 'text/javascript'}  <span class="normal"># default</span>
+                                          =&gt; {-language =&gt; 'PerlScript',
+                                              -code     =&gt; 'print "hello world!\n;"'}
+                             -noScript    =&gt; $html_code,
+                             -onLoad      =&gt; 'function',
+                             -onUnload    =&gt; 'function',
+                             -attr        =&gt; 'value'  <span class="normal"># any attribute for the body element</span>
+                             )</span>;</pre>
+<pre>  $style, $script, and $html_code contains the text of a here-document with
+  appropriate syntax
+  The default DTD is '-//W3C//DTD XHTML 1.0 Transitional//EN',
+                      http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'
+  Link and meta need the :standard function set.
+
+Example:
+  use CGI qw/:standard/;
+  my $q = CGI-&gt;new;
+  my $script = &lt;&lt; "EOJS";
+    function alarm() {
+      alert("Page loaded");
+    }
+  EOJS
+
+  my $style = &lt;&lt; "EOS";
+    :link {color: #0000EE}
+    :visited {color: #0000EE}
+    :active {color: #000FFF}
+  EOS
+
+  my $html_code = &lt;&lt; "EOC";
+    &lt;div&gt;
+      &lt;p&gt;Sorry, you need a JavaScript compatible browser to view this page,&lt;/p&gt;
+    &lt;/div&gt;
+  EOC
+
+  print $q-&gt;header;
+  print $q-&gt;start_html(-title    =&gt; 'a short page',
+                       -style    =&gt; $style,
+                       -script   =&gt; [{-src      =&gt; 'path/to/script.js'},
+                                     {-code     =&gt; $script}
+                                    ],
+                       -noScript =&gt; $html_code,
+                       -head     =&gt; [Link({-rel  =&gt; 'stylesheet',
+                                           -href =&gt; 'path/to/style.css',
+                                           -type =&gt; 'text/css'
+                                         }),
+                                     meta({-http_equiv =&gt; 'Content-Type',
+                                           -content    =&gt; 'text/html'
+                                         })
+                                    ],
+                       -onLoad   =&gt; 'alarm()',
+                       -bgcolor  =&gt; 'white',
+                      );
+  print $q-&gt;p('Hello world');
+  print $q-&gt;end_html;</pre>
+
+<h3>Terminate HTML Document</h3>
+<pre class="required">$string = $query-&gt;end_html<span class="optional">()</span>;</pre>
+
+<h3>Create HTML Tag</h3>
+<pre>Tags must be written in lowercase, except:
+  <strong>PARAM, Select, Sub, and Tr</strong></pre>
+<pre>All HTML tags are distributive.
+  If you give them an argument consisting of a reference to a list,
+  the tag will be distributed across each element of the list with
+  the given attributes.</pre>
+<pre class="required">$string = $query-&gt;tag<span class="optional">({-attr1 =&gt; 'val',
+                       -attr2 =&gt; undef,       <span class="normal"># attr without value, invalid in XHTML </span>
+                       -attr3 =&gt; '', ...      <span class="normal"># attr with empty value</span>
+                      },
+                      'val',
+                      tag(...),
+                      tag(...) . 'val' . tag(...),
+                      ['val', tag(...), 'val', ...], <span class="normal"># distributive</span>
+                      )</span>;</pre>
+<pre>  Example:
+    use CGI qw(:standard);
+    $q = CGI-&gt;new;
+    print table({-border =&gt; undef},
+                caption(strong('When Should You Eat Your Vegetables?')),
+                Tr({-align =&gt; 'CENTER', -valign =&gt; 'TOP'},
+                     [th(['', 'Breakfast', 'Lunch', 'Dinner']),
+                      th('Tomatoes') . td(['no',  'yes', 'yes']),
+                      th('Broccoli') . td(['no',  'no',  'yes']),
+                      th('Onions')   . td(['yes', 'yes', 'yes'])
+                     ]
+                  )
+               );
+
+  produces the following HTML code:
+    &lt;table border="1"&gt;
+      &lt;caption&gt;&lt;strong&gt;When Should You Eat Your Vegetables?&lt;/strong&gt;&lt;/caption&gt;
+      &lt;tr align="center" valign="top"&gt;
+        &lt;th&gt;&lt;/th&gt;
+        &lt;th&gt;Breakfast&lt;/th&gt;
+        &lt;th&gt;Lunch&lt;/th&gt;
+        &lt;th&gt;Dinner&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr align="center" valign="top"&gt;
+        &lt;th&gt;Tomatoes&lt;/th&gt;
+        &lt;td&gt;no&lt;/td&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr align="center" valign="top"&gt;
+        &lt;th&gt;Broccoli&lt;/th&gt;
+        &lt;td&gt;no&lt;/td&gt;
+        &lt;td&gt;no&lt;/td&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr align="center" valign="top"&gt;
+        &lt;th&gt;Onions&lt;/th&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+        &lt;td&gt;yes&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/table&gt;</pre>
+
+<h3>Create a Comment Tag</h3>
+<pre class="required">$string = $query-&gt;comment<span class="optional">('string')</span>;</pre>
+
+<h3>Create &lt;isindex&gt; Tag</h3>
+<pre class="required">$string = $query-&gt;isindex<span class="optional">($url)</span>; <span class="normal">#default: the script</span></pre>
+
+<h3>Get Filehandle of Uploaded File</h3>
+<pre class="required">$fh = $query-&gt;upload('uploaded_file');</pre>
+
+<h3>Get Name of Uploaded File</h3>
+<pre class="required">$tmpfilename = $query-&gt;tmpFileName($fh);</pre>
+
+<h3>Get Header Info of Uploaded File</h3>
+<pre class="required">$ref = $query-&gt;uploadInfo($tmpfilename);</pre>
+<pre>   $type = $ref-&gt;{'Content-Type'};</pre>
+
+<h2>Forms</h2>
+<pre>All Form Methods except group methods return the HTML-Code of the Element as
+a string. The group methods return a list of strings of the particular element.
+If the parameter -label =&gt; \%labels is used the hash must have been created
+and its keys must be the values of the -values parameter:
+
+  %labels = (val =&gt; 'shown_value', ...);
+
+If the parameter -attributes =&gt; \%attributes is used the hash must have been
+created and its keys must be the values of the -values parameter:
+
+  %attributes = (val =&gt; {common_html_attribute =&gt; 'value',
+                         ...
+                        },
+                 ...
+                )   
+
+  Example:
+    use CGI;
+
+    my $q = CGI-&gt;new;
+    my %labels = (val1 =&gt; 'value1', val2 =&gt; 'value2');
+    my %attributes = (val1 =&gt; {style =&gt; 'color: red'});
+
+    print $q-&gt;header;
+    print $q-&gt;start_html;
+    print $q-&gt;start_form;
+    print $q-&gt;popup_menu(-name       =&gt; 'popup',
+                         -values     =&gt; ['val1', 'val2'],
+                         -labels     =&gt; \%labels,
+                         -attributes =&gt; \%attributes,
+                        );
+    print $q-&gt;end_form;
+    print $q-&gt;end_html;
+
+  This produces the following HTML code:
+
+  &lt;?xml version="1.0" encoding="iso-8859-1"?&gt;
+  &lt;!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+  &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"&gt;
+    &lt;head&gt;
+      &lt;title&gt;Untitled Document&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;form method="post"
+            action="/path/your_script"
+            enctype="application/x-www-form-urlencoded"&gt;
+        &lt;select name="popup"&gt;
+          &lt;option style="color: red" value="val1"&gt;value1&lt;/option&gt;
+          &lt;option value="val2"&gt;value2&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/form&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;</pre>
+
+<h3>Start a Form</h3>
+<pre class="required">$query-&gt;start_form<span class="optional">(-method    =&gt; 'method',      <span class="normal">     # default: POST</span>
+                   -action    =&gt; 'action',    <span class="normal"><span class="normal">       # default: this script</span></span>
+                   -enctype   =&gt; 'encoding',
+                   -name      =&gt; 'name',
+                   -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                   -core_attr =&gt; 'val', ...          <span class="normal"># any valid common html attribute</span>
+                   )</span>;</pre>
+<pre>  encoding: <strong>application/x-www-form-urlencoded</strong> (default)
+            stored in $CGI::URL_ENCODED
+            <strong>multipart/form-data</strong>
+            stored in $CGI::MULTIPART</pre>
+<pre class="required">$query-&gt;start_multipart_form<span class="optional">(...)</span></pre>
+<pre>  uses <strong>multipart/form-data</strong> as default encoding</pre>
+
+<h3>End a Form</h3>
+<pre class="required">$query-&gt;end_form<span class="optional">()</span>;</pre>
+
+<h3>Create a Text Field</h3>
+<pre class="required">$query-&gt;textfield(-name      =&gt; 'name',
+                  <span class="optional">-default   =&gt; 'starting value',
+                  -size      =&gt; n,                  <span class="normal"># characters</span>
+                  -maxlength =&gt; n,                  <span class="normal"># characters</span>
+                  -override  =&gt; 1,                  <span class="normal"># default: 0</span>
+                  -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                  -core_attr =&gt; 'val', ...</span>        <span class="normal">  # any valid common html attribute</span>
+                  );</pre>
+
+<h3>Create a Multi-Row Text Field</h3>
+<pre class="required">$query-&gt;textarea(-name      =&gt; 'name',
+                 <span class="optional">-default   =&gt; 'starting value',
+                 -rows      =&gt; n,
+                 -columns   =&gt; n,
+                 -override  =&gt; 1,                 <span class="normal"># default: 0</span>
+                 -onXxxx    =&gt; 'funct(par, ...)'  <span class="normal"># any valid JavaScript event</span>
+                 -core_attr =&gt; 'val', ...</span>         <span class="normal"># any valid common html attribute</span>
+                 );</pre>
+
+<h3>Create a Password Field</h3>
+<pre class="required">$query-&gt;password_field(-name      =&gt; 'name',
+                       <span class="optional">-value     =&gt; 'starting value',
+                       -size      =&gt; n,                  <span class="normal"># characters</span>
+                       -maxlength =&gt; n,                  <span class="normal"># Characters</span>
+                       -override  =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                       -core_attr =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                       );</pre>
+
+<h3>Create a File Upload Field</h3>
+<pre class="required">$query-&gt;filefield(-name      =&gt; 'uploaded_file',
+                  <span class="optional">-default   =&gt; 'starting value',
+                  -size      =&gt; n,                  <span class="normal"># characters
+</span>                  -maxlength =&gt; n,                  <span class="normal"># characters</span>
+                  -override  =&gt; 1,                  <span class="normal"># default: 0</span>
+                  -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                  -core_attr =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                  );</pre>
+
+<h3>Create a Popup Menu</h3>
+<pre class="required">$query-&gt;popup_menu(-name       =&gt; 'menu_name',
+                   -values     =&gt; ['val', ...],
+                   <span class="optional">-default    =&gt; 'val',
+                   -labels     =&gt; \%labels,
+                   -attributes =&gt; \%attributes
+                   -override   =&gt; 1,                  <span class="normal"># default: 0</span>
+                   -onXxxx     =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                   -core_attr  =&gt; 'val', ...          </span><span class="normal"># any valid common html attribute</span>    
+                   );</pre>
+<pre>  $popup_menu_value = $query-&gt;param('menu_name');</pre>
+
+<h3>Create an Option Group</h3>
+<pre class="required">$query-&gt;optgroup(-name       =&gt; 'optgroup_label',
+                 -values     =&gt; ['val', ...],
+                <span class="optional"> -labels     =&gt; \%labels,
+                 -attributes =&gt; \%attributes
+                 -labeled    =&gt; 1,                <span class="normal"># default: 0</span>
+                 -novals     =&gt; 1,                <span class="normal"># default: 0</span>
+                 -core_attr  =&gt; 'val', ...</span><span class="normal">        # any valid common html attribute</span>
+                 );</pre>
+
+<h3>Create a Scrolling List</h3>
+<pre class="required">$query-&gt;scrolling_list(-name       =&gt; 'list_name',
+                       -values     =&gt; ['val', ...],
+                       <span class="optional">-default    =&gt; ['val', ...],
+                       -size       =&gt; n,                  <span class="normal"># rows, default: number of values</span>
+                       -multiple   =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -labels     =&gt; \%labels,
+                       -attributes =&gt; \%attributes
+                       -override   =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -onXxxx     =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                       -core_attr  =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                       );</pre>
+<pre>  @selected = $query-&gt;param('list_name');</pre>
+
+<h3>Create a Group of Related Checkboxes</h3>
+<pre class="required">$query-&gt;checkbox_group(-name       =&gt; 'group_name',
+                       -values     =&gt; ['val', ...],
+                       <span class="optional">-default    =&gt; ['val', ...],
+                       -linebreak  =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -labels     =&gt; \%labels,
+                       -attributes =&gt; \%attributes
+                       -nolables   =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -rows       =&gt; n,            <span class="normal">      # default: 1</span>
+                       -columns    =&gt; n,                  <span class="normal"># default: 0</span>
+                       -rowheaders =&gt; ['val', ...],
+                       -colheaders =&gt; ['val', ...],
+                       -override   =&gt; 1,                  <span class="normal"># default: 0</span>
+                       -onXxxx     =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                       -core_attr  =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                       );</pre>
+<pre>  @turned_on = $query-&gt;param('group_name');</pre>
+
+<h3>Create a Standalone Checkbox</h3>
+<pre class="required">$query-&gt;checkbox(-name      =&gt; 'checkbox_name',
+                 <span class="optional">-checked   =&gt; 'checked',
+                 -value     =&gt; 'val',              <span class="normal"># default: 'on'</span>
+                 -label     =&gt; 'label',
+                 -override  =&gt; 1,                  <span class="normal"># default: 0</span>
+                 -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                 -core_attr =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                 );</pre>
+<pre>  $turned_on = $query-&gt;param('checkbox_name');</pre>
+
+<h3>Create a Group of Related Radio Buttons</h3>
+<pre class="required">$query-&gt;radio_group(-name       =&gt; 'group_name',
+                    -values     =&gt; ['val', ...],
+                    <span class="optional">-default    =&gt; 'val',
+                    -linebreak  =&gt; 1,                  <span class="normal"># default: 0</span>
+                    -labels     =&gt; \%labels,
+                    -attributes =&gt; \%attributes
+                    -nolabels   =&gt; 1,                  <span class="normal"># default: 0</span>
+                    -rows       =&gt; n,                  <span class="normal"># default: 1</span>
+                    -columns    =&gt; n,                  <span class="normal"># default: 0</span>
+                    -rowheaders =&gt; ['val', ...],
+                    -colheaders =&gt; ['val', ...],
+                    -override   =&gt; 1,                  <span class="normal"># default: 0</span>
+                    -onXxxx     =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                    -core_attr  =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+                    );</pre>
+<pre>  $which_radio_button = $query-&gt;param('group_name');</pre>
+
+<h3>Create a Submit Button</h3>
+<pre class="required">$query-&gt;submit<span class="optional">(-name      =&gt; 'button_name',
+               -value     =&gt; 'value',            <span class="normal"># button label</span>
+               -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+               -core_attr =&gt; 'val', ...      <span class="normal">    # any valid common html attribute</span>
+               )</span>;</pre>
+
+<h3>Create a Reset Button</h3>
+<pre class="required">$query-&gt;reset<span class="optional">(-name      =&gt; 'button_label',
+              -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+              -core_attr =&gt; 'val', ...          <span class="normal"># any valid common html attribute</span>
+              )</span>;</pre>
+
+<h3>Createt a Defaults Button</h3>
+<pre class="required">$query-&gt;defaults<span class="optional">(-name      =&gt; 'button_label',
+                 -core_attr =&gt; 'val', ...          <span class="normal"># any valid common html attribute</span>
+                 -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                 )</span>;</pre>
+
+<h3>Create a Hidden Field</h3>
+<pre class="required">$query-&gt;hidden(-name      =&gt; 'hidden_name',
+               <span class="optional">-default   =&gt; ['val', ...],
+               -core_attr =&gt; 'val', ...</span>      <span class="normal"># any valid common html attribute</span>
+               );</pre>
+<pre>  $hidden_value = $query-&gt;param('hidden_name');
+  @hidden_values = $query-&gt;param('hidden_name'); # for values created with arrays</pre>
+
+<h3>Create a Clickable Image Button</h3>
+<pre class="required">$query-&gt;image_button(-name      =&gt; 'button_name',
+                     -src       =&gt; 'url/of/image',
+                     <span class="optional">-align     =&gt; 'alignment',
+                     -core_attr =&gt; 'val', ...<span class="normal">          # any valid common html attribute</span>
+                     -onXxxx    =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+                     </span>);</pre>
+<pre>    to get the coordinates:
+    $x = $query-&gt;param('button_name.x');
+    $y = $query-&gt;param('button_name.y');</pre>
+
+<h3>Create a Javascript Action Button</h3>
+<pre class="required">$query-&gt;button(-name       =&gt; 'button_name',
+               -value      =&gt; 'label',
+               -onXxxx     =&gt; 'funct(par, ...)',  <span class="normal"># any valid JavaScript event</span>
+               <span class="optional">-core_attr  =&gt; 'val', ...</span>          <span class="normal"># any valid common html attribute</span>
+               );</pre>
+
+<h2>Miscellaneous</h2>
+
+<h3>(Un)Escape HTML Hex Characters</h3>
+<pre class="required">use CGI qw(escape unescape);
+$escaped_string = escape("unescaped string");
+$u = unescape($escaped_string);</pre>
+
+<h3>(Un)Escape HTML Entity Characters</h3>
+<pre class="required">use CGI qw(escapeHTML unescapeHTML);
+$escaped_string = escapeHTML("unescaped string");
+$u = unescapeHTML($escaped_string);</pre>
+
+<h3>Get or Set Current Character Set</h3>
+<pre class="required">use CGI qw(charset);
+$charset = charset<span class="optional">($charset)</span>;</pre>
+
+<h3>Get or Set Value of Autoescape Flag</h3>
+<pre class="required">use CGI qw(autoEscape);
+$flag = autoEscape<span class="optional">($flag)</span>; <span class="normal"># undef or 1</span> </pre>
+
+<h3>Get CGI-Error</h3>
+<pre class="required">$error = $query-&gt;cgi_error<span class="optional">()</span>;</pre>
+
+<h3>Dump All Name/Value Pairs of Query</h3>
+<pre class="required">$query-&gt;Dump<span class="optional">()</span>;</pre>
+
+<h2>HTTP Session Variables</h2>
+<pre class="required">$string = $query-&gt;Accept<span class="optional">()</span>;
+$string = $query-&gt;auth_type<span class="optional">()</span>;
+$string = $query-&gt;raw_cookie<span class="optional">()</span>;
+$string = $query-&gt;path_info<span class="optional">()</span>;
+$string = $query-&gt;path_translated<span class="optional">()</span>;
+$string = $query-&gt;query_string<span class="optional">()</span>;
+$string = $query-&gt;referer<span class="optional">()</span>;
+$string = $query-&gt;remote_addr<span class="optional">()</span>;
+$string = $query-&gt;remote_ident<span class="optional">()</span>;
+$string = $query-&gt;remote_host<span class="optional">()</span>;
+$string = $query-&gt;remote_user<span class="optional">()</span>;
+$string = $query-&gt;request_method<span class="optional">()</span>;
+$string = $query-&gt;script_name<span class="optional">()</span>;
+$string = $query-&gt;server_name<span class="optional">()</span>;
+$string = $query-&gt;server_software<span class="optional">()</span>;
+$string = $query-&gt;virtual_host<span class="optional">()</span>;
+$string = $query-&gt;server_port<span class="optional">()</span>;
+$string = $query-&gt;user_agent<span class="optional">()</span>;
+$string = $query-&gt;user_name<span class="optional">()</span>;
+$string = $query-&gt;http<span class="optional">('http-header-field')</span>; <span class="normal"><span class="normal"># default: list of HTTP environment variables</span></span>
+$string = $query-&gt;https<span class="optional">('http-header-field')</span>; </pre>
+
+<h2>Server Push</h2>
+<pre class="required">$string = $query-&gt;multipart_init(-boundary =&gt; 'boundary');
+$string = $query-&gt;multipart_start(-type =&gt; 'mime_type');
+$string = $query-&gt;multipart_end<span class="optional">()</span>;
+$string = $query-&gt;multipart_final<span class="optional">()</span>;</pre>
+<pre>  use CGI qw(:push -nph);
+
+  $| = 1;
+  print multipart_init(-boundary =&gt; '----------------here we go!');
+  foreach (0 .. 4) {
+     print multipart_start(-type =&gt; 'text/plain'),
+           "The current time is ",scalar(localtime),"\n";
+     if ($_ &lt; 4) {
+        print multipart_end;
+     }
+     else {
+        print multipart_final;
+     }
+     sleep 1;
+  } </pre>
+
+<h2>HTTP Cookies</h2>
+
+<h3>Set Cookie</h3>
+<pre class="required">$cookie = $query-&gt;cookie(-name    =&gt; 'sessionID',
+                         <span class="optional">-value   =&gt; \%hash_of_info,
+                         -expires =&gt; 'time',           <span class="normal"># see header()</span>
+                         -path    =&gt; 'partial_path',
+                         -domain  =&gt; 'partial domain,
+                         -secure  =&gt; 1</span>                 <span class="normal"># default: 0</span>
+                         );</pre>
+<pre>    print $query-&gt;header(-cookie =&gt; $cookie);</pre>
+
+<h3>Get Cookie</h3>
+<pre class="required">%cookie = $query-&gt;cookie(-name =&gt; 'sessionID');</pre>
+
+<h2>Global Variables</h2>
+<pre class="required">  $val = $CGI::POST_MAX;
+  $val = $CGI::DISABLE_UPLOADS;
+  $val = $CGI::URL_ENCODED;
+  $val = $CGI::MULTIPART;
+  $val = $CGI::PRIVATE_TEMPFILES;
+
+  $CGI::POST_MAX = $val;
+  $CGI::DISABLE_UPLOADS = $val;
+  $CGI::URL_ENCODED = $val;
+  $CGI::MULTIPART = $val;
+  $CGI::PRIVATE_TEMPFILES = $val;</pre>
+
+<h2>Error Handling</h2>
+
+<h4>STDERR with Timestamp</h4>
+<pre>  use CGI::Carp;
+    croak "dying: $!";
+    confess "dying: $!";  # stack backtrace
+    carp "warning: $!";
+    warn "warning: $!";
+    die "dying: $!.\n";
+
+  use CGI::Carp qw(cluck); # stack backtrace
+    cluck "warning: $!";</pre>
+
+<h4>Redirect STDERR</h4>
+<pre>    BEGIN {
+      use CGI::Carp qw(carpout);
+      open(LOG, "&gt;&gt;/usr/local/cgi-logs/mycgi-log") or
+        die("Unable to open mycgi-log: $!\n");
+      carpout(LOG);
+    }
+
+  use CGI::Carp qw(fatalsToBrowser);
+    die "Bad error here";</pre>
+
+<h4>Redirect to Browser Window</h4>
+<pre>  use CGI::Carp qw(fatalsToBrowser set_message);
+    BEGIN {
+       sub handle_errors {
+          my $msg = shift;
+          print "&lt;h1&gt;Oh gosh&lt;/h1&gt;";
+          print "Got an error: $msg";
+      }
+      set_message(\&amp;handle_errors);
+    }</pre>
+
+<h4>Errors or Warnings as HTML Comments</h4>
+<pre>  use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+  use CGI qw(:standard);
+    print header();
+    warningsToBrowser(1);
+
+    warningsToBrowser(0);    # disable warnings
+    print "&lt;SCRIPT type=javascript&gt;&lt;!--\n";
+    print_some_javascript_code();
+    print "//--&gt;&lt;/SCRIPT&gt;\n";
+    warningsToBrowser(1);    # re-enable warnings</pre>
+
+<h2>Debugging</h2>
+<pre>Run the script with one of the following command line:
+  [perl] your_script [-d[:your_debugger]] keyword1 keyword2 ...
+  [perl] your_script [-d[:your_debugger]] name1=value1 name2=value2 ...</pre>
+
+<h2>Skeleton of a CGI Script</h2>
+<pre>#!/path/of/perl -w -T
+
+use strict;
+use CGI;
+
+sub process_form {
+  my $query = shift;
+  my $value = $query-&gt;param('name');
+  ...
+}
+
+sub show_form {
+  my $query = shift;
+  print $query-&gt;header;
+  print $query-&gt;start_html;
+  print $query-&gt;start_form;
+  ...
+  print $query-&gt;end_form;
+  print $query-&gt;end_html;
+}
+
+$| = 1;
+my $query = CGI-&gt;new;
+
+if ($query-&gt;param) {
+  process_form($query);
+}
+else {
+  show_form($query);
+}
+
+
+#!/path/of/perl -w -T
+
+# If we import the standard methods and use only
+# one form we can omit the object notation
+
+use strict;
+use CGI qw(:standard);
+
+sub process_form {
+  my $value = param('name');
+  ...
+}
+
+sub show_form {
+  print header;
+  print start_html;
+  print start_form;
+  ...
+  print end_form;
+  print end_html;
+}
+
+$| = 1;
+
+if (param) {
+  process_form;
+}
+else {
+  show_form;
+}</pre>
+</body>
+</html>
