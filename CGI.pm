@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.63 2002-05-09 14:23:44 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.64 2002-06-11 22:40:04 lstein Exp $';
 $CGI::VERSION='2.82';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6677,13 +6677,7 @@ for suggestions and bug fixes.
 
 =head1 BUGS
 
-This module has grown large and monolithic.  Furthermore it's doing many
-things, such as handling URLs, parsing CGI input, writing HTML, etc., that
-are also done in the LWP modules. It should be discarded in favor of
-the CGI::* modules, but somehow I continue to work on it.
-
-Note that the code is truly contorted in order to avoid spurious
-warnings when programs are run with the B<-w> switch.
+Please report them.
 
 =head1 SEE ALSO
 

@@ -8,7 +8,7 @@ use lib qw(t/lib);
 # ensure the blib's are in @INC, else we might use the core CGI.pm
 use lib qw(blib/lib blib/arch);
 
-use Test::More tests => 42;
+use Test::More tests => 47;
 use IO::Handle;
 
 BEGIN { use_ok('CGI::Carp') };
@@ -151,6 +151,28 @@ is($CGI::Carp::CUSTOM_MSG,
 # set the message back to the empty string so that the tests later
 # work properly.
 CGI::Carp::set_message(''),
+
+#-----------------------------------------------------------------------------
+# Test set_progname
+#-----------------------------------------------------------------------------
+
+import CGI::Carp qw(name=new_progname);
+is($CGI::Carp::PROGNAME,
+     'new_progname',
+     'CGI::Carp::import set program name correctly');
+
+is(CGI::Carp::set_progname('newer_progname'),
+   'newer_progname',
+   'CGI::Carp::set_progname returns new program name');
+
+is($CGI::Carp::PROGNAME,
+   'newer_progname',
+   'CGI::Carp::set_progname program name set correctly');
+
+# set the message back to the empty string so that the tests later
+# work properly.
+is (CGI::Carp::set_progname(undef),undef,"CGI::Carp::set_progname returns unset name correctly");
+is ($CGI::Carp::PROGNAME,undef,"CGI::Carp::set_progname program name unset correctly");
 
 #-----------------------------------------------------------------------------
 # Test warnings_to_browser
