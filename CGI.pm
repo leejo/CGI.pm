@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.23 2000-02-18 18:49:47 lstein Exp $';
-$CGI::VERSION='2.572';
+$CGI::revision = '$Id: CGI.pm,v 1.24 2000-02-18 19:22:29 lstein Exp $';
+$CGI::VERSION='2.573';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -604,7 +604,7 @@ sub _make_tag_func {
 	    
 	    my(\$attr) = '';
 	    if (ref(\$_[0]) && ref(\$_[0]) eq 'HASH') {
-		my(\@attr) = make_attributes( '',shift() );
+		my(\@attr) = make_attributes(shift() );
 		\$attr = " \@attr" if \@attr;
 	    }
 	);
