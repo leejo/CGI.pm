@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.127 2003-06-18 19:57:21 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.128 2003-07-21 21:49:28 lstein Exp $';
 $CGI::VERSION='2.98';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -4941,7 +4941,7 @@ Generate just the protocol and net location, as in http://www.foo.com:8000
 
 =head2 MIXING POST AND URL PARAMETERS
 
-   $color = $query-&gt;url_param('color');
+   $color = $query->url_param('color');
 
 It is possible for a script to receive CGI parameters in the URL as
 well as in the fill-out form by creating a form that POSTs to a URL
@@ -5695,6 +5695,8 @@ any of the common HTML attributes to an individual menu item. It's
 a pointer to an associative array relating menu values to another
 associative array with the attribute's name as the key and the
 attribute's value as the value.
+
+=back
 
 =head2 CREATING A SCROLLING LIST
 
