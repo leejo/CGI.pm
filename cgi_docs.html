@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.58, 3/23/2000, L. Stein
+Version 2.59, 3/24/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -2661,12 +2661,14 @@ the standard ones:
 
 <h3>AUTOESCAPING HTML</h3>
 
-By default, all HTML that is emitted by the shortcut functions is
-passed through a function called escapeHTML():
+By default, all HTML that are emitted by the form-generating functions
+are passed through a function called escapeHTML():
 
 <blockquote><pre>
-$encoded_string = escapeHTML("unencoded string");
+$escaped_string = escapeHTML("unescaped string");
 </pre></blockquote>
+
+<p>
 
 Provided that you have specified a character set of ISO-8859-1 (the
 default), the standard HTML escaping rules will be used.  The "&lt;"
@@ -2683,10 +2685,15 @@ possible encodings.
 
 <p>
 
-You may call escapeHTML() yourself in order to protect your pages
-against nasty tricks that people may enter into guestbooks.  To change
-the character set, use charset().  To turn autoescaping off
-completely, use autoescape():
+Autoescaping does not apply to other HTML-generating functions, such
+as h1().  You should call escapeHTML() yourself on any data that is
+passed in from the outside, such as nasty text that people may enter
+into guestbooks.
+
+<p>
+
+To change the character set, use charset().  To turn
+autoescaping off completely, use autoescape():
 
 <blockquote><pre>
 $charset = charset([$charset]);  # Get or set the current character set.
@@ -4619,6 +4626,12 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.59</h3>
+<ol>
+  <li>autoescape functionality breaks too much existing code, removed it.
+  <li>use escapeHTML() manually
+</ol>
+
 <h3>Version 2.58</h3>
 This is the release version of 2.57.
 
@@ -5365,6 +5378,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Mar 23 17:37:08 EST 2000
+Last modified: Fri Mar 24 07:28:40 EST 2000
 <!-- hhmts end -->
 </BODY> </HTML>

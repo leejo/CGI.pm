@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.26 2000-03-23 22:52:03 lstein Exp $';
-$CGI::VERSION='2.58';
+$CGI::revision = '$Id: CGI.pm,v 1.27 2000-03-27 14:45:30 lstein Exp $';
+$CGI::VERSION='2.59';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -616,7 +616,7 @@ sub _make_tag_func {
 	$func .= qq#
 	    my(\$tag,\$untag) = ("\U<$tagname\E\$attr>","\U</$tagname>\E");
 	    return \$tag unless \@_;
-	    my \@result = map { "\$tag".\$self->escapeHTML(\$_)."\$untag" } 
+	    my \@result = map { "\$tag\$_\$untag" } 
                               (ref(\$_[0]) eq 'ARRAY') ? \@{\$_[0]} : "\@_";
 	    return "\@result";
             }#;
@@ -4742,12 +4742,12 @@ See their respective sections.
 
 =head2 AUTOESCAPING HTML
 
-By default, all HTML that is emitted by the shortcut functions is
-passed through a function called escapeHTML():
+By default, all HTML that is emitted by the form-generating functions
+is passed through a function called escapeHTML():
 
 =over 4
 
-=item $encoded_string = escapeHTML("unencoded string");
+=item $escaped_string = escapeHTML("unescaped string");
 
 Escape HTML formatting characters in a string.
 
@@ -4765,10 +4765,11 @@ passing a -charset argument to header(), then B<all> characters will
 be replaced by their numeric entities, since CGI.pm has no lookup
 table for all the possible encodings.
 
-You may call escapeHTML() yourself in order to protect your pages
-against nasty tricks that people may enter into guestbooks.  To change
-the character set, use charset().  To turn autoescaping off
-completely, use autoescape():
+The automatic escaping does not apply to other shortcuts, such as
+h1().  You should call escapeHTML() yourself on untrusted data in
+order to protect your pages against nasty tricks that people may enter
+into guestbooks, etc..  To change the character set, use charset().
+To turn autoescaping off completely, use autoescape():
 
 =over 4
 
