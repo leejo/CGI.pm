@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.104 2003-04-14 19:11:31 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.105 2003-04-14 19:18:54 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -32,7 +32,10 @@ use CGI::Util qw(rearrange make_attributes unescape escape expires);
 use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
 
-$TAINTED = substr("$0$^X",0,0);
+{
+  local $^W = 0;
+  $TAINTED = substr("$0$^X",0,0);
+}
 
 my @SAVED_SYMBOLS;
 

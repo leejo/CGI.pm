@@ -477,7 +477,7 @@ END
       if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
 	$r->send_http_header('text/html');
 	$r->print($mess);
-	$r->exit();
+	$mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
       } else {
 	$r->custom_response(500,$mess);
       }
