@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.48, 2/19/1999, L. Stein
+Version 2.49, 2/23/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -1699,7 +1699,7 @@ filehandle, or undef if the parameter is not a valid filehandle.
      while (&lt;$fh&gt;) {
 	   print;
      }
-<pre>
+</pre>
 
 <p>
 
@@ -2085,7 +2085,7 @@ code to be performed every time the user clicks on the button.
        line breaks between the buttons, creating a vertical list.
   <LI>The optional fifth parameter (<STRONG>-labels</STRONG> specifies
        an associative array containing labels to be printed next to
-       each the button.  If not provided the button value will be
+       each button.  If not provided the button value will be
        used instead.  This example assumes that the associative array
        <CODE>%labels</CODE> has already been defined.  This is
       equivalent to passing a hash reference to -values.
@@ -2877,7 +2877,27 @@ through this interface.  The methods are as follows:
        of environment variables.  This only works with older browsers
        such as Mosaic.  Netscape does not reliably report the user
        name!
+  <DT>http()
+  <DD>Called with no arguments returns the list of HTTP environment
+      variables, including such things as HTTP_USER_AGENT,
+      HTTP_ACCEPT_LANGUAGE, and HTTP_ACCEPT_CHARSET, corresponding to the
+      like-named HTTP header fields in the request.  Called with the name of
+      an HTTP header field, returns its value.  Capitalization and the use
+      of hyphens versus underscores are not significant.
+<p>
+      For example, all three of these examples are equivalent:
+<pre>
+   $requested_language = $q-&gt;http('Accept-language');
+   $requested_language = $q-&gt;http('Accept_language');
+   $requested_language = $q-&gt;http('HTTP_ACCEPT_LANGUAGE');
+</pre>
+
+  <DT>https()
+  <DD>The same as http(), but operates on the HTTPS environment variables
+      present when the SSL protocol is in effect.  Can be used to determine
+      whether SSL is turned on.
 </DL>
+
 <A HREF="#contents">Table of contents</A>
 
 <HR>
@@ -4092,12 +4112,10 @@ want it to be automatically deleted when CGI.pm exits.
 <h2><a name="push">Server Push</a></h2>
 
 <p> CGI.pm provides three simple functions for producing multipart
-documents of the type needed to implement server push.  These
-functions were graciously provided by Ed Jordan (<a
-href="mailto:ed@fidalgo.net">ed@fidalgo.net</a>).  To import these
-into your namespace, you must import the ":push" set.  You are also
-advised to put the script into NPH mode and to set $| to 1 to avoid
-buffering problems.  </p>
+documents of the type needed to implement server push.  To import
+these into your namespace, you must import the ":push" set.  You are
+also advised to put the script into NPH mode and to set $| to 1 to
+avoid buffering problems.  </p>
 
 <p>Here is a simple script that demonstrates server push:</p>
 
@@ -4508,6 +4526,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+
+<h3>Version 2.49</h3>
+<ol>
+  <li>Fixes for FastCGI (globals not getting reset)
+  <li>Fixed url() to correctly handle query string and path under MOD_PERL
+</ol>
 
 <h3>Version 2.48</h3>
 <ol>
@@ -5170,6 +5194,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Feb 19 09:06:27 EST 1999
+Last modified: Tue Mar  9 10:31:49 EST 1999
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.9 1999-02-19 14:07:22 lstein Exp $';
-$CGI::VERSION='2.48';
+$CGI::revision = '$Id: CGI.pm,v 1.10 1999-03-11 04:16:26 lstein Exp $';
+$CGI::VERSION='2.50';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -488,7 +488,7 @@ sub cgi_error {
 
 # unescape URL-encoded data
 sub unescape {
-    shift() if ref($_[0]);
+    shift() if ref($_[0]) || $_[0] eq $DefaultClass;
     my $todecode = shift;
     return undef unless defined($todecode);
     $todecode =~ tr/+/ /;       # pluses become spaces
@@ -775,7 +775,7 @@ sub import_names {
     my($self,$namespace,$delete) = self_or_default(@_);
     $namespace = 'Q' unless defined($namespace);
     die "Can't import names into \"main\"\n" if \%{"${namespace}::"} == \%::;
-    if ($delete || $MOD_PERL) {
+    if ($delete || $MOD_PERL || exists $ENV{'FCGI_ROLE'}) {
 	# can anyone find an easier way to do this?
 	foreach (keys %{"${namespace}::"}) {
 	    local *symbol = "${namespace}::${_}";
@@ -1361,7 +1361,7 @@ sub _script {
 	    ($src,$code,$language) =
 		$self->rearrange([SRC,CODE,LANGUAGE],
 				 '-foo'=>'bar',	# a trick to allow the '-' to be omitted
-				 ref($style) eq 'ARRAY' ? @$script : %$script);
+				 ref($script) eq 'ARRAY' ? @$script : %$script);
 	    
 	} else {
 	    ($src,$code,$language) = ('',$script,'JavaScript');
@@ -2150,9 +2150,12 @@ sub url {
     my $path = $self->path_info;
     my $script_name;
     if (exists($ENV{REQUEST_URI})) {
+        my $index;
 	$script_name = $ENV{REQUEST_URI};
-	# is this how to strip off path information?
-	$script_name =~ s/$path.*$// if defined $path;
+        # strip path
+        substr($script_name,$index) = '' if $path and ($index = rindex($script_name,$path)) >= 0;
+        # and query string
+        substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
     } else {
 	$script_name = $self->script_name;
     }
@@ -2374,6 +2377,7 @@ sub query_string {
     foreach $param ($self->param) {
 	my($eparam) = escape($param);
 	foreach $value ($self->param($param)) {
+            next unless defined $value;
 	    $value = escape($value);
 	    push(@pairs,"$eparam=$value");
 	}
@@ -2578,6 +2582,7 @@ END_OF_FUNC
 sub http {
     my ($self,$parameter) = self_or_CGI(@_);
     return $ENV{$parameter} if $parameter=~/^HTTP/;
+    $parameter =~ tr/-/_/;
     return $ENV{"HTTP_\U$parameter\E"} if $parameter;
     my(@p);
     foreach (keys %ENV) {
@@ -2596,6 +2601,7 @@ sub https {
     my ($self,$parameter) = self_or_CGI(@_);
     return $ENV{HTTPS} unless $parameter;
     return $ENV{$parameter} if $parameter=~/^HTTPS/;
+    $parameter =~ tr/-/_/;
     return $ENV{"HTTPS_\U$parameter\E"} if $parameter;
     my(@p);
     foreach (keys %ENV) {
@@ -2811,10 +2817,14 @@ sub read_multipart {
 	  }
 
 	  # choose a relatively unpredictable tmpfile sequence number
-	  $tmpfile = new TempFile(unpack("%16C*",join('',localtime,values %ENV)));
-	  $tmp = $tmpfile->as_string;
-	  
-	  $filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES);
+          my $seqno = unpack("%16C*",join('',localtime,values %ENV));
+          for (my $cnt=10;$cnt>0;$cnt--) {
+	    next unless $tmpfile = new TempFile($seqno);
+	    $tmp = $tmpfile->as_string;
+	    last if $filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES);
+            $seqno += int rand(100);
+          }
+          die "CGI open of tmpfile: $!\n" unless $filehandle;
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
 
 	  my ($data);
@@ -2941,8 +2951,7 @@ sub new {
     require Fcntl unless defined &Fcntl::O_RDWR;
     ++$FH;
     my $ref = \*{'Fh::' . quotemeta($name)}; 
-    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) 
-	|| die "CGI open of $file: $!\n";
+    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
     delete $Fh::{$FH};
     return bless $ref,$pack;
@@ -3238,13 +3247,14 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 'new' => <<'END_OF_FUNC',
 sub new {
     my($package,$sequence) = @_;
-    my $directory;
-    my $i;
-    for ($i = 0; $i < $MAXTRIES; $i++) {
-	$directory = sprintf("${TMPDIRECTORY}${SL}CGItemp%d",$sequence++);
-	last if ! -f $directory;
+    my $filename;
+    for (my $i = 0; $i < $MAXTRIES; $i++) {
+	last if ! -f ($filename = sprintf("${TMPDIRECTORY}${SL}CGItemp%d",$sequence++));
     }
-    return bless \$directory;
+    # untaint the darn thing
+    return unless $filename =~ m!^([a-zA-Z0-9_ '":/\\]+)$!;
+    $filename = $1;
+    return bless \$filename;
 }
 END_OF_FUNC
 
@@ -5947,6 +5957,27 @@ Newer browsers do not report the user name for privacy reasons!
 
 Returns the method used to access your script, usually
 one of 'POST', 'GET' or 'HEAD'.
+
+=item B<http()>
+
+Called with no arguments returns the list of HTTP environment
+variables, including such things as HTTP_USER_AGENT,
+HTTP_ACCEPT_LANGUAGE, and HTTP_ACCEPT_CHARSET, corresponding to the
+like-named HTTP header fields in the request.  Called with the name of
+an HTTP header field, returns its value.  Capitalization and the use
+of hyphens versus underscores are not significant.
+
+For example, all three of these examples are equivalent:
+
+   $requested_language = $q->http('Accept-language');
+   $requested_language = $q->http('Accept_language');
+   $requested_language = $q->http('HTTP_ACCEPT_LANGUAGE');
+
+=item B<https()>
+
+The same as I<http()>, but operates on the HTTPS environment variables
+present when the SSL protocol is in effect.  Can be used to determine
+whether SSL is turned on.
 
 =back
 

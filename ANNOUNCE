@@ -1,4 +1,4 @@
-CGI.pm version 2.48 is now available for your fun and edification.
+CGI.pm version 2.49 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
 1. Patch to fix file upload bug appearing in IE 3.01 for Macintosh/PowerPC.
@@ -23,7 +23,7 @@ This version includes the following bug fixes and features:
    cgi_error() to find out what went wrong.
 
 Lincoln Stein
-2/17/99
+2/23/99
 
 ========================================================================
 Lincoln D. Stein
