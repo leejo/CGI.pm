@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.58 2002-01-12 02:44:56 lstein Exp $';
-$CGI::VERSION='2.80';
+$CGI::revision = '$Id: CGI.pm,v 1.59 2002-02-19 23:32:47 lstein Exp $';
+$CGI::VERSION='2.81';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1418,7 +1418,7 @@ sub _style {
        foreach $src (@$src)
        {
          push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" />)
-                             : qq(<link rel="stylesheet" type="$type" href="$src">/)) if $src;
+                             : qq(<link rel="stylesheet" type="$type" href="$src">)) if $src;
        }
      }
      else

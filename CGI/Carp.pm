@@ -134,7 +134,7 @@ of the error message that caused the script to die.  Example:
        sub handle_errors {
           my $msg = shift;
           print "<h1>Oh gosh</h1>";
-          print "Got an error: $msg";
+          print "<p>Got an error: $msg</p>";
       }
       set_message(\&handle_errors);
     }
@@ -161,9 +161,9 @@ warnings from being sent to the browser while you are printing some
 content where HTML comments are not allowed:
 
     warningsToBrowser(0);    # disable warnings
-    print "<SCRIPT type=javascript><!--\n";
+    print "<script type=\"text/javascript\"><!--\n";
     print_some_javascript_code();
-    print "//--></SCRIPT>\n";
+    print "//--></script>\n";
     warningsToBrowser(1);    # re-enable warnings
 
 Note: In this respect warningsToBrowser() differs fundamentally from
@@ -371,10 +371,11 @@ END
     }
     
     my $mess = <<END;
-<H1>Software error:</H1>
-<PRE>$msg</PRE>
-<P>
+<h1>Software error:</h1>
+<pre>$msg</pre>
+<p>
 $outer_message
+</p>
 END
     ;
 
