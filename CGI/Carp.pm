@@ -268,7 +268,7 @@ use Exporter;
 #use Carp;
 BEGIN { 
   require Carp; 
-#  *CORE::GLOBAL::die = \&CGI::Carp::die;
+  *CORE::GLOBAL::die = \&CGI::Carp::die;
 }
 
 use File::Spec;
@@ -278,7 +278,6 @@ use File::Spec;
 @EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message set_progname cluck ^name= die);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
-$main::SIG{__DIE__} =\&CGI::Carp::die;
 
 $CGI::Carp::VERSION    = '1.26';
 $CGI::Carp::CUSTOM_MSG = undef;
@@ -304,6 +303,7 @@ sub import {
     $Exporter::ExportLevel = 1;
     Exporter::import($pkg,keys %routines);
     $Exporter::ExportLevel = $oldlevel;
+    $main::SIG{__DIE__} =\&CGI::Carp::die if $routines{'fatalsToBrowser'};
 #    $pkg->export('CORE::GLOBAL','die');
 }
 
