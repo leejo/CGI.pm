@@ -4,7 +4,7 @@
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..31\n"; }
+BEGIN {$| = 1; print "1..33\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use CGI ();
 $loaded = 1;
@@ -68,6 +68,13 @@ test(26,$q->param('foo') eq 'bar','CGI::param() redux');
 test(27,$q=new CGI({'foo'=>'bar','bar'=>'froz'}),"CGI::new() redux 2");
 test(28,$q->param('bar') eq 'froz',"CGI::param() redux 2");
 
+# test tied interface
+my $p = $q->Vars;
+test(29,$p->{bar} eq 'froz',"tied interface fetch");
+$p->{bar} = join("\0",qw(foo bar baz));
+test(30,join(' ',$q->param('bar')) eq 'foo bar baz','tied interface store');
+
+# test posting
 $q->_reset_globals;
 $test_string = 'game=soccer&game=baseball&weather=nice';
 $ENV{REQUEST_METHOD}='POST';
@@ -79,6 +86,7 @@ if (open(CHILD,"|-")) {  # cparent
     exit 0;
 }
 # at this point, we're in a new (child) process
-test(29,$q=new CGI,"CGI::new() from POST");
-test(30,$q->param('weather') eq 'nice',"CGI::param() from POST");
-test(31,$q->url_param('big_balls') eq 'basketball',"CGI::url_param()");
+test(31,$q=new CGI,"CGI::new() from POST");
+test(32,$q->param('weather') eq 'nice',"CGI::param() from POST");
+test(33,$q->url_param('big_balls') eq 'basketball',"CGI::url_param()");
+

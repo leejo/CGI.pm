@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.29 2000-03-28 02:44:24 lstein Exp $';
-$CGI::VERSION='2.61';
+$CGI::revision = '$Id: CGI.pm,v 1.30 2000-03-28 21:31:40 lstein Exp $';
+$CGI::VERSION='2.62';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -419,7 +419,7 @@ sub init {
 	      $query_string = Apache->request->args;
 	  } else {
 	      $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
-	      $query_string = $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
+	      $query_string ||= $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
 	  }
 	  last METHOD;
       }
@@ -841,13 +841,16 @@ END_OF_FUNC
 'TIEHASH' => <<'END_OF_FUNC',
 sub TIEHASH { 
     return $_[1] if defined $_[1];
-    return $Q || new shift;
+    return $Q ||= new shift;
 }
 END_OF_FUNC
 
 'STORE' => <<'END_OF_FUNC',
 sub STORE {
-    $_[0]->param($_[1],split("\0",$_[2],-1)||'');
+    my $self = shift;
+    my $tag  = shift;
+    my @vals = split("\0",shift);
+    $self->param(-name=>$tag,-value=>\@vals);
 }
 END_OF_FUNC
 

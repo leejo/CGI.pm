@@ -1,11 +1,7 @@
-CGI.pm version 2.60 is now available for your fun and edification.
+CGI.pm version 2.62 is now available for your fun and edification.
 The new version, 3.0, will be fully modularized and optimized for
 faster loading and execution (thanks to a comprehensive rewrite by
-David James).
+David James).  It should be released "any day now".
 
 Lincoln Stein
-
-========================================================================
-Lincoln D. Stein
 lstein@cshl.org
-========================================================================
