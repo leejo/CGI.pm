@@ -2,6 +2,7 @@ ANNOUNCE
 CGI.pm
 CGI/Carp.pm
 CGI/Fast.pm
+CGI/Pretty.pm
 CGI/Push.pm
 CGI/Cookie.pm
 MANIFEST

@@ -1,4 +1,4 @@
-CGI.pm version 2.44 is now available for your fun and edification.
+CGI.pm version 2.45 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
 1. Fixed leaking file descriptor during uploads (thanks to Gerald

@@ -1,6 +1,6 @@
 WHAT IS THIS?
 
-This is CGI.pm 2.42, an easy-to-use Perl5 library for writing World
+This is CGI.pm 2.45, an easy-to-use Perl5 library for writing World
 Wide Web CGI scripts.
 
 HOW DO I INSTALL IT?
@@ -50,16 +50,29 @@ WHERE IS THE ONLINE DOCUMENTATION?
 Online documentation of for CGI.pm, and notifications of new versions
 can be found at:
 
-   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/
+   http://stein.cshl.org/software/WWW/CGI/
 
-A copy of this documentation can be found in the package in the file
-cgi_docs.html.
+A copy of the HTML documentation can be found in the package in the
+file cgi_docs.html or in the standard POD pages.
 
 WHERE CAN I LEARN MORE?
 
 I have written a book about CGI.pm called "The Official Guide to
 Programming with CGI.pm" which was published by John Wiley & Sons in
 May 1998.  If you like CGI.pm, you'll love this book.
+
+IMPORTANT NOTES:
+
+Versions 2.44 and 2.45 introduce two API changes that will affect
+users of previous versions:
+
+1) The accept() function has been renamed Accept() to avoid conflicting with
+Perl's built-in function of the same name.
+
+2) The sub() function has been renamed Sub() for similar reasons.
+
+My apologies for these changes, but they were necessary in order for
+CGI to pass the perl5.005 regression tests!
 
 Have fun, and let me know how it turns out!
 

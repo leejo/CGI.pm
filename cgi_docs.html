@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.44, 11/24/98, L. Stein
+Version 2.45, 11/26/98, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -109,7 +109,7 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
   <LI><A HREF="#book">The CGI.pm Book</A>
   <LI><A HREF="#y2000">CGI.pm and the Year 2000 Problem</A>
   <LI><A HREF="#bugs">Bug Reporting and Support</A>
-  <LI><A HREF="#new">What's new in version 2.44?</A>
+  <LI><A HREF="#new">What's new in version 2.45?</A>
 </MENU>
 
 <HR>
@@ -117,15 +117,11 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 <H2>Downloading & Installation</H2>
 </A>
 <ul>
-  <li><STRONG><A HREF="CGI.pm-2.43.tar.gz">Download 2.44 (gzip tar archive)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm-2.43.zip">Download 2.44 (pkzip archive)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm-2.43.sit">Download 2.43
-      (Macintosh stuffit archive)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.tar.gz">Download gzip tar archive (Unix)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.zip">Download pkzip archive (Windows)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.sit">Download 2.45 sit archive  (Macintosh)</A></STRONG>
   <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
 </ul>
-
-<em>I'm looking for a volunteer to make a Macintosh Stuffit archive of
-version 2.44!</em>
 
 <p>
 
@@ -177,7 +173,7 @@ In the former case don't panic.  Here's a recipe that will work
 (commands are given in MS-DOS/Windows form):
 
 <pre>
-  &gt; cd CGI.pm-2.44
+  &gt; cd CGI.pm-2.45
   &gt; copy CGI.pm C:\Perl\lib
   &gt; mkdir C:\Perl\lib\CGI
   &gt; copy CGI\*.pm C:\Perl\lib\CGI
@@ -4424,6 +4420,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.45</h3>
+<ol>
+  <li>Multiple small documentation fixes
+  <li><cite>CGI::Pretty</cite> didn't get into 2.44.  Fixed now.
+</ol>
+
 <h3>Version 2.44</h3>
 <ol>
   <li>Fixed file descriptor leak in upload function.
@@ -5050,6 +5052,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Nov 24 14:30:59 EST 1998
+Last modified: Thu Nov 26 11:55:32 MET 1998
 <!-- hhmts end -->
 </BODY> </HTML>
