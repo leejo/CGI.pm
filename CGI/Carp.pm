@@ -230,8 +230,9 @@ use File::Spec;
 @EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message cluck);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
-$main::SIG{__DIE__}=\&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.23';
+# $main::SIG{__DIE__}=\&CGI::Carp::die;
+$CORE::GLOBAL::die = \&CGI::Carp::die;
+$CGI::Carp::VERSION = '1.24';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -294,7 +295,10 @@ sub _warn {
     }
 }
 
-sub ineval { $^S || _longmess() =~ /eval [\{\']/m }
+sub ineval { 
+  (exists $ENV{MOD_PERL} ? 0 : $^S) || _longmess() =~ /eval [\{\']/m 
+}
+
 
 # The mod_perl package Apache::Registry loads CGI programs by calling
 # eval.  These evals don't count when looking at the stack backtrace.
