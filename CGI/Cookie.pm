@@ -7,17 +7,13 @@ package CGI::Cookie;
 # documentation in manual or html file format (these utilities are part of the
 # Perl 5 distribution).
 
-# Copyright 1995,1996, Lincoln D. Stein.  All rights reserved.
+# Copyright 1995-1999, Lincoln D. Stein.  All rights reserved.
 # It may be used and modified freely, but I do request that this copyright
 # notice remain attached to the file.  You may modify this module as you 
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-# The most recent version and complete docs are available at:
-#   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/cgi_docs.html
-#   ftp://ftp-genome.wi.mit.edu/pub/software/WWW/
-
-$CGI::Cookie::VERSION='1.07';
+$CGI::Cookie::VERSION='1.08';
 
 use CGI;
 use overload '""' => \&as_string,
@@ -102,6 +98,7 @@ sub new {
 
     # IE requires the path to be present for some reason.
     ($path = $ENV{'SCRIPT_NAME'})=~s![^/]+$!! unless $path;
+    $domain ||= $ENV{'SERVER_NAME'};
 
     $self->path($path) if defined $path;
     $self->domain($domain) if defined $domain;

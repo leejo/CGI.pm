@@ -1043,7 +1043,7 @@ All parameters are optional:
       <a href="#header">header</a> method.  Example:
       <blockquote>
       <pre>
-      print $q-&gt;header(-Refresh=>'10; URL=http://www.capricorn.com');
+      print $q-&gt;start_html(-Refresh=>'10; URL=http://www.capricorn.com');
       </pre>
       </blockquote>
   <LI>A <strong>-dtd</strong> parameter to make start_html()
@@ -1066,13 +1066,13 @@ All parameters are optional:
   <li>A <strong>-head</strong> parameter to define other arbitrary elements
       of the &lt;HEAD&gt; section.  For example:
       <pre>
-      print header(-head=&gt;Link({-rel=&gt;'next',
-                   -href=&gt;'http://www.capricorn.com/s2.html'}));
+      print start_html(-head=&gt;Link({-rel=&gt;'next',
+                           -href=&gt;'http://www.capricorn.com/s2.html'}));
 
       </pre>
       or even
       <pre>
-      print header(-head=&gt;[ Link({-rel=&gt;'next',
+      print start_html(-head=&gt;[ Link({-rel=&gt;'next',
 			             -href=&gt;'http://www.capricorn.com/s2.html'}),
 			       Link({-rel=&gt;'previous',
 				     -href=&gt;'http://www.capricorn.com/s1.html'})
@@ -4551,7 +4551,7 @@ HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>.  When sending bug
 reports, please provide the following information:
 
 <ul>
-  <li>the version of CGI.pm (<code>perl -MCGI 'print $CGI::VERSION'</code>)
+  <li>the version of CGI.pm (<code>perl -MCGI -e 'print $CGI::VERSION'</code>)
   <li>the version of Perl (<code>perl -v</code>)
   <li>the name and version of your Web server
   <li>the name and version of the operating system you are using
@@ -5243,6 +5243,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Mar 17 21:09:10 EST 1999
+Last modified: Wed Apr  7 23:18:33 EDT 1999
 <!-- hhmts end -->
 </BODY> </HTML>

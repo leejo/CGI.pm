@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.14 1999-03-31 15:30:13 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.15 1999-05-03 17:57:18 lstein Exp $';
 $CGI::VERSION='2.51';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -668,7 +668,7 @@ sub _compile {
 	   die $@;
        }
     }       
-    delete($sub->{$func_name});  #free storage
+    CORE::delete($sub->{$func_name});  #free storage
     return "$pack\:\:$func_name";
 }
 
@@ -764,8 +764,8 @@ END_OF_FUNC
 ####
 sub delete {
     my($self,$name) = self_or_default(@_);
-    delete $self->{$name};
-    delete $self->{'.fieldnames'}->{$name};
+    CORE::delete $self->{$name};
+    CORE::delete $self->{'.fieldnames'}->{$name};
     @{$self->{'.parameters'}}=grep($_ ne $name,$self->param());
     return wantarray ? () : undef;
 }
@@ -1356,7 +1356,7 @@ sub _style {
 			     '-foo'=>'bar',	# a trick to allow the '-' to be omitted
 			     ref($style) eq 'ARRAY' ? @$style : %$style);
 	$type = $stype if $stype;
-	push(@result,qq/<LINK REL="stylesheet" HREF="$src">/) if $src;
+	push(@result,qq/<LINK REL="stylesheet" TYPE="$type" HREF="$src">/) if $src;
 	push(@result,style({'type'=>$type},"<!--\n$code\n-->")) if $code;
     } else {
 	push(@result,style({'type'=>$type},"<!--\n$style\n-->"));
@@ -1389,7 +1389,7 @@ sub _script {
 	    if $code && $language=~/javascript/i;
 	$code = "<!-- Hide script\n$code\n\# End script hiding -->"
 	    if $code && $language=~/perl/i;
-	push(@result,script({@satts},$code));
+	push(@result,script({@satts},$code || ''));
     }
     @result;
 }
@@ -2168,10 +2168,10 @@ sub url {
     if (exists($ENV{REQUEST_URI})) {
         my $index;
 	$script_name = $ENV{REQUEST_URI};
-        # strip path
-        substr($script_name,$index) = '' if $path and ($index = rindex($script_name,$path)) >= 0;
-        # and query string
+        # strip query string
         substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
+        # and path
+        substr($script_name,$index) = '' if $path and ($index = rindex($script_name,$path)) >= 0;
     } else {
 	$script_name = $self->script_name;
     }
@@ -2980,7 +2980,7 @@ sub new {
     my $ref = \*{'Fh::' . quotemeta($name)}; 
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
-    delete $Fh::{$FH};
+    CORE::delete $Fh::{$FH};
     return bless $ref,$pack;
 }
 END_OF_FUNC
@@ -4352,8 +4352,8 @@ one or more of -language, -src, or -code:
 			 );
 
     print $q->(-title=>'The Riddle of the Sphinx',
-	       -script=>{-language=>'PERLSCRIPT'},
-			 -code=>'print "hello world!\n;"'
+	       -script=>{-language=>'PERLSCRIPT',
+			 -code=>'print "hello world!\n;"'}
 	       );
 
 
