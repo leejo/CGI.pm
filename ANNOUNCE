@@ -1,0 +1,24 @@
+CGI.pm version 2.42 is now available for your fun and edification.
+This version includes the following bug fixes and features:
+
+1. Fixed nasty bug in url() method
+
+2. Added new features to url() method.
+
+3. Added regression tests ("make test" works)
+
+4. Remove warnings about ambiguous use of shift() when running on
+   windows platforms
+
+5. Small documentation fixes.
+
+The master copy can be found at
+http://www.genome.wi.mit.edu/ftp/pub/software/WWW/.  Mirror copies
+are available on a CPAN near you.
+
+Lincoln Stein
+
+========================================================================
+Lincoln D. Stein
+lstein@cshl.org
+========================================================================

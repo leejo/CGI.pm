@@ -1,0 +1,68 @@
+WHAT IS THIS?
+
+This is CGI.pm 2.42, an easy-to-use Perl5 library for writing World
+Wide Web CGI scripts.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If this doesn't work for you, try:
+
+   cp CGI.pm /usr/local/lib/perl5
+
+If you have trouble installing CGI.pm because you have insufficient
+access privileges to add to the perl library directory, you can still
+use CGI.pm.  See the docs for details.
+
+WHAT SYSTEMS DOES IT WORK WITH?
+
+This module works with NT, Windows, Macintosh, OS/2 and VMS servers,
+although it hasn't been tested as extensively as it should be.  See
+the docs for notes on your particular platform.
+
+WHERE IS THE DOCUMENTATION?
+
+You'll find very verbose documentation in the file cgi_docs.html,
+located in the top level directory.  
+
+Terser documentation is found in POD (plain old documentation) form in
+CGI.pm itself.  When you install CGI, the MakeMaker program will
+automatically install the manual pages for you (on Unix systems, type
+"man CGI").
+
+WHERE ARE THE EXAMPLES?
+
+A collection of examples demonstrating various CGI features and
+techniques are in the directory "examples".  Many more examples of CGI
+scripts of various degrees of complexity can be found at:
+
+   http://www.genome.wi.mit.edu/WWW/examples/Ch9/
+
+WHERE IS THE ONLINE DOCUMENTATION?
+
+Online documentation of for CGI.pm, and notifications of new versions
+can be found at:
+
+   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/
+
+A copy of this documentation can be found in the package in the file
+cgi_docs.html.
+
+WHERE CAN I LEARN MORE?
+
+I have written a book about CGI.pm called "The Official Guide to
+Programming with CGI.pm" which was published by John Wiley & Sons in
+May 1998.  If you like CGI.pm, you'll love this book.
+
+Have fun, and let me know how it turns out!
+
+Lincoln D. Stein
+lstein@cshl.org
+
