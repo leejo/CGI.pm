@@ -1,0 +1,37 @@
+From: Nicolas Kessler <usenet@kessler.cx>
+Sender: www@aurora.balcab.ch
+To: lstein@cshl.org
+Subject: Problems with XHTML support in CGI.pm 2.72
+Date: Sat, 02 Sep 2000 17:35:43 +0200
+
+Dear Mr. Stein
+
+Support for XHTML is a very welcome addition to CGI.pm.
+
+I have come across the following problems when trying to validate a
+XHTML file created with CGI.pm 2.72:
+
+1. In the DOCTYPE declaration, 'HTML' should be 'html';
+2. In the start_form() method, the value of the 'method' attribute
+   should be lowercase (i.e. 'get' instead of 'GET');
+3. The hidden() method does not produce a proper empty element
+   (the other methods producing 'input' elements seem to behave
+correctly);
+4. The 'true' values of attributes in form elements (like 'checked',
+   'multiple', etc. should be made from the names of the attribute
+rather than
+   'yes'.
+
+This is just a random list of problems that occurred with a specific
+(small)
+application. If you think that a more exhaustive test and error report
+could
+be useful, I will gladly try to set up a more complete test. I am using
+nsgmls for validation.
+
+Kind regards,
+Nicolas Kessler
+
+nicolas@kessler.cx
+
+

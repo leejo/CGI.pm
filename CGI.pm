@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.43 2000-08-25 02:56:14 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.44 2000-09-03 18:19:42 lstein Exp $';
 $CGI::VERSION='2.72';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3163,8 +3163,7 @@ sub read {
     die "Malformed multipart POST\n" unless ($start >= 0) || ($self->{LENGTH} > 0);
 
     # If the boundary begins the data, then skip past it
-    # and return undef.  The +2 here is a fiendish plot to
-    # remove the CR/LF pair at the end of the boundary.
+    # and return undef.
     if ($start == 0) {
 
 	# clear us out completely if we've hit the last boundary.
@@ -3175,7 +3174,8 @@ sub read {
 	}
 
 	# just remove the boundary.
-	substr($self->{BUFFER},0,length($self->{BOUNDARY})+2)='';
+	substr($self->{BUFFER},0,length($self->{BOUNDARY}))=''
+        $self->{BUFFER} =~ s/^\012\015?//;
 	return undef;
     }
 
