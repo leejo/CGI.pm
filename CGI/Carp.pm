@@ -443,8 +443,6 @@ END
   ;
   my $mod_perl = exists $ENV{MOD_PERL};
 
-  warningsToBrowser(1);    # emit warnings before dying
-
   if ($CUSTOM_MSG) {
     if (ref($CUSTOM_MSG) eq 'CODE') {
       print STDOUT "Content-type: text/html\n\n" 
@@ -501,6 +499,8 @@ END
         print STDOUT $mess;
     }
   }
+
+  warningsToBrowser(1);    # emit warnings before dying
 }
 
 # Cut and paste from CGI.pm so that we don't have the overhead of
