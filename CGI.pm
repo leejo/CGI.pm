@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.157 2004-03-16 14:48:08 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.158 2004-03-16 19:17:38 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1698,8 +1698,8 @@ sub startform {
     my($method,$action,$enctype,@other) = 
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
-    $method = lc($method) || 'post';
-    $enctype = $enctype || &URL_ENCODED;
+    $method  = $self->escapeHTML(lc($method) || 'post');
+    $enctype = $self->escapeHTML($enctype || &URL_ENCODED);
     if (defined $action) {
        $action = $self->escapeHTML($action);
     }
