@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.110 2003-04-23 16:47:08 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.111 2003-04-27 16:26:24 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1330,7 +1330,7 @@ sub header {
     push(@header,"Window-Target: $target") if $target;
     if ($p3p) {
        $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
-       push(@header,qq(P3P: policyref="/w3c/p3p.xml" CP="$p3p"));
+       push(@header,qq(P3P: policyref="/w3c/p3p.xml", CP="$p3p"));
     }
     # push all the cookies -- there may be several
     if ($cookie) {
@@ -1700,7 +1700,7 @@ END_OF_FUNC
 sub _textfield {
     my($self,$tag,@p) = self_or_default(@_);
     my($name,$default,$size,$maxlength,$override,@other) = 
-	rearrange([NAME,[DEFAULT,VALUE],SIZE,MAXLENGTH,[OVERRIDE,FORCE]],@p);
+	rearrange([NAME,[DEFAULT,VALUE,VALUES],SIZE,MAXLENGTH,[OVERRIDE,FORCE]],@p);
 
     my $current = $override ? $default : 
 	(defined($self->param($name)) ? $self->param($name) : $default);
