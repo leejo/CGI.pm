@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.39 2000-07-28 03:00:03 lstein Exp $';
-$CGI::VERSION='2.69';
+$CGI::revision = '$Id: CGI.pm,v 1.40 2000-08-13 15:07:04 lstein Exp $';
+$CGI::VERSION='2.70';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1162,7 +1162,7 @@ sub header {
     # need to fix it up a little.
     foreach (@other) {
         next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
-	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.unescapeHTML($value)/e;
+	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.$self->unescapeHTML($value)/e;
     }
 
     $type ||= 'text/html' unless defined($type);
@@ -1228,7 +1228,7 @@ END_OF_FUNC
 sub redirect {
     my($self,@p) = self_or_default(@_);
     my($url,$target,$cookie,$nph,@other) = rearrange([[LOCATION,URI,URL],TARGET,COOKIE,NPH],@p);
-    $url = $url || $self->self_url;
+    $url ||= $self->self_url;
     my(@o);
     foreach (@other) { tr/\"//d; push(@o,split("=",$_,2)); }
     unshift(@o,
@@ -1275,7 +1275,7 @@ sub start_html {
     $lang ||= 'en-US';
     my(@result);
     if ($dtd) {
-        if (ref $dtd && $ref eq 'ARRAY') {
+        if (defined(ref($dtd)) and (ref($dtd) eq 'ARRAY')) {
             $dtd = $DEFAULT_DTD unless $dtd->[0] =~ m|^-//|;
         } else {
             $dtd = $DEFAULT_DTD unless $dtd =~ m|^-//|;
@@ -1448,7 +1448,8 @@ sub startform {
 
     $method = uc($method) || 'POST';
     $enctype = $enctype || &URL_ENCODED;
-    $action = $action ? qq(action="$action") : qq 'action="' . $self->script_name . '"';
+    $action = $action ? qq(action="$action") : qq 'action="' . 
+              $self->url(-absolute=>1,-path=>1,-query=>1) . '"';
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
     return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
@@ -1869,8 +1870,7 @@ END_OF_FUNC
 sub unescapeHTML {
     my ($self,$string) = CGI::self_or_default(@_);
     return undef unless defined($string);
-    my $latin = uc $self->{'.charset'} eq 'ISO-8859-1' or
-                uc $self->{'.charset'} eq 'WINDOWS-1252';
+    my $latin = $self->{'.charset'} =~ /^(ISO-8859-1|WINDOWS-1252)$/i;
     # thanks to Randal Schwartz for the correct solution to this one
     $string=~ s[&(.*?);]{
 	local $_ = $1;
@@ -2075,8 +2075,8 @@ sub scrolling_list {
     $size = $size || scalar(@values);
 
     my(%selected) = $self->previous_or_default($name,$defaults,$override);
-    my($is_multiple) = $multiple ? qq/multiple="yes"/ : '';
-    my($has_size) = $size ? " size=$size" : '';
+    my($is_multiple) = $multiple ? qq/ multiple="yes"/ : '';
+    my($has_size) = $size ? qq/ size="$size"/: '';
     my($other) = @other ? " @other" : '';
 
     $name=$self->escapeHTML($name);
@@ -2811,7 +2811,7 @@ sub read_multipart {
 	my($param)= $header{'Content-Disposition'}=~/ name="?([^\";]*)"?/;
 
 	# Bug:  Netscape doesn't escape quotation marks in file names!!!
-	my($filename) = $header{'Content-Disposition'}=~/ filename="?([^\";]*)"?/;
+	my($filename) = $header{'Content-Disposition'}=~/ filename="?([^\"]*)"?/;
 
 	# add this parameter to our list
 	$self->add_parameter($param);
@@ -3727,13 +3727,13 @@ the keys are the names of the CGI parameters, and the values are the
 parameters' values.  The Vars() method does this.  Called in a scalar
 context, it returns the parameter list as a tied hash reference.
 Changing a key changes the value of the parameter in the underlying
-CGI parameter list.  Called in an array context, it returns the
+CGI parameter list.  Called in a list context, it returns the
 parameter list as an ordinary hash.  This allows you to read the
 contents of the parameter list, but not to change it.
 
 When using this, the thing you must watch out for are multivalued CGI
 parameters.  Because a hash cannot distinguish between scalar and
-array context, multivalued parameters will be returned as a packed
+list context, multivalued parameters will be returned as a packed
 string, separated by the "\0" (null) character.  You must split this
 packed string in order to get at the individual values.  This is the
 convention introduced long ago by Steve Brenner in his cgi-lib.pl

@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.69, 7/27/2000, L. Stein
+Version 2.70, 8/4/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4644,6 +4644,15 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+
+<h3>Version 2.70</h3>
+<p>
+August 4, 2000
+<ol>
+  <li>Fixed bug in scrolling_list() which omitted a space in front of the "multiple" attribute.
+  <li>Squashed the "useless use of string in void context" message from redirects.
+</ol>
+
 <h3>Version 2.69</h3>
 <ol>
   <li>startform() now creates default ACTION for POSTs as well as GETs.
@@ -5481,6 +5490,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Jul 27 22:59:03 EDT 2000
+Last modified: Fri Aug  4 15:36:23 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>
