@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.57, X/XX/1999, L. Stein
+Version 2.57, 2/15/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -769,19 +769,7 @@ This will result in an HTML tag that looks like this:
 </PRE>
 
 Parameter names are case insensitive: you can use -name, or -Name or
--NAME.  You don't have to use the hyphen if you don't want to.  After
-creating a CGI object, call the <STRONG><CODE>
-use_named_parameters()</CODE></STRONG> method with
-a nonzero value.  This will tell CGI.pm that you intend to use named
-parameters exclusively:
-
-<PRE>
-   $query = new CGI;
-   $query-&gt;use_named_parameters(1);
-   $field = $query-&gt;radio_group('name'=&gt;'OS',
-                                'values'=&gt;['Unix','Windows','Macintosh'],
-                                'default'=&gt;'Unix');
-</PRE>
+-NAME.
 
 Actually, CGI.pm only looks for a hyphen in the first parameter.  So
 you can leave it off subsequent parameters if you like.  Something to
@@ -3842,8 +3830,8 @@ print header,
 }
 </pre></blockquote>
 
-<strong>Important configuration note:</strong> When using CGI.pm with
-mod_perl be careful <strong>not</strong> to enable either the
+<strong>Configuration note:</strong> When using CGI.pm with mod_perl
+it is <strong>not</strong> necessary to enable either the
 <tt>PerlSendHeader</tt> or <tt>PerlSetupEnv</tt> directives.  This is
 handled automatically by CGI.pm and by Apache::Registry.
 
@@ -4583,12 +4571,15 @@ you.
 
 <h3>Version 2.57</h3>
 <ol>
+  <li>Removed use_named_parameters() because of dependency problems
+      and general lameness.
   <li>Silenced a warning on upload (patch provided by Jonas Liljegren)
   <li>Fixed race condition in CGI::Carp when errors occur during parsing
       (patch provided by Maurice Aubrey).
   <li>Fixed failure of url(-path_info=>1) when path contains % signs.
   <li>Fixed warning from CGI::Cookie when receiving foreign cookies
       that don't use name=value format.
+  <li>Fixed incompatibilities with file uploading on VMS systems.
 </ol>
 <h3>Version 2.56</h3>
 <ol>
@@ -5313,6 +5304,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Jan 17 13:23:41 EST 2000
+Last modified: Tue Feb 15 15:04:12 EST 2000
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -15,7 +15,7 @@ package CGI::Cookie;
 
 $CGI::Cookie::VERSION='1.13';
 
-use CGI qw(-no_debug);
+use CGI::Util 'rearrange';
 use overload '""' => \&as_string,
     'cmp' => \&compare,
     'fallback'=>1;
@@ -80,7 +80,7 @@ sub new {
     my $class = shift;
     $class = ref($class) if ref($class);
     my($name,$value,$path,$domain,$secure,$expires) =
-	CGI->rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES],@_);
+      rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES],@_);
 
     # Pull out our parameters.
     my @values;
