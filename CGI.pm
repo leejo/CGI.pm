@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.158 2004-03-16 19:17:38 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.159 2004-03-16 22:51:54 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1568,9 +1568,9 @@ sub _style {
     for my $s (@s) {
       if (ref($s)) {
        my($src,$code,$verbatim,$stype,$foo,@other) =
-           rearrange([SRC,CODE,VERBATIM,TYPE],
-                      '-foo'=>'bar',    # trick to allow dash to be omitted
-                      ref($s) eq 'ARRAY' ? @$s : %$s);
+           rearrange([qw(SRC CODE VERBATIM TYPE FOO)],
+                      ('-foo'=>'bar',
+                       ref($s) eq 'ARRAY' ? @$s : %$s));
        $type  = $stype if $stype;
        my $other = @other ? join ' ',@other : '';
 
@@ -1592,7 +1592,7 @@ sub _style {
            my @v = ref($verbatim) eq 'ARRAY' ? @$verbatim : $verbatim;
            push(@result, "<style type=\"text/css\">\n$_\n</style>") foreach @v;
       }
-      my @c = ref($code) eq 'ARRAY' ? @$code : $code;
+      my @c = ref($code) eq 'ARRAY' ? @$code : $code if $code;
       push(@result,style({'type'=>$type},"$cdata_start\n$_\n$cdata_end")) foreach @c;
 
       } else {
