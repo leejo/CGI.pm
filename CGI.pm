@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.111 2003-04-27 16:26:24 lstein Exp $';
-$CGI::VERSION='2.92';
+$CGI::revision = '$Id: CGI.pm,v 1.112 2003-04-28 13:35:56 lstein Exp $';
+$CGI::VERSION='2.93';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -330,7 +330,7 @@ sub DESTROY { }
 sub r {
   my $self = shift;
   my $r = $self->{'.r'};
-  $self->{'.r'} = shift if @ARGV;
+  $self->{'.r'} = shift if @_;
   $r;
 }
 
