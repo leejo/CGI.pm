@@ -1067,6 +1067,8 @@ All parameters are optional:
       &lt;META NAME="description" CONTENT="copyright 1996 King Tut"&gt;
       </pre></blockquote>
       To create an HTTP-EQUIV tag, use the <B>-head</B> argument as described below.
+  <li>The <b>-encoding</b> argument can be used to specify the character set for
+       XHTML.  It defaults to UTF-8 if not specified.
   <li>A <strong>-lang</strong>> argument is used to incorporate a language attribute into
       the &lt;HTM&gt;> tag.  The default if not specified is "en-US" for US English.  For example:
 <blockquote><pre>
@@ -4687,6 +4689,13 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.78</h3>
+<ol>
+  <li>Added ability to change encoding in <?xml> assertion.
+  <li>Fixed the old escapeHTML('CGI') ne "CGI" bug
+</ol>
+
+
 <h3>Version 2.77</h3>
 <ol>
   <li>No new features, but released in order to fix an apparent CPAN bug.
@@ -5611,6 +5620,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Aug  7 08:28:23 EDT 2001
+Last modified: Fri Aug 10 03:27:40 EDT 2001
 <!-- hhmts end -->
 </BODY> </HTML>

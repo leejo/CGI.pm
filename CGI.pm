@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.51 2001-08-07 12:28:43 lstein Exp $';
-$CGI::VERSION='2.77';
+$CGI::revision = '$Id: CGI.pm,v 1.52 2001-08-27 19:08:57 lstein Exp $';
+$CGI::VERSION='2.78';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1311,8 +1311,11 @@ END_OF_FUNC
 'start_html' => <<'END_OF_FUNC',
 sub start_html {
     my($self,@p) = &self_or_default(@_);
-    my($title,$author,$base,$xbase,$script,$noscript,$target,$meta,$head,$style,$dtd,$lang,@other) = 
-	rearrange([TITLE,AUTHOR,BASE,XBASE,SCRIPT,NOSCRIPT,TARGET,META,HEAD,STYLE,DTD,LANG],@p);
+    my($title,$author,$base,$xbase,$script,$noscript,
+        $target,$meta,$head,$style,$dtd,$lang,$encoding,@other) = 
+	rearrange([TITLE,AUTHOR,BASE,XBASE,SCRIPT,NOSCRIPT,TARGET,META,HEAD,STYLE,DTD,LANG,ENCODING],@p);
+
+    $encoding = 'utf-8' unless defined $encoding;
 
     # strangely enough, the title needs to be escaped as HTML
     # while the author needs to be escaped as a URL
@@ -1332,7 +1335,7 @@ sub start_html {
 
     $xml_dtd++ if ref($dtd) eq 'ARRAY' && $dtd->[0] =~ /\bXHTML\b/i;
     $xml_dtd++ if ref($dtd) eq '' && $dtd =~ /\bXHTML\b/i;
-    push @result,q(<?xml version="1.0" encoding="utf-8"?>) if $xml_dtd; 
+    push @result,qq(<?xml version="1.0" encoding="$encoding"?>) if $xml_dtd; 
 
     if (ref($dtd) && ref($dtd) eq 'ARRAY') {
         push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd->[0]"\n\t"$dtd->[1]">));
@@ -1911,6 +1914,8 @@ END_OF_FUNC
 # Escape HTML -- used internally
 'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
+         # hack to work around  earlier hacks
+         push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
          my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
          return undef unless defined($toencode);
          return $toencode if ref($self) && $self->{'dontescape'};
@@ -4393,6 +4398,9 @@ the <HTML> tag.  The default if not specified is "en-US" for US
 English.  For example:
 
     print $q->start_html(-lang=>'fr-CA');
+
+The B<-encoding> argument can be used to specify the character set for
+XHTML.  It defaults to UTF-8 if not specified.
 
 You can place other arbitrary HTML elements to the <HEAD> section with the
 B<-head> tag.  For example, to place the rarely-used <LINK> element in the

@@ -6,7 +6,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(rearrange make_attributes unescape escape expires);
 
-$VERSION = '1.2';
+$VERSION = '1.3';
 
 $EBCDIC = "\t" ne "\011";
 if ($EBCDIC) {
@@ -266,7 +266,7 @@ sub utf8_chr ($) {
 
 # unescape URL-encoded data
 sub unescape {
-  shift() if ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass);
+  shift() if @_ > 1 and (ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass));
   my $todecode = shift;
   return undef unless defined($todecode);
   $todecode =~ tr/+/ /;       # pluses become spaces
@@ -282,7 +282,7 @@ sub unescape {
 
 # URL-encode data
 sub escape {
-  shift() if ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass);
+  shift() if @_ > 1 and ( ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass));
   my $toencode = shift;
   return undef unless defined($toencode);
     $EBCDIC = "\t" ne "\011";
