@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.115 2003-05-12 00:22:27 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.116 2003-05-15 14:42:56 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1051,7 +1051,7 @@ EOF
 'delete_all' => <<'EOF',
 sub delete_all {
     my($self) = self_or_default(@_);
-    my @param = $self->param;
+    my @param = $self->param();
     $self->delete(@param);
 }
 EOF
