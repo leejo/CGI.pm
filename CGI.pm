@@ -18,7 +18,7 @@ require 5.004;
 #   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/cgi_docs.html
 #   ftp://ftp-genome.wi.mit.edu/pub/software/WWW/
 
-$CGI::revision = '$Id: CGI.pm,v 1.1 1998-10-08 20:23:02 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.2 1998-11-24 12:20:46 lstein Exp $';
 $CGI::VERSION='2.43';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -157,15 +157,15 @@ if ($needs_binmode) {
 			   tt u i b blockquote pre img a address cite samp dfn html head
 			   base body Link nextid title meta kbd start_html end_html
 			   input Select option comment/],
-		':html3'=>[qw/div table caption th td TR Tr sup sub strike applet Param 
+		':html3'=>[qw/div table caption th td TR Tr sup Sub strike applet Param 
 			   embed basefont style span layer ilayer font frameset frame script small big/],
 		':netscape'=>[qw/blink fontsize center/],
 		':form'=>[qw/textfield textarea filefield password_field hidden checkbox checkbox_group 
 			  submit reset defaults radio_group popup_menu button autoEscape
 			  scrolling_list image_button start_form end_form startform endform
 			  start_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
-		':cgi'=>[qw/param path_info path_translated url self_url script_name cookie dump
-			 raw_cookie request_method query_string accept user_agent remote_host 
+		':cgi'=>[qw/param path_info path_translated url self_url script_name cookie Dump
+			 raw_cookie request_method query_string Accept user_agent remote_host 
 			 remote_addr referer server_name server_software server_port server_protocol
 			 virtual_host remote_ident auth_type http use_named_parameters 
 			 save_parameters restore_parameters param_fetch
@@ -280,7 +280,7 @@ sub param {
 	$name = $p[0];
     }
 
-    return () unless defined($name) && $self->{$name};
+    return unless defined($name) && $self->{$name};
     return wantarray ? @{$self->{$name}} : $self->{$name}->[0];
 }
 
@@ -322,6 +322,7 @@ sub self_or_CGI {
 sub init {
     my($self,$initializer) = @_;
     my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
+    local($/) = "\n";
 
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
@@ -1052,6 +1053,7 @@ sub save {
     $filehandle = to_filehandle($filehandle);
     my($param);
     local($,) = '';  # set print field separator back to a sane value
+    local($\) = '';  # set output line separator to a sane value
     foreach $param ($self->param) {
 	my($escaped_param) = escape($param);
 	my($value);
@@ -1160,7 +1162,7 @@ sub header {
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.
     foreach (@other) {
-	next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
+        next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
 	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ": $value"/e;
     }
 
@@ -1176,7 +1178,8 @@ sub header {
     if ($cookie) {
 	my(@cookie) = ref($cookie) && ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie;
 	foreach (@cookie) {
-	    push(@header,"Set-Cookie: " . (UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_));
+            my $cs = UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_;
+	    push(@header,"Set-Cookie: $cs") if $cs ne '';
 	}
     }
     # if the user indicates an expiration time, then we need
@@ -2357,8 +2360,8 @@ END_OF_FUNC
 # declares a quantitative score for it.
 # This handles MIME type globs correctly.
 ####
-'accept' => <<'END_OF_FUNC',
-sub accept {
+'Accept' => <<'END_OF_FUNC',
+sub Accept {
     my($self,$search) = self_or_CGI(@_);
     my(%prefs,$type,$pref,$pat);
     
@@ -2862,10 +2865,7 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 'asString' => <<'END_OF_FUNC',
 sub asString {
     my $self = shift;
-    my $i = $$self;
-    $i=~ s/^\*(\w+::)+//; # get rid of package name
-    $i =~ s/\\(.)/$1/g;
-    return $i;
+    return ${*{$self}{SCALAR}};
 }
 END_OF_FUNC
 
@@ -2882,11 +2882,12 @@ sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
     ++$FH;
-    *{$FH} = quotemeta($name);
-    sysopen($FH,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL()) 
+    my $ref = \*{'Fh::' . quotemeta($name)};
+    sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL()) 
 	|| die "CGI open of $file: $!\n";
     unlink($file) if $delete;
-    return bless \*{$FH},$pack;
+    delete $Fh::{$FH};
+    return bless $ref,$pack;
 }
 END_OF_FUNC
 
@@ -2904,10 +2905,10 @@ END_OF_AUTOLOAD
 package MultipartBuffer;
 
 # how many bytes to read at a time.  We use
-# a 5K buffer by default.
-$INITIAL_FILLUNIT = 1024 * 5;
-$TIMEOUT = 10*60;       # 10 minute timeout
-$SPIN_LOOP_MAX = 1000;  # bug fix for some Netscape servers
+# a 4K buffer by default.
+$INITIAL_FILLUNIT = 1024 * 4;
+$TIMEOUT = 240*60;       # 4 hour timeout for big files
+$SPIN_LOOP_MAX = 2000;  # bug fix for some Netscape servers
 $CRLF=$CGI::CRLF;
 
 #reuse the autoload function
@@ -2951,8 +2952,8 @@ sub new {
 	# characters "--" PLUS the Boundary string
 
 	# BUG: IE 3.01 on the Macintosh uses just the boundary -- not
-	# the two extra spaces.  We do a special case here on the user-agent!!!!
-	$boundary = "--$boundary" unless CGI::user_agent('MSIE 3\.0[12];  Mac');
+	# the two extra hyphens.  We do a special case here on the user-agent!!!!
+	$boundary = "--$boundary" unless CGI::user_agent('MSIE 3\.0[12];  ?Mac');
 
     } else { # otherwise we find it ourselves
 	my($old);
@@ -5208,6 +5209,9 @@ reset() creates the "reset" button.  Note that it restores the
 form to its value from the last time the script was called, 
 NOT necessarily to the defaults.
 
+Note that this conflicts with the Perl reset() built-in.  Use
+CORE::reset() to get the original reset function.
+
 =head2 CREATING A DEFAULT BUTTON
 
    print $query->defaults('button_label')
@@ -5655,16 +5659,17 @@ through this interface.  The methods are as follows:
 
 =over 4
 
-=item B<accept()>
+=item B<Accept()>
 
-Return a list of MIME types that the remote browser
-accepts. If you give this method a single argument
-corresponding to a MIME type, as in
-$query->accept('text/html'), it will return a
-floating point value corresponding to the browser's
-preference for this type from 0.0 (don't want) to 1.0.
-Glob types (e.g. text/*) in the browser's accept list
-are handled correctly.
+Return a list of MIME types that the remote browser accepts. If you
+give this method a single argument corresponding to a MIME type, as in
+$query->Accept('text/html'), it will return a floating point value
+corresponding to the browser's preference for this type from 0.0
+(don't want) to 1.0.  Glob types (e.g. text/*) in the browser's accept
+list are handled correctly.
+
+Note that the capitalization changed between version 2.43 and 2.44 in
+order to avoid conflict with Perl's accept() function.
 
 =item B<raw_cookie()>
 
@@ -6100,7 +6105,7 @@ for suggestions and bug fixes.
 				  -rows=>10,
 				  -columns=>50);
  
-	   print "<P>",$query->reset;
+	   print "<P>",$query->Reset;
 	   print $query->submit('Action','Shout');
 	   print $query->submit('Action','Scream');
 	   print $query->endform;

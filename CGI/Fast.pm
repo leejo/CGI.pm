@@ -16,7 +16,7 @@ package CGI::Fast;
 # The most recent version and complete docs are available at:
 #   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/cgi_docs.html
 #   ftp://ftp-genome.wi.mit.edu/pub/software/WWW/
-$CGI::Fast::VERSION='1.00a';
+$CGI::Fast::VERSION='1.01';
 
 use CGI;
 use FCGI;
@@ -34,9 +34,11 @@ sub save_request {
 # New is slightly different in that it calls FCGI's
 # accept() method.
 sub new {
-    return undef unless FCGI::accept() >= 0;
-    my($self,@param) = @_;
-    return $CGI::Q = $self->SUPER::new(@param);
+     my ($self, $initializer, @param) = @_;
+     unless (defined $initializer) {
+         return undef unless FCGI::accept() >= 0;
+     }
+     return $CGI::Q = $self->SUPER::new($initializer, @param);
 }
 
 1;

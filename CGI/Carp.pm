@@ -155,6 +155,10 @@ set_message() from within a BEGIN{} block.
 1.10 Patch from Chris Dean (ctdean@cogit.com) to allow 
      module to run correctly under mod_perl.
 
+1.11 Changed order of &gt; and &lt; escapes.
+
+1.12 Changed die() on line 217 to CORE::die to avoid B<-w> warning.
+
 =head1 AUTHORS
 
 Lincoln D. Stein <lstein@genome.wi.mit.edu>.  Feel free to redistribute
@@ -178,7 +182,7 @@ use Carp;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 $main::SIG{__DIE__}=\&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.11';
+$CGI::Carp::VERSION = '1.12';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -195,7 +199,7 @@ sub import {
 
 # These are the originals
 sub realwarn { warn(@_); }
-sub realdie { die(@_); }
+sub realdie { CORE::die(@_); }
 
 sub id {
     my $level = shift;
@@ -268,7 +272,7 @@ EOF
 sub carpout {
     my($in) = @_;
     my($no) = fileno(to_filehandle($in));
-    die "Invalid filehandle $in\n" unless defined $no;
+    realdie("Invalid filehandle $in\n") unless defined $no;
     
     open(SAVEERR, ">&STDERR");
     open(STDERR, ">&$no") or 

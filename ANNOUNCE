@@ -1,20 +1,24 @@
-CGI.pm version 2.42 is now available for your fun and edification.
+CGI.pm version 2.43 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
-1. Fixed nasty bug in url() method
-
-2. Added new features to url() method.
-
-3. Added regression tests ("make test" works)
-
-4. Remove warnings about ambiguous use of shift() when running on
-   windows platforms
-
-5. Small documentation fixes.
+1. Fixed problem with "use strict" and file uploads (thanks to Peter Haworth)
+2. Fixed problem with not MSIE 3.01 for the power_mac not doing
+      file uploads right.
+3. Fixed problem with file upload on IIS 4.0 when authorization in
+      use.
+4. -content_type and '-content-type' can now be provided to
+      header() as synonyms for -type.
+5. CGI::Carp now escapes the ampersand BEFORE escaping the &gt; and
+      &lt; signs.
+6. Fixed "not an array reference" error when passing a hash
+      reference to radio_group().
+7. Fixed non-removal of uploaded TMP files on NT platforms which
+      occurs when server runs on non-C drive (thanks to Steve Kilbane
+      for finding this one).
 
 The master copy can be found at
-http://www.genome.wi.mit.edu/ftp/pub/software/WWW/.  Mirror copies
-are available on a CPAN near you.
+http://stein.cshl.org/WWW/software/CGI/.  Mirror copies are
+available on a CPAN near you.
 
 Lincoln Stein
 

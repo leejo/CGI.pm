@@ -401,6 +401,7 @@ Get or set the cookie's expiration time.
 
 =head1 AUTHOR INFORMATION
 
+Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  It may
 be used and modified freely, but I do request that this copyright
 notice remain attached to the file.  You may modify this module as you
 wish, but if you redistribute a modified version, please attach a note

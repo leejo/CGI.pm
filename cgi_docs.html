@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.43, 7/??/98, L. Stein
+Version 2.44, 10/28/98, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -109,7 +109,7 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
   <LI><A HREF="#book">The CGI.pm Book</A>
   <LI><A HREF="#y2000">CGI.pm and the Year 2000 Problem</A>
   <LI><A HREF="#bugs">Bug Reporting and Support</A>
-  <LI><A HREF="#new">What's new in version 2.42?</A>
+  <LI><A HREF="#new">What's new in version 2.44?</A>
 </MENU>
 
 <HR>
@@ -117,8 +117,8 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 <H2>Downloading & Installation</H2>
 </A>
 <ul>
-  <li><STRONG><A HREF="CGI.pm-2.42.tar.gz">Download 2.42 (gzip tar archive)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm-2.42.zip">Download 2.42 (pkzip archive)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm-2.43.tar.gz">Download 2.43 (gzip tar archive)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm-2.43.zip">Download 2.43 (pkzip archive)</A></STRONG>
   <li><STRONG><A HREF="CGI.pm-2.41.sit">Download 2.41
       (Macintosh stuffit archive)</A></STRONG>
   <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
@@ -131,7 +131,7 @@ version 2.42!</em>
 
 The current version of the software can always be downloaded from the
 master copy of this document maintained at <a
-href="http://www.genome.wi.mit.edu/ftp/pub/software/WWW/">http://www.genome.wi.mit.edu/ftp/pub/software/WWW/</a>.
+href="http://stein.cshl.org/WWW/software/CGI/">http://stein.cshl.org/WWW/software/CGI/</a>.
 
 <P>
 
@@ -2680,15 +2680,16 @@ into a string, as in:
 Some of the more useful environment variables can be fetched
 through this interface.  The methods are as follows:
 <DL>
-  <DT>accept()   
+  <DT>Accept()   
   <DD>Return a list of MIME types that the remote browser
        accepts. If you give this method a single argument
        corresponding to a MIME type, as in
-       <CODE>$query-&gt;accept('text/html')</CODE>, it will return a
+       <CODE>$query-&gt;Accept('text/html')</CODE>, it will return a
        floating point value corresponding to the browser's
        preference for this type from 0.0 (don't want) to 1.0.
        Glob types (e.g. text/*) in the browser's accept list
-       are handled correctly.
+       are handled correctly.  Note the capitalization of the initial letter.  This avoids
+      conflict with the Perl built-in accept().
   <DT>auth_type()
   <DD>Return the authorization type, if protection is active.  Example "Basic".
   <DT><a name="raw_cookie">raw_cookie()</a>
@@ -4358,9 +4359,18 @@ perl -V
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.44</h3>
+<ol>
+  <li>Fixed bug in header() that prevented fields from containing double quotes.
+  <li>Changed accept() to Accept(), sub() to Sub().  There's still a conflict with
+      reset(), but this will break too many existing scripts!
+</ol>
 
 <h3>Version 2.43</h3>
 <ol>
+  <li>Fixed problem with "use strict" and file uploads (thanks to Peter Haworth)
+  <li>Fixed problem with not MSIE 3.01 for the power_mac not doing
+      file uploads right.
   <li>Fixed problem with file upload on IIS 4.0 when authorization in
       use.
   <li>-content_type and '-content-type' can now be provided to
@@ -4968,6 +4978,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Sep 11 09:44:43 EDT 1998
+Last modified: Wed Oct 28 10:17:20 EST 1998
 <!-- hhmts end -->
 </BODY> </HTML>
