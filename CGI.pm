@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.68 2002-09-11 12:26:36 lstein Exp $';
-$CGI::VERSION='2.84';
+$CGI::revision = '$Id: CGI.pm,v 1.69 2002-09-12 03:45:05 lstein Exp $';
+$CGI::VERSION='2.85';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -384,6 +384,9 @@ sub init {
 
     # set charset to the safe ISO-8859-1
     $self->charset('ISO-8859-1');
+
+    # set autoescaping to on
+    $self->{'escape'} = 1;
 
   METHOD: {
 
@@ -997,8 +1000,8 @@ EOF
 'autoEscape' => <<'END_OF_FUNC',
 sub autoEscape {
     my($self,$escape) = self_or_default(@_);
-    my $d = $self->{'dontescape'};
-    $self->{'dontescape'} = $escape;
+    my $d = $self->{'escape'};
+    $self->{'escape'} = $escape;
     $d;
 }
 END_OF_FUNC
@@ -1947,7 +1950,7 @@ sub escapeHTML {
          push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
          my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
          return undef unless defined($toencode);
-         return $toencode if ref($self) && $self->{'dontescape'};
+         return $toencode if ref($self) && !$self->{'escape'};
          $toencode =~ s{&}{&amp;}gso;
          $toencode =~ s{<}{&lt;}gso;
          $toencode =~ s{>}{&gt;}gso;
