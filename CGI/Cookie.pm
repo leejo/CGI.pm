@@ -13,9 +13,9 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.14';
+$CGI::Cookie::VERSION='1.16';
 
-use CGI::Util 'rearrange';
+use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string,
     'cmp' => \&compare,
     'fallback'=>1;
@@ -63,8 +63,8 @@ sub parse {
     my(@pairs) = split("; ",$raw_cookie);
     foreach (@pairs) {
 	my($key,$value) = split("=");
-	my(@values) = map CGI::unescape($_),split('&',$value);
-	$key = CGI::unescape($key);
+	my(@values) = map unescape($_),split('&',$value);
+	$key = unescape($key);
 	# Some foreign cookies are not in name=value format, so ignore
 	# them.
 	next if !defined($value);
@@ -123,8 +123,8 @@ sub as_string {
     push(@constant_values,"expires=$expires") if $expires = $self->expires;
     push(@constant_values,'secure') if $secure = $self->secure;
 
-    my($key) = CGI::escape($self->name);
-    my($cookie) = join("=",$key,join("&",map CGI::escape($_),$self->value));
+    my($key) = escape($self->name);
+    my($cookie) = join("=",$key,join("&",map escape($_),$self->value));
     return join("; ",$cookie,@constant_values);
 }
 
@@ -166,7 +166,7 @@ sub secure {
 sub expires {
     my $self = shift;
     my $expires = shift;
-    $self->{'expires'} = CGI::expires($expires,'cookie') if defined $expires;
+    $self->{'expires'} = CGI::Util::expires($expires,'cookie') if defined $expires;
     return $self->{'expires'};
 }
 

@@ -1,19 +1,9 @@
-CGI.pm version 2.56 is now available for your fun and edification.
-This will be the last version of the monolithic CGI.pm module.
-
+CGI.pm version 2.60 is now available for your fun and edification.
 The new version, 3.0, will be fully modularized and optimized for
 faster loading and execution (thanks to a comprehensive rewrite by
 David James).
 
-Fixes in this version:
-
-1. Fixed bugs in file uploaded introduced in version 2.55.
-
-2. Fixed long-standing bug which prevented two files with identical
-names from being uploaded.
-
 Lincoln Stein
-9/14/99
 
 ========================================================================
 Lincoln D. Stein
