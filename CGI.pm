@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.56 2001-12-09 21:36:23 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.57 2002-01-12 02:19:25 lstein Exp $';
 $CGI::VERSION='2.79';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -662,14 +662,14 @@ sub _selected {
   my $self = shift;
   my $value = shift;
   return '' unless $value;
-  return $XHTML ? qq( selected="1") : qq( selected);
+  return $XHTML ? qq( selected="selected") : qq( selected);
 }
 
 sub _checked {
   my $self = shift;
   my $value = shift;
   return '' unless $value;
-  return $XHTML ? qq( checked="1") : qq( checked);
+  return $XHTML ? qq( checked="checked") : qq( checked);
 }
 
 sub _reset_globals { initialize_globals(); }
@@ -2057,7 +2057,7 @@ sub radio_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	my($checkit) = $checked eq $_ ? qq/ checked="1"/ : '';
+	my($checkit) = $checked eq $_ ? qq/ checked="checked"/ : '';
 	my($break);
 	if ($linebreak) {
           $break = $XHTML ? "<br />" : "<br>";
@@ -2123,7 +2123,7 @@ sub popup_menu {
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	my($value) = $self->escapeHTML($_);
 	$label=$self->escapeHTML($label,1);
-	$result .= "<option $selectit value=\"$value\">$label</option>\n";
+	$result .= "<option$selectit value=\"$value\">$label</option>\n";
     }
 
     $result .= "</select>";
@@ -2177,7 +2177,7 @@ sub scrolling_list {
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	$label=$self->escapeHTML($label);
 	my($value)=$self->escapeHTML($_,1);
-	$result .= "<option $selectit value=\"$value\">$label</option>\n";
+	$result .= "<option$selectit value=\"$value\">$label</option>\n";
     }
     $result .= "</select>";
     $self->register_parameter($name);
