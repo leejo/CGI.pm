@@ -268,7 +268,7 @@ use Exporter;
 #use Carp;
 BEGIN { 
   require Carp; 
-  *CORE::GLOBAL::die = \&CGI::Carp::die;
+#  *CORE::GLOBAL::die = \&CGI::Carp::die;
 }
 
 use File::Spec;
@@ -278,7 +278,7 @@ use File::Spec;
 @EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message set_progname cluck ^name= die);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
-# $main::SIG{__DIE__} =\&CGI::Carp::die;
+$main::SIG{__DIE__} =\&CGI::Carp::die;
 
 $CGI::Carp::VERSION    = '1.26';
 $CGI::Carp::CUSTOM_MSG = undef;
@@ -378,7 +378,7 @@ sub ineval {
   (exists $ENV{MOD_PERL} ? 0 : $^S) || _longmess() =~ /eval [\{\']/m
 }
 
-sub die (@) {
+sub die {
   my ($arg) = @_;
   realdie @_ if ineval;
   if (!ref($arg)) {
