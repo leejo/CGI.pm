@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.121 2003-06-06 19:25:22 lstein Exp $';
-$CGI::VERSION='2.94';
+$CGI::revision = '$Id: CGI.pm,v 1.122 2003-06-13 02:32:42 lstein Exp $';
+$CGI::VERSION='2.95';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1530,10 +1530,12 @@ sub _style {
       }
       if ($verbatim) {
          push(@result, "<style type=\"text/css\">\n$verbatim\n</style>");
-    }      
+    }
       push(@result,style({'type'=>$type},"$cdata_start\n$code\n$cdata_end")) if $code;
     } else {
-     push(@result,style({'type'=>$type},"$cdata_start\n$style\n$cdata_end"));
+         my $src = $style;
+         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
+                             : qq(<link rel="stylesheet" type="$type" href="$src"@other>));
     }
     @result;
 }
