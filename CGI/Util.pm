@@ -141,6 +141,7 @@ sub simple_escape {
 
 sub utf8_chr {
         my $c = shift(@_);
+	return chr($c) if $] >= 5.006;
 
         if ($c < 0x80) {
                 return sprintf("%c", $c);

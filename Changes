@@ -22,6 +22,10 @@
         IE6 (and maybe some versions of Opera) were getting confused by this.
    12. Support for tab indexes.
    13. Retired the HTML docs.  The POD docs are now primary documentation.
+   14. CGI::Carp now correctly detects and handles Apache::Dispatch.
+   15. CGI::Util::utf8_chr now correctly sets the UTF8 flag on 5.006 or
+	higher perls (fix courtesy Slaven Rezic).
+
 
   Version 3.05
 

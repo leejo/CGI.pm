@@ -63,13 +63,13 @@ is(textfield(-name     => 'weather',
 
 is(checkbox(-name  => 'weather',
 	    -value => 'nice'),
-   qq(<input type="checkbox" name="weather" value="nice" tabindex="6" />weather),
+   qq(<label><input type="checkbox" name="weather" value="nice" tabindex="6" />weather</label>),
    "checkbox()");
 
 is(checkbox(-name  => 'weather',
 	    -value => 'nice',
 	    -label => 'forecast'),
-   qq(<input type="checkbox" name="weather" value="nice" tabindex="7" />forecast),
+   qq(<label><input type="checkbox" name="weather" value="nice" tabindex="7" />forecast</label>),
    "checkbox()");
 
 is(checkbox(-name     => 'weather',
@@ -77,13 +77,13 @@ is(checkbox(-name     => 'weather',
 	    -label    => 'forecast',
 	    -checked  => 1,
 	    -override => 1),
-   qq(<input type="checkbox" name="weather" value="nice" tabindex="8" checked="checked" />forecast),
+   qq(<label><input type="checkbox" name="weather" value="nice" tabindex="8" checked="checked" />forecast</label>),
    "checkbox()");
 
 is(checkbox(-name  => 'weather',
 	    -value => 'dull',
 	    -label => 'forecast'),
-   qq(<input type="checkbox" name="weather" value="dull" tabindex="9" checked="checked" />forecast),
+   qq(<label><input type="checkbox" name="weather" value="dull" tabindex="9" checked="checked" />forecast</label>),
    "checkbox()");
 
 is(radio_group(-name => 'game'),

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.176 2005-02-10 04:17:00 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.177 2005-03-09 21:04:48 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1709,7 +1709,7 @@ sub _script {
      push(@satts,'src'=>$src) if $src;
      push(@satts,'language'=>$language) unless defined $type;
      push(@satts,'type'=>$type);
-     $code = "$cdata_start$code$cdata_end" if defined $code;
+     $code = $cdata_start . $code . $cdata_end if defined $code;
      push(@result,$self->script({@satts},$code || ''));
     }
     @result;
@@ -1925,7 +1925,7 @@ sub textarea {
     $current = defined($current) ? $self->escapeHTML($current) : '';
     my($r) = $rows ? qq/ rows="$rows"/ : '';
     my($c) = $cols ? qq/ cols="$cols"/ : '';
-    my($other) = @other ? " @other" : ''
+    my($other) = @other ? " @other" : '';
     $tabindex = $self->element_tab($tabindex);
     return qq{<textarea name="$name" tabindex="$tabindex"$r$c$other>$current</textarea>};
 }
@@ -2096,7 +2096,7 @@ sub checkbox {
     my($other) = @other ? " @other" : '';
     $tabindex = $self->element_tab($tabindex);
     $self->register_parameter($name);
-    return $XHTML ? qq{<input type="checkbox" name="$name" value="$value" tabindex="$tabindex"$checked$other />$the_label}
+    return $XHTML ? CGI::label(qq{<input type="checkbox" name="$name" value="$value" tabindex="$tabindex"$checked$other />$the_label})
                   : qq{<input type="checkbox" name="$name" value="$value"$checked$other>$the_label};
 }
 END_OF_FUNC
@@ -2259,14 +2259,12 @@ sub _box_group {
     my $box_type = shift;
 
     my($name,$values,$defaults,$linebreak,$labels,$attributes,
-       $rows,$columns,$rowheaders,$colheaders,$override,$nolabels,$tabindex,@other) =
+       $rows,$columns,$rowheaders,$colheaders,
+       $override,$nolabels,$tabindex,@other) =
        rearrange([      NAME,[VALUES,VALUE],[DEFAULT,DEFAULTS],LINEBREAK,LABELS,ATTRIBUTES,
-		        ROWS,[COLUMNS,COLS],
-			ROWHEADERS,COLHEADERS,
-			[OVERRIDE,FORCE],NOLABELS,
-                        TABINDEX
-                        ],@_);
-
+		        ROWS,[COLUMNS,COLS],ROWHEADERS,COLHEADERS,
+			[OVERRIDE,FORCE],NOLABELS,TABINDEX
+                 ],@_);
     my($result,$checked);
 
 
@@ -2291,11 +2289,11 @@ sub _box_group {
     }
     %tabs = map {$_=>$self->element_tab} @values unless %tabs;
 
-    my($other) = @other ? " @other" : '';
+    my $other = @other ? " @other" : '';
     my $radio_checked;
     foreach (@values) {
-        my $checkit = $box_type eq 'radio' ? !$radio_checked++ && $self->_checked($checked{$_})
-                                           : $self->_checked($checked{$_});
+        my $checkit = $self->_checked($box_type eq 'radio' ? ($checked{$_} && !$radio_checked++)
+                                                           : $checked{$_});
 	my($break);
 	if ($linebreak) {
           $break = $XHTML ? "<br />" : "<br>";
