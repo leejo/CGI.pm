@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.173 2004-09-28 20:05:03 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.174 2004-09-28 20:06:55 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -5841,9 +5841,9 @@ handlers are called.
 Named parameter style
 
   print $query->popup_menu(-name=>'menu_name',
-                  -values=>[qw/eenie meenie minie/,
+                  -values=>[qw/eenie meenie minie/],
                             $query->optgroup(-name=>'optgroup_name',
-                                             -values ['moe','catch'],
+                                             -values => ['moe','catch'],
                                              -attributes=>{'catch'=>{'class'=>'red'}}),
                   -labels=>{'eenie'=>'one',
                             'meenie'=>'two',
@@ -5852,7 +5852,7 @@ Named parameter style
 
   Old style
   print $query->popup_menu('menu_name',
-                  ['eenie','meenie','minie',
+                  ['eenie','meenie','minie'],
                    $query->optgroup('optgroup_name', ['moe', 'catch'],
                                    {'catch'=>{'class'=>'red'}})],'meenie',
                   {'eenie'=>'one','meenie'=>'two','minie'=>'three'});
