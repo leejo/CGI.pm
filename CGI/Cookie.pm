@@ -13,54 +13,70 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.23';
+$CGI::Cookie::VERSION='1.24';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string,
     'cmp' => \&compare,
     'fallback'=>1;
 
+# Turn on special checking for Doug MacEachern's modperl
+my $MOD_PERL = 0;
+if (exists $ENV{MOD_PERL}) {
+  eval "require mod_perl";
+  if (defined $mod_perl::VERSION) {
+    if ($mod_perl::VERSION >= 1.99) {
+      $MOD_PERL = 2;
+      require Apache::RequestUtil;
+    } else {
+      $MOD_PERL = 1;
+      require Apache;
+    }
+  }
+}
+
 # fetch a list of cookies from the environment and
 # return as a hash.  the cookies are parsed as normal
 # escaped URL data.
 sub fetch {
     my $class = shift;
-    my $r     = shift;
-    my $raw_cookie;
-    if ($r && ref($r) && ($r->isa('Apache') || $r->isa('Apache::RequestRec'))) {
-      $raw_cookie = $r->headers_in->get('Cookie');
-    } else {
-      $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
-    }
-    return () unless $raw_cookie;
+    my $raw_cookie = get_raw_cookie(@_) or return;
     return $class->parse($raw_cookie);
 }
 
-# fetch a list of cookies from the environment and
-# return as a hash.  the cookie values are not unescaped
-# or altered in any way.
-sub raw_fetch {
-    my $class = shift;
-    my $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
-    return () unless $raw_cookie;
-    my %results;
-    my($key,$value);
+# Fetch a list of cookies from the environment or the incoming headers and
+# return as a hash. The cookie values are not unescaped or altered in any way.
+ sub raw_fetch {
+   my $class = shift;
+   my $raw_cookie = get_raw_cookie(@_) or return;
+   my %results;
+   my($key,$value);
+   
+   my(@pairs) = split("; ?",$raw_cookie);
+   foreach (@pairs) {
+     s/\s*(.*?)\s*/$1/;
+     if (/^([^=]+)=(.*)/) {
+       $key = $1;
+       $value = $2;
+     }
+     else {
+       $key = $_;
+       $value = '';
+     }
+     $results{$key} = $value;
+   }
+   return \%results unless wantarray;
+   return %results;
+}
 
-    my(@pairs) = split("; ?",$raw_cookie);
-    foreach (@pairs) {
-      s/\s*(.*?)\s*/$1/;
-      if (/^([^=]+)=(.*)/) {
-	$key = $1;
-	$value = $2;
-      }
-      else {
-	$key = $_;
-	$value = '';
-      }
-      $results{$key} = $value;
-    }
-    return \%results unless wantarray;
-    return %results;
+sub get_raw_cookie {
+  my $r = shift;
+  $r ||= eval { Apache->request() } if $MOD_PERL;
+  if ($r) {
+    $raw_cookie = $r->headers_in->{'Cookie'};
+  } else {
+    $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
+  }
 }
 
 
