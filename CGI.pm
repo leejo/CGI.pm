@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.142 2003-11-21 00:50:07 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.143 2003-11-21 00:54:12 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -333,8 +333,8 @@ sub new {
 sub DESTROY {
   my $self = shift;
   foreach my $href (values %{$self->{'.tmpfiles'}}) {
-    $href->{hndl}->DESTROY;
-    $href->{name}->DESTROY;
+    $href->{hndl}->DESTROY if defined $href->{hndl};
+    $href->{name}->DESTROY if defined $href->{name};
   }
 }
 
