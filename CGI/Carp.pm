@@ -243,6 +243,8 @@ non-overridden program name
      former isn't working in some people's hands.  There is no such thing
      as reliable exception handling in Perl.
 
+1.27 Replaced tell STDOUT with bytes=tell STDOUT.
+
 =head1 AUTHORS
 
 Copyright 1995-2002, Lincoln D. Stein.  All rights reserved.  
@@ -279,7 +281,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION    = '1.26';
+$CGI::Carp::VERSION    = '1.27';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 

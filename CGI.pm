@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.140 2003-11-13 13:52:56 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.141 2003-11-20 22:11:16 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -497,6 +497,21 @@ sub init {
 	  if (ref($initializer) && ref($initializer) eq 'HASH') {
 	      foreach (keys %$initializer) {
 		  $self->param('-name'=>$_,'-value'=>$initializer->{$_});
+	      }
+	      last METHOD;
+	  }
+	  
+	  if (defined($fh) && ($fh ne '')) {
+	      while (<$fh>) {
+		  chomp;
+		  last if /^=/;
+		  push(@lines,$_);
+	      }
+	      # massage back into standard format
+	      if ("@lines" =~ /=/) {
+		  $query_string=join("&",@lines);
+	      } else {
+		  $query_string=join("+",@lines);
 	      }
 	      last METHOD;
 	  }
@@ -3197,7 +3212,7 @@ sub read_multipart {
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
 
 	  # if this is an multipart/mixed attachment, save the header
-	  # together with the body for lateron parsing with an external
+	  # together with the body for later parsing with an external
 	  # MIME parser module
 	  if ( $multipart ) {
 	      foreach ( keys %header ) {
@@ -3451,7 +3466,7 @@ sub new {
     unless ($boundary_read) {
       while ($self->read(0)) { }
     }
-    die "Malformed multipart POST\n" if $self->eof;
+    die "Malformed multipart POST: data truncated\n" if $self->eof;
 
     return $retval;
 }
@@ -3475,6 +3490,8 @@ sub readHeader {
 	# $FILLUNIT *= 2 if length($self->{BUFFER}) >= $FILLUNIT; 
     } until $ok || $bad;
     return () if $bad;
+
+    #EBCDIC NOTE: translate header into EBCDIC, but watch out for continuation lines!
 
     my($header) = substr($self->{BUFFER},0,$end+2);
     substr($self->{BUFFER},0,$end+4) = '';
@@ -3502,6 +3519,9 @@ sub readBody {
     my($self) = @_;
     my($data);
     my($returnval)='';
+
+    #EBCDIC NOTE: want to translate returnval into EBCDIC HERE
+
     while (defined($data = $self->read)) {
 	$returnval .= $data;
     }
@@ -3527,6 +3547,9 @@ sub read {
     my $start = index($self->{BUFFER},$self->{BOUNDARY});
     # protect against malformed multipart POST operations
     die "Malformed multipart POST\n" unless ($start >= 0) || ($self->{LENGTH} > 0);
+
+
+    #EBCDIC NOTE: want to translate boundary search into ASCII here.
 
     # If the boundary begins the data, then skip past it
     # and return undef.
