@@ -4881,6 +4881,13 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.05</h3>
 <ol>
+  <li>Fixed incorrect results from end_form() when called in OO manner.
+  <li>Fixed query string stripping in order to handle URLs containing escaped newlines.
+  <li>During server push, set NPH to 0 rather than 1.  This is supposed to fix problems
+      with Apache.
+  <li>Fixed incorrect processing of multipart form fields that contain embedded quotes.
+      There's still the issue of how to handle ones that contain embedded semicolons,
+      but no one has complained (yet).
   <li>Fixed documentation bug in -style argument to start_html()
   <li>Added -status argument to redirect().
 </ol>
@@ -6020,6 +6027,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Jan 19 20:37:19 SAST 2004
+Last modified: Tue Mar  9 10:40:02 EST 2004
 <!-- hhmts end -->
 </BODY> </HTML>

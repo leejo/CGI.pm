@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.154 2004-01-19 18:37:49 lstein Exp $';
-$CGI::VERSION=3.04;
+$CGI::revision = '$Id: CGI.pm,v 1.155 2004-03-09 15:40:15 lstein Exp $';
+$CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -121,6 +121,8 @@ sub initialize_globals {
 }
 
 # ------------------ START OF THE LIBRARY ------------
+
+*end_form = \&endform;
 
 # make mod_perlhappy
 initialize_globals();
@@ -1279,7 +1281,7 @@ sub multipart_init {
     $self->{'final_separator'} = "$CRLF--$boundary--$CRLF";
     $type = SERVER_PUSH($boundary);
     return $self->header(
-	-nph => 1,
+	-nph => 0,
 	-type => $type,
 	(map { split "=", $_, 2 } @other),
     ) . "WARNING: YOUR BROWSER DOESN'T SUPPORT THIS SERVER-PUSH TECHNOLOGY." . $self->multipart_end;
@@ -1756,15 +1758,6 @@ sub endform {
     return wantarray ? ("<div>",$self->get_fields,"</div>","</form>") : 
                         "<div>".$self->get_fields ."</div>\n</form>";
     }
-}
-END_OF_FUNC
-
-
-#### Method: end_form
-# synonym for endform
-'end_form' => <<'END_OF_FUNC',
-sub end_form {
-    &endform;
 }
 END_OF_FUNC
 
@@ -2554,7 +2547,7 @@ sub url {
     if (exists($ENV{REQUEST_URI})) {
         my $index;
 	$script_name = unescape($ENV{REQUEST_URI});
-        $script_name =~ s/\?.+$//;   # strip query string
+        $script_name =~ s/\?.+$//s;   # strip query string
         # and path
         if (exists($ENV{PATH_INFO})) {
            my $encoded_path = unescape($ENV{PATH_INFO});
@@ -3192,11 +3185,11 @@ sub read_multipart {
 	    return;
 	}
 
-	my($param)= $header{'Content-Disposition'}=~/ name="?([^\";]*)"?/;
+	my($param)= $header{'Content-Disposition'}=~/ name="([^;]*)"/;
         $param .= $TAINTED;
 
 	# Bug:  Netscape doesn't escape quotation marks in file names!!!
-	my($filename) = $header{'Content-Disposition'}=~/ filename="?([^\"]*)"?/;
+	my($filename) = $header{'Content-Disposition'}=~/ filename="([^;]*)"/;
 	# Test for Opera's multiple upload feature
 	my($multipart) = ( defined( $header{'Content-Type'} ) &&
 		$header{'Content-Type'} =~ /multipart\/mixed/ ) ?
