@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.86 2003-02-10 22:48:11 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.87 2003-02-11 14:11:19 lstein Exp $';
 $CGI::VERSION='2.90';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1628,7 +1628,7 @@ sub endform {
     if ( $NOSTICKY ) {
     return wantarray ? ("</form>") : "\n</form>";
     } else {
-    return wantarray ? (("<div>",$self->get_fields,"</div>","</form>") : 
+    return wantarray ? ("<div>",$self->get_fields,"</div>","</form>") : 
                         "<div>".$self->get_fields ."</div>\n</form>";
     }
 }
