@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.162 2004-03-25 17:51:29 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.163 2004-04-05 16:51:48 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2581,7 +2581,7 @@ sub url {
     if ($full) {
 	my $protocol = $self->protocol();
 	$url = "$protocol://";
-	my $vh = http('host');
+	my $vh = http('x_forwarded_host') || http('host');
 	if ($vh) {
 	    $url .= $vh;
 	} else {
@@ -2853,7 +2853,7 @@ END_OF_FUNC
 ######
 'virtual_host' => <<'END_OF_FUNC',
 sub virtual_host {
-    my $vh = http('host') || server_name();
+    my $vh = http('x_forwarded_host') || http('host') || server_name();
     $vh =~ s/:\d+$//;		# get rid of port number
     return $vh;
 }
@@ -2935,7 +2935,7 @@ END_OF_FUNC
 'virtual_port' => <<'END_OF_FUNC',
 sub virtual_port {
     my($self) = self_or_default(@_);
-    my $vh = $self->http('host');
+    my $vh = $self->http('x_forwarded_host') || $self->http('host');
     if ($vh) {
         return ($vh =~ /:(\d+)$/)[0] || '80';
     } else {
@@ -6232,14 +6232,19 @@ should have one of these.
 
 The first argument (-name) is optional.  You can give the button a
 name if you have several submission buttons in your form and you want
-to distinguish between them.  The name will also be used as the
-user-visible label.  Be aware that a few older browsers don't deal with this correctly and
-B<never> send back a value from a button.
+to distinguish between them.  
 
 =item 2.
 
 The second argument (-value) is also optional.  This gives the button
-a value that will be passed to your script in the query string.
+a value that will be passed to your script in the query string. The
+name will also be used as the user-visible label.
+
+=item 3.
+
+You can use -label as an alias for -value.  I always get confused
+about which of -name and -value changes the user-visible label on the
+button.
 
 =back
 

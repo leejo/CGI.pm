@@ -7,7 +7,7 @@ require Exporter;
 @EXPORT_OK = qw(rearrange make_attributes unescape escape 
 		expires ebcdic2ascii ascii2ebcdic);
 
-$VERSION = '1.4';
+$VERSION = '1.5';
 
 $EBCDIC = "\t" ne "\011";
 if ($EBCDIC) {
@@ -175,7 +175,7 @@ sub utf8_chr ($) {
                                            0x80 | (($c >> 6)  & 0x3f),
                                            0x80 | ( $c          & 0x3f));
         } else {
-                return utf8(0xfffd);
+                return utf8_chr(0xfffd);
         }
 }
 

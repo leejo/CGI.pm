@@ -381,10 +381,11 @@ sub ineval {
 }
 
 sub die {
-  my ($arg) = @_;
-  realdie @_ if ineval;
+  my ($arg,@rest) = @_;
+  realdie ($arg,@rest) if ineval();
+
   if (!ref($arg)) {
-    $arg = join("", @_);
+    $arg = join("", ($arg,@rest));
     my($file,$line,$id) = id(1);
     $arg .= " at $file line $line." unless $arg=~/\n$/;
     &fatalsToBrowser($arg) if $WRAP;

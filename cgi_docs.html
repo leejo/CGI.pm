@@ -4899,6 +4899,10 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.05</h3>
 <ol>
+  <li>Fixed CGI::Carp::die() so as to avoid problems from _longmess() clobbering @_.
+  <li>If HTTP_X_FORWARDED_HOST is defined (i.e. running under a proxy), the
+      various functions that return HOST will use that instead.
+  <li>Fix for undefined utf8() call in CGI::Util.
   <li>Changed the call to warningsToBrowser() in CGI::Carp::fatalsToBrowser to call only
       after HTTP header is sent (thanks to Didier Lebrun for noticing).
   <li>Patches from Dan Harkless to make CGI.pm validatable against HTML 3.2.
@@ -6053,6 +6057,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Mar 26 20:08:30 EST 2004
+Last modified: Mon Apr  5 12:51:32 EDT 2004
 <!-- hhmts end -->
 </BODY> </HTML>
