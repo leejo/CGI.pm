@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.35 2000-05-28 16:52:36 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.36 2000-06-11 13:22:39 lstein Exp $';
 $CGI::VERSION='2.69';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -724,7 +724,8 @@ END_OF_FUNC
 # Deletes the named parameter entirely.
 ####
 sub delete {
-    my($self,$name) = self_or_default(@_);
+    my($self,@p) = self_or_default(@_);
+    my($name) = rearrange([NAME],@p);
     CORE::delete $self->{$name};
     CORE::delete $self->{'.fieldnames'}->{$name};
     @{$self->{'.parameters'}}=grep($_ ne $name,$self->param());
@@ -858,8 +859,8 @@ END_OF_FUNC
 sub STORE {
     my $self = shift;
     my $tag  = shift;
-    my @vals = split("\0",shift);
-    $self->param(-name=>$tag,-value=>\@vals);
+    my $vals = shift;
+    my @vals = index($vals,"\0")!=-1 ? split("\0",shift) : $vals;
 }
 END_OF_FUNC
 
@@ -1746,7 +1747,7 @@ sub checkbox {
     } else {
 	$checked = $checked ? ' CHECKED' : '';
     }
-    my($the_label) = defined $label ? $label : $name;
+    my($the_label) = defined $label ? $label : $value;
     $name = $self->escapeHTML($name);
     $value = $self->escapeHTML($value);
     $the_label = $self->escapeHTML($the_label);
@@ -4273,12 +4274,8 @@ into a series of header <META> tags that look something like this:
     <META NAME="keywords" CONTENT="pharaoh secret mummy">
     <META NAME="description" CONTENT="copyright 1996 King Tut">
 
-There is no direct support for the HTTP-EQUIV type of <META> tag.
-This is because you can modify the HTTP header directly with the
-B<header()> method.  For example, if you want to send the Refresh:
-header, do it in the header() method:
-
-    print $q->header(-Refresh=>'10; URL=http://www.capricorn.com');
+To create an HTTP-EQUIV type of <META> tag, use B<-head>, described
+below.
 
 The B<-style> argument is used to incorporate cascading stylesheets
 into your code.  See the section on CASCADING STYLESHEETS for more
@@ -4307,6 +4304,12 @@ array reference:
 				   -href=>'http://www.capricorn.com/s1.html'})
 			     ]
 		     );
+
+And here's how to create an HTTP-EQUIV <META> tag:
+
+      print header(-head=>meta({-http_equiv => 'Content-Type',
+                                -content    => 'text/html'}))
+
 
 JAVASCRIPTING: The B<-script>, B<-noScript>, B<-onLoad>,
 B<-onMouseOver>, B<-onMouseOut> and B<-onUnload> parameters are used
@@ -4620,7 +4623,7 @@ element of the list.  For example, here's one way to make an ordered
 list:
 
    print ul(
-             li({-type=>'disc'},['Sneezy','Doc','Sleepy','Happy']);
+             li({-type=>'disc'},['Sneezy','Doc','Sleepy','Happy'])
            );
 
 This example will result in HTML output that looks like this:
@@ -4834,7 +4837,7 @@ This is the older type of encoding used by all browsers prior to
 Netscape 2.0.  It is compatible with many CGI scripts and is
 suitable for short fields containing text data.  For your
 convenience, CGI.pm stores the name of this encoding
-type in B<$CGI::URL_ENCODED>.
+type in B<&CGI::URL_ENCODED>.
 
 =item B<multipart/form-data>
 
@@ -4988,7 +4991,7 @@ recognized.  See textfield().
 filefield() will return a file upload field for Netscape 2.0 browsers.
 In order to take full advantage of this I<you must use the new 
 multipart encoding scheme> for the form.  You can do this either
-by calling B<start_form()> with an encoding type of B<$CGI::MULTIPART>,
+by calling B<start_form()> with an encoding type of B<&CGI::MULTIPART>,
 or by calling the new method B<start_multipart_form()> instead of
 vanilla B<start_form()>.
 

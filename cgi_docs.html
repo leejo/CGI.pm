@@ -1039,14 +1039,7 @@ All parameters are optional:
       &lt;META NAME="keywords" CONTENT="pharoah secret mummy"&gt;
       &lt;META NAME="description" CONTENT="copyright 1996 King Tut"&gt;
       </pre></blockquote>
-      There is no support for the HTTP-EQUIV type of &lt;META&gt; tag.  This is
-      because you can modify the HTTP header directly with the
-      <a href="#header">header</a> method.  Example:
-      <blockquote>
-      <pre>
-      print $q-&gt;header(-Refresh=&gt;'10; URL=http://www.capricorn.com');
-      </pre>
-      </blockquote>
+      To create an HTTP-EQUIV tag, use the <B>-head</B> argument as described below.
   <li>A <strong>-lang</strong>> argument is used to incorporate a language attribute into
       the &lt;HTM&gt;> tag.  The default if not specified is "en-US" for US English.  For example:
 <blockquote><pre>
@@ -1084,6 +1077,11 @@ All parameters are optional:
 				     -href=&gt;'http://www.capricorn.com/s1.html'})
 			      ]
 		      );
+      </pre>
+      To create an HTTP-EQUIV tag, use something like this:
+      <pre>
+      print header(-head=&gt;meta({-http_equiv=&gt;'Content-Type',
+                                   -content=&gt;'text/html'}))
       </pre>
   <LI>A <strong>-script</strong> parameter to define Netscape <a
       href="#javascripting">JavaScript</a> functions
@@ -4635,6 +4633,14 @@ you.
 
 <h3>Version 2.68</h3>
 <ol>
+  <li>No longer attempts to escape characters when dealing with non
+      ISO-8861 character sets.
+  <li>checkbox() function now defaults to using -value as its label,
+      rather than -name.  The current behavior is what has been documented
+      from the beginning.
+</ol>
+
+<ol>
   <li>Fixed two bugs that caused the -compile pragma to fail with a
       syntax error.
 </ol>
@@ -5451,6 +5457,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu May 18 13:53:19 EDT 2000
+Last modified: Wed Jun  7 14:26:45 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>
