@@ -36,6 +36,7 @@ examples/save_state.cgi
 examples/tryit.cgi
 examples/wilogo.gif
 t/apache.t
+t/can.t
 t/carp.t
 t/cookie.t
 t/fast.t

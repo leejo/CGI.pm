@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.165 2004-04-12 20:37:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.166 2004-05-05 14:23:33 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -247,6 +247,33 @@ if ($needs_binmode) {
 		':push' => [qw/multipart_init multipart_start multipart_end multipart_final/],
 		':all' => [qw/:html2 :html3 :netscape :form :cgi :internal :html4/]
 		);
+
+# Custom 'can' method for both autoloaded and non-autoloaded subroutines.
+# Author: Cees Hek <cees@sitesuite.com.au>
+
+sub can {
+	my($class, $method) = @_;
+
+	# See if UNIVERSAL::can finds it.
+
+	if (my $func = $class -> SUPER::can($method) ){
+		return $func;
+	}
+
+	# Try to compile the function.
+
+	eval {
+		# _compile looks at $AUTOLOAD for the function name.
+
+		local $AUTOLOAD = join "::", $class, $method;
+		&_compile;
+	};
+
+	# Now that the function is loaded (if it exists)
+	# just use UNIVERSAL::can again to do the work.
+
+	return $class -> SUPER::can($method);
+}
 
 # to import symbols into caller
 sub import {
