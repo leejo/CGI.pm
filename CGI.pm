@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.96 2003-04-07 01:17:58 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.97 2003-04-07 03:11:11 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -112,6 +112,7 @@ sub initialize_globals {
     undef %EXPORT;
     undef $QUERY_CHARSET;
     undef %QUERY_FIELDNAMES;
+    undef $QUERY_ESCAPE;
 
     # prevent complaints by mod_perl
     1;
@@ -402,6 +403,7 @@ sub init {
 	}
 	$self->charset($QUERY_CHARSET);
 	$self->{'.fieldnames'} = {%QUERY_FIELDNAMES};
+	$self->{'escape'} = $QUERY_ESCAPE;
 	return;
     }
 
@@ -579,6 +581,7 @@ sub save_request {
     }
     $QUERY_CHARSET = $self->charset;
     %QUERY_FIELDNAMES = %{$self->{'.fieldnames'}};
+    $QUERY_ESCAPE = $self->{'escape'};
 }
 
 sub parse_params {
