@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.136 2003-10-31 13:33:00 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.137 2003-11-06 21:07:57 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -447,12 +447,15 @@ sub init {
 	# quietly read and discard the post
 	  my $buffer;
 	  my $max = $content_length;
-	  while ($max > 0 && (my $bytes = read(STDIN,$buffer,$max < 10000 ? $max : 10000))) {
-	    $max -= $bytes;
+	  while ($max > 0 &&
+		 (my $bytes = $MOD_PERL
+                  ? $self->r->read($buffer,$max < 10000 ? $max : 10000)
+                  : read(STDIN,$buffer,$max < 10000 ? $max : 10000)
+                 )) {
+	    $self->cgi_error("413 Request entity too large");
+	    last METHOD;
 	  }
-	  $self->cgi_error("413 Request entity too large");
-	  last METHOD;
-      }
+	}
 
       # Process multipart postings, but only if the initializer is
       # not defined.
@@ -481,18 +484,21 @@ sub init {
 	  }
 	  
 	  if (defined($fh) && ($fh ne '')) {
-	      while (<$fh>) {
-		  chomp;
-		  last if /^=/;
-		  push(@lines,$_);
-	      }
-	      # massage back into standard format
-	      if ("@lines" =~ /=/) {
-		  $query_string=join("&",@lines);
-	      } else {
-		  $query_string=join("+",@lines);
-	      }
-	      last METHOD;
+	    my $data;
+	    my $offset = 0;
+	    while (1) {
+	      my $bytes = $self->read_from_client($fh,\$data,1024,$offset);
+	      $offset += $bytes;
+	      last unless $bytes;
+	    }
+	    push @lines,split("\n",$data);
+	    # massage back into standard format
+	    if ("@lines" =~ /=/) {
+	      $query_string=join("&",@lines);
+	    } else {
+	      $query_string=join("+",@lines);
+	    }
+	    last METHOD;
 	  }
 
 	  # last chance -- treat it as a string
@@ -834,7 +840,9 @@ sub read_from_client {
     my($self, $fh, $buff, $len, $offset) = @_;
     local $^W=0;                # prevent a warning
     return undef unless defined($fh);
-    return read($fh, $$buff, $len, $offset);
+    return $MOD_PERL && fileno($fh) == fileno(\*STDIN||0)
+        ? $self->r->read($$buff, $len, $offset)
+        : read($fh, $$buff, $len, $offset);
 }
 END_OF_FUNC
 
@@ -3385,7 +3393,7 @@ sub new {
     }
     $IN = "main::STDIN" unless $IN;
 
-    $CGI::DefaultClass->binmode($IN) if $CGI::needs_binmode;
+    $CGI::DefaultClass->binmode($IN); # if $CGI::needs_binmode;  # just do it always
     
     # If the user types garbage into the file upload field,
     # then Netscape passes NOTHING to the server (not good).

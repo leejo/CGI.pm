@@ -8,7 +8,7 @@ use lib qw(t/lib);
 # ensure the blib's are in @INC, else we might use the core CGI.pm
 use lib qw(blib/lib blib/arch);
 
-use Test::More tests => 47;
+use Test::More tests => 41;
 use IO::Handle;
 
 BEGIN { use_ok('CGI::Carp') };
@@ -68,7 +68,6 @@ like(stamp2(), $stamp, "Time in correct format");
 # set some variables to control what's going on.
 $CGI::Carp::WARN = 0;
 $CGI::Carp::EMIT_WARNINGS = 0;
-$CGI::Carp::DELAYED_WARNINGS = "";
 my $q_file = quotemeta($file);
 
 
@@ -82,7 +81,6 @@ $expect_l = __LINE__ + 1;
 is(CGI::Carp::warn("There is a problem"),
    "Called realwarn",
    "CGI::Carp::warn calls CORE::warn");
-is($CGI::Carp::DELAYED_WARNINGS, "", "_warn not called");
 
 # Test that message is constructed correctly
 eval 'sub CGI::Carp::realwarn {my $mess = shift; return $mess};';
@@ -91,7 +89,6 @@ $expect_l = __LINE__ + 1;
 like(CGI::Carp::warn("There is a problem"),
    "/] $id: There is a problem at $q_file line $expect_l.".'$/',
    "CGI::Carp::warn builds correct message");
-is($CGI::Carp::DELAYED_WARNINGS, "", "_warn not called");
 
 # Test that _warn is called at the correct time
 $CGI::Carp::WARN = 1;
@@ -100,11 +97,6 @@ my $warn_expect_l = $expect_l = __LINE__ + 1;
 like(CGI::Carp::warn("There is a problem"),
    "/] $id: There is a problem at $q_file line $expect_l.".'$/',
    "CGI::Carp::warn builds correct message");
-
-isnt($CGI::Carp::DELAYED_WARNINGS, "", "_warn now called");
-like($CGI::Carp::DELAYED_WARNINGS,
-   "/^<!-- warning: There is a problem at $q_file line $expect_l. -->".'$/',
-   "CGI::Carp::DELAYED_WARNINGS has correct message (without stamp)");
 
 #-----------------------------------------------------------------------------
 # Test ineval
@@ -180,7 +172,6 @@ is ($CGI::Carp::PROGNAME,undef,"CGI::Carp::set_progname program name unset corre
 
 CGI::Carp::warningsToBrowser(0);
 is($CGI::Carp::EMIT_WARNINGS, 0, "Warnings turned off");
-isnt($CGI::Carp::DELAYED_WARNINGS, "", "_warn not called");
 
 # turn off STDOUT (prevents spurious warnings to screen
 tie *STDOUT, 'StoreStuff' or die "Can't tie STDOUT";
@@ -195,7 +186,6 @@ is( $fake_out, "<!-- warning: There is a problem at $fname line $warn_expect_l. 
                         'warningsToBrowser() on' );
 
 is($CGI::Carp::EMIT_WARNINGS, 1, "Warnings turned off");
-is($CGI::Carp::DELAYED_WARNINGS, "", "_warn is called");
 
 #-----------------------------------------------------------------------------
 # Test fatals_to_browser
