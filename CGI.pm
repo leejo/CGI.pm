@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.76 2002-11-04 16:31:42 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.77 2002-11-05 13:40:21 lstein Exp $';
 $CGI::VERSION='2.89';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3008,13 +3008,17 @@ sub read_multipart {
 
 	# Bug:  Netscape doesn't escape quotation marks in file names!!!
 	my($filename) = $header{'Content-Disposition'}=~/ filename="?([^\"]*)"?/;
+	# Test for Opera's multiple upload feature
+	my($multipart) = ( defined( $header{'Content-Type'} ) &&
+		$header{'Content-Type'} =~ /multipart\/mixed/ ) ?
+		1 : 0;
 
 	# add this parameter to our list
 	$self->add_parameter($param);
 
 	# If no filename specified, then just read the data and assign it
 	# to our parameter list.
-	if ( !defined($filename) || $filename eq '' ) {
+	if ( ( !defined($filename) || $filename eq '' ) && !$multipart ) {
 	    my($value) = $buffer->readBody;
             $value .= $TAINTED;
 	    push(@{$self->{$param}},$value);
@@ -3033,6 +3037,11 @@ sub read_multipart {
 	      last UPLOADS;
 	  }
 
+	  # set the filename to some recognizable value
+          if ( ( !defined($filename) || $filename eq '' ) && $multipart ) {
+              $filename = "multipart/mixed";
+          }
+
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
@@ -3043,6 +3052,16 @@ sub read_multipart {
           }
           die "CGI open of tmpfile: $!\n" unless defined $filehandle;
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
+
+	  # if this is an multipart/mixed attachment, save the header
+	  # together with the body for lateron parsing with an external
+	  # MIME parser module
+	  if ( $multipart ) {
+	      foreach ( keys %header ) {
+		  print $filehandle "$_: $header{$_}${CRLF}";
+	      }
+	      print $filehandle "${CRLF}";
+	  }
 
 	  my ($data);
 	  local($\) = '';
