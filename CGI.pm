@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.18 1999-06-09 14:52:45 lstein Exp $';
-$CGI::VERSION='2.53';
+$CGI::revision = '$Id: CGI.pm,v 1.19 1999-08-31 17:04:37 lstein Exp $';
+$CGI::VERSION='2.55';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -95,6 +95,8 @@ if ($OS=~/Win/i) {
   $OS = 'WINDOWS';
 } elsif ($OS=~/vms/i) {
   $OS = 'VMS';
+} elsif ($OS=~/bsdos/i) {
+  $OS = 'UNIX';
 } elsif ($OS=~/dos/i) {
   $OS = 'DOS';
 } elsif ($OS=~/^MacOS$/i) {
@@ -453,7 +455,7 @@ sub init {
 
     # We now have the query string in hand.  We do slightly
     # different things for keyword lists and parameter lists.
-    if ($query_string ne '') {
+    if (defined $query_string && $query_string) {
 	if ($query_string =~ /=/) {
 	    $self->parse_params($query_string);
 	} else {
@@ -518,7 +520,7 @@ sub cgi_error {
 
 # unescape URL-encoded data
 sub unescape {
-  shift() if ref($_[0]) || $_[0] eq $DefaultClass;
+  shift() if ref($_[0]) || (defined $_[1] && $_[0] eq $DefaultClass);
   my $todecode = shift;
   return undef unless defined($todecode);
   $todecode =~ tr/+/ /;       # pluses become spaces
@@ -532,12 +534,11 @@ sub unescape {
 
 # URL-encode data
 sub escape {
-    shift() if ref($_[0]) || $_[0] eq $DefaultClass;
-    my $toencode = shift;
-    return undef unless defined($toencode);
-    $toencode=~s/ /+/g;
-    $toencode=~s/([^a-zA-Z0-9_.+-])/uc sprintf("%%%02x",ord($1))/eg;
-    return $toencode;
+  shift() if ref($_[0]) || (defined $_[1] && $_[0] eq $DefaultClass);
+  my $toencode = shift;
+  return undef unless defined($toencode);
+  $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
+  return $toencode;
 }
 
 sub save_request {
@@ -851,8 +852,9 @@ END_OF_FUNC
 # with Steve Brenner's cgi-lib.pl routines
 'Vars' => <<'END_OF_FUNC',
 sub Vars {
+    my $q = shift;
     my %in;
-    tie(%in,CGI);
+    tie(%in,CGI,$q);
     return %in if wantarray;
     return \%in;
 }
@@ -917,7 +919,8 @@ END_OF_FUNC
 
 'TIEHASH' => <<'END_OF_FUNC',
 sub TIEHASH { 
-    return $Q || new CGI;
+    return $_[1] if defined $_[1];
+    return $Q || new shift;
 }
 END_OF_FUNC
 
@@ -1520,7 +1523,8 @@ END_OF_FUNC
 'endform' => <<'END_OF_FUNC',
 sub endform {
     my($self,@p) = self_or_default(@_);    
-    return ($self->get_fields,"</FORM>");
+    return wantarray ? ($self->get_fields,"</FORM>") : 
+                        $self->get_fields ."\n</FORM>";
 }
 END_OF_FUNC
 
@@ -2126,7 +2130,7 @@ sub hidden {
 
     $name=$self->escapeHTML($name);
     foreach (@value) {
-	$_=$self->escapeHTML($_);
+	$_ = defined($_) ? $self->escapeHTML($_) : '';
 	push(@result,qq/<INPUT TYPE="hidden" NAME="$name" VALUE="$_">/);
     }
     return wantarray ? @result : join('',@result);
@@ -2200,7 +2204,8 @@ sub url {
         # strip query string
         substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
         # and path
-        substr($script_name,$index) = '' if $path and ($index = rindex($script_name,$path)) >= 0;
+        substr($script_name,$index) = '' if exists($ENV{PATH_INFO})
+                                     and ($index = rindex($script_name,$ENV{PATH_INFO})) >= 0;
     } else {
 	$script_name = $self->script_name;
     }
@@ -2854,7 +2859,7 @@ sub read_multipart {
 
 	# If no filename specified, then just read the data and assign it
 	# to our parameter list.
-	unless ($filename) {
+	unless (defined $filename) {
 	    my($value) = $buffer->readBody;
 	    push(@{$self->{$param}},$value);
 	    next;
@@ -2877,7 +2882,7 @@ sub read_multipart {
           for (my $cnt=10;$cnt>0;$cnt--) {
 	    next unless $tmpfile = new TempFile($seqno);
 	    $tmp = $tmpfile->as_string;
-	    last if $filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES);
+	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
           }
           die "CGI open of tmpfile: $!\n" unless $filehandle;
@@ -5075,7 +5080,7 @@ Example:
 
    $file = $query->upload('uploaded_file');
    if (!$file && $query->cgi_error) {
-      print $query->header(-status->$query->cgi_error);
+      print $query->header(-status=>$query->cgi_error);
       exit 0;
    }
 
@@ -6429,7 +6434,7 @@ for suggestions and bug fixes.
 				  -rows=>10,
 				  -columns=>50);
  
-	   print "<P>",$query->Reset;
+	   print "<P>",$query->reset;
 	   print $query->submit('Action','Shout');
 	   print $query->submit('Action','Scream');
 	   print $query->endform;

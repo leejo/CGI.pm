@@ -1,16 +1,25 @@
-CGI.pm version 2.53 is now available for your fun and edification.
-This is identical to the 2.52 release, except that the regression
-tests have been updated to handle the intentional changes in 2.52.
+CGI.pm version 2.54 is now available for your fun and edification.
+This will be the last version of the monolithic CGI.pm module.
 
-Version 2.52  includes the following bug fixes and features:
+The new version, 3.0, will be fully modularized and optimized for
+faster loading and execution (thanks to a comprehensive rewrite by
+David James).
 
-1. VMS and DOS fixes
-2. More cookie fixes
-3. Linebreaks supported in dump routine
-4. spurious newline removed from checkbox().
+Fixes in this version:
+
+1. Removed automatic domain name addition from CGI::Cookie.  This will
+BREAK some versions of Internet Explorer, but will fix problems that
+arise in internal networks when the host table-based domain names are
+not fully qualified.  To avoid breaking browsers, ALWAYS use the
+-domain argument when creating cookies -- and fix your host tables!
+
+2. Fixed problems in escape() handling of + signs.
+
+3. Improvements to CGI::Pretty from Brian Paulsen (*not* regression
+tested).
 
 Lincoln Stein
-6/9/99
+8/9/99
 
 ========================================================================
 Lincoln D. Stein

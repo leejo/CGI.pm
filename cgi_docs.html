@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.53, 6/9/1999, L. Stein
+Version 2.55, 8/31/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4548,7 +4548,7 @@ HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>.  When sending bug
 reports, please provide the following information:
 
 <ul>
-  <li>the version of CGI.pm (<code>perl -MCGI -e 'print '$CGI::VERSION'</code>)
+  <li>the version of CGI.pm (<code>perl -MCGI -e 'print $CGI::VERSION'</code>)
   <li>the version of Perl (<code>perl -v</code>)
   <li>the name and version of your Web server
   <li>the name and version of the operating system you are using
@@ -4566,6 +4566,27 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+
+<h3>Version 2.55</h3>
+<ol>
+  <li>Fixed cookie regression test so as not to produce an error.
+  <li>Fixed path_info() and self_url() to work correctly together when
+      path_info() modified.
+  <li>Removed manify warnings from CGI::{Switch,Apache}.
+</ol>
+
+<h3>Version 2.54</h3>
+<ol>
+  <li>This will be the last release of the monolithic CGI.pm module.  Later versions will be
+      modularized and optimized.
+  <li>DOMAIN tag no longer added to cookies by default.  This will break some versions of
+      Internet Explorer, but will avoid breaking networks which use host tables without fully
+      qualified domain names.  For compatibility, please always add the -domain tag when creating
+      cookies.
+  <li>Fixed escape() method so that +'s are treated correctly.
+  <li>Updated CGI::Pretty module.
+</ol>
+
 <h3>Version 2.53</h3>
 <ol>
   <li>Forgot to upgrade regression tests before releasing 2.52.  <b>NOTHING ELSE HAS CHANGED IN LIBRARY</b>
@@ -5262,6 +5283,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Jun  9 10:50:08 EDT 1999
+Last modified: Tue Aug 31 13:03:44 EDT 1999
 <!-- hhmts end -->
 </BODY> </HTML>

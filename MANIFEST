@@ -5,6 +5,8 @@ CGI/Cookie.pm
 CGI/Fast.pm
 CGI/Pretty.pm
 CGI/Push.pm
+CGI/Switch.pm
+CGI/Apache.pm
 MANIFEST
 Makefile.PL
 README
