@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.44 2000-09-03 18:19:42 lstein Exp $';
-$CGI::VERSION='2.72';
+$CGI::revision = '$Id: CGI.pm,v 1.45 2000-09-13 02:55:41 lstein Exp $';
+$CGI::VERSION='2.73';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -86,6 +86,8 @@ sub initialize_globals {
     $BEEN_THERE = 0;
     undef @QUERY_PARAM;
     undef %EXPORT;
+    undef $QUERY_CHARSET;
+    undef %QUERY_FIELDNAMES;
 
     # prevent complaints by mod_perl
     1;
@@ -350,10 +352,12 @@ sub init {
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
     # if it was read from STDIN originally.)
-    if (@QUERY_PARAM && !defined($initializer)) {
+    if (defined(@QUERY_PARAM) && !defined($initializer)) {
 	foreach (@QUERY_PARAM) {
 	    $self->param('-name'=>$_,'-value'=>$QUERY_PARAM{$_});
 	}
+	$self->charset($QUERY_CHARSET);
+	$self->{'.fieldnames'} = {%QUERY_FIELDNAMES};
 	return;
     }
 
@@ -526,6 +530,8 @@ sub save_request {
       next unless defined $_;
       $QUERY_PARAM{$_}=$self->{$_};
     }
+    $QUERY_CHARSET = $self->charset;
+    %QUERY_FIELDNAMES = %{$self->{'.fieldnames'}};
 }
 
 sub parse_params {
@@ -1053,6 +1059,9 @@ sub save {
 	    print $filehandle "$escaped_param=",escape("$value"),"\n";
 	}
     }
+    foreach (keys %{$self->{'.fieldnames'}}) {
+          print $filehandle ".cgifields=",escape("$_"),"\n";
+    }
     print $filehandle "=\n";    # end of record
 }
 END_OF_FUNC
@@ -1285,15 +1294,15 @@ sub start_html {
         $dtd = $XHTML ? XHTML_DTD : $DEFAULT_DTD;
     }
     if (ref($dtd) && ref($dtd) eq 'ARRAY') {
-        push(@result,qq(<!DOCTYPE HTML\n\tPUBLIC "$dtd->[0]"\n\t"$dtd->[1]">));
+        push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd->[0]"\n\t"$dtd->[1]">));
     } else {
-        push(@result,qq(<!DOCTYPE HTML\n\tPUBLIC "$dtd">));
+        push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd">));
     }
     push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang"><head><title>$title</title>)
                         : qq(<html lang="$lang"><head><title>$title</title>));
 	if (defined $author) {
     push(@result,$XHTML ? "<link rev=\"made\" href=\"mailto:$author\" />"
-								: "<link rev=made href=\"mailto:$author\">");
+								: "<link rev=\"made\" href=\"mailto:$author\">");
 	}
 
     if ($base || $xbase || $target) {
@@ -1452,11 +1461,11 @@ sub startform {
     my($method,$action,$enctype,@other) = 
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
-    $method = uc($method) || 'POST';
+    $method = lc($method) || 'post';
     $enctype = $enctype || &URL_ENCODED;
     unless (defined $action) {
        $action = $self->url(-absolute=>1,-path=>1);
-       $action .= "?$ENV{QUERY_STRING}" if defined $ENV{QUERY_STRING};
+       $action .= "?$ENV{QUERY_STRING}" if $ENV{QUERY_STRING};
     }
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
@@ -1731,7 +1740,7 @@ sub defaults {
     $label = $label || "Defaults";
     my($value) = qq/ value="$label"/;
     my($other) = @other ? " @other" : '';
-    return $XHTML ? qq(<input type="submit" value".defaults"$value$other />)
+    return $XHTML ? qq(<input type="submit" name=".defaults"$value$other />)
                   : qq/<input type="submit" NAME=".defaults"$value$other>/;
 }
 END_OF_FUNC
@@ -1770,9 +1779,9 @@ sub checkbox {
 
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined $self->param($name))) {
-	$checked = grep($_ eq $value,$self->param($name)) ? ' checked="yes"' : '';
+	$checked = grep($_ eq $value,$self->param($name)) ? ' checked' : '';
     } else {
-	$checked = $checked ? qq/ checked="yes"/ : '';
+	$checked = $checked ? qq/ checked/ : '';
     }
     my($the_label) = defined $label ? $label : $name;
     $name = $self->escapeHTML($name);
@@ -1837,7 +1846,7 @@ sub checkbox_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	$checked = $checked{$_} ? qq/ checked="yes"/ : '';
+	$checked = $checked{$_} ? qq/ checked/ : '';
 	$label = '';
 	unless (defined($nolabels) && $nolabels) {
 	    $label = $_;
@@ -1982,7 +1991,7 @@ sub radio_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	my($checkit) = $checked eq $_ ? qq/ checked="yes"/ : '';
+	my($checkit) = $checked eq $_ ? qq/ checked/ : '';
 	my($break);
 	if ($linebreak) {
     $break = $XHTML ? "<br />" : "<br>";
@@ -2043,7 +2052,7 @@ sub popup_menu {
 
     $result = qq/<select name="$name"$other>\n/;
     foreach (@values) {
-	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected="yes"/ : '' ) : '';
+	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected/ : '' ) : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	my($value) = $self->escapeHTML($_);
@@ -2090,14 +2099,14 @@ sub scrolling_list {
     $size = $size || scalar(@values);
 
     my(%selected) = $self->previous_or_default($name,$defaults,$override);
-    my($is_multiple) = $multiple ? qq/ multiple="yes"/ : '';
+    my($is_multiple) = $multiple ? qq/ multiple/ : '';
     my($has_size) = $size ? qq/ size="$size"/: '';
     my($other) = @other ? " @other" : '';
 
     $name=$self->escapeHTML($name);
     $result = qq/<select name="$name"$has_size$is_multiple$other>\n/;
     foreach (@values) {
-	my($selectit) = $selected{$_} ? qq/selected="yes"/ : '';
+	my($selectit) = $selected{$_} ? qq/selected/ : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	$label=$self->escapeHTML($label);
@@ -2147,8 +2156,8 @@ sub hidden {
     $name=$self->escapeHTML($name);
     foreach (@value) {
 	$_ = defined($_) ? $self->escapeHTML($_,1) : '';
-	push(@result,$XHTMl ? qq(<input type="hidden" name="$name" value="$_" />)
-                            : qq/<input type="hidden" name="$name" value="$_">/);
+	push @result,$XHTMl ? qq(<input type="hidden" name="$name" value="$_" />)
+                            : qq(<input type="hidden" name="$name" value="$_">);
     }
     return wantarray ? @result : join('',@result);
 }
@@ -2209,26 +2218,28 @@ END_OF_FUNC
 'url' => <<'END_OF_FUNC',
 sub url {
     my($self,@p) = self_or_default(@_);
-    my ($relative,$absolute,$full,$path_info,$query) = 
-	rearrange(['RELATIVE','ABSOLUTE','FULL',['PATH','PATH_INFO'],['QUERY','QUERY_STRING']],@p);
+    my ($relative,$absolute,$full,$path_info,$query,$base) = 
+	rearrange(['RELATIVE','ABSOLUTE','FULL',['PATH','PATH_INFO'],['QUERY','QUERY_STRING'],'BASE'],@p);
     my $url;
-    $full++ if !($relative || $absolute);
+    $full++ if $base || !($relative || $absolute);
 
     my $path = $self->path_info;
-    my $script_name;
-    if (exists($ENV{REQUEST_URI})) {
-        my $index;
-	$script_name = $ENV{REQUEST_URI};
-        # strip query string
-        substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
-        # and path
-        if (exists($ENV{PATH_INFO})) {
-           my $decoded_path = unescape($ENV{PATH_INFO});
-           substr($script_name,$index) = '' if ($index = rindex($script_name,$decoded_path)) >= 0;
-         }
-    } else {
-	$script_name = $self->script_name;
-    }
+    my $script_name = $self->script_name;
+
+# If anybody knows why I ever wrote this please tell me!
+#    if (exists($ENV{REQUEST_URI})) {
+#        my $index;
+#	$script_name = $ENV{REQUEST_URI};
+#        # strip query string
+#        substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
+#        # and path
+#        if (exists($ENV{PATH_INFO})) {
+#           (my $encoded_path = $ENV{PATH_INFO}) =~ s!([^a-zA-Z0-9_./-])!uc sprintf("%%%02x",ord($1))!eg;;
+#           substr($script_name,$index) = '' if ($index = rindex($script_name,$encoded_path)) >= 0;
+#         }
+#    } else {
+#	$script_name = $self->script_name;
+#    }
 
     if ($full) {
 	my $protocol = $self->protocol();
@@ -2243,12 +2254,14 @@ sub url {
 		unless (lc($protocol) eq 'http' && $port == 80)
 		    || (lc($protocol) eq 'https' && $port == 443);
 	}
+        return $url if $base;
 	$url .= $script_name;
     } elsif ($relative) {
 	($url) = $script_name =~ m!([^/]+)$!;
     } elsif ($absolute) {
 	$url = $script_name;
     }
+
     $url .= $path if $path_info and defined $path;
     $url .= "?" . $self->query_string if $query and $self->query_string;
     $url = '' unless defined $url;
@@ -2401,6 +2414,9 @@ sub query_string {
             next unless defined $value;
 	    push(@pairs,"$eparam=$value");
 	}
+    }
+    foreach (keys %{$self->{'.fieldnames'}}) {
+      push(@pairs,".cgifields=".escape("$_"));
     }
     return join($USE_PARAM_SEMICOLONS ? ';' : '&',@pairs);
 }
@@ -2985,7 +3001,6 @@ sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
     my $fv = ++$FH . quotemeta($name);
-    warn unless *{"Fh::$fv"};
     my $ref = \*{"Fh::$fv"};
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
@@ -4509,6 +4524,7 @@ You can also retrieve the unprocessed query string with query_string():
     $absolute_url  = $query->url(-absolute=>1);
     $url_with_path = $query->url(-path_info=>1);
     $url_with_path_and_query = $query->url(-path_info=>1,-query=>1);
+    $netloc        = $query->url(-base => 1);
 
 B<url()> returns the script's URL in a variety of formats.  Called
 without any arguments, it returns the full form of the URL, including
@@ -4549,6 +4565,10 @@ is provided as a synonym.
 Append the query string to the URL.  This can be combined with
 B<-full>, B<-absolute> or B<-relative>.  B<-query_string> is provided
 as a synonym.
+
+=item B<-base>
+
+Generate just the protocol and net location, as in http://www.foo.com:8000
 
 =back
 
@@ -5797,13 +5817,17 @@ To create multiple cookies, give header() an array reference:
 				  -value=>\%answers);
 	print $query->header(-cookie=>[$cookie1,$cookie2]);
 
-To retrieve a cookie, request it by name by calling cookie()
-method without the B<-value> parameter:
+To retrieve a cookie, request it by name by calling cookie() method
+without the B<-value> parameter:
 
 	use CGI;
 	$query = new CGI;
-	%answers = $query->cookie(-name=>'answers');
-	# $query->cookie('answers') will work too!
+	$riddle = $query->cookie('riddle_name');
+        %answers = $query->cookie('answers');
+
+Cookies created with a single scalar value, such as the "riddle_name"
+cookie, will be returned in that form.  Cookies with array and hash
+values can also be retrieved.
 
 The cookie and CGI namespaces are separate.  If you have a parameter
 named 'answers' and a cookie named 'answers', the values retrieved by
@@ -6101,6 +6125,10 @@ name.
 
 When using virtual hosts, returns the name of the host that
 the browser attempted to contact
+
+=item B<server_port ()>
+
+Return the port that the server is listening on.
 
 =item B<server_software ()>
 

@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.71, 8/13/2000, L. Stein
+Version 2.73, 9/12/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -186,7 +186,7 @@ In the former case don't panic.  Here's a recipe that will work
 (commands are given in MS-DOS/Windows form):
 
 <pre>
-  &gt; cd CGI.pm-2.46
+  &gt; cd CGI.pm-2.73
   &gt; copy CGI.pm C:\Perl\lib
   &gt; mkdir C:\Perl\lib\CGI
   &gt; copy CGI\*.pm C:\Perl\lib\CGI
@@ -4644,6 +4644,25 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.73</h3>
+<p>
+September 12, 2000
+<ol>
+  <li>Added -base to the list of arguments accepted by url().
+  <li>Fixes to XHTML support.
+  <li>POST parameters no longer show up in the Location box.
+</ol>
+
+<h3>Version 2.72</h3>
+<p>
+August 19, 2000
+<ol>
+  <li>Fixed the defaults button so that it works again
+  <li>Charset is now correctly saved and restored when saving to files
+  <li>url() now works correctly when given scripts with %20 and other
+      escapes in the additional path info.  This undoes a patch introduced
+      in version 2.47 that I no longer understand the rationale for.
+</ol>
 
 <h3>Version 2.71</h3>
 <p>
@@ -5500,6 +5519,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sun Aug 13 11:41:07 EDT 2000
+Last modified: Tue Sep 12 22:52:02 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>
