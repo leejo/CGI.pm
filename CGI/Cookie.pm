@@ -371,7 +371,7 @@ argument to the header() method:
 Mod_perl users can set cookies using the request object's header_out()
 method:
 
-  $r->header_out('Set-Cookie',$c);
+  $r->headers_out->set('Set-Cookie' => $c);
 
 Internally, Cookie overloads the "" operator to call its as_string()
 method when incorporated into the HTTP header.  as_string() turns the

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.107 2003-04-17 14:44:57 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.108 2003-04-18 19:56:50 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -304,8 +304,9 @@ sub new {
 	 )) {
     $self->r(shift @initializer);
   }
-  if (my $r = ($self->r || $MOD_PERL)) {
-    $self->r($r) unless $self->r;
+  if ($MOD_PERL) {
+    $self->r(Apache->request) unless $self->r;
+    my $r = $self->r;
     if ($MOD_PERL == 1) {
       $r->register_cleanup(\&CGI::_reset_globals);
     }
@@ -329,7 +330,7 @@ sub DESTROY { }
 sub r {
   my $self = shift;
   my $r = $self->{'.r'};
-  $self->{'.r'} = shift if @_;
+  $self->{'.r'} = shift if @ARGV;
   $r;
 }
 
@@ -500,7 +501,7 @@ sub init {
       # the environment.
       if ($meth=~/^(GET|HEAD)$/) {
 	  if ($MOD_PERL) {
-	      $query_string = Apache->request->args;
+	    $query_string = $self->r->args;
 	  } else {
 	      $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
 	      $query_string ||= $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
@@ -1349,7 +1350,7 @@ sub header {
     push(@header,"Content-Type: $type") if $type ne '';
     my $header = join($CRLF,@header)."${CRLF}${CRLF}";
     if ($MOD_PERL and not $nph) {
-        Apache->request->send_cgi_header($header);
+        $self->r->send_cgi_header($header);
         return '';
     }
     return $header;
