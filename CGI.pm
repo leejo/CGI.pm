@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.150 2004-01-12 23:37:35 lstein Exp $';
-$CGI::VERSION=3.02;
+$CGI::revision = '$Id: CGI.pm,v 1.151 2004-01-13 16:28:35 lstein Exp $';
+$CGI::VERSION=3.03;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2548,8 +2548,8 @@ sub url {
         $script_name =~ s/\?.+$//;   # strip query string
         # and path
         if (exists($ENV{PATH_INFO})) {
-           my $encoded_path = quotemeta($ENV{PATH_INFO});
-           $script_name      =~ s/$encoded_path$//i;
+           my $encoded_path = unescape($ENV{PATH_INFO});
+           $script_name      =~ s/\Q$encoded_path\E$//i;
          }
     }
 
