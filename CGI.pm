@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.152 2004-01-19 12:41:10 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.153 2004-01-19 18:23:01 lstein Exp $';
 $CGI::VERSION=3.04;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1531,7 +1531,7 @@ sub start_html {
     push(@result,ref($head) ? @$head : $head) if $head;
 
     # handle the infrequently-used -style and -script parameters
-    push(@result,$self->_style($style)) if defined $style;
+    push(@result,$self->_style($style))   if defined $style;
     push(@result,$self->_script($script)) if defined $script;
 
     # handle -noscript parameter
@@ -1559,36 +1559,43 @@ sub _style {
     my $cdata_start = $XHTML ? "\n<!--/* <![CDATA[ */" : "\n<!-- ";
     my $cdata_end   = $XHTML ? "\n/* ]]> */-->\n" : " -->\n";
 
-    if (ref($style)) {
-     my($src,$code,$verbatim,$stype,$foo,@other) =
-         rearrange([SRC,CODE,VERBATIM,TYPE],
-                    '-foo'=>'bar',    # trick to allow dash to be omitted
-                    ref($style) eq 'ARRAY' ? @$style : %$style);
-     $type  = $stype if $stype;
-     my $other = @other ? join ' ',@other : '';
+    my @s = ref($style) eq 'ARRAY' ? @$style : $style;
 
-     if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
-     { # If it is, push a LINK tag for each one
-         foreach $src (@$src)
-       {
-         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
+    for my $s (@s) {
+      if (ref($s)) {
+       my($src,$code,$verbatim,$stype,$foo,@other) =
+           rearrange([SRC,CODE,VERBATIM,TYPE],
+                      '-foo'=>'bar',    # trick to allow dash to be omitted
+                      ref($s) eq 'ARRAY' ? @$s : %$s);
+       $type  = $stype if $stype;
+       my $other = @other ? join ' ',@other : '';
+
+       if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
+       { # If it is, push a LINK tag for each one
+           foreach $src (@$src)
+         {
+           push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
                              : qq(<link rel="stylesheet" type="$type" href="$src"$other>)) if $src;
+         }
        }
-     }
-     else
-     { # Otherwise, push the single -src, if it exists.
-       push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
-                           : qq(<link rel="stylesheet" type="$type" href="$src"$other>)
-            ) if $src;
-      }
-   if ($verbatim) {
-         push(@result, "<style type=\"text/css\">\n$verbatim\n</style>");
-    }
-      push(@result,style({'type'=>$type},"$cdata_start\n$code\n$cdata_end")) if $code;
-    } else {
-         my $src = $style;
+       else
+       { # Otherwise, push the single -src, if it exists.
          push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
-                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>));
+                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>)
+              ) if $src;
+        }
+     if ($verbatim) {
+           my @v = ref($verbatim) eq 'ARRAY' ? @$verbatim : $verbatim;
+           push(@result, "<style type=\"text/css\">\n$_\n</style>") foreach @v;
+      }
+      my @c = ref($code) eq 'ARRAY' ? @$code : $code;
+      push(@result,style({'type'=>$type},"$cdata_start\n$_\n$cdata_end")) foreach @c;
+
+      } else {
+           my $src = $s;
+           push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
+                               : qq(<link rel="stylesheet" type="$type" href="$src"$other>));
+      }
     }
     @result;
 }
@@ -6580,8 +6587,8 @@ http://www.w3.org/pub/WWW/TR/Wd-css-1.html for more information.
 	       );
     print end_html;
 
-Pass an array reference to B<-style> in order to incorporate multiple
-stylesheets into your document.
+Pass an array reference to B<-code> or B<-src> in order to incorporate
+multiple stylesheets into your document.
 
 Should you wish to incorporate a verbatim stylesheet that includes
 arbitrary formatting in the header, you may pass a -verbatim tag to
