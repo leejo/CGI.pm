@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.90, 11/??/2002, L. Stein
+Version 2.91, ??/??/2002, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -952,6 +952,23 @@ attachment.  Instead of displaying the page, some browsers will prompt
 the user to save it to disk.  The value of the argument is the
 suggested name for the saved file.  In order for this to work, you may
 have to set the <b>-type</b> to "application/octet-stream".
+
+<h4>-p3p</h4>
+
+The <b>-p3p</b> parameter will add a P3P tag to the outgoing header.  The
+parameter can be an arrayref or a space-delimited string of P3P tags.
+For example:
+
+<blockquote><pre>
+print header(-p3p=&gt;[qw(CAO DSP LAW CURa)]);
+print header(-p3p=&gt;'CAO DSP LAW CURa');
+</pre></blockquote>
+
+In either case, the outgoing header will be formatted as:
+
+<blockquote><pre>
+P3P: policyref="/w3c/p3p.xml" cp="CAO DSP LAW CURa"
+</pre></blockquote>
 
 <h4>Other header fields</h4>
 
@@ -4726,8 +4743,14 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.91</h3>
+<ol>
+  <li>Attribute generation now correctly respects the value of autoEscape().
+</ol>
 <h3>Version 2.90</h3>
 <ol>
+  <li>Fixed bug in redirect header handling.
+  <li>Added P3P option to header().
   <li>Patches from Alexey Mahotkin to make CGI::Carp work correctly with object-oriented exceptions.
   <li>Removed inaccurate description of how to set multiple cookies from CGI::Cookie pod file.
   <li>Patch from Kevin Mahony to prevent running out of filehandles when uploading lots of files.
@@ -5751,6 +5774,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sat Dec 14 09:02:27 EST 2002
+Last modified: Mon Feb 10 17:46:56 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.85 2002-12-14 14:03:42 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.86 2003-02-10 22:48:11 lstein Exp $';
 $CGI::VERSION='2.90';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -177,9 +177,9 @@ if (exists $ENV{'GATEWAY_INTERFACE'}
     $| = 1;
     require mod_perl;
     if ($mod_perl::VERSION >= 1.99) {
-      require Apache::compat;
+      eval "require Apache::compat";
     } else {
-      require Apache;
+      eval "require Apache";
     }
   }
 
@@ -611,15 +611,14 @@ sub _make_tag_func {
     my ($self,$tagname) = @_;
     my $func = qq(
 	sub $tagname {
-            shift if \$_[0] && 
-                    (ref(\$_[0]) &&
-                     (substr(ref(\$_[0]),0,3) eq 'CGI' ||
-                    UNIVERSAL::isa(\$_[0],'CGI')));
-	    my(\$attr) = '';
-	    if (ref(\$_[0]) && ref(\$_[0]) eq 'HASH') {
-		my(\@attr) = make_attributes(shift()||undef,1);
-		\$attr = " \@attr" if \@attr;
-	    }
+         my (\$q,\$a,\@rest) = self_or_default(\@_);
+         my(\$attr) = '';
+	 if (ref(\$a) && ref(\$a) eq 'HASH') {
+	    my(\@attr) = make_attributes(\$a,\$q->{'escape'});
+	    \$attr = " \@attr" if \@attr;
+	  } else {
+	    unshift \@rest,\$a;
+	  }
 	);
     if ($tagname=~/start_(\w+)/i) {
 	$func .= qq! return "<\L$1\E\$attr>";} !;
@@ -630,7 +629,7 @@ sub _make_tag_func {
 	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@_;
 	    my(\$tag,\$untag) = ("\L<$tagname\E\$attr>","\L</$tagname>\E");
 	    my \@result = map { "\$tag\$_\$untag" } 
-                              (ref(\$_[0]) eq 'ARRAY') ? \@{\$_[0]} : "\@_";
+                              (ref(\$rest[0]) eq 'ARRAY') ? \@{\$rest[0]} : "\@rest";
 	    return "\@result";
             }#;
     }
@@ -1246,11 +1245,11 @@ sub header {
 
     return undef if $self->{'.header_printed'}++ and $HEADERS_ONCE;
 
-    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,@other) = 
+    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) = 
 	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
 			    'STATUS',['COOKIE','COOKIES'],'TARGET',
                             'EXPIRES','NPH','CHARSET',
-                            'ATTACHMENT'],@p);
+                            'ATTACHMENT','P3P'],@p);
 
     $nph     ||= $NPH;
     if (defined $charset) {
@@ -1276,6 +1275,10 @@ sub header {
 
     push(@header,"Status: $status") if $status;
     push(@header,"Window-Target: $target") if $target;
+    if ($p3p) {
+       $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
+       push(@header,qq(P3P: policyref="/w3c/p3p.xml" CP="$p3p"));
+    }
     # push all the cookies -- there may be several
     if ($cookie) {
 	my(@cookie) = ref($cookie) && ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie;
@@ -1340,7 +1343,7 @@ sub redirect {
     unshift(@o,'-Target'=>$target) if $target;
     unshift(@o,'-Cookie'=>$cookie) if $cookie;
     unshift(@o,'-Type'=>'');
-    return $self->header(@o);
+    return $self->header(map {$self->unescapeHTML($_)} @o);
 }
 END_OF_FUNC
 
@@ -4532,6 +4535,17 @@ attachment.  Instead of displaying the page, some browsers will prompt
 the user to save it to disk.  The value of the argument is the
 suggested name for the saved file.  In order for this to work, you may
 have to set the B<-type> to "application/octet-stream".
+
+The B<-p3p> parameter will add a P3P tag to the outgoing header.  The
+parameter can be an arrayref or a space-delimited string of P3P tags.
+For example:
+
+   print header(-p3p=>[qw(CAO DSP LAW CURa)]);
+   print header(-p3p=>'CAO DSP LAW CURa');
+
+In either case, the outgoing header will be formatted as:
+
+  P3P: policyref="/w3c/p3p.xml" cp="CAO DSP LAW CURa"
 
 =head2 GENERATING A REDIRECTION HEADER
 

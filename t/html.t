@@ -10,7 +10,7 @@ $loaded = 1;
 print "ok 1\n";
 
 BEGIN {
-   $| = 1; print "1..24\n";
+   $| = 1; print "1..27\n";
   if( $] > 5.006 ) {
     # no utf8
     require utf8; # we contain Latin-1
@@ -96,3 +96,9 @@ test(22,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt
 test(23,i(p('hello there')) eq '<i><p>hello there</p></i>');
 my $q = new CGI;
 test(24,$q->h1('hi') eq '<h1>hi</h1>');
+
+$q->autoEscape(1);
+test(25,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');
+$q->autoEscape(0);
+test(26,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&egrave;">hello &aacute;</p>');
+test(27,p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');

@@ -353,10 +353,6 @@ sub _warn {
     }
 }
 
-sub ineval { 
-  (exists $ENV{MOD_PERL} ? 0 : $^S) || _longmess() =~ /eval [\{\']/m 
-}
-
 
 # The mod_perl package Apache::Registry loads CGI programs by calling
 # eval.  These evals don't count when looking at the stack backtrace.
@@ -367,15 +363,25 @@ sub _longmess {
     return $message;    
 }
 
+sub ineval {
+  (exists $ENV{MOD_PERL} ? 0 : $^S) || _longmess() =~ /eval [\{\']/m
+}
+
 sub die {
+  my ($arg) = @_;
   realdie @_ if ineval;
   if (!ref($arg)) {
-    my $time = scalar(localtime);
+    $arg = join("", @_);
     my($file,$line,$id) = id(1);
     $arg .= " at $file line $line." unless $arg=~/\n$/;
     &fatalsToBrowser($arg) if $WRAP;
-    my $stamp = stamp;
-    $arg=~s/^/$stamp/gm;
+    if (($arg =~ /\n$/) || !exists($ENV{MOD_PERL})) {
+      my $stamp = stamp;
+      $arg=~s/^/$stamp/gm;
+    }
+    if ($arg !~ /\n$/) {
+      $arg .= "\n";
+    }
   }
   realdie $arg;
 }
