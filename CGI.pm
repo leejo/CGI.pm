@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.11 1999-03-18 01:36:22 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.12 1999-03-18 02:12:46 lstein Exp $';
 $CGI::VERSION='2.50';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -165,7 +165,7 @@ if ($needs_binmode) {
 			  scrolling_list image_button start_form end_form startform endform
 			  start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
 		':cgi'=>[qw/param upload path_info path_translated url self_url script_name cookie Dump
-			 raw_cookie request_method query_string Accept user_agent remote_host 
+			 raw_cookie request_method query_string Accept user_agent remote_host content_type
 			 remote_addr referer server_name server_software server_port server_protocol
 			 virtual_host remote_ident auth_type http use_named_parameters 
 			 save_parameters restore_parameters param_fetch
@@ -173,7 +173,7 @@ if ($needs_binmode) {
 			 Delete Delete_all url_param cgi_error/],
 		':ssl' => [qw/https/],
 		':imagemap' => [qw/Area Map/],
-		':cgi-lib' => [qw/ReadParse PrintHeader HtmlTop HtmlBot SplitParam/],
+		':cgi-lib' => [qw/ReadParse PrintHeader HtmlTop HtmlBot SplitParam Vars/],
 		':html' => [qw/:html2 :html3 :netscape/],
 		':standard' => [qw/:html2 :html3 :form :cgi/],
 		':push' => [qw/multipart_init multipart_start multipart_end/],
@@ -809,6 +809,17 @@ sub keywords {
     $self->{'keywords'}=[@values] if defined(@values);
     my(@result) = defined($self->{'keywords'}) ? @{$self->{'keywords'}} : ();
     @result;
+}
+END_OF_FUNC
+
+# These are some tie() interfaces for compatibility
+# with Steve Brenner's cgi-lib.pl routines
+'Vars' => <<'END_OF_FUNC',
+sub Vars {
+    my %in;
+    tie(%in,CGI);
+    return %in if wantarray;
+    return \%in;
 }
 END_OF_FUNC
 
@@ -2358,6 +2369,15 @@ sub request_method {
 }
 END_OF_FUNC
 
+#### Method: content_type
+# Returns the content_type string
+####
+'content_type' => <<'END_OF_FUNC',
+sub content_type {
+    return $ENV{'CONTENT_TYPE'};
+}
+END_OF_FUNC
+
 #### Method: path_translated
 # Return the physical path information provided
 # by the URL (if any)
@@ -3689,6 +3709,36 @@ will return an array reference to the named parameters, which you then
 can manipulate in any way you like.
 
 You can also use a named argument style using the B<-name> argument.
+
+=head2 FETCHING THE PARAMETER LIST AS A HASH:
+
+    $params = $q->Vars;
+    print $params->{'address'};
+    @foo = split("\0",$params->{'foo'});
+    %params = $q->Vars;
+
+    use CGI ':cgi-lib';
+    $params = Vars;
+
+Many people want to fetch the entire parameter list as a hash in which
+the keys are the names of the CGI parameters, and the values are the
+parameters' values.  The Vars() method does this.  Called in a scalar
+context, it returns the parameter list as a tied hash reference.
+Changing a key changes the value of the parameter in the underlying
+CGI parameter list.  Called in an array context, it returns the
+parameter list as an ordinary hash.  This allows you to read the
+contents of the parameter list, but not to change it.
+
+When using this, the thing you must watch out for are multivalued CGI
+parameters.  Because a hash cannot distinguish between scalar and
+array context, multivalued parameters will be returned as a packed
+string, separated by the "\0" (null) character.  You must split this
+packed string in order to get at the individual values.  This is the
+convention introduced long ago by Steve Brenner in his cgi-lib.pl
+module for Perl version 4.
+
+If you wish to use Vars() as a function, import the I<:cgi-lib> set of
+function calls (also see the section on CGI-LIB compatibility).
 
 =head2 SAVING THE STATE OF THE SCRIPT TO A FILE:
 
@@ -5961,6 +6011,11 @@ Newer browsers do not report the user name for privacy reasons!
 Returns the method used to access your script, usually
 one of 'POST', 'GET' or 'HEAD'.
 
+=item B<content_type()>
+
+Returns the content_type of data submitted in a POST, generally 
+multipart/form-data or application/x-www-form-urlencoded
+
 =item B<http()>
 
 Called with no arguments returns the list of HTTP environment
@@ -6181,9 +6236,8 @@ HTML page that warns the user of the problem.
 
 =head1 COMPATIBILITY WITH CGI-LIB.PL
 
-To make it easier to port existing programs that use cgi-lib.pl
-the compatibility routine "ReadParse" is provided.  Porting is
-simple:
+To make it easier to port existing programs that use cgi-lib.pl the
+compatibility routine "ReadParse" is provided.  Porting is simple:
 
 OLD VERSION
     require "cgi-lib.pl";

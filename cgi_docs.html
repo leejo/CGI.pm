@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.49, 2/23/1999, L. Stein
+Version 2.50, 3/17/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -540,8 +540,51 @@ You may call <b>param_fetch()</b> with the name of the CGI parameter,
 or with the <b>-name</b> argument, which has the same meaning as
 elsewhere.
 
+<h3>Fetching the Parameter List as a Hash</h3>
+
+<blockquote>
+<pre>
+$params = $q-&gt;Vars;
+print $params-&gt;{'address'};
+@foo = split("\0",$params-&gt;{'foo'});
+%params = $q-&gt;Vars;
+
+use CGI ':cgi-lib';
+$params = Vars;
+</pre>
+</blockquote>
+
+
+<p>
+
+Many people want to fetch the entire parameter list as a hash in which
+the keys are the names of the CGI parameters, and the values are the
+parameters' values.  The <B>Vars()</B> method does this.  Called in a
+scalar context, it returns the parameter list as a tied hash
+reference.  Changing a key changes the value of the parameter in the
+underlying CGI parameter list.  Called in an array context, it returns
+the parameter list as an ordinary hash.  This allows you to read the
+contents of the parameter list, but not to change it.
+
+<p>
+
+When using this, the thing you must watch out for are multivalued CGI
+parameters.  Because a hash cannot distinguish between scalar and
+array context, multivalued parameters will be returned as a packed
+string, separated by the "\0" (null) character.  You must split this
+packed string in order to get at the individual values.  This is the
+convention introduced long ago by Steve Brenner in his cgi-lib.pl
+module for Perl version 4.
+
+<p>
+
+If you wish to use <B>Vars()</B> as a function, import the
+<I>:cgi-lib</I> set of function calls (also see the section on <a
+href="#migrating">CGI-LIB compatibility</a>).
+
+
 <A NAME="errors">
-<h3>RETRIEVING CGI ERRORS</h3>
+<h3>RETRIEVING CGI ERRORS</h3></A>
 
 <p> Errors can occur while processing user input, particularly when
 processing uploaded files.  When these errors occur, CGI will stop
@@ -1691,7 +1734,7 @@ is not a filehandle at all, but a string.
 <p>
 
 To be safe, use the <b>upload()</b> function (new in version 2.47).
-When called with the name of an upload field, I<upload()> returns a
+When called with the name of an upload field, <b>upload()</b> returns a
 filehandle, or undef if the parameter is not a valid filehandle.
 
 <pre>
@@ -4528,7 +4571,8 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.50</h3>
 <ol>
-  <li>Untainted tainted tempfile name so that script doesn't fail on terminal unlink
+  <li>Added a new Vars() method to retrieve all parameters as a tied hash.
+  <li>Untainted tainted tempfile name so that script doesn't fail on terminal unlink.
   <li>Made picking of upload tempfile name more intelligent so that doesn't fail in case of name collision.
   <li>Fixed handling of expire times when passed an absolute timestamp.
 </ol>
@@ -5199,6 +5243,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Mar 11 16:18:45 EST 1999
+Last modified: Wed Mar 17 21:09:10 EST 1999
 <!-- hhmts end -->
 </BODY> </HTML>
