@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 3.02, 12/10/2003, L. Stein
+Version 3.03, XX/XX/XXXX, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -419,6 +419,14 @@ $q = CGI->new($r);
 
 To do this with the function-oriented interface, set
 Apache-&gt;request($r) before calling the first CGI function.
+
+<p>
+
+Finally, you can pass code reference to new() in order to install an
+upload_hook function that will be called regularly while a long file
+is being uploaded.  See <a href="#upload">Creating a File Upload Field</a>
+for details.
+
 <p>
 
 See <A HREF="#advanced">advanced techniques</A> for more information.
@@ -1873,8 +1881,7 @@ here it's the remote filename.
 <p>
 
 <pre>
- $q = CGI-&gt;new();
- $q-&gt;upload_hook(\&hook,$data);
+ $q = CGI-&gt;new(\&hook);
  sub hook  {
         my ($filename, $buffer, $bytes_read, $data) = @_;
         print  "Read $bytes_read bytes of $filename\n";         
@@ -4852,6 +4859,10 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 3.03</h3>
+<li>Fix upload hook functionality
+</h3>
+
 <h3>Version 3.02</h3>
   <ol>
     <li>Bring in Apache::Response just in case.
@@ -5975,6 +5986,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Dec 11 16:58:21 EST 2003
+Last modified: Tue Dec 16 15:47:41 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>

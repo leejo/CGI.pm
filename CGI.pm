@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.147 2003-12-10 17:38:51 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.148 2003-12-16 20:47:44 lstein Exp $';
 $CGI::VERSION=3.02;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -304,6 +304,10 @@ sub new {
 	  UNIVERSAL::isa($initializer[0],'Apache::RequestRec')
 	 )) {
     $self->r(shift @initializer);
+  }
+ if (ref($initializer[0]) 
+     && (UNIVERSAL::isa($initializer[0],'CODE'))) {
+    $self->upload_hook(shift @initializer, shift @initializer);
   }
   if ($MOD_PERL) {
     $self->r(Apache->request) unless $self->r;
