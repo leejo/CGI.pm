@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.159 2004-03-16 22:51:54 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.160 2004-03-18 13:53:12 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2475,8 +2475,8 @@ sub hidden {
     $name=$self->escapeHTML($name);
     foreach (@value) {
 	$_ = defined($_) ? $self->escapeHTML($_,1) : '';
-	push @result,$XHTML ? qq(<input type="hidden" name="$name" value="$_" />)
-                            : qq(<input type="hidden" name="$name" value="$_">);
+	push @result,$XHTML ? qq(<input type="hidden" name="$name" value="$_" @other />)
+                            : qq(<input type="hidden" name="$name" value="$_" @other>);
     }
     return wantarray ? @result : join('',@result);
 }
