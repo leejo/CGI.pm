@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.133 2003-08-29 16:41:23 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.134 2003-08-29 19:53:26 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -232,7 +232,7 @@ if ($needs_binmode) {
 			  start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
 		':cgi'=>[qw/param upload path_info path_translated url self_url script_name cookie Dump
 			 raw_cookie request_method query_string Accept user_agent remote_host content_type
-			 remote_addr referer server_name server_software server_port server_protocol
+			 remote_addr referer server_name server_software server_port server_protocol virtual_port
 			 virtual_host remote_ident auth_type http
 			 save_parameters restore_parameters param_fetch
 			 remote_user user_name header redirect import_names put 
@@ -2510,7 +2510,7 @@ sub url {
 	    $url .= server_name();
 	    my $port = $self->server_port;
 	    $url .= ":" . $port
-		unless (lc($protocol) eq 'http' && $port == 80)
+		unless (lc($protocol) eq 'http'  && $port == 80)
 		    || (lc($protocol) eq 'https' && $port == 443);
 	}
         return $url if $base;
@@ -2848,6 +2848,21 @@ END_OF_FUNC
 'server_software' => <<'END_OF_FUNC',
 sub server_software {
     return $ENV{'SERVER_SOFTWARE'} || 'cmdline';
+}
+END_OF_FUNC
+
+#### Method: virtual_port
+# Return the server port, taking virtual hosts into account
+####
+'virtual_port' => <<'END_OF_FUNC',
+sub virtual_port {
+    my($self) = self_or_default(@_);
+    my $vh = $self->http('host');
+    if ($vh) {
+        return ($vh =~ /:(\d+)$/)[0] || '80';
+    } else {
+        return $self->server_port();
+    }
 }
 END_OF_FUNC
 
@@ -6662,6 +6677,11 @@ the browser attempted to contact
 =item B<server_port ()>
 
 Return the port that the server is listening on.
+
+=item B<virtual_port ()>
+
+Like server_port() except that it takes virtual hosts into account.
+Use this when running with virtual hosts.
 
 =item B<server_software ()>
 
