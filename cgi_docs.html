@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.87, 10/7/2002, L. Stein
+Version 2.88, 10/14/2002, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4685,6 +4685,17 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.89</h3>
+<ol>
+  <li>Fixed behavior of ACTION tag when POSTING to a URL that has a query string.
+</ol>
+<h3>Version 2.88</h3>
+<ol>
+  <li>Fixed problem with uploads being refused under Perl 5.8 when
+      under Taint mode.
+  <li>Fixed uninitialized variable warnings under Perl 5.8.
+  <li>Fixed CGI::Pretty regression test failures.
+</ol>
 <h3>Version 2.87</h3>
 <ol>
   <li>Security hole patched: when processing multipart/form-data postings,
@@ -5681,6 +5692,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Oct 10 19:08:27 EDT 2002
+Last modified: Wed Oct 16 13:44:43 EDT 2002
 <!-- hhmts end -->
 </BODY> </HTML>
