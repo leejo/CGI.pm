@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.100 2003-04-11 00:28:06 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.101 2003-04-11 17:26:49 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -500,6 +500,17 @@ sub init {
       # UN*X programmers expect.
       $query_string = read_from_cmdline() if $DEBUG;
   }
+
+# YL: Begin Change for XML handler 10/19/2001
+    if ($meth eq 'POST'
+        && defined($ENV{'CONTENT_TYPE'})
+        && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded| ) {
+        my($param) = 'POSTDATA' ;
+        $self->add_parameter($param) ;
+      push (@{$self->{$param}},$query_string);
+      undef $query_string ;
+    }
+# YL: End Change for XML handler 10/19/2001
 
     # We now have the query string in hand.  We do slightly
     # different things for keyword lists and parameter lists.
@@ -1311,23 +1322,12 @@ sub header {
     push(@header,"Content-Disposition: attachment; filename=\"$attachment\"") if $attachment;
     push(@header,map {ucfirst $_} @other);
     push(@header,"Content-Type: $type") if $type ne '';
-
+    my $header = join($CRLF,@header)."${CRLF}${CRLF}";
     if ($MOD_PERL and not $nph) {
-         my $r = Apache->request;
-         my $out = $r->headers_out;
-         for (@header) {
-             my($k, $v) = split /:\s+/, $_, 2;
-             if ($k eq 'Content-Type') {
-                 $r->content_type($v);
-             }
-             else {
-                 $out->add($k=>$v);
-             }
-         }
-         $r->send_http_header();
-         return '';
+        Apache->request->send_cgi_header($header);
+        return '';
     }
-    return join($CRLF,@header)."${CRLF}${CRLF}";
+    return $header;
 }
 END_OF_FUNC
 

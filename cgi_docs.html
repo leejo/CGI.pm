@@ -474,7 +474,6 @@ call that is accepted by most of the CGI methods.  See <a href="#named_param">
 Calling CGI functions that Take Multiple Arguments</a> for an explanation of
 this style.
 
-
 <H3><A NAME="append">Appending a Parameter</A></H3>
 
 <PRE>
@@ -503,6 +502,24 @@ down between invocations of the script.
 This deletes all the parameters and leaves you with an empty CGI
 object.  This may be useful to restore all the defaults produced by
 the form element generating methods.
+
+
+<H3><A NAME="postdata">Handling non-URLencoded Arguments</A></H3>
+
+<p>
+
+If POSTed data is not of type application/x-www-form-urlencoded or
+multipart/form-data, then the POSTed data will not be processed, but
+instead be returned as-is in a parameter named POSTDATA.  To retrieve
+it, use code like this:
+
+<PRE>
+   my $data = $query-&gt;param('FORMDATA');
+</PRE>
+
+(If you don't know what the preceding means, don't worry about it.  It
+only affects people trying to use CGI for XML processing and other
+specialized tasks.)
 
 
 <H3><A NAME="importing">Importing parameters into a namespace</A></H3>
@@ -4745,9 +4762,10 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.92</h3>
 <ol>
+  <li>Added Yair Lenga's patch for non-urlencoded postings.
+  <li>Added Stas Bekman's patches for mod_perl 2 compatibility.
   <li>Fixed uninitialized escape behavior submitted by William Campbell.
   <li>Fixed tied behavior so that you can pass arguments to tie()
-  <li>Added Stas Beckman's patches for mod_perl 2 compatibility.
   <li>Fixed incorrect generation of URLs when the path_info contains + and other odd characters.
   <li>Fixed redirect(-cookies=&gt;$cookie) problem.
   <li>Fixed tag generation bug that affects -javascript passed to start_html().
@@ -5784,6 +5802,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sun Apr  6 23:10:36 EDT 2003
+Last modified: Fri Apr 11 10:13:09 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>
