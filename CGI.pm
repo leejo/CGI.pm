@@ -18,13 +18,13 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.141 2003-11-20 22:11:16 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.142 2003-11-21 00:50:07 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
 # $CGITempFile::TMPDIRECTORY = '/usr/tmp';
-use CGI::Util qw(rearrange make_attributes unescape escape expires);
+use CGI::Util qw(rearrange make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
 #use constant XHTML_DTD => ['-//W3C//DTD XHTML Basic 1.0//EN',
 #                           'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'];
@@ -3479,7 +3479,7 @@ sub readHeader {
     my($ok) = 0;
     my($bad) = 0;
 
-    local($CRLF) = "\015\012" if $CGI::OS eq 'VMS';
+    local($CRLF) = "\015\012" if $CGI::OS eq 'VMS' || $EBCDIC;
 
     do {
 	$self->fillBuffer($FILLUNIT);
@@ -3496,6 +3496,10 @@ sub readHeader {
     my($header) = substr($self->{BUFFER},0,$end+2);
     substr($self->{BUFFER},0,$end+4) = '';
     my %return;
+
+    warn "untranslated header=$header\n";
+    $header = ascii2ebcdic($header) if $EBCDIC;
+    warn "translated header=$header\n";
 
     # See RFC 2045 Appendix A and RFC 822 sections 3.4.8
     #   (Folding Long Header Fields), 3.4.3 (Comments)
@@ -3525,6 +3529,9 @@ sub readBody {
     while (defined($data = $self->read)) {
 	$returnval .= $data;
     }
+    warn "untranslated body=$returnval\n";
+    $returnval = ascii2ebcdic($returnval) if $EBCDIC;
+    warn "translated body=$returnval\n";
     return $returnval;
 }
 END_OF_FUNC
@@ -3543,8 +3550,11 @@ sub read {
     # is never split between reads.
     $self->fillBuffer($bytes);
 
+    my $boundary_start = $EBCDIC ? ebcdic2ascii($self->{BOUNDARY})      : $self->{BOUNDARY};
+    my $boundary_end   = $EBCDIC ? ebcdic2ascii($self->{BOUNDARY}.'--') : $self->{BOUNDARY}.'--';
+
     # Find the boundary in the buffer (it may not be there).
-    my $start = index($self->{BUFFER},$self->{BOUNDARY});
+    my $start = index($self->{BUFFER},$boundary_start);
     # protect against malformed multipart POST operations
     die "Malformed multipart POST\n" unless ($start >= 0) || ($self->{LENGTH} > 0);
 
@@ -3556,14 +3566,14 @@ sub read {
     if ($start == 0) {
 
 	# clear us out completely if we've hit the last boundary.
-	if (index($self->{BUFFER},"$self->{BOUNDARY}--")==0) {
+	if (index($self->{BUFFER},$boundary_end)==0) {
 	    $self->{BUFFER}='';
 	    $self->{LENGTH}=0;
 	    return undef;
 	}
 
 	# just remove the boundary.
-	substr($self->{BUFFER},0,length($self->{BOUNDARY}))='';
+	substr($self->{BUFFER},0,length($boundary_start))='';
         $self->{BUFFER} =~ s/^\012\015?//;
 	return undef;
     }
@@ -3575,7 +3585,7 @@ sub read {
 	# leave enough bytes in the buffer to allow us to read
 	# the boundary.  Thanks to Kevin Hendrick for finding
 	# this one.
-	$bytesToReturn = $bytes - (length($self->{BOUNDARY})+1);
+	$bytesToReturn = $bytes - (length($boundary_start)+1);
     }
 
     my $returnval=substr($self->{BUFFER},0,$bytesToReturn);
