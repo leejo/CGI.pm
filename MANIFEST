@@ -51,4 +51,3 @@ t/request.t
 t/switch.t
 t/util.t
 t/util-58.t
-META.yml                                 Module meta-data (added by MakeMaker)
