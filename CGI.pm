@@ -15,11 +15,10 @@ require 5.004;
 # listing the modifications you have made.
 
 # The most recent version and complete docs are available at:
-#   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/cgi_docs.html
-#   ftp://ftp-genome.wi.mit.edu/pub/software/WWW/
+#   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.2 1998-11-24 12:20:46 lstein Exp $';
-$CGI::VERSION='2.43';
+$CGI::revision = '$Id: CGI.pm,v 1.3 1998-11-24 18:29:58 lstein Exp $';
+$CGI::VERSION='2.44';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -123,7 +122,7 @@ $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for Doug MacEachern's modperl
 if (defined($ENV{'GATEWAY_INTERFACE'}) && 
-    ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//)) 
+    ($MOD_PERL = exists $ENV{'MOD_PERL'}))
 {
     $| = 1;
     require Apache;
@@ -213,6 +212,7 @@ sub compile {
 
 sub expand_tags {
     my($tag) = @_;
+    return ("start_$1","end_$1") if $tag=~/^(?:\*|start_|end_)(.+)/;
     my(@r);
     return ($tag) unless $EXPORT_TAGS{$tag};
     foreach (@{$EXPORT_TAGS{$tag}}) {
@@ -534,11 +534,9 @@ sub binmode {
 }
 
 sub _make_tag_func {
-    my $tagname = shift;
-    return qq{
+    my ($self,$tagname) = @_;
+    my $func = qq#
 	sub $tagname { 
-	    # handle various cases in which we're called
-	    # most of this bizarre stuff is to avoid -w errors
 	    shift if \$_[0] && 
 		(!ref(\$_[0]) && \$_[0] eq \$CGI::DefaultClass) ||
 		    (ref(\$_[0]) &&
@@ -550,12 +548,20 @@ sub _make_tag_func {
 		my(\@attr) = make_attributes( '',shift() );
 		\$attr = " \@attr" if \@attr;
 	    }
+	#;
+    if ($tagname=~/start_(\w+)/i) {
+	$func .= qq! return "<\U$1\E\$attr>";} !;
+    } elsif ($tagname=~/end_(\w+)/i) {
+	$func .= qq! return "<\U/$1\E>"; } !;
+    } else {
+	$func .= qq#
 	    my(\$tag,\$untag) = ("\U<$tagname\E\$attr>","\U</$tagname>\E");
 	    return \$tag unless \@_;
 	    my \@result = map { "\$tag\$_\$untag" } (ref(\$_[0]) eq 'ARRAY') ? \@{\$_[0]} : "\@_";
 	    return "\@result";
-         }
-}
+            }#;
+    }
+return $func;
 }
 
 sub AUTOLOAD {
@@ -627,12 +633,13 @@ sub _compile {
 
        $code = "sub $AUTOLOAD { }" if (!$code and $func_name eq 'DESTROY');
        if (!$code) {
+	   (my $base = $func_name) =~ s/^(start_|end_)//i;
 	   if ($EXPORT{':any'} || 
 	       $EXPORT{'-any'} ||
-	       $EXPORT{$func_name} || 
+	       $EXPORT{$base} || 
 	       (%EXPORT_OK || grep(++$EXPORT_OK{$_},&expand_tags(':html')))
-	           && $EXPORT_OK{$func_name}) {
-	       $code = _make_tag_func($func_name);
+	           && $EXPORT_OK{$base}) {
+	       $code = $CGI::DefaultClass->_make_tag_func($func_name);
 	   }
        }
        die "Undefined subroutine $AUTOLOAD\n" unless $code;
@@ -652,16 +659,15 @@ sub _setup_symbols {
     my $self = shift;
     my $compile = 0;
     foreach (@_) {
-	$HEADERS_ONCE++, next if /^[:-]unique_headers$/;
-	$NPH++, next if /^[:-]nph$/;
-	$NO_DEBUG++, next if /^[:-]no_?[Dd]ebug$/;
+	$HEADERS_ONCE++,         next if /^[:-]unique_headers$/;
+	$NPH++,                  next if /^[:-]nph$/;
+	$NO_DEBUG++,             next if /^[:-]no_?[Dd]ebug$/;
 	$USE_PARAM_SEMICOLONS++, next if /^[:-]newstyle_urls$/;
-	$PRIVATE_TEMPFILES++, next if /^[:-]private_tempfiles$/;
-	$EXPORT{$_}++, next if /^[:-]any$/;
-	$compile++, next if /^[:-]compile$/;
+	$PRIVATE_TEMPFILES++,    next if /^[:-]private_tempfiles$/;
+	$EXPORT{$_}++,           next if /^[:-]any$/;
+	$compile++,              next if /^[:-]compile$/;
 	
-	# This is probably extremely evil code -- to be deleted
-	# some day.
+	# This is probably extremely evil code -- to be deleted some day.
 	if (/^[-]autoload$/) {
 	    my($pkg) = caller(1);
 	    *{"${pkg}::AUTOLOAD"} = sub { 
@@ -2865,7 +2871,18 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 'asString' => <<'END_OF_FUNC',
 sub asString {
     my $self = shift;
-    return ${*{$self}{SCALAR}};
+    # get rid of package name
+    (my $i = $$self) =~ s/^\*(\w+::)+//; 
+    $i =~ s/\\(.)/$1/g;
+    return $i;
+# BEGIN DEAD CODE
+# This was an extremely clever patch that allowed "use strict refs".
+# Unfortunately it relied on another bug that caused leaky file descriptors.
+# The underlying bug has been fixed, so this no longer works.  However
+# "strict refs" still works for some reason.
+#    my $self = shift;
+#    return ${*{$self}{SCALAR}};
+# END DEAD CODE
 }
 END_OF_FUNC
 
@@ -2882,7 +2899,7 @@ sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
     ++$FH;
-    my $ref = \*{'Fh::' . quotemeta($name)};
+    my $ref = \*{'Fh::' . quotemeta($name)}; 
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL()) 
 	|| die "CGI open of $file: $!\n";
     unlink($file) if $delete;
@@ -3110,6 +3127,7 @@ sub fillBuffer {
 							 \$self->{BUFFER},
 							 $bytesToRead,
 							 $bufferLength);
+    $self->{BUFFER} = '' unless defined $self->{BUFFER};
 
     # An apparent bug in the Apache server causes the read()
     # to return zero bytes repeatedly without blocking if the
@@ -3892,7 +3910,51 @@ upload, even if it is confidential information. On Unix systems,
 the -private_tempfiles pragma will cause the temporary file to be unlinked as soon
 as it is opened and before any data is written into it,
 eliminating the risk of eavesdropping.
-n
+
+=back
+
+=head2 SPECIAL FORMS FOR IMPORTING HTML-TAG FUNCTIONS
+
+Many of the methods generate HTML tags.  As described below, tag
+functions automatically generate both the opening and closing tags.
+For example:
+
+  print h1('Level 1 Header');
+
+produces
+
+  <H1>Level 1 Header</H1>
+
+There will be some times when you want to produce the start and end
+tags yourself.  In this case, you can use the form start_I<tag_name>
+and end_I<tag_name>, as in:
+
+  print start_h1,'Level 1 Header',end_h1;
+
+With a few exceptions (described below), start_I<tag_name> and
+end_I<tag_name> functions are not generated automatically when you
+I<use CGI>.  However, you can specify the tags you want to generate
+I<start/end> functions for by putting an asterisk in front of their
+name, or, alternatively, requesting either "start_I<tag_name>" or
+"end_I<tag_name>" in the import list.
+
+Example:
+
+  use CGI qw/:standard *table start_ul/;
+
+In this example, the following functions are generated in addition to
+the standard ones:
+
+=over 4
+
+=item 1. start_table() (generates a <TABLE> tag)
+
+=item 2. end_table() (generates a </TABLE> tag)
+
+=item 3. start_ul() (generates a <UL> tag)
+
+=item 4. end_ul() (generates a </UL> tag)
+
 =back
 
 =head1 GENERATING DYNAMIC DOCUMENTS
@@ -4462,10 +4524,20 @@ begin with initial caps:
     Tr
     Link
     Delete
+    Accept
+    Sub
 
 In addition, start_html(), end_html(), start_form(), end_form(),
 start_multipart_form() and all the fill-out form tags are special.
 See their respective sections.
+
+=head2 PRETTY-PRINTING HTML
+
+By default, all the HTML produced by these functions comes out as one
+long line without carriage returns or indentation. This is yuck, but
+it does reduce the size of the documents by 10-20%.  To get
+pretty-printed output, please use L<CGI::Pretty>, a subclass
+contributed by Brian Paulsen.
 
 =head1 CREATING FILL-OUT FORMS:
 
@@ -4723,12 +4795,11 @@ The first parameter is the required name for the field (-name).
 The optional second parameter is the starting value for the field contents
 to be used as the default file name (-default).
 
-The beta2 version of Netscape 2.0 currently doesn't pay any attention
-to this field, and so the starting value will always be blank.  Worse,
-the field loses its "sticky" behavior and forgets its previous
-contents.  The starting value field is called for in the HTML
-specification, however, and possibly later versions of Netscape will
-honor it.
+For security reasons, browsers don't pay any attention to this field,
+and so the starting value will always be blank.  Worse, the field
+loses its "sticky" behavior and forgets its previous contents.  The
+starting value field is called for in the HTML specification, however,
+and possibly some browser will eventually provide support for it.
 
 =item 3.
 
@@ -5318,11 +5389,12 @@ pointed to by the B<-onClick> parameter will be executed.  On
 non-Netscape browsers this form element will probably not even
 display.
 
-=head1 NETSCAPE COOKIES
+=head1 HTTP COOKIES
 
-Netscape browsers versions 1.1 and higher support a so-called
-"cookie" designed to help maintain state within a browser session.
-CGI.pm has several methods that support cookies.
+Netscape browsers versions 1.1 and higher, and all versions of
+Internet Explorer, support a so-called "cookie" designed to help
+maintain state within a browser session.  CGI.pm has several methods
+that support cookies.
 
 A cookie is a name=value pair much like the named parameters in a CGI
 query string.  CGI scripts create one or more cookies and send
@@ -5340,15 +5412,15 @@ optional attributes:
 This is a time/date string (in a special GMT format) that indicates
 when a cookie expires.  The cookie will be saved and returned to your
 script until this expiration date is reached if the user exits
-Netscape and restarts it.  If an expiration date isn't specified, the cookie
-will remain active until the user quits Netscape.
+the browser and restarts it.  If an expiration date isn't specified, the cookie
+will remain active until the user quits the browser.
 
 =item 2. a domain
 
 This is a partial or complete domain name for which the cookie is 
 valid.  The browser will return the cookie to any host that matches
 the partial domain name.  For example, if you specify a domain name
-of ".capricorn.com", then Netscape will return the cookie to
+of ".capricorn.com", then the browser will return the cookie to
 Web servers running on any of the machines "www.capricorn.com", 
 "www2.capricorn.com", "feckless.capricorn.com", etc.  Domain names
 must contain at least two periods to prevent attempts to match
@@ -5373,7 +5445,7 @@ script if the CGI request is occurring on a secure channel, such as SSL.
 
 =back
 
-The interface to Netscape cookies is the B<cookie()> method:
+The interface to HTTP cookies is the B<cookie()> method:
 
     $cookie = $query->cookie(-name=>'sessionID',
 			     -value=>'xyzzy',
@@ -5390,7 +5462,7 @@ B<cookie()> creates a new cookie.  Its parameters include:
 =item B<-name>
 
 The name of the cookie (required).  This can be any string at all.
-Although Netscape limits its cookie names to non-whitespace
+Although browsers limit their cookie names to non-whitespace
 alphanumeric characters, CGI.pm removes this restriction by escaping
 and unescaping cookies behind the scenes.
 
@@ -5461,19 +5533,11 @@ simple to turn a CGI parameter into a cookie, and vice-versa:
 See the B<cookie.cgi> example script for some ideas on how to use
 cookies effectively.
 
-B<NOTE:> There appear to be some (undocumented) restrictions on
-Netscape cookies.  In Netscape 2.01, at least, I haven't been able to
-set more than three cookies at a time.  There may also be limits on
-the length of cookies.  If you need to store a lot of information,
-it's probably better to create a unique session ID, store it in a
-cookie, and use the session ID to locate an external file/database
-saved on the server's side of the connection.
+=head1 WORKING WITH FRAMES
 
-=head1 WORKING WITH NETSCAPE FRAMES
-
-It's possible for CGI.pm scripts to write into several browser
-panels and windows using Netscape's frame mechanism.  
-There are three techniques for defining new frames programmatically:
+It's possible for CGI.pm scripts to write into several browser panels
+and windows using the HTML 4 frame mechanism.  There are three
+techniques for defining new frames programmatically:
 
 =over 4
 
@@ -5496,12 +5560,12 @@ You may provide a B<-target> parameter to the header() method:
    
     print $q->header(-target=>'ResultsWindow');
 
-This will tell Netscape to load the output of your script into the
-frame named "ResultsWindow".  If a frame of that name doesn't
-already exist, Netscape will pop up a new window and load your
-script's document into that.  There are a number of magic names
-that you can use for targets.  See the frame documents on Netscape's
-home pages for details.
+This will tell the browser to load the output of your script into the
+frame named "ResultsWindow".  If a frame of that name doesn't already
+exist, the browser will pop up a new window and load your script's
+document into that.  There are a number of magic names that you can
+use for targets.  See the frame documents on Netscape's home pages for
+details.
 
 =item 3. Specify the destination for the document in the <FORM> tag
 
@@ -5674,10 +5738,10 @@ order to avoid conflict with Perl's accept() function.
 =item B<raw_cookie()>
 
 Returns the HTTP_COOKIE variable, an HTTP extension implemented by
-Netscape browsers version 1.1 and higher.  Cookies have a special
-format, and this method call just returns the raw form (?cookie
-dough).  See cookie() for ways of setting and retrieving cooked
-cookies.
+Netscape browsers version 1.1 and higher, and all versions of Internet
+Explorer.  Cookies have a special format, and this method call just
+returns the raw form (?cookie dough).  See cookie() for ways of
+setting and retrieving cooked cookies.
 
 Called with no parameters, raw_cookie() returns the packed cookie
 structure.  You can separate it into individual cookies by splitting
@@ -5759,10 +5823,9 @@ verification, if this script is protected.
 
 =item B<user_name ()>
 
-Attempt to obtain the remote user's name, using a variety
-of different techniques.  This only works with older browsers
-such as Mosaic.  Netscape does not reliably report the user
-name!
+Attempt to obtain the remote user's name, using a variety of different
+techniques.  This only works with older browsers such as Mosaic.
+Newer browsers do not report the user name for privacy reasons!
 
 =item B<request_method()>
 
@@ -5986,14 +6049,17 @@ of CGI.pm without rewriting your old scripts from scratch.
 
 =head1 AUTHOR INFORMATION
 
-Copyright 1995-1997, Lincoln D. Stein.  All rights reserved.  It may
-be used and modified freely, but I do request that this copyright
-notice remain attached to the file.  You may modify this module as you
-wish, but if you redistribute a modified version, please attach a note
-listing the modifications you have made.
+Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
 
-Address bug reports and comments to:
-lstein@genome.wi.mit.edu
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: lstein@cshl.org.  When sending
+bug reports, please provide the version of CGI.pm, the version of
+Perl, the name and version of your Web server, and the name and
+version of the operating system you are using.  If the problem is even
+remotely browser dependent, please provide information about the
+affected browers as well.
 
 =head1 CREDITS
 
@@ -6146,8 +6212,8 @@ warnings when programs are run with the B<-w> switch.
 =head1 SEE ALSO
 
 L<CGI::Carp>, L<URI::URL>, L<CGI::Request>, L<CGI::MiniSvr>,
-L<CGI::Base>, L<CGI::Form>, L<CGI::Apache>, L<CGI::Switch>,
-L<CGI::Push>, L<CGI::Fast>
+L<CGI::Base>, L<CGI::Form>, L<CGI::Push>, L<CGI::Fast>,
+L<CGI::Pretty>
 
 =cut
 

@@ -4,9 +4,9 @@
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..17\n"; }
+BEGIN {$| = 1; print "1..20\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use CGI (':standard','-no_debug');
+use CGI (':standard','-no_debug','*h3','start_table');
 $loaded = 1;
 print "ok 1\n";
 
@@ -58,3 +58,6 @@ test(16,($cookie=cookie(-name=>'fred',-value=>['chocolate','chip'],-path=>'/')) 
      'fred=chocolate&chip; path=/',"cookie()");
 test(17,header(-Cookie=>$cookie) =~ m!^Set-Cookie: fred=chocolate&chip\; path=/\r\nDate:.*\r\nContent-Type: text/html\r\n\r\n!s,
      "header(-cookie)");
+test(18,start_h3 eq '<H3>');
+test(19,end_h3 eq '</H3>');
+test(20,start_table({-border=>undef}) eq '<TABLE BORDER>');

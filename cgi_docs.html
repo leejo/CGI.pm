@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.44, 10/28/98, L. Stein
+Version 2.44, 11/24/98, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -91,8 +91,8 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
   <LI><A HREF="#import">Importing CGI methods</A>
   <LI><A HREF="#debugging">Debugging</A>
   <LI><A HREF="#environment">HTTP session variables</A>
-  <LI><A HREF="#cookies">Netscape Cookies</A>
-  <li><a href="#frames">Support for Netscape frames</a>
+  <LI><A HREF="#cookies">HTTP Cookies</A>
+  <li><a href="#frames">Support for frames</a>
   <li><a href="#javascripting">Support for JavaScript</a>
   <li><a href="#stylesheets">Limited Support for Cascading Style Sheets</a>
   <LI><A HREF="#nph">Using NPH Scripts</A>
@@ -117,15 +117,15 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 <H2>Downloading & Installation</H2>
 </A>
 <ul>
-  <li><STRONG><A HREF="CGI.pm-2.43.tar.gz">Download 2.43 (gzip tar archive)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm-2.43.zip">Download 2.43 (pkzip archive)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm-2.41.sit">Download 2.41
+  <li><STRONG><A HREF="CGI.pm-2.43.tar.gz">Download 2.44 (gzip tar archive)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm-2.43.zip">Download 2.44 (pkzip archive)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm-2.43.sit">Download 2.43
       (Macintosh stuffit archive)</A></STRONG>
   <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
 </ul>
 
 <em>I'm looking for a volunteer to make a Macintosh Stuffit archive of
-version 2.42!</em>
+version 2.44!</em>
 
 <p>
 
@@ -177,7 +177,7 @@ In the former case don't panic.  Here's a recipe that will work
 (commands are given in MS-DOS/Windows form):
 
 <pre>
-  &gt; cd CGI.pm-2.38
+  &gt; cd CGI.pm-2.44
   &gt; copy CGI.pm C:\Perl\lib
   &gt; mkdir C:\Perl\lib\CGI
   &gt; copy CGI\*.pm C:\Perl\lib\CGI
@@ -823,7 +823,7 @@ you wish.
 
 The <strong>-cookie</strong> parameter generates a header that tells
 Netscape browsers to return a "magic cookie" during all subsequent
-transactions with your script.  Netscape cookies have a special format
+transactions with your script.  HTTP cookies have a special format
 that includes interesting attributes such as expiration time.  Use the
 <a href="#cookies">cookie()</a> method to create and retrieve session
 cookies.  The value of this parameter can be either a scalar value or
@@ -1206,7 +1206,10 @@ a few exceptions:
       conflicts with CGI's own <code>param() </code> method.  Use
       PARAM() instead.
   <li>The &lt;select&gt; tag used to create selection lists conflicts
-      with perl's select() function.  Use <code>Select()</code> instead.
+      with Perl's select() function.  Use <code>Select()</code> instead.
+  <li>The &lt;sub&gt; tag used to create subscripts conflicts
+      wit Perl's operator for creating subroutines.  Use
+      <code>Sub()</code> instead.
 </ol>
 
 <h4>Tags with Attributes</h4>
@@ -2512,6 +2515,63 @@ dashes.
       eliminating the risk of eavesdropping.
 </dl>
 
+<h3>Special Forms for Importing HTML-Tag Functions</h3>
+
+Many of the methods generate HTML tags.  As described below, tag
+functions automatically generate both the opening and closing tags.
+For example:
+
+<pre>
+  print h1('Level 1 Header');
+</pre>
+
+produces
+
+<pre>
+  &lt;H1&gt;Level 1 Header&lt;/H1&gt;
+</pre>
+
+There will be some times when you want to produce the start and end
+tags yourself.  In this case, you can use the form
+start_I<cite>tag_name</cite> and end_I<cite>tag_name</cite>, as in:
+
+<pre>
+  print start_h1,'Level 1 Header',end_h1;
+</pre>
+
+With a few exceptions (described below), start_<cite>tag_name</cite>
+and end_I<cite>tag_name</cite> functions are not generated
+automatically when you <cite>use CGI</cite>.  However, you can specify
+the tags you want to generate <cite>start/end</cite> functions for by
+putting an asterisk in front of their name, or, alternatively,
+requesting either "start_<cite>tag_name</cite>" or
+"end_<cite>tag_name</cite>" in the import list.
+
+<p>
+
+Example:
+
+<pre>
+  use CGI qw/:standard *table start_ul/;
+</pre>
+
+In this example, the following functions are generated in addition to
+the standard ones:
+
+<ol>
+  <li><code>start_table()</code> (generates a &lt;TABLE&gt; tag)
+  <li><code>end_table()</code> (generates a &lt;/TABLE&gt; tag)
+  <li><code>start_ul()</code> (generates a &lt;UL&gt; tag)
+  <li><code>end_ul()</code> (generates a &lt;/UL&gt; tag)
+</ol>
+
+<h3>PRETTY-PRINTING HTML</h3>
+
+By default, all the HTML produced by these functions comes out as one
+long line without carriage returns or indentation. This is yuck, but
+it does reduce the size of the documents by 10-20%.  To get
+pretty-printed output, please use <cite>CGI::Pretty</cite>, a subclass
+contributed by <a href="bpaulsen@lehman.com">Brian Paulsen</a>.
 
 <H3>Optional Utility Functions</H3>
 
@@ -2766,12 +2826,13 @@ through this interface.  The methods are as follows:
 
 <HR>
 <A NAME="cookies">
-<H2>Netscape Cookies</H2>
+<H2>HTTP Cookies</H2>
 </A>
 
-Netscape browsers versions 1.1 and higher support a so-called
-"cookie" designed to help maintain state within a browser session.
-CGI.pm has several methods that support cookies.
+Netscape browsers versions 1.1 and higher, and all versions of
+Internet Explorer support a so-called "cookie" designed to help
+maintain state within a browser session.  CGI.pm has several methods
+that support cookies.
 
 <p>
 
@@ -2791,8 +2852,8 @@ optional attributes:
   <dd>This is a time/date string (in a special GMT format) that indicates
       when a cookie expires.  The cookie will be saved and returned to your
       script until this expiration date is reached if the user exits
-      Netscape and restarts it.  If an expiration date isn't specified, the cookie
-      will remain active until the user quits Netscape.
+      the browser and restarts it.  If an expiration date isn't specified, the cookie
+      will remain active until the user quits the browser.
       <p>
       Negative expiration times (e.g. "-1d") cause some browsers
       to delete the cookie from its persistent store.  This is a
@@ -2802,7 +2863,7 @@ optional attributes:
   <dd>This is a partial or complete domain name for which the cookie is 
       valid.  The browser will return the cookie to any host that matches
       the partial domain name.  For example, if you specify a domain name
-      of ".capricorn.com", then Netscape will return the cookie to
+      of ".capricorn.com", then the browser will return the cookie to
       Web servers running on any of the machines "www.capricorn.com", 
       "www2.capricorn.com", "feckless.capricorn.com", etc.  Domain names
       must contain at least two periods to prevent attempts to match
@@ -2822,7 +2883,7 @@ optional attributes:
       script if the CGI request is occurring on a secure channel, such as SSL.
 </dl>
 
-The interface to Netscape cookies is the <strong>cookie()</strong> method:
+The interface to HTTP cookies is the <strong>cookie()</strong> method:
 <pre>
     $cookie = $query-&gt;cookie(-name=&gt;'sessionID',
 			     -value=&gt;'xyzzy',
@@ -2963,17 +3024,18 @@ file/database saved on the server's side of the connection.
 
 <HR>
 
-<A NAME="frames">
-<H2>Support for Netscape Frames</H2>
-</A>
-CGI.pm contains support for
-<a href="http://home.netscape.com/assist/net_sites/frames.html">Netscape frames</a>,
-a new feature in version 2.0 and higher.  Frames are supported in two ways:
+<A NAME="frames"> <H2>Support for Frames</H2> </A>
+
+CGI.pm contains support for <a
+href="http://home.netscape.com/assist/net_sites/frames.html">HTML
+frames</a>, a feature of Netscape 2.0 and higher, and Internet
+Explorer 3.0 and higher.  Frames are supported in two ways:
+
 <ol>
   <li> You can direct the output of a script into a new window or into a
       preexisting named frame by providing the name of the frame as a
       <code>-target</code> argument in the header method.  For example,
-      the following code will pop up a new Netscape window and display the script's
+      the following code will pop up a new window and display the script's
       output:
       <pre>
       $query = new CGI;
@@ -3004,13 +3066,17 @@ a skeleton script for creating side-by-side query/result frame sets.
 <A NAME="javascripting">
 <H2>Support for JavaScript</H2>
 </A>
+
 Netscape versions 2.0 and higher incorporate an interpreted language
-called JavaScript.  It isn't the same as Java, and certainly isn't at all
-the same as Perl, which is a great pity.  JavaScript allows you to
-programatically change the contents of fill-out forms, create new
-windows, and pop up dialog box from within Netscape itself.  From the
-point of view of CGI scripting, JavaScript is quite useful for
-validating fill-out forms prior to submitting them.
+called JavaScript.  Internet Explorer, 3.0 and higher, supports a
+closely-related dialect called JScript.  JavaScript isn't the same as
+Java, and certainly isn't at all the same as Perl, which is a great
+pity.  JavaScript allows you to programatically change the contents of
+fill-out forms, create new windows, and pop up dialog box from within
+Netscape itself.  From the point of view of CGI scripting, JavaScript
+is quite useful for validating fill-out forms prior to submitting
+them.
+
 <p>
 You'll need to know JavaScript in order to use it.  The
 <a href="http://home.netscape.com/eng/mozilla/2.0/handbook/javascript/">
@@ -3785,11 +3851,11 @@ Using the File Upload Feature
 </H2>
 
 The file upload feature doesn't work with every combination of browser
-and server.  The various versions of Netscape on the Macintosh, Unix
-and Windows platforms don't all seem to implement file uploading in
-exactly the same way.  I've tried to make CGI.pm work with all
-versions on all platforms, but I keep getting reports from people of
-instances that break the file upload feature.
+and server.  The various versions of Netscape and Internet Explorer on
+the Macintosh, Unix and Windows platforms don't all seem to implement
+file uploading in exactly the same way.  I've tried to make CGI.pm
+work with all versions on all platforms, but I keep getting reports
+from people of instances that break the file upload feature.
 
 <p>
 
@@ -4334,9 +4400,26 @@ through previous messages before you make a posting.  Respondents are
 not always friendly to people who neglect to do so!
 
 <H3>Bug Reports</H3>
-Address bug reports and comments to:<BR>
-<A HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>
-<P><A HREF="#contents">Up to table of contents</A>
+
+Address bug reports and comments to:<BR> <A
+HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>.  When sending bug
+reports, please provide the following information:
+
+<ul>
+  <li>the version of CGI.pm
+  <li>the version of Perl
+  <li>the name and version of your Web server
+  <li>the name and version of the operating system you are using
+  <li>if applicable, the name and version of the browser you are using
+  <li>a short test script that reproduces the problem (30 lines or less)
+</ul>
+
+It is very important that I receive this information in order to help
+you.
+
+<P>
+
+<A HREF="#contents">Up to table of contents</A>
 
 Please send the following information:
 
@@ -4361,7 +4444,14 @@ perl -V
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.44</h3>
 <ol>
+  <li>Fixed file descriptor leak in upload function.
   <li>Fixed bug in header() that prevented fields from containing double quotes.
+  <li>Added Brian Paulsen's <cite>CGI::Pretty</cite> package for
+      pretty-printing output HTML.
+  <li>Removed CGI::Apache and CGI::Switch from the distribution.
+  <li>Generated start_* shortcuts so that start_table(), end_table(),
+      start_ol(), end_ol(), and so forth now work (see the docs on how to
+      enable this feature).
   <li>Changed accept() to Accept(), sub() to Sub().  There's still a conflict with
       reset(), but this will break too many existing scripts!
 </ol>
@@ -4978,6 +5068,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Oct 28 10:17:20 EST 1998
+Last modified: Tue Nov 24 18:36:11 MET 1998
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -1,24 +1,24 @@
-CGI.pm version 2.43 is now available for your fun and edification.
+CGI.pm version 2.44 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
-1. Fixed problem with "use strict" and file uploads (thanks to Peter Haworth)
-2. Fixed problem with not MSIE 3.01 for the power_mac not doing
-      file uploads right.
-3. Fixed problem with file upload on IIS 4.0 when authorization in
-      use.
-4. -content_type and '-content-type' can now be provided to
-      header() as synonyms for -type.
-5. CGI::Carp now escapes the ampersand BEFORE escaping the &gt; and
-      &lt; signs.
-6. Fixed "not an array reference" error when passing a hash
-      reference to radio_group().
-7. Fixed non-removal of uploaded TMP files on NT platforms which
-      occurs when server runs on non-C drive (thanks to Steve Kilbane
-      for finding this one).
+1. Fixed leaking file descriptor during uploads (thanks to Gerald
+Richter and Doug MacEachern for pointing this one out.)
 
-The master copy can be found at
-http://stein.cshl.org/WWW/software/CGI/.  Mirror copies are
-available on a CPAN near you.
+2. Added Brian Paulsen's CGI::Pretty for pretty-printing the emitted
+HTML.
+
+3. Fixed conflicts between sub() and the Perl sub operator, which caused
+warnings during perl 5.005 regression tests.
+
+4. Generated start_* shortcuts so that start_table(), end_table(),
+start_ol(), end_ol(), and so forth now work (see the docs on how to
+enable this feature).
+
+5.  Fixed bug in header() that prevented fields from containing double
+quotes.
+
+6. Removed some dead packages, including CGI::Apache and CGI::Switch.
+You don't need them any more.  Trust me!
 
 Lincoln Stein
 

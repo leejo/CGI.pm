@@ -161,9 +161,12 @@ set_message() from within a BEGIN{} block.
 
 =head1 AUTHORS
 
-Lincoln D. Stein <lstein@genome.wi.mit.edu>.  Feel free to redistribute
-this under the Perl Artistic License.
+Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: lstein@cshl.org
 
 =head1 SEE ALSO
 
@@ -178,11 +181,11 @@ use Carp;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(confess croak carp);
-@EXPORT_OK = qw(carpout fatalsToBrowser wrap set_message);
+@EXPORT_OK = qw(carpout fatalsToBrowser wrap set_message cluck);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 $main::SIG{__DIE__}=\&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.12';
+$CGI::Carp::VERSION = '1.13';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -243,7 +246,7 @@ sub die {
     my $message = shift;
     my $time = scalar(localtime);
     my($file,$line,$id) = id(1);
-    $message .= " at $file line $line.\n" unless $message=~/\n$/;
+    $message .= " at $file line $line." unless $message=~/\n$/;
     &fatalsToBrowser($message) if $WRAP && _longmess() !~ /eval [{\']/m;
     my $stamp = stamp;
     $message=~s/^/$stamp/gm;
@@ -261,8 +264,9 @@ sub set_message {
     local $^W=0;
     eval <<EOF;
 sub confess { CGI::Carp::die Carp::longmess \@_; }
-sub croak { CGI::Carp::die Carp::shortmess \@_; }
-sub carp { CGI::Carp::warn Carp::shortmess \@_; }
+sub croak   { CGI::Carp::die Carp::shortmess \@_; }
+sub carp    { CGI::Carp::warn Carp::shortmess \@_; }
+sub cluck   { CGI::Carp::warn Carp::longmess \@_; }
 EOF
     ;
 }
@@ -294,7 +298,7 @@ For help, please send mail to $wm, giving this error message
 and the time and date of the error.
 END
     ;
-    print STDOUT "Content-type: text/html\n\n";
+    print STDOUT "Content-type: text/html\n\n" unless exists $ENV{MOD_PERL};
 
     if ($CUSTOM_MSG) {
 	if (ref($CUSTOM_MSG) eq 'CODE') {
@@ -305,13 +309,21 @@ END
 	}
     }
     
-    print STDOUT <<END;
+    my $mess = <<END;
 <H1>Software error:</H1>
 <CODE>$msg</CODE>
 <P>
 $outer_message
 END
     ;
+
+    if (exists $ENV{MOD_PERL}) {
+	my $r = Apache->request;
+	$r->status(500);
+	$r->custom_response(500,$mess);
+    } else {
+	print STDOUT $mess;
+    }
 }
 
 # Cut and paste from CGI.pm so that we don't have the overhead of
