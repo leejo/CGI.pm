@@ -490,7 +490,7 @@ END
       $r->custom_response(500,$mess);
     }
   } else {
-    if (tell STDOUT) {
+    if (eval{tell STDOUT}) {
         print STDOUT $mess;
     }
     else {
