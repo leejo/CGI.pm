@@ -452,6 +452,11 @@ empty string (not undef).  This feature is new in 2.63, and was
 introduced to avoid multiple "undefined value" warnings when running
 with the -w switch.
 
+<p>
+
+If the parameter does not exist at all, then param() will return undef
+in a scalar context, and the empty list in a list context.
+
 <H3><A NAME="setting">Setting The Value(s) Of A Named Parameter</A></H3>
 
 <PRE>
@@ -5746,6 +5751,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Dec 13 20:54:45 EST 2002
+Last modified: Sat Dec 14 09:02:27 EST 2002
 <!-- hhmts end -->
 </BODY> </HTML>

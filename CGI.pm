@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.84 2002-12-14 01:54:49 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.85 2002-12-14 14:03:42 lstein Exp $';
 $CGI::VERSION='2.90';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3918,6 +3918,11 @@ the method will return a single value.
 If a value is not given in the query string, as in the queries
 "name1=&name2=" or "name1&name2", it will be returned as an empty
 string.  This feature is new in 2.63.
+
+
+If the parameter does not exist at all, then param() will return undef
+in a scalar context, and the empty list in a list context.
+
 
 =head2 SETTING THE VALUE(S) OF A NAMED PARAMETER:
 
