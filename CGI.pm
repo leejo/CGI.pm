@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.130 2003-08-01 14:39:17 lstein Exp $';
-$CGI::VERSION='2.99';
+$CGI::revision = '$Id: CGI.pm,v 1.131 2003-08-18 21:57:28 lstein Exp $
+$CGI::VERSION='3.00';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1530,7 +1530,7 @@ sub _style {
                            : qq(<link rel="stylesheet" type="$type" href="$src"$other>)
             ) if $src;
       }
-      if ($verbatim) {
+   if ($verbatim) {
          push(@result, "<style type=\"text/css\">\n$verbatim\n</style>");
     }
       push(@result,style({'type'=>$type},"$cdata_start\n$code\n$cdata_end")) if $code;
@@ -1639,12 +1639,11 @@ sub startform {
     $method = lc($method) || 'post';
     $enctype = $enctype || &URL_ENCODED;
     unless (defined $action) {
-       $action = $self->url(-absolute=>1,-path=>1);
+       $action = $self->escapeHTML($self->url(-absolute=>1,-path=>1));
        if (length($ENV{QUERY_STRING})>0) {
            $action .= "?".$self->escapeHTML($ENV{QUERY_STRING},1);
        }
     }
-    $action = escape($action);
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
@@ -6394,8 +6393,8 @@ side-by-side frames.
 CGI.pm has limited support for HTML3's cascading style sheets (css).
 To incorporate a stylesheet into your document, pass the
 start_html() method a B<-style> parameter.  The value of this
-parameter may be a scalar, in which case it is incorporated directly
-into a <style> section, or it may be a hash reference.  In the latter
+parameter may be a scalar, in which case it is treated as the source
+URL for the stylesheet, or it may be a hash reference.  In the latter
 case you should provide the hash with one or more of B<-src> or
 B<-code>.  B<-src> points to a URL where an externally-defined
 stylesheet can be found.  B<-code> points to a scalar value to be
