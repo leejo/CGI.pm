@@ -20,6 +20,9 @@ quotes.
 6. Removed some dead packages, including CGI::Apache and CGI::Switch.
 You don't need them any more.  Trust me!
 
+7. Fixed CGI::Carp to run better under mod_perl (somewhat -- it will never
+be perfect).
+
 Lincoln Stein
 
 ========================================================================

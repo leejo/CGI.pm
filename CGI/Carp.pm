@@ -14,6 +14,12 @@ B<CGI::Carp> - CGI routines for writing to the HTTPD (or other) error log
     warn "I'm confused";
     die  "I'm dying.\n";
 
+    use CGI::Carp qw(cluck);
+    cluck "I wouldn't do that if I were you";
+
+    use CGI::Carp qw(fatalsToBrowser);
+    die "Fatal error messages are now sent to browser";
+
 =head1 DESCRIPTION
 
 CGI scripts have a nasty habit of leaving warning messages in the error
@@ -159,6 +165,9 @@ set_message() from within a BEGIN{} block.
 
 1.12 Changed die() on line 217 to CORE::die to avoid B<-w> warning.
 
+1.13 Added cluck() to make the module orthogonal with Carp.
+    More mod_perl related fixes.
+
 =head1 AUTHORS
 
 Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
@@ -201,7 +210,7 @@ sub import {
 }
 
 # These are the originals
-sub realwarn { warn(@_); }
+sub realwarn { CORE::warn(@_); }
 sub realdie { CORE::die(@_); }
 
 sub id {
@@ -236,8 +245,7 @@ sub warn {
 # eval.  These evals don't count when looking at the stack backtrace.
 sub _longmess {
     my $message = Carp::longmess();
-    my $mod_perl = ($ENV{'GATEWAY_INTERFACE'} 
-                    && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//);
+    my $mod_perl = exists $ENV{MOD_PERL};
     $message =~ s,eval[^\n]+Apache/Registry\.pm.*,,s if $mod_perl;
     return( $message );    
 }
@@ -298,7 +306,9 @@ For help, please send mail to $wm, giving this error message
 and the time and date of the error.
 END
     ;
-    print STDOUT "Content-type: text/html\n\n" unless exists $ENV{MOD_PERL};
+    my $mod_perl = exists $ENV{MOD_PERL};
+    print STDOUT "Content-type: text/html\n\n" 
+	unless $mod_perl;
 
     if ($CUSTOM_MSG) {
 	if (ref($CUSTOM_MSG) eq 'CODE') {
@@ -317,10 +327,19 @@ $outer_message
 END
     ;
 
-    if (exists $ENV{MOD_PERL}) {
+    if ($mod_perl) {
 	my $r = Apache->request;
-	$r->status(500);
-	$r->custom_response(500,$mess);
+	# If bytes have already been sent, then
+	# we print the message out directly.
+	# Otherwise we make a custom error
+	# handler to produce the doc for us.
+	if ($r->bytes_sent) {
+	    $r->print($mess);
+	    $r->exit;
+	} else {
+	    $r->status(500);
+	    $r->custom_response(500,$mess);
+	}
     } else {
 	print STDOUT $mess;
     }
