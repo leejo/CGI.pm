@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.31 2000-05-16 00:51:27 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.32 2000-05-16 01:23:38 lstein Exp $';
 $CGI::VERSION='2.67';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1676,7 +1676,7 @@ sub reset {
     $label=$self->escapeHTML($label);
     my($value) = defined($label) ? qq/ VALUE="$label"/ : '';
     my($other) = @other ? " @other" : '';
-    return $XHTML ? qq(<INPUT TYPE="reset"$value$other />);
+    return $XHTML ? qq(<INPUT TYPE="reset"$value$other />)
                   : qq/<INPUT TYPE="reset"$value$other>/;
 }
 END_OF_FUNC
@@ -6003,9 +6003,8 @@ like $query->user_agent(netscape);
 =item B<path_info()>
 
 Returns additional path information from the script URL.
-E.G. fetching /cgi-bin/your_script/additional/stuff will
-result in $query->path_info() returning
-"additional/stuff".
+E.G. fetching /cgi-bin/your_script/additional/stuff will result in
+$query->path_info() returning "/additional/stuff".
 
 NOTE: The Microsoft Internet Information Server
 is broken with respect to additional path information.  If

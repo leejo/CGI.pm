@@ -249,7 +249,7 @@ sub _longmess {
     my $message = Carp::longmess();
     my $mod_perl = exists $ENV{MOD_PERL};
     $message =~ s,eval[^\n]+Apache/Registry\.pm.*,,s if $mod_perl;
-    return( $message );    
+    return $message;    
 }
 
 sub die {
