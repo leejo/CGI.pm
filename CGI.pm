@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.50 2001-07-26 21:19:19 lstein Exp $';
-$CGI::VERSION='2.76';
+$CGI::revision = '$Id: CGI.pm,v 1.51 2001-08-07 12:28:43 lstein Exp $';
+$CGI::VERSION='2.77';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2920,7 +2920,7 @@ sub read_multipart {
 	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
           }
-          die "CGI open of tmpfile: $!\n" unless $filehandle;
+          die "CGI open of tmpfile: $!\n" unless defined $filehandle;
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
 
 	  my ($data);
