@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.149 2003-12-29 02:30:46 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.150 2004-01-12 23:37:35 lstein Exp $';
 $CGI::VERSION=3.02;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2131,6 +2131,8 @@ END_OF_FUNC
 # unescape HTML -- used internally
 'unescapeHTML' => <<'END_OF_FUNC',
 sub unescapeHTML {
+    # hack to work around  earlier hacks
+    push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
     my ($self,$string) = CGI::self_or_default(@_);
     return undef unless defined($string);
     my $latin = defined $self->{'.charset'} ? $self->{'.charset'} =~ /^(ISO-8859-1|WINDOWS-1252)$/i
