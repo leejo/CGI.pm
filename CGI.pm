@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.137 2003-11-06 21:07:57 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.138 2003-11-08 16:02:38 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -293,8 +293,15 @@ sub expand_tags {
 # for an existing query string, and initialize itself, if so.
 ####
 sub new {
-  my($class,@initializer) = @_;
+  my($class,$initializer, $hook, $data) = @_;
   my $self = {};
+
+  if ($hook)
+  {
+    $self->{'.upload_hook'} = $hook;
+    $self->{'.upload_data'} = $data;
+  }
+
   bless $self,ref $class || $class || $DefaultClass;
   if (ref($initializer[0])
       && (UNIVERSAL::isa($initializer[0],'Apache')
@@ -331,6 +338,12 @@ sub r {
   my $r = $self->{'.r'};
   $self->{'.r'} = shift if @_;
   $r;
+}
+
+sub upload_hook {
+  my ($self,$hook,$data) = self_or_default(@_);
+  $self->{'.upload_hook'} = $hook;
+  $self->{'.upload_data'} = $data;
 }
 
 #### Method: param
@@ -3194,9 +3207,13 @@ sub read_multipart {
 
 	  my ($data);
 	  local($\) = '';
-	  while (defined($data = $buffer->read)) {
-	      print $filehandle $data;
-	  }
+          my $totalbytes;
+           while (defined($data = $buffer->read)) {
+              if (defined $self->{'.upload_hook'})
+               {
+                  $totalbytes += length($data);
+                   &{$self->{'.upload_hook'}}($filename ,$data, $totalbytes, $self->{'.upload_data'});
+              }
 
 	  # back up to beginning of file
 	  seek($filehandle,0,0);
@@ -5564,6 +5581,28 @@ Example:
 
 You are free to create a custom HTML page to complain about the error,
 if you wish.
+
+You can set up a callback that will be called whenever a file upload
+is being read during the form processing. This is much like the
+UPLOAD_HOOK facility available in Apache::Request, with the exception
+that the first argument to the callback is an Apache::Upload object,
+here it's the remote filename.
+
+ $q = CGI->new(undef, \&hook, $data);
+
+ sub hook
+ {
+        my ($filename, $buffer, $bytes_read, $data) = @_;
+        print  "Read $bytes_read bytes of $filename\n";         
+ }
+
+If using the function-oriented interface, call the CGI::upload_hook()
+method before calling param() or any other CGI functions:
+
+  CGI::upload_hook(\&hook,$data);
+
+This method is not exported by default.  You will have to import it
+explicitly if you wish to use it without the CGI:: prefix.
 
 If you are using CGI.pm on a Windows platform and find that binary
 files get slightly larger when uploaded but that text files remain the

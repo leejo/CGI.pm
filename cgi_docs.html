@@ -1864,6 +1864,39 @@ temporary file will fail.
 
 <p>
 
+You can set up a callback that will be called whenever a file upload
+is being read during the form processing. This is much like the
+UPLOAD_HOOK facility available in Apache::Request, with the exception
+that the first argument to the callback is an Apache::Upload object,
+here it's the remote filename.
+
+<pre>
+$q = CGI-&gt;new(undef, \&hook, $data);
+</pre>
+<p>
+
+<pre>
+sub hook
+ {
+        my ($filename, $buffer, $bytes_read, $data) = @_;
+        print  "Read $bytes_read bytes of $filename\n";         
+ }
+</pre>
+
+<p>
+
+If using the function-oriented interface, call the CGI::upload_hook()
+method before calling param() or any other CGI functions:
+
+  CGI::upload_hook(\&hook,$data);
+
+<p>
+
+This method is not exported by default.  You will have to import it
+explicitly if you wish to use it without the CGI:: prefix.
+
+<p>
+
 A potential problem with the temporary file upload feature is that the
 temporary file is accessible to any local user on the system.  In
 previous versions of this module, the temporary file was world
@@ -1910,6 +1943,25 @@ careful to use the proper capitalization for "Content-Type"!):
 	  die "HTML FILES ONLY!";
        }
 </pre>
+
+<p>
+
+You can set up a callback that will be called whenever a file upload
+is being read during the form processing. This is much like the
+UPLOAD_HOOK facility available in Apache::Request, with the exception
+that the first argument to the callback is an Apache::Upload object,
+here it's the remote filename.
+
+<pre>
+ $q = CGI->new(undef, \&hook, $data);
+
+ sub hook
+ {
+        my ($filename, $buffer, $bytes_read, $data) = @_;
+        print  "Read $bytes_read bytes of $filename\n";         
+ }
+</pre>
+
 
 <p>
 
@@ -4804,6 +4856,7 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.01</h3>
 <ol>
+  <li>Added upload_hook functionality from Jamie LeTaul
   <li>Workarounds for mod_perl 2 IO issues.  Check that file upload and state saving still working.
   <li>Added code for underreads.
   <li>Fixed misleading description of redirect() and relative URLs in the POD docs.
@@ -5914,6 +5967,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Nov  5 09:06:14 EST 2003
+Last modified: Sat Nov  8 11:02:17 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>
