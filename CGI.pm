@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.8 1999-02-18 03:42:05 lstein Exp $';
-$CGI::VERSION='2.47';
+$CGI::revision = '$Id: CGI.pm,v 1.9 1999-02-19 14:07:22 lstein Exp $';
+$CGI::VERSION='2.48';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -123,7 +123,7 @@ $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 # Turn on special checking for Doug MacEachern's modperl
 if (exists $ENV{'GATEWAY_INTERFACE'} 
     && 
-    ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl/))
+    ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//))
 {
     $| = 1;
     require Apache;
