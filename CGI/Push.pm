@@ -16,8 +16,9 @@ package CGI::Push;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::Push::VERSION='1.01';
+$CGI::Push::VERSION='1.02';
 use CGI;
+use CGI::Util 'rearrange';
 @ISA = ('CGI');
 
 $CGI::DefaultClass = 'CGI::Push';
@@ -37,7 +38,7 @@ sub do_push {
 
     my (@header);
     my ($type,$callback,$delay,$last_page,$cookie,$target,$expires,@other) =
-	$self->rearrange([TYPE,NEXT_PAGE,DELAY,LAST_PAGE,[COOKIE,COOKIES],TARGET,EXPIRES],@p);
+	rearrange([TYPE,NEXT_PAGE,DELAY,LAST_PAGE,[COOKIE,COOKIES],TARGET,EXPIRES],@p);
     $type = 'text/html' unless $type;
     $callback = \&simple_counter unless $callback && ref($callback) eq 'CODE';
     $delay = 1 unless defined($delay);

@@ -69,9 +69,9 @@ test(16, checkbox_group(-name=>'game',-Values=>[qw/checkers chess cribbage/],-De
 
 test(17, popup_menu(-name=>'game',-Values=>[qw/checkers chess cribbage/],-Default=>'cribbage',-override=>1) eq <<END,'checkbox_group()');
 <SELECT NAME="game">
-<OPTION  VALUE="checkers">checkers
-<OPTION  VALUE="chess">chess
-<OPTION SELECTED VALUE="cribbage">cribbage
+<OPTION  VALUE="checkers">checkers</OPTION>
+<OPTION  VALUE="chess">chess</OPTION>
+<OPTION SELECTED VALUE="cribbage">cribbage</OPTION>
 </SELECT>
 END
 

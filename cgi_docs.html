@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.62, 3/28/2000, L. Stein
+Version 2.67, 4/20/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -408,14 +408,14 @@ Script</A></H3>
 
 
 <PRE>
-    @names = $query-&gt;param
-</PRE>
-If the script was invoked with a parameter list
+    @names = $query-&gt;param </PRE> If the script was invoked with a
+parameter list
 (e.g. "name1=value1&amp;name2=value2&amp;name3=value3"), the param()
 method will return the parameter names as a list.  For backwards
-compatability, this method will work even if the
-script was invoked as an &lt;ISINDEX&gt; script: in this case there
-will be a single parameter name returned named 'keywords'.
+compatibility if the script was invoked as an &lt;ISINDEX&gt; script
+and contains a string without ampersands (e.g. "value1+value2+value3")
+, there will be a single parameter named "keywords" containing the
+"+"-delimited keywords.
 
 <H3><A NAME="values">Fetching The Value(s) Of A Named Parameter</A></H3>
 
@@ -429,12 +429,12 @@ named parameter. If the parameter is multivalued (e.g. from multiple
 selections in a scrolling list), you can ask to receive an array.  Otherwise
 the method will return a single value.
 <P>
-As of version 1.50 of this library, the array of parameter names returned
-will be in the same order in which the browser sent them.  Although
-this is not guaranteed to be identical to the order in which the
-parameters were defined in the fill-out form, this is usually the
-case.
 
+If a value is not given in the query string, as in the queries
+"name1=&amp;name2=" or "name1&amp;name2", it will be returned as an
+empty string (not undef).  This feature is new in 2.63, and was
+introduced to avoid multiple "undefined value" warnings when running
+with the -w switch.
 
 <H3><A NAME="setting">Setting The Value(s) Of A Named Parameter</A></H3>
 
@@ -840,6 +840,7 @@ contrived example that uses them all:
                         -expires=&gt;'+3d',
                         -cookie=&gt;$my_cookie,
                         -charset=&gt;'UTF-7',
+                        -attachment=&gt;'foo.gif',
                         -Cost=&gt;'$0.02');
 </PRE>
 
@@ -887,7 +888,6 @@ an array reference.  You can use the latter to generate multiple
 cookies.  (You can use the alias <strong>-cookies</strong> for
 readability.)
 
-
 <h4>-nph</h4>
 
 The <strong>-nph</strong> parameter, if set to a non-zero value, will
@@ -917,6 +917,12 @@ The <b>-charset</b> parameter can be used to control the character set
 sent to the browser.  If not provided, defaults to ISO-8859-1.  As a
 side effect, this calls the charset() method to set the behavior for
 escapeHTML().
+
+<h4>-attachment</h4>
+The <b>-attachment</b> parameter can be used to turn the page into an
+attachment.  Instead of displaying the page, some browsers will prompt
+the user to save it to disk.  The value of the argument is the
+suggested name for the saved file.
 
 <h4>Other header fields</h4>
 
@@ -1040,6 +1046,11 @@ All parameters are optional:
       print $q-&gt;header(-Refresh=&gt;'10; URL=http://www.capricorn.com');
       </pre>
       </blockquote>
+  <li>A <strong>-lang</strong>> argument is used to incorporate a language attribute into
+      the &lt;HTM&gt;> tag.  The default if not specified is "en-US" for US English.  For example:
+<blockquote><pre>
+    print $q->header(-lang=>'fr-CA');
+</pre></blockquote>
   <LI>A <strong>-dtd</strong> parameter to make start_html()
       generate an SGML document type definition for the document.
       This is used by SGML editors and high-end Web publishing systems
@@ -1132,7 +1143,7 @@ All parameters are optional:
 
      print $q-&gt;start_html(-title=&gt;'The Riddle of the Sphinx',
                           -script=&gt;{-language=&gt;'PerlScript',
-                                    -code-&gt;'print "hello world!\n;"'
+                                    -code=&gt;'print "hello world!\n;"'}
                              );
      </pre>
 
@@ -2559,26 +2570,45 @@ dashes.
       <cite>hr</cite>, or add something like <em>use subs qw/hr p
       header/</em> to the top of your script.
       <p>
+  <dt><b>-nosticky</b>
+  <dd>Turns off "sticky" behavior in fill-out forms.  Every form
+      element will act as if you passed -override.
+      <p>
+  <dt><b>-xhtml</b>
+  <dd>Enable support for XHTML (<a
+href="http://www.w3.org/TR/xhtml1/">http://www.w3.org/TR/xhtml1/</a>)
+      output.  This
+      changes the default DTD and adds a closing / to all unpaired tags,
+      such as &lt;BR /&gt;.
+      <p>
   <dt><b>-nph</b>
   <dd>This makes CGI.pm produce a header appropriate for an NPH (no
       parsed header) script.  You may need to do other things as well
       to tell the server that the script is NPH.  See the <a href="#nph">discussion
       of NPH scripts</a> below.
       <p>
+  <dt><b>-oldstyle_urls</b>
+  <dd>Separate the name=value pairs in CGI parameter query strings emitted by
+      self_url() and query_string() with ampersands.  Otherwise, CGI.pm emits
+      HTML-compliant semicolons.  If you use this form, be sure to escape ampersands
+      into HTML entities with escapeHTML.  Example:
+      <blockquote>
+      <pre>
+      $href = $q->self_url();
+      $href = escapeHTML($href);
+      print <a href="$href">I'm talking to myself</a>
+      </pre>
+      </blockquote>
+      <p>
   <dt><b>-newstyle_urls</b>
   <dd>Separate the name=value pairs in CGI parameter query strings with
       semicolons rather than ampersands.  For example:
-      <blockquote>
-<pre>
-?name=fred;age=24;favorite_color=3
-</pre>
+      <blockquote><pre>
+      <pre>
+      name=fred;age=24;favorite_color=3
+      </pre>
       </blockquote>
-      
-      Semicolon-delimited query strings are always accepted, but will not be
-      emitted by <cite>self_url()</cite> and
-      <cite>query_string()</cite> unless the <b>-newstyle_urls</b>
-      pragma is specified.
-      <p>
+      As of version 2.64, this is the default style.
   <dt><b>-no_debug</b>
   <dd>This turns off the command-line processing features.  If you
       want to run a CGI.pm script from the command line to produce
@@ -4411,34 +4441,12 @@ Microsoft IIS server.  CGI.pm must be put in the perl5 library
 directory, and all CGI scripts that use it should be placed in cgi-bin
 directory.  You also need to associate the <CODE>.pl</CODE> suffix
 with perl5 using the NT file manager (Website, Purveyor), or install
-the correct script mapping registry keys for IIS.  There are two ports
-of Perl for Windows, one done by the ActiveWare company, and the other
-by Gurusamy Sarathy.  I have only tested CGI.pm with the former.  The
-home site for the ActiveWare port is:
+the correct script mapping registry keys for IIS.  Perl for Windows is
+available from the ActiveState company, which can be found at:
 
 <blockquote>
-<a href="http://www.activeware.com/">http://www.activeware.com/</a>
+<a href="http://www.activestate.com/">http://www.activestate.com/</a>
 </blockquote>
-
-<p>
-
-The ActiveWare port comes in two parts.  The first part is a standard
-standalone Perl interpreter.  The second part is a small DLL library
-that implements a Perl ISAPI interface for IIS and other Web servers.
-As of build 307, the DLL library is <strong>seriously broken</strong>.
-It is seriously unreliable when used for any Perl CGI script, with or
-without CGI.pm.  Symptoms include truncated CGI parameters, missing
-parameters, scrambled output, and failed file uploads.  I strongly
-recommend that you use the standalone interpreter instead.
-
-<p>
-
-The Microsoft IIS server is broken with respect to the handling of <a
-href="#path_info">additional path information</a>.  If you use the DLL
-version of ActiveWare Perl, IIS will attempt to execute the additional
-path information as a script.  If you use the external Perl
-interpreter, the additional path information may contain incorrect
-information.  This is not a bug in CGI.pm.
 
 <p>
 
@@ -4516,10 +4524,6 @@ http://www.genome.wi.mit.edu/ftp/pub/software/WWW/</A>
 <P>
 You are encouraged to look at these other Web-related modules:
 <DL>
-  <DT> <A HREF="ftp://ftp.acoates.com/acoates/perl/">HTML.pm</A>
-  <DD> A module that simplifies the creation of HTML documents
-       programatically.
-
   <DT> <A HREF="http://www.genome.wi.mit.edu/ftp/pub/software/WWW/CGIperl/">
        CGI::Base,CGI::Form,CGI::MiniSrv,CGI::Request and CGI::URI::URL</A>
   <DD> Modules for parsing script input, manipulating URLs, creating
@@ -4624,6 +4628,44 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+
+<h3>Version 2.67</h3>
+<ol>
+  <li>Added XHTML support.
+  <li>Suppress warnings from _tableize() that were appearing when using -w switch with
+      radio_group() and checkbox_group().
+</ol>
+
+<h3>Version 2.66</h3>
+<ol>
+  <li>2.65 changes in make_attributes() broke HTTP header functions
+      (including redirect), so made it context sensitive.
+</ol>
+
+<h3>Version 2.65</h3>
+<ol>
+  <li>Fixed regression tests to skip tests that require implicit fork
+      on machines without fork().
+  <li>Changed make_attributes() to automatically escape any HTML reserved
+      characters.
+  <li>Minor documentation fix in javascript example.
+</ol>
+
+<h3>Version 2.64</h3>
+<ol>
+  <li>Changes introduced in 2.63 broke param() when retrieving parameter lists
+      containing only a single argument.  This is now fixed.
+  <li>self_url() now defaults to returning parameters delimited with
+      semicolon. Use the pragma -oldstyle_urls to get the old "&" delimiter.
+</ol>
+
+<h3>Version 2.63</h3>
+<ol>
+  <li>Fixed CGI::Push to pull out parameters correctly.
+  <li>Fixed redirect() so that it works with default character set
+  <li>Changed param() so as to returned empty string '' when referring
+      to variables passed in query strings like 'name1=&amp;name2'
+</ol>
 
 <h3>Version 2.62</h3>
 <ol>
@@ -5395,6 +5437,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Mar 28 16:20:29 EST 2000
+Last modified: Mon May 15 20:44:29 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>

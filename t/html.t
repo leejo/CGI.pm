@@ -37,22 +37,25 @@ test(10,header(-type=>'image/gif') eq "Content-Type: image/gif; charset=ISO-8859
 test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif; charset=ISO-8859-1\015\012\015\012","header()");
 test(12,header(-nph=>1) eq "HTTP/1.0 200 OK\015\012Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
 test(13,start_html() ."\n" eq <<END,"start_html()");
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+<!DOCTYPE HTML
+	PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
-<HTML><HEAD><TITLE>Untitled Document</TITLE>
+<HTML LANG="en-US"><HEAD><TITLE>Untitled Document</TITLE>
 </HEAD><BODY>
 END
     ;
 test(14,start_html(-dtd=>"-//IETF//DTD HTML 3.2//FR") ."\n" eq <<END,"start_html()");
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.2//FR">
-<HTML><HEAD><TITLE>Untitled Document</TITLE>
+<!DOCTYPE HTML
+	PUBLIC "-//IETF//DTD HTML 3.2//FR">
+<HTML LANG="en-US"><HEAD><TITLE>Untitled Document</TITLE>
 </HEAD><BODY>
 END
     ;
 test(15,start_html(-Title=>'The world of foo') ."\n" eq <<END,"start_html()");
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+<!DOCTYPE HTML
+	PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 	"http://www.w3.org/TR/html4/loose.dtd">
-<HTML><HEAD><TITLE>The world of foo</TITLE>
+<HTML LANG="en-US"><HEAD><TITLE>The world of foo</TITLE>
 </HEAD><BODY>
 END
     ;
