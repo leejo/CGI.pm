@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.160 2004-03-18 13:53:12 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.161 2004-03-18 22:30:46 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -111,6 +111,7 @@ sub initialize_globals {
     # Other globals that you shouldn't worry about.
     undef $Q;
     $BEEN_THERE = 0;
+    $DTD_PUBLIC_IDENTIFIER = "";
     undef @QUERY_PARAM;
     undef %EXPORT;
     undef $QUERY_CHARSET;
@@ -1488,11 +1489,7 @@ sub start_html {
 
     $encoding = 'iso-8859-1' unless defined $encoding;
 
-    # strangely enough, the title needs to be escaped as HTML
-    # while the author needs to be escaped as a URL
-    $title = $self->escapeHTML($title || 'Untitled Document');
-    $author = $self->escape($author);
-    $lang = 'en-US' unless defined $lang;
+    # Need to sort out the DTD before it's okay to call escapeHTML().
     my(@result,$xml_dtd);
     if ($dtd) {
         if (defined(ref($dtd)) and (ref($dtd) eq 'ARRAY')) {
@@ -1510,9 +1507,26 @@ sub start_html {
 
     if (ref($dtd) && ref($dtd) eq 'ARRAY') {
         push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd->[0]"\n\t "$dtd->[1]">));
+	$DTD_PUBLIC_IDENTIFIER = $dtd->[0];
     } else {
         push(@result,qq(<!DOCTYPE html\n\tPUBLIC "$dtd">));
+	$DTD_PUBLIC_IDENTIFIER = $dtd;
     }
+
+    # Now that we know whether we're using the HTML 3.2 DTD or not, it's okay to
+    # call escapeHTML().  Strangely enough, the title needs to be escaped as
+    # HTML while the author needs to be escaped as a URL.
+    $title = $self->escapeHTML($title || 'Untitled Document');
+    $author = $self->escape($author);
+
+    if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2)/i) {
+	$lang = "" unless defined $lang;
+	$XHTML = 0;
+    }
+    else {
+	$lang = 'en-US' unless defined $lang;
+    }
+
     push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang" xml:lang="$lang"><head><title>$title</title>)
                         : ($lang ? qq(<html lang="$lang">) : "<html>") 
 	                  . "<head><title>$title</title>");
@@ -2116,7 +2130,15 @@ sub escapeHTML {
          $toencode =~ s{&}{&amp;}gso;
          $toencode =~ s{<}{&lt;}gso;
          $toencode =~ s{>}{&gt;}gso;
-         $toencode =~ s{"}{&quot;}gso;
+	 if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
+	     # $quot; was accidentally omitted from the HTML 3.2 DTD -- see
+	     # <http://validator.w3.org/docs/errors.html#bad-entity> /
+	     # <http://lists.w3.org/Archives/Public/www-html/1997Mar/0003.html>.
+	     $toencode =~ s{"}{&#34;}gso;
+         }
+         else {
+	     $toencode =~ s{"}{&quot;}gso;
+         }
          my $latin = uc $self->{'.charset'} eq 'ISO-8859-1' ||
                      uc $self->{'.charset'} eq 'WINDOWS-1252';
          if ($latin) {  # bug in some browsers
@@ -4489,6 +4511,10 @@ By default, CGI.pm versions 2.69 and higher emit XHTML
 feature.  Thanks to Michalis Kabrianis <kabrianis@hellug.gr> for this
 feature.
 
+If start_html()'s -dtd parameter specifies an HTML 2.0 or 3.2 DTD, 
+XHTML will automatically be disabled without needing to use this 
+pragma.
+
 =item -nph
 
 This makes CGI.pm produce a header appropriate for an NPH (no
@@ -4821,13 +4847,14 @@ into your code.  See the section on CASCADING STYLESHEETS for more
 information.
 
 The B<-lang> argument is used to incorporate a language attribute into
-the <html> tag.  The default if not specified is "en-US" for US
-English.  For example:
+the <html> tag.  For example:
 
     print $q->start_html(-lang=>'fr-CA');
 
-To leave off the lang attribute, as you must do if you want to generate
-legal HTML 3.2 or earlier, pass the empty string (-lang=>'').
+The default if not specified is "en-US" for US English, unless the 
+-dtd parameter specifies an HTML 2.0 or 3.2 DTD, in which case the
+lang attribute is left off.  You can force the lang attribute to left
+off in other cases by passing an empty string (-lang=>'').
 
 The B<-encoding> argument can be used to specify the character set for
 XHTML.  It defaults to iso-8859-1 if not specified.
