@@ -281,7 +281,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION    = '1.27';
+$CGI::Carp::VERSION    = '1.28';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 
