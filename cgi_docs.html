@@ -4881,6 +4881,7 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.06</h3>
 <ol>
+  <li>Fixed bare call to script() in start_html
   <li>Moved Fh::DESTROY out of autoloaded functions so as to avoid clobbering
       $@ when CGI functions are executed in an eval{} context.
   <li>mod_perl 2.0 version detection patch in CGI::Cookie provided by
@@ -6052,6 +6053,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Sep 17 09:28:31 EDT 2004
+Last modified: Wed Sep 29 14:13:57 EDT 2004
 <!-- hhmts end -->
 </BODY> </HTML>
