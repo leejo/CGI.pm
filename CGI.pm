@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.163 2004-04-05 16:51:48 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.164 2004-04-05 17:38:12 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3349,8 +3349,8 @@ sub _set_attributes {
     return '' unless defined($attributes->{$element});
     $attribs = ' ';
     foreach my $attrib (keys %{$attributes->{$element}}) {
-        $attrib =~ s/^-//;
-        $attribs .= "@{[lc($attrib)]}=\"$attributes->{$element}{$attrib}\" ";
+        (my $clean_attrib = $attrib) =~ s/^-//;
+        $attribs .= "@{[lc($clean_attrib)]}=\"$attributes->{$element}{$attrib}\" ";
     }
     $attribs =~ s/ $//;
     return $attribs;
