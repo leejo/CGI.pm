@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.21 2000-01-18 02:00:16 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.22 2000-01-18 03:14:32 lstein Exp $';
 $CGI::VERSION='2.57';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3140,7 +3140,9 @@ sub new {
     my $retval = bless $self,ref $package || $package;
 
     # Read the preamble and the topmost (boundary) line plus the CRLF.
-    1 while $self->read(0) unless unless $boundary_read;
+    unless ($boundary_read) {
+      while ($self->read(0)) { }
+    }
     die "Malformed multipart POST\n" if $self->eof;
 
     return $retval;
