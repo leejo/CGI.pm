@@ -6,7 +6,7 @@ use lib qw(t/lib);
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..28\n"; }
+BEGIN {$| = 1; print "1..30\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Config;
 use CGI (':standard','keywords');
@@ -108,3 +108,6 @@ test(26,$h eq "Status: 302 Moved${CRLF}Location: http://somewhere.else${CRLF}Con
 test(27,redirect(-Location=>'http://somewhere.else/bin/foo&bar',-Type=>'text/html') eq "Status: 302 Moved${CRLF}Location: http://somewhere.else/bin/foo&bar${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","CGI::redirect() 2");
 
 test(28,escapeHTML('CGI') eq 'CGI','escapeHTML(CGI) failing again');
+
+test(29, charset("UTF-8") && header() eq "Content-Type: text/html; charset=UTF-8${CRLF}${CRLF}", "UTF-8 charset");
+test(30, !charset("") && header() eq "Content-Type: text/html${CRLF}${CRLF}", "Empty charset");
