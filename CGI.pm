@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.98 2003-04-07 03:15:47 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.99 2003-04-11 00:18:32 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1320,7 +1320,7 @@ sub header {
                  $r->content_type($v);
              }
              else {
-                 $r->headers_out->{$k} = $v;
+                 $r->header_out($k=>$v);
              }
          }
         $r->send_http_header() if $MOD_PERL == 1;
@@ -2443,7 +2443,7 @@ sub url {
     # for compatibility with Apache's MultiViews
     if (exists($ENV{REQUEST_URI})) {
         my $index;
-	$script_name = $ENV{REQUEST_URI};
+	$script_name = unescape($ENV{REQUEST_URI});
         $script_name =~ s/\?.+$//;   # strip query string
         # and path
         if (exists($ENV{PATH_INFO})) {
