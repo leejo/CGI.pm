@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.169 2004-07-08 19:24:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.170 2004-07-09 18:09:45 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -786,6 +786,7 @@ sub _compile {
         my($sub) = \%{"$pack\:\:SUBS"};
         unless (%$sub) {
 	   my($auto) = \${"$pack\:\:AUTOLOADED_ROUTINES"};
+	   local ($@,$!);
 	   eval "package $pack; $$auto";
 	   croak("$AUTOLOAD: $@") if $@;
            $$auto = '';  # Free the unneeded storage (but don't undef it!!!)
@@ -804,6 +805,7 @@ sub _compile {
 	   }
        }
        croak("Undefined subroutine $AUTOLOAD\n") unless $code;
+       local ($@,$!);
        eval "package $pack; $code";
        if ($@) {
 	   $@ =~ s/ at .*\n//;
