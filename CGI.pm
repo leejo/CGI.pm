@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.99 2003-04-11 00:18:32 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.100 2003-04-11 00:28:06 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1312,20 +1312,21 @@ sub header {
     push(@header,map {ucfirst $_} @other);
     push(@header,"Content-Type: $type") if $type ne '';
 
-      if ($MOD_PERL and not $nph) {
+    if ($MOD_PERL and not $nph) {
          my $r = Apache->request;
+         my $out = $r->headers_out;
          for (@header) {
              my($k, $v) = split /:\s+/, $_, 2;
              if ($k eq 'Content-Type') {
                  $r->content_type($v);
              }
              else {
-                 $r->header_out($k=>$v);
+                 $out->add($k=>$v);
              }
          }
-        $r->send_http_header() if $MOD_PERL == 1;
+         $r->send_http_header();
          return '';
-      }
+    }
     return join($CRLF,@header)."${CRLF}${CRLF}";
 }
 END_OF_FUNC
