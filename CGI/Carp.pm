@@ -358,9 +358,9 @@ sub _warn {
 # eval.  These evals don't count when looking at the stack backtrace.
 sub _longmess {
     my $message = Carp::longmess();
-    my $mod_perl = exists $ENV{MOD_PERL};
-    $message =~ s,eval[^\n]+Apache/Registry\.pm.*,,s if $mod_perl;
-    return $message;    
+    $message =~ s,eval[^\n]+(ModPerl|Apache)/Registry\w*\.pm.*,,s
+        if exists $ENV{MOD_PERL};
+    return $message;
 }
 
 sub ineval {
@@ -452,14 +452,25 @@ $outer_message
 END
     ;
 
-    if ($mod_perl && (my $r = Apache->request)) {
-	# If bytes have already been sent, then
-	# we print the message out directly.
-	# Otherwise we make a custom error
-	# handler to produce the doc for us.
+     if ($mod_perl) {
+       require mod_perl;
+       if ($mod_perl::VERSION >= 1.99) {
+	 $mod_perl = 2;
+	 require Apache::RequestRec;
+	 require Apache::RequestIO;
+	 require Apache::RequestUtil;
+	 require APR::Pool;
+	 require ModPerl::Util;
+	 require Apache::Response;
+       }
+       my $r = Apache->request;
+       # If bytes have already been sent, then
+       # we print the message out directly.
+       # Otherwise we make a custom error
+       # handler to produce the doc for us.
 	if ($r->bytes_sent) {
 	    $r->print($mess);
-	    $r->exit;
+	    $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
 	} else {
 	    $r->status(500);
 	    $r->custom_response(500,$mess);

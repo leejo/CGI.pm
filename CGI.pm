@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.93 2003-03-05 14:22:34 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.94 2003-03-13 19:47:03 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -35,6 +35,8 @@ use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
 $TAINTED = substr("$0$^X",0,0);
 
 my @SAVED_SYMBOLS;
+
+$MOD_PERL = 0; # no mod_perl by default
 
 # >>>>> Here are some globals that you might want to adjust <<<<<<
 sub initialize_globals {
@@ -169,6 +171,19 @@ $SL = {
 $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for Doug MacEachern's modperl
+if (exists $ENV{MOD_PERL}) {
+  require mod_perl;
+  if (defined $mod_perl::VERSION && ($mod_perl::VERSION >= 1.99)) {
+    $MOD_PERL = 2;
+    require Apache::RequestRec;
+    require Apache::RequestUtil;
+    require APR::Pool;
+  } else {
+    $MOD_PERL = 1;
+    require Apache;
+  }
+}
+
 if (exists $ENV{'GATEWAY_INTERFACE'}
     &&
     ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//))
@@ -289,9 +304,15 @@ sub new {
     my($class,$initializer) = @_;
     my $self = {};
     bless $self,ref $class || $class || $DefaultClass;
-    if ($MOD_PERL && defined Apache->request) {
-      Apache->request->register_cleanup(\&CGI::_reset_globals);
-      undef $NPH;
+    if ($MOD_PERL) {
+        my $r = Apache->request;
+        if ($MOD_PERL == 1) {
+            $r->register_cleanup(\&CGI::_reset_globals);
+        }
+        else {
+            $r->pool->cleanup_register(\&CGI::_reset_globals);
+        }
+        undef $NPH;
     }
     $self->_reset_globals if $PERLEX;
     $self->init($initializer);
@@ -1299,13 +1320,21 @@ sub header {
     push(@header,map {ucfirst $_} @other);
     push(@header,"Content-Type: $type") if $type ne '';
 
-    my $header = join($CRLF,@header)."${CRLF}${CRLF}";
-    if ($MOD_PERL and not $nph) {
-	my $r = Apache->request;
-	$r->send_cgi_header($header);
-	return '';
-    }
-    return $header;
+      if ($MOD_PERL and not $nph) {
+         my $r = Apache->request;
+         for (@header) {
+             my($k, $v) = split /:\s+/, $_, 2;
+             if ($k eq 'Content-Type') {
+                 $r->content_type($v);
+             }
+             else {
+                 $r->headers_out->{$k} = $v;
+             }
+         }
+        $r->send_http_header() if $MOD_PERL == 1;
+         return '';
+      }
+    return join($CRLF,@header)."${CRLF}${CRLF}";
 }
 END_OF_FUNC
 
