@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.109 2003-04-18 21:59:07 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.110 2003-04-23 16:47:08 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1248,7 +1248,8 @@ sub multipart_start {
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.
     foreach (@other) {
-        next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
+        # Don't use \s because of perl bug 21951
+        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
 	($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.$self->unescapeHTML($value)/e;
     }
     push(@header,@other);
@@ -1312,7 +1313,8 @@ sub header {
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.
     foreach (@other) {
-        next unless my($header,$value) = /([^\s=]+)=\"?(.+?)\"?$/;
+        # Don't use \s because of perl bug 21951
+        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
         ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 

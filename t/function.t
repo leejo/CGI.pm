@@ -6,7 +6,7 @@ use lib qw(t/lib);
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..30\n"; }
+BEGIN {$| = 1; print "1..31\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Config;
 use CGI (':standard','keywords');
@@ -111,3 +111,5 @@ test(28,escapeHTML('CGI') eq 'CGI','escapeHTML(CGI) failing again');
 
 test(29, charset("UTF-8") && header() eq "Content-Type: text/html; charset=UTF-8${CRLF}${CRLF}", "UTF-8 charset");
 test(30, !charset("") && header() eq "Content-Type: text/html${CRLF}${CRLF}", "Empty charset");
+
+test(31, header(-foo=>'bar') eq "Foo: bar${CRLF}Content-Type: text/html${CRLF}${CRLF}", "Custom header");
