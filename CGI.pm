@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.88 2003-02-11 14:13:18 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.89 2003-02-25 13:34:21 lstein Exp $';
 $CGI::VERSION='2.91';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -159,9 +159,8 @@ $AutoloadClass = $DefaultClass unless defined $CGI::AutoloadClass;
 # The path separator is a slash, backslash or semicolon, depending
 # on the paltform.
 $SL = {
-       UNIX=>'/', OS2=>'\\', EPOC=>'/',
-       WINDOWS=>'\\', DOS=>'\\', MACINTOSH=>':', VMS=>'/',
-       CYGWIN=>'/',
+     UNIX    => '/',  OS2 => '\\', EPOC      => '/', CYGWIN => '/',
+     WINDOWS => '\\', DOS => '\\', MACINTOSH => ':', VMS    => '/'
     }->{$OS};
 
 # This no longer seems to be necessary
