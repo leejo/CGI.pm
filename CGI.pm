@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.12 1999-03-18 02:12:46 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.13 1999-03-19 03:49:40 lstein Exp $';
 $CGI::VERSION='2.50';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2272,9 +2272,8 @@ sub expire_calc {
     my($offset);
     if (!$time || (lc($time) eq 'now')) {
         $offset = 0;
-    } elsif ($time=~/^\d+/)
+    } elsif ($time=~/^\d+/) {
         return $time;
-    }
     } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([mhdMy]?)/) {
         $offset = ($mult{$2} || 1)*$1;
     } else {
@@ -2286,7 +2285,7 @@ END_OF_FUNC
 
 # This internal routine creates date strings suitable for use in
 # cookies and HTTP headers.  (They differ, unfortunately.)
-# Thanks to Fisher Mark for this.
+# Thanks to Mark Fisher for this.
 'expires' => <<'END_OF_FUNC',
 sub expires {
     my($time,$format) = @_;
