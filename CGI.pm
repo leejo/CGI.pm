@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.102 2003-04-14 18:27:51 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.103 2003-04-14 18:52:26 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1831,7 +1831,7 @@ sub submit {
     my($name) = ' name=".submit"' unless $NOSTICKY;
     $name = qq/ name="$label"/ if defined($label);
     $value = defined($value) ? $value : $label;
-    my($val) = '';
+    my $val = '';
     $val = qq/ value="$value"/ if defined($value);
     my($other) = @other ? " @other" : '';
     return $XHTML ? qq(<input type="submit"$name$val$other />)
@@ -1850,12 +1850,18 @@ END_OF_FUNC
 'reset' => <<'END_OF_FUNC',
 sub reset {
     my($self,@p) = self_or_default(@_);
-    my($label,@other) = rearrange([NAME],@p);
+    my($label,$value,@other) = rearrange(['NAME',['VALUE','LABEL']],@p);
+    warn "label = $label, value = $value";
     $label=$self->escapeHTML($label);
-    my($value) = defined($label) ? qq/ value="$label"/ : '';
+    $value=$self->escapeHTML($value,1);
+    my ($name) = ' name=".reset"';
+    $name = qq/ name="$label"/ if defined($label);
+    $value = defined($value) ? $value : $label;
+    my($val) = '';
+    $val = qq/ value="$value"/ if defined($value);
     my($other) = @other ? " @other" : '';
-    return $XHTML ? qq(<input type="reset"$value$other />)
-                  : qq(<input type="reset"$value$other>);
+    return $XHTML ? qq(<input type="reset"$name$val$other />)
+                  : qq(<input type="reset"$name$val$other>);
 }
 END_OF_FUNC
 
