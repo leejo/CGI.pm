@@ -4,16 +4,18 @@
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
 
-BEGIN {$| = 1; print "1..24\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use CGI (':standard','-no_debug','*h3','start_table');
 $loaded = 1;
 print "ok 1\n";
 
-if( $] > 5.006 ) {
+BEGIN {
+   $| = 1; print "1..24\n";
+  if( $] > 5.006 ) {
     # no utf8
     require utf8; # we contain Latin-1
     utf8->unimport;
+  }
 }
 
 ######################### End of black magic.
@@ -54,8 +56,8 @@ test(12,header(-nph=>1) =~ m!HTTP/1.0 200 OK${CRLF}Server: cmdline${CRLF}Date:.+
 test(13,start_html() ."\n" eq <<END,"start_html()");
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
-	"http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>Untitled Document</title>
 </head><body>
 END
@@ -70,8 +72,8 @@ END
 test(15,start_html(-Title=>'The world of foo') ."\n" eq <<END,"start_html()");
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN"
-	"http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>The world of foo</title>
 </head><body>
 END

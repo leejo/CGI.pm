@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+require 5.6.0;
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -6,6 +8,9 @@ WriteMakefile(
     'NAME'	=> 'CGI',
     'DISTNAME'  => 'CGI.pm',
     'VERSION_FROM'   => 'CGI.pm',
+     'PREREQ_PM' => {
+       'File::Spec'  => .82,
+    },
     'linkext'   => { LINKTYPE=>'' },	# no link needed
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
 	            'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}

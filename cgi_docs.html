@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.78, 9/25/2001, L. Stein
+Version 2.79, 12/9/2001, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -1230,10 +1230,9 @@ This ends an HTML document by printing the &lt;/BODY&gt; &lt;/HTML&gt; tags.
 <H3>Other HTML Tags</H3>
 
 CGI.pm provides shortcut methods for many other HTML tags.  All HTML2
-tags and the Netscape extensions are supported, as well as the
-HTML3 tags that are in common usage (including tables).  Unpaired
-tags, paired tags, and tags that contain attributes are all supported
-using a simple syntax.
+tags and the Netscape extensions are supported, as well as the HTML3
+and HTML4 tags.  Unpaired tags, paired tags, and tags that contain
+attributes are all supported using a simple syntax.
 
 <p>
 
@@ -2528,6 +2527,8 @@ Currently there are 8 method families defined in CGI.pm.  They are:
   <dt><cite>:html3</cite>
   <dd>These contain various HTML3 tags for tables, frames, super- and
       subscripts, applets and other objects.
+  <dt><cite>:html4</cite>
+  <dd>These contain various HTML4 tags, including table headers and footers.
   <dt><cite>:netscape</cite>
   <dd>These are Netscape extensions not included in the HTML3
       category including  blink() and center().
@@ -2539,9 +2540,8 @@ Currently there are 8 method families defined in CGI.pm.  They are:
       the various multipart MIME types, and are useful for
       implementing server push.
   <dt><cite>:standard</cite>
-  <dd>This is the union of <cite>html2, form,</cite> and
-      <cite>:cgi</cite> (everything except the HTML3 and
-      Netscape extensions).
+  <dd>This is the union of <cite>html2, html3, html4, form,</cite> and
+      <cite>:cgi</cite>.
   <dt><cite>:all</cite>
   <dd>This imports all the public methods into your namespace!
 </dl>
@@ -4688,7 +4688,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
-
+<h3>Version 2.79</h3>
+<ol>
+  <li>Changes to CGI::Carp to avoid "subroutine redefined" error messages.
+  <li>Default DTD is now XHTML 1.0 Transitional
+  <li>Patches to support all HTML4 tags.
+</ol>
 <h3>Version 2.78</h3>
 <ol>
   <li>Added ability to change encoding in &lt;?xml&gt; assertion.
@@ -5625,6 +5630,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Sep 25 22:14:37 EDT 2001
+Last modified: Sun Dec  9 16:35:43 EST 2001
 <!-- hhmts end -->
 </BODY> </HTML>
