@@ -922,7 +922,8 @@ escapeHTML().
 The <b>-attachment</b> parameter can be used to turn the page into an
 attachment.  Instead of displaying the page, some browsers will prompt
 the user to save it to disk.  The value of the argument is the
-suggested name for the saved file.
+suggested name for the saved file.  In order for this to work, you may
+have to set the <b>-type</b> to "application/octet-stream".
 
 <h4>Other header fields</h4>
 
@@ -2580,6 +2581,9 @@ href="http://www.w3.org/TR/xhtml1/">http://www.w3.org/TR/xhtml1/</a>)
       output.  This
       changes the default DTD and adds a closing / to all unpaired tags,
       such as &lt;BR /&gt;.
+      <p>
+      This doesn't yet (May 2000) make the document fully XHTML compliant, because
+      the tags are still in all-caps.
       <p>
   <dt><b>-nph</b>
   <dd>This makes CGI.pm produce a header appropriate for an NPH (no
@@ -4636,6 +4640,8 @@ you.
   <li>Fixed problems when passing multiple cookies.
   <li>Suppress warnings from _tableize() that were appearing when using -w switch with
       radio_group() and checkbox_group().
+  <li>Support for the header() -attachment argument, which can give
+      pages a default file name when saving to disk.
 </ol>
 
 <h3>Version 2.66</h3>
@@ -5439,6 +5445,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon May 15 21:23:13 EDT 2000
+Last modified: Mon May 15 21:35:42 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>

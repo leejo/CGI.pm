@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.32 2000-05-16 01:23:38 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.33 2000-05-16 01:36:32 lstein Exp $';
 $CGI::VERSION='2.67';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3971,6 +3971,9 @@ Enable support for XHTML (http://www.w3.org/TR/xhtml1/) output.  This
 changes the default DTD and adds a closing / to all unpaired tags,
 such as <BR />.
 
+This doesn't yet (May 2000) make the document fully XHTML compliant, because
+the tags are still in all-caps.
+
 =item -nph
 
 This makes CGI.pm produce a header appropriate for an NPH (no
@@ -4195,7 +4198,8 @@ side effect, this sets the charset() method as well.
 The B<-attachment> parameter can be used to turn the page into an
 attachment.  Instead of displaying the page, some browsers will prompt
 the user to save it to disk.  The value of the argument is the
-suggested name for the saved file.
+suggested name for the saved file.  In order for this to work, you may
+have to set the B<-type> to "application/octet-stream".
 
 =head2 GENERATING A REDIRECTION HEADER
 
