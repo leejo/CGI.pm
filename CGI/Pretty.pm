@@ -10,7 +10,7 @@ package CGI::Pretty;
 use strict;
 use CGI ();
 
-$CGI::Pretty::VERSION = '1.06_00';
+$CGI::Pretty::VERSION = '1.07_00';
 $CGI::DefaultClass = __PACKAGE__;
 $CGI::Pretty::AutoloadClass = 'CGI';
 @CGI::Pretty::ISA = qw( CGI );
@@ -21,6 +21,8 @@ sub _prettyPrint {
     my $input = shift;
     return if !$$input;
     return if !$CGI::Pretty::LINEBREAK || !$CGI::Pretty::INDENT;
+
+#    print STDERR "'", $$input, "'\n";
 
     foreach my $i ( @CGI::Pretty::AS_IS ) {
 	if ( $$input =~ m{</$i>}si ) {
@@ -90,6 +92,7 @@ sub _make_tag_func {
                    \$CGI::Pretty::LINEBREAK unless \@_;
 	    my(\$tag,\$untag) = ("<\L$tagname\E\$attr>","</\L$tagname>\E");
 
+            my \%ASIS = map { lc("\$_") => 1 } \@CGI::Pretty::AS_IS;
             my \@args;
             if ( \$CGI::Pretty::LINEBREAK || \$CGI::Pretty::INDENT ) {
    	      if(ref(\$_[0]) eq 'ARRAY') {
@@ -97,8 +100,10 @@ sub _make_tag_func {
               } else {
                   foreach (\@_) {
 		      \$args[0] .= \$_;
-		      chomp \$args[0];
-		      \$args[0] .= \$";
+                      \$args[0] .= \$CGI::Pretty::LINEBREAK if \$args[0] !~ /\$CGI::Pretty::LINEBREAK\$/ && 0;
+                      chomp \$args[0] if exists \$ASIS{ "\L$tagname\E" };
+                      
+  	              \$args[0] .= \$" if \$args[0] !~ /\$CGI::Pretty::LINEBREAK\$/ && 1;
 		  }
                   chop \$args[0];
 	      }
@@ -108,7 +113,7 @@ sub _make_tag_func {
             }
 
             my \@result;
-            if ( exists( { map { lc("\$_") => 1 } \@CGI::Pretty::AS_IS }->{ "\L$tagname\E" } ) ) {
+            if ( exists \$ASIS{ "\L$tagname\E" } ) {
 		\@result = map { "\$tag\$_\$untag\$CGI::Pretty::LINEBREAK" } 
 		 \@args;
 	    }
@@ -122,7 +127,7 @@ sub _make_tag_func {
                     \$untag . \$CGI::Pretty::LINEBREAK
                 } \@args;
 	    }
-	    local \$" = "";
+	    local \$" = "" if \$CGI::Pretty::LINEBREAK || \$CGI::Pretty::INDENT;
 	    return "\@result";
 	}#;
     }    
@@ -156,7 +161,7 @@ sub initialize_globals {
     $CGI::Pretty::LINEBREAK = $/;
 
     # These tags are not prettify'd.
-    @CGI::Pretty::AS_IS = qw( a pre code script textarea );
+    @CGI::Pretty::AS_IS = qw( a pre code script textarea td );
 
     1;
 }

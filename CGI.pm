@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.73 2002-10-11 15:07:05 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.74 2002-10-14 13:54:33 lstein Exp $';
 $CGI::VERSION='2.88';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3183,8 +3183,9 @@ sub new {
     my $fv = ++$FH . $safename;
     my $ref = \*{"Fh::$fv"};
     $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
-    sysopen($ref,$1,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
-    unlink($file) if $delete;
+    my $safe = $1;
+    sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
+    unlink($safe) if $delete;
     CORE::delete $Fh::{$fv};
     return bless $ref,$pack;
 }
@@ -3483,8 +3484,9 @@ $MAXTRIES = 5000;
 
 sub DESTROY {
     my($self) = @_;
-    $$self =~ /^(.+)$/;     # untaint operation
-    unlink $1;              # get rid of the file
+    $$self =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$! || return;
+    my $safe = $1;             # untaint operation
+    unlink $safe;              # get rid of the file
 }
 
 ###############################################################################
