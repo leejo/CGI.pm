@@ -415,69 +415,76 @@ sub warningsToBrowser {
 
 # headers
 sub fatalsToBrowser {
-    my($msg) = @_;
-    $msg=~s/&/&amp;/g;
-    $msg=~s/>/&gt;/g;
-    $msg=~s/</&lt;/g;
-    $msg=~s/\"/&quot;/g;
-    my($wm) = $ENV{SERVER_ADMIN} ? 
-	qq[the webmaster (<a href="mailto:$ENV{SERVER_ADMIN}">$ENV{SERVER_ADMIN}</a>)] :
-	"this site's webmaster";
-    my ($outer_message) = <<END;
+  my($msg) = @_;
+  $msg=~s/&/&amp;/g;
+  $msg=~s/>/&gt;/g;
+  $msg=~s/</&lt;/g;
+  $msg=~s/\"/&quot;/g;
+  my($wm) = $ENV{SERVER_ADMIN} ? 
+    qq[the webmaster (<a href="mailto:$ENV{SERVER_ADMIN}">$ENV{SERVER_ADMIN}</a>)] :
+      "this site's webmaster";
+  my ($outer_message) = <<END;
 For help, please send mail to $wm, giving this error message 
 and the time and date of the error.
 END
-    ;
-    my $mod_perl = exists $ENV{MOD_PERL};
-    print STDOUT "Content-type: text/html\n\n" 
-	unless $mod_perl;
+  ;
+  my $mod_perl = exists $ENV{MOD_PERL};
+  print STDOUT "Content-type: text/html\n\n" 
+    unless $mod_perl;
 
-    warningsToBrowser(1);    # emit warnings before dying
+  warningsToBrowser(1);    # emit warnings before dying
 
-    if ($CUSTOM_MSG) {
-	if (ref($CUSTOM_MSG) eq 'CODE') {
-	    &$CUSTOM_MSG($msg); # nicer to perl 5.003 users
-	    return;
-	} else {
-	    $outer_message = $CUSTOM_MSG;
-	}
+  if ($CUSTOM_MSG) {
+    if (ref($CUSTOM_MSG) eq 'CODE') {
+      &$CUSTOM_MSG($msg); # nicer to perl 5.003 users
+      return;
+    } else {
+      $outer_message = $CUSTOM_MSG;
     }
+  }
     
-    my $mess = <<END;
+  my $mess = <<END;
 <h1>Software error:</h1>
 <pre>$msg</pre>
 <p>
 $outer_message
 </p>
 END
-    ;
-
-     if ($mod_perl) {
-       require mod_perl;
-       if ($mod_perl::VERSION >= 1.99) {
-	 $mod_perl = 2;
-	 require Apache::RequestRec;
-	 require Apache::RequestIO;
-	 require Apache::RequestUtil;
-	 require APR::Pool;
-	 require ModPerl::Util;
-	 require Apache::Response;
-       }
-       my $r = Apache->request;
-       # If bytes have already been sent, then
-       # we print the message out directly.
-       # Otherwise we make a custom error
-       # handler to produce the doc for us.
-	if ($r->bytes_sent) {
-	    $r->print($mess);
-	    $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
-	} else {
-	    $r->status(500);
-	    $r->custom_response(500,$mess);
-	}
-    } else {
-	print STDOUT $mess;
+  ;
+  
+  if ($mod_perl) {
+    require mod_perl;
+    if ($mod_perl::VERSION >= 1.99) {
+      $mod_perl = 2;
+      require Apache::RequestRec;
+      require Apache::RequestIO;
+      require Apache::RequestUtil;
+      require APR::Pool;
+      require ModPerl::Util;
+      require Apache::Response;
     }
+    my $r = Apache->request;
+    # If bytes have already been sent, then
+    # we print the message out directly.
+    # Otherwise we make a custom error
+    # handler to produce the doc for us.
+    if ($r->bytes_sent) {
+      $r->print($mess);
+      $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
+    } else {
+      # MSIE browsers don't show the $mess when sent
+      # a custom 500 response.
+      if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
+	$r->send_http_header('text/html');
+	$r->print($mess);
+	$r->exit();
+      } else {
+	$r->custom_response(500,$mess);
+      }
+    }
+  } else {
+    print STDOUT $mess;
+  }
 }
 
 # Cut and paste from CGI.pm so that we don't have the overhead of
