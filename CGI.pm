@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.134 2003-08-29 19:53:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.135 2003-10-19 02:07:52 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1300,7 +1300,7 @@ sub header {
     my($self,@p) = self_or_default(@_);
     my(@header);
 
-    return undef if $self->{'.header_printed'}++ and $HEADERS_ONCE;
+    return "" if $self->{'.header_printed'}++ and $HEADERS_ONCE;
 
     my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) = 
 	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],

@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 3.00, 8/18/2003, L. Stein
+Version 3.01, X/XX/2003, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4806,6 +4806,8 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.01</h3>
 <ol>
+  <li>Workaround for weird interaction of CGI::Carp with Safe module reported by William McKee.
+  <li>Added patches from Ilmari Karonen to improve behavior of CGI::Carp.
   <li>Fixed documentation error in -style argument.
   <li>Added virtual_port() method for finding out what port server is listening on
       in a virtual-host aware fashion.
@@ -5911,6 +5913,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Aug 29 15:53:17 EDT 2003
+Last modified: Sat Oct 18 22:04:47 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>

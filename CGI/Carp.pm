@@ -110,7 +110,8 @@ import the special "fatalsToBrowser" subroutine:
 
 Fatal errors will now be echoed to the browser as well as to the log.  CGI::Carp
 arranges to send a minimal HTTP header to the browser so that even errors that
-occur in the early compile phase will be seen.
+occur in the early compile phase will be seen.  (As of version 1.27, CGI::Carp
+will check if the CGI module is loaded, and if so, use it to generate the header.)
 Nonfatal errors will still be directed to the log file only (unless redirected
 with carpout).
 
@@ -131,16 +132,19 @@ of the error message that caused the script to die.  Example:
 
     use CGI::Carp qw(fatalsToBrowser set_message);
     BEGIN {
-       sub handle_errors {
-          my $msg = shift;
-          print "<h1>Oh gosh</h1>";
-          print "<p>Got an error: $msg</p>";
-      }
-      set_message(\&handle_errors);
+        set_message sub {
+            my $msg = shift;
+            print "<h1>Oh gosh</h1>";
+            print "<p>Got an error: $msg</p>";
+        };
     }
 
 In order to correctly intercept compile-time errors, you should call
 set_message() from within a BEGIN{} block.
+
+Normally CGI::Carp will send HTTP headers to the browser even if you
+provide your own error handler.  If you wish to disable this feature,
+you may call the suppress_header() function with a true argument.
 
 =head1 MAKING WARNINGS APPEAR AS HTML COMMENTS
 
@@ -228,13 +232,12 @@ non-overridden program name
 1.13 Added cluck() to make the module orthogonal with Carp.
      More mod_perl related fixes.
 
-1.20 Patch from Ilmari Karonen (perl@itz.pp.sci.fi):  Added
-     warningsToBrowser().  Replaced <CODE> tags with <PRE> in
-     fatalsToBrowser() output.
+1.20 Patch from Ilmari Karonen:  Added warningsToBrowser().  Replaced
+     <CODE> tags with <PRE> in fatalsToBrowser() output.
 
-1.23 ineval() now checks both $^S and inspects the message for the "eval" pattern
-     (hack alert!) in order to accomodate various combinations of Perl and
-     mod_perl.
+1.23 ineval() now checks both $^S and inspects the message for the "eval"
+     pattern (hack alert!) in order to accomodate various combinations of
+     Perl and mod_perl.
 
 1.24 Patch from Scott Gifford (sgifford@suspectclass.com): Add support
      for overriding program name.
@@ -242,6 +245,11 @@ non-overridden program name
 1.26 Replaced CORE::GLOBAL::die with the evil $SIG{__DIE__} because the
      former isn't working in some people's hands.  There is no such thing
      as reliable exception handling in Perl.
+
+1.27 Patch from Ilmari Karonen:  Added suppress_header(), mostly rewrote
+     fatalsToBrowser() for clarity.  fatalsToBrowser now checks if CGI.pm
+     is in use and uses it to generate headers if so.  warningsToBrowser()
+     should now work under mod_perl (not tested).
 
 =head1 AUTHORS
 
@@ -256,10 +264,6 @@ Address bug reports and comments to: lstein@cshl.org
 
 Carp, CGI::Base, CGI::BasePlus, CGI::Request, CGI::MiniSvr, CGI::Form,
 CGI::Response
-    if (defined($CGI::Carp::PROGNAME)) 
-    {
-      $file = $CGI::Carp::PROGNAME;
-    }
 
 =cut
 
@@ -272,16 +276,17 @@ BEGIN {
 }
 
 use File::Spec;
+use CGI::Util qw(escape);
 
 @ISA = qw(Exporter);
 @EXPORT = qw(confess croak carp);
-@EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message set_progname cluck ^name= die);
+@EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message suppress_header set_progname cluck ^name= die);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION    = '1.26';
+$CGI::Carp::VERSION    = '1.28';
 $CGI::Carp::CUSTOM_MSG = undef;
-
+$CGI::Carp::DELAYED_WARNINGS = "";
 
 # fancy import routine detects and handles 'errorWrap' specially.
 sub import {
@@ -314,7 +319,7 @@ sub realdie { CORE::die(@_); }
 sub id {
     my $level = shift;
     my($pack,$file,$line,$sub) = caller($level);
-    my($dev,$dirs,$id) = File::Spec->splitpath($file);
+    my($dev,$dirs,$id) = splitpath($file);
     return ($file,$line,$id);
 }
 
@@ -330,7 +335,7 @@ sub stamp {
 	  ($pack,$file) = caller($frame++);
         } until !$file;
     }
-    ($dev,$dirs,$id) = File::Spec->splitpath($id);
+    ($dev,$dirs,$id) = splitpath($id);
     return "[$time] $id: ";
 }
 
@@ -339,12 +344,22 @@ sub set_progname {
     return $CGI::Carp::PROGNAME;
 }
 
+sub splitpath {
+  my $path = shift;
+  if (UNIVERSAL::can('File::Spec','splitpath')) {
+    return File::Spec->splitpath($path);
+  }
+  else {
+    return split '/',$path;
+  }
+}
+
 
 sub warn {
     my $message = shift;
     my($file,$line,$id) = id(1);
     $message .= " at $file line $line.\n" unless $message=~/\n$/;
-    _warn($message) if $WARN;
+    _warn(mangle_warning($message)) if $WARN;
     my $stamp = stamp;
     $message=~s/^/$stamp/gm;
     realwarn $message;
@@ -352,18 +367,24 @@ sub warn {
 
 sub _warn {
     my $msg = shift;
-    if ($EMIT_WARNINGS) {
-	# We need to mangle the message a bit to make it a valid HTML
-	# comment.  This is done by substituting similar-looking ISO
-	# 8859-1 characters for <, > and -.  This is a hack.
-	$msg =~ tr/<>-/\253\273\255/;
-	chomp $msg;
-	print STDOUT "<!-- warning: $msg -->\n";
+    if (!$EMIT_WARNINGS) {
+        $DELAYED_WARNINGS .= $msg;
+    } elsif (exists $ENV{MOD_PERL}) {
+        Apache->request->print($msg);
     } else {
-	push @WARNINGS, $msg;
+        print STDOUT $msg;
     }
 }
 
+sub mangle_warning {
+    my $msg = shift;
+    # We need to mangle the message a bit to make it a valid HTML
+    # comment.  This is done by substituting similar-looking ISO
+    # 8859-1 characters for <, > and -.  This is a hack.
+    $msg =~ tr/<>-/\253\273\255/;
+    chomp $msg;
+    return "<!-- warning: $msg -->\n";
+}
 
 # The mod_perl package Apache::Registry loads CGI programs by calling
 # eval.  These evals don't count when looking at the stack backtrace.
@@ -399,7 +420,10 @@ sub die {
 
 sub set_message {
     $CGI::Carp::CUSTOM_MSG = shift;
-    return $CGI::Carp::CUSTOM_MSG;
+}
+
+sub suppress_header {
+    $CGI::Carp::NO_HEADER = (@_ ? shift : 1);
 }
 
 sub confess { CGI::Carp::die Carp::longmess @_; }
@@ -420,85 +444,114 @@ sub carpout {
 }
 
 sub warningsToBrowser {
-    $EMIT_WARNINGS = @_ ? shift : 1;
-    _warn(shift @WARNINGS) while $EMIT_WARNINGS and @WARNINGS;
+    if ($EMIT_WARNINGS = @_ ? shift : 1) {
+        _warn $DELAYED_WARNINGS if length($DELAYED_WARNINGS);
+        $DELAYED_WARNINGS = "";
+    }
 }
 
 # headers
 sub fatalsToBrowser {
-  my($msg) = @_;
-  $msg=~s/&/&amp;/g;
-  $msg=~s/>/&gt;/g;
-  $msg=~s/</&lt;/g;
-  $msg=~s/\"/&quot;/g;
-  my($wm) = $ENV{SERVER_ADMIN} ? 
-    qq[the webmaster (<a href="mailto:$ENV{SERVER_ADMIN}">$ENV{SERVER_ADMIN}</a>)] :
-      "this site's webmaster";
-  my ($outer_message) = <<END;
+    my $msg = shift;
+    _htmlescape($msg);
+
+    my $mod_perl = exists $ENV{MOD_PERL};
+    my $no_header = $mod_perl || $NO_HEADER || eval {
+        # This trick might work on some setups, but not always.
+        my $bytes_sent = tell(STDOUT);
+        defined($bytes_sent) && $bytes_sent > 0;
+    };
+      
+    # First we send the CGI header.  If the CGI module is available,
+    # we use that, otherwise we create a simple header ourselves.
+    
+    unless ($no_header) {
+        if ($CGI::VERSION) {
+            print STDOUT CGI::header(-status => "500 Software error");
+        } else {
+            print STDOUT <<END;
+Status: 500 Software error
+Content-type: text/html
+
+END
+        }
+    }
+    
+    # If the user has provided an error handler, we execute it and
+    # return.  Presumably the handler knows what to do.
+
+    &$CUSTOM_MSG($msg), return  if ref($CUSTOM_MSG) eq 'CODE';
+
+    # If the user didn't provide a custom explanatory message, we create
+    # one.  We try to include the webmaster's email address if possible.
+
+    my $outer_message = $CUSTOM_MSG;
+    if (!$outer_message) {
+        my $wm = "this site's webmaster";
+        if ($ENV{SERVER_ADMIN}) {
+            my $admin = $ENV{SERVER_ADMIN};
+            my $mailto = "mailto:" . escape($admin);
+            _htmlescape($admin, $mailto);
+            $wm = qq[the webmaster (<a href="$mailto">$admin</a>)];
+        }
+        $outer_message = <<END;
 For help, please send mail to $wm, giving this error message 
 and the time and date of the error.
 END
-  ;
-  my $mod_perl = exists $ENV{MOD_PERL};
-
-  warningsToBrowser(1);    # emit warnings before dying
-
-  if ($CUSTOM_MSG) {
-    if (ref($CUSTOM_MSG) eq 'CODE') {
-      print STDOUT "Content-type: text/html\n\n" 
-        unless $mod_perl;
-      &$CUSTOM_MSG($msg); # nicer to perl 5.003 users
-      return;
-    } else {
-      $outer_message = $CUSTOM_MSG;
     }
-  }
 
-  my $mess = <<END;
+    # Next we wrap the error and the explanatory message in some simple
+    # HTML.  We also include any delayed warnings.
+
+    my $message = $DELAYED_WARNINGS . <<END;
 <h1>Software error:</h1>
 <pre>$msg</pre>
-<p>
-$outer_message
-</p>
+<p>$outer_message</p>
 END
-  ;
+    $DELAYED_WARNINGS = "";
 
-  if ($mod_perl) {
-    require mod_perl;
-    if ($mod_perl::VERSION >= 1.99) {
-      $mod_perl = 2;
-      require Apache::RequestRec;
-      require Apache::RequestIO;
-      require Apache::RequestUtil;
-      require APR::Pool;
-      require ModPerl::Util;
-      require Apache::Response;
-    }
-    my $r = Apache->request;
-    # If bytes have already been sent, then
-    # we print the message out directly.
-    # Otherwise we make a custom error
-    # handler to produce the doc for us.
-    if ($r->bytes_sent) {
-      $r->print($mess);
-      $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
+    # MSIE won't display a custom 500 response unless it is >512 bytes!
+    $message .= "<!-- " . ' ' x (512-length($message)) . " -->\n"
+        if $ENV{HTTP_USER_AGENT} && $ENV{HTTP_USER_AGENT} =~ /\bMSIE\b/;
+
+    # Finally the message is sent to the browser.  This takes some extra
+    # code if we're under mod_perl, otherwise we just send it to STDOUT.
+
+    if ($mod_perl) {
+        require mod_perl;
+        if ($mod_perl::VERSION >= 1.99) {
+            $mod_perl = 2;
+            require Apache::RequestRec;
+            require Apache::RequestIO;
+            require Apache::RequestUtil;
+            require APR::Pool;
+            require ModPerl::Util;
+            require Apache::Response;
+        }
+        my $r = Apache->request;
+        
+        # If bytes have already been sent, then we print the message out
+        # directly.  Otherwise we make a custom error handler to produce
+        # the doc for us.
+
+        if ($r->bytes_sent) {
+            $r->print($message);
+            $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
+        } else {
+            $r->custom_response(500, $message);
+        }
     } else {
-      # MSIE won't display a custom 500 response unless it is >512 bytes!
-      if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
-        $mess = "<!-- " . (' ' x 513) . " -->\n$mess";
-      }
-      $r->custom_response(500,$mess);
+        print STDOUT $message;
     }
-  } else {
-    my $bytes_written = eval{tell STDOUT};
-    if (defined $bytes_written & $bytes_written > 0) {
-        print STDOUT $mess;
+}
+
+sub _htmlescape {
+    for (@_) {
+        s/&/&amp;/g;
+        s/</&lt;/g;
+        s/>/&gt;/g;
+        s/\"/&quot/g;
     }
-    else {
-        print STDOUT "Content-type: text/html\n\n";
-        print STDOUT $mess;
-    }
-  }
 }
 
 # Cut and paste from CGI.pm so that we don't have the overhead of
