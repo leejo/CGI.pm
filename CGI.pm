@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.91 2003-02-26 22:26:09 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.92 2003-03-01 17:42:03 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -174,12 +174,13 @@ if (exists $ENV{'GATEWAY_INTERFACE'}
     ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//))
   {
     $| = 1;
-    require mod_perl;
-    if ($mod_perl::VERSION >= 1.99) {
+    eval "require mod_perl";
+    if (defined $mod_perl::VERSION && ($mod_perl::VERSION >= 1.99)) {
       eval "require Apache::compat";
     } else {
       eval "require Apache";
     }
+    defined &Apache::request or undef $MOD_PERL;
   }
 
 # Turn on special checking for ActiveState's PerlEx
