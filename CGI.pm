@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.139 2003-11-08 23:25:52 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.140 2003-11-13 13:52:56 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -323,9 +323,20 @@ sub new {
   return $self;
 }
 
-# We provide a DESTROY method so that the autoloader
-# doesn't bother trying to find it.
-sub DESTROY { }
+# We provide a DESTROY method so that we can ensure that
+# temporary files are closed (via Fh->DESTROY) before they
+# are unlinked (via CGITempFile->DESTROY) because it is not
+# possible to unlink an open file on Win32. We explicitly
+# call DESTROY on each, rather than just undefing them and
+# letting Perl DESTROY them by garbage collection, in case the
+# user is still holding any reference to them as well.
+sub DESTROY {
+  my $self = shift;
+  foreach my $href (values %{$self->{'.tmpfiles'}}) {
+    $href->{hndl}->DESTROY;
+    $href->{name}->DESTROY;
+  }
+}
 
 sub r {
   my $self = shift;
@@ -3220,6 +3231,7 @@ sub read_multipart {
 	  # Save some information about the uploaded file where we can get
 	  # at it later.
 	  $self->{'.tmpfiles'}->{fileno($filehandle)}= {
+              hndl => $filehandle,
 	      name => $tmpfile,
 	      info => {%header},
 	  };
