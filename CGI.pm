@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.170 2004-07-09 18:09:45 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.171 2004-07-17 16:37:22 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1555,7 +1555,9 @@ sub start_html {
 	$lang = 'en-US' unless defined $lang;
     }
 
-    push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang" xml:lang="$lang"><head><title>$title</title>)
+    my $lang_bits = $lang ne '' ? qq( lang="$lang" xml:lang="$lang") : '';
+
+    push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml"$lang_bits><head><title>$title</title>)
                         : ($lang ? qq(<html lang="$lang">) : "<html>") 
 	                  . "<head><title>$title</title>");
 	if (defined $author) {
