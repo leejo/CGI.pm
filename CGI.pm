@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.53 2001-09-26 01:27:10 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.54 2001-09-26 01:38:52 lstein Exp $';
 $CGI::VERSION='2.78';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1826,9 +1826,9 @@ sub checkbox {
 
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined $self->param($name))) {
-	$checked = grep($_ eq $value,$self->param($name)) ? ' checked="checked"' : '';
+	$checked = grep($_ eq $value,$self->param($name)) ? ' checked="1"' : '';
     } else {
-	$checked = $checked ? qq/ checked="checked"/ : '';
+	$checked = $checked ? qq/ checked="1"/ : '';
     }
     my($the_label) = defined $label ? $label : $name;
     $name = $self->escapeHTML($name);
@@ -1893,7 +1893,7 @@ sub checkbox_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	$checked = $checked{$_} ? qq/ checked="checked"/ : '';
+	$checked = $checked{$_} ? qq/ checked="1"/ : '';
 	$label = '';
 	unless (defined($nolabels) && $nolabels) {
 	    $label = $_;
@@ -2041,7 +2041,7 @@ sub radio_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	my($checkit) = $checked eq $_ ? qq/ checked="checked"/ : '';
+	my($checkit) = $checked eq $_ ? qq/ checked="1"/ : '';
 	my($break);
 	if ($linebreak) {
           $break = $XHTML ? "<br />" : "<br>";
@@ -2102,7 +2102,7 @@ sub popup_menu {
 
     $result = qq/<select name="$name"$other>\n/;
     foreach (@values) {
-	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected="selected"/ : '' ) : '';
+	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected="1"/ : '' ) : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	my($value) = $self->escapeHTML($_);
@@ -2156,7 +2156,7 @@ sub scrolling_list {
     $name=$self->escapeHTML($name);
     $result = qq/<select name="$name"$has_size$is_multiple$other>\n/;
     foreach (@values) {
-	my($selectit) = $selected{$_} ? qq/selected="selected"/ : '';
+	my($selectit) = $selected{$_} ? qq/selected="1"/ : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	$label=$self->escapeHTML($label);
@@ -5470,7 +5470,7 @@ of the particular button clicked on using the "this" variable.
 =head2 CREATING A STANDALONE CHECKBOX
 
     print $query->checkbox(-name=>'checkbox_name',
-			   -checked=>'checked',
+			   -checked=>1,
 			   -value=>'ON',
 			   -label=>'CLICK ME');
 
