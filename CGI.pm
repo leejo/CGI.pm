@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.24 2000-02-18 19:22:29 lstein Exp $';
-$CGI::VERSION='2.573';
+$CGI::revision = '$Id: CGI.pm,v 1.25 2000-03-20 03:29:44 lstein Exp $';
+$CGI::VERSION='2.574';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -441,6 +441,7 @@ sub init {
 	      $query_string = Apache->request->args;
 	  } else {
 	      $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	      $query_string = $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
 	  }
 	  last METHOD;
       }
@@ -557,7 +558,8 @@ sub save_request {
     # us to have several of these objects.
     @QUERY_PARAM = $self->param; # save list of parameters
     foreach (@QUERY_PARAM) {
-	$QUERY_PARAM{$_}=$self->{$_};
+      next unless defined $_;
+      $QUERY_PARAM{$_}=$self->{$_};
     }
 }
 
@@ -570,12 +572,13 @@ sub parse_params {
 	$param = unescape($param);
 	$value = unescape($value);
 	$self->add_parameter($param);
-	push (@{$self->{$param}},$value);
+	push (@{$self->{$param}},$value) if defined $value;
     }
 }
 
 sub add_parameter {
     my($self,$param)=@_;
+    return unless defined $param;
     push (@{$self->{'.parameters'}},$param) 
 	unless defined($self->{$param});
 }
@@ -2198,6 +2201,7 @@ sub url {
     }
     $url .= $path if $path_info and defined $path;
     $url .= "?" . $self->query_string if $query and $self->query_string;
+    $url = '' unless defined $url;
     $url =~ s/([^a-zA-Z0-9_.%;&?\/\\:+=~-])/uc sprintf("%%%02x",ord($1))/eg;
     return $url;
 }
@@ -4276,8 +4280,10 @@ different from the current location, as in
 All relative links will be interpreted relative to this tag.
 
 The argument B<-target> allows you to provide a default target frame
-for all the links and fill-out forms on the page.  See the Netscape
-documentation on frames for details of how to manipulate this.
+for all the links and fill-out forms on the page.  B<This is a
+non-standard HTTP feature which only works with Netscape browsers!>
+See the Netscape documentation on frames for details of how to
+manipulate this.
 
     -target=>"answer_window"
 
