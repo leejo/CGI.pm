@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.79, 12/9/2001, L. Stein
+Version 2.80, 1/11/2002, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4688,6 +4688,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.80</h3>
+<ol>
+  <li>Fixed broken messages in CGI::Carp.
+  <li>Changed checked="1" to checked="checked" for real XHTML compatibility.
+  <li>Resurrected REQUEST_URI code so that url() works correctly with multiviews.
+</ol>
 <h3>Version 2.79</h3>
 <ol>
   <li>Changes to CGI::Carp to avoid "subroutine redefined" error messages.
@@ -5630,6 +5636,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sun Dec  9 16:35:43 EST 2001
+Last modified: Fri Jan 11 21:44:27 EST 2002
 <!-- hhmts end -->
 </BODY> </HTML>
