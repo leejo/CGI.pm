@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.101 2003-04-11 17:26:49 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.102 2003-04-14 18:27:51 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -173,6 +173,8 @@ $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 # Turn on special checking for Doug MacEachern's modperl
 if (exists $ENV{MOD_PERL}) {
   eval "require mod_perl";
+  # mod_perl handlers may run system() on scripts using CGI.pm;
+  # Make sure so we don't get fooled by inherited $ENV{MOD_PERL}
   if (defined $mod_perl::VERSION) {
     if ($mod_perl::VERSION >= 1.99) {
       $MOD_PERL = 2;
@@ -298,7 +300,10 @@ sub new {
             $r->register_cleanup(\&CGI::_reset_globals);
         }
         else {
-            $r->pool->cleanup_register(\&CGI::_reset_globals);
+	  # XXX: once we have the new API
+	  # will do a real PerlOptions -SetupEnv check
+	  $r->subprocess_env unless exists $ENV{REQUEST_METHOD};
+	  $r->pool->cleanup_register(\&CGI::_reset_globals);
         }
         undef $NPH;
     }
