@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.148 2003-12-16 20:47:44 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.149 2003-12-29 02:30:46 lstein Exp $';
 $CGI::VERSION=3.02;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1916,7 +1916,7 @@ sub submit {
     $label=$self->escapeHTML($label);
     $value=$self->escapeHTML($value,1);
 
-    my($name) = ' name=".submit"' unless $NOSTICKY;
+    my $name = $NOSTICKY ? '' : ' name=".submit"';
     $name = qq/ name="$label"/ if defined($label);
     $value = defined($value) ? $value : $label;
     my $val = '';
