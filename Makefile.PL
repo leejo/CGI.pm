@@ -1,6 +1,8 @@
 use ExtUtils::MakeMaker;
 require 5.004;
 
+system("perl", "t/gen-tests/gen-start-end-tags.pl");
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -15,3 +17,4 @@ WriteMakefile(
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
 	            'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
 );
+

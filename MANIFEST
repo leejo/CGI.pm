@@ -42,6 +42,7 @@ t/fast.t
 t/form.t
 t/function.t
 t/html.t
+t/gen-tests/gen-start-end-tags.pl
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/lib/Test/Utils.pm
@@ -51,3 +52,4 @@ t/request.t
 t/switch.t
 t/util.t
 t/util-58.t
+META.yml                                 Module meta-data (added by MakeMaker)
