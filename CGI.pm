@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.36 2000-06-11 13:22:39 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.37 2000-07-06 03:16:57 lstein Exp $';
 $CGI::VERSION='2.69';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2940,12 +2940,12 @@ END_OF_FUNC
 sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
-    my $fv = ('Fh::' .  ++$FH . quotemeta($name));
-    warn unless *{$fv};
-    my $ref = \*{$fv};
+    my $fv = ++$FH . quotemeta($name);
+    warn unless *{"Fh::$fv"};
+    my $ref = \*{"Fh::$fv"};
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
-    CORE::delete $Fh::{$FH};
+    CORE::delete $Fh::{$fv};
     return bless $ref,$pack;
 }
 END_OF_FUNC
