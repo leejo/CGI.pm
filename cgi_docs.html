@@ -3516,6 +3516,7 @@ print button(-name=&gt;'bail out',-onInterPlaneteryDisaster=&gt;"alert('uh oh')"
 
 <h2><a name="stylesheets">Limited Support for Cascading Style Sheets</a></h2>
 
+<p>
 
 CGI.pm has limited support for HTML3's cascading style sheets (css).
 To incorporate a stylesheet into your document, pass the
@@ -3640,6 +3641,32 @@ This will generate HTML like this:
 </blockquote></pre>
 
 <p>
+
+Any additional arguments passed in the -style value will be
+incorporated into the &lt;link&gt; tag.  For example:
+
+<pre><blockquote>
+ start_html(-style=&gt;{-src=&gt;['/styles/print.css','/styles/layout.css'],
+			  -media =&gt; 'all'});
+</blockquote></pre>
+
+This will give:
+
+<blockquote><pre>
+&lt;link rel="stylesheet" type="text/css" href="/styles/print.css" media="all"/&gt;
+&lt;link rel="stylesheet" type="text/css" href="/styles/layout.css" media="all"/&gt;
+</pre></blockquote>
+
+<p>
+
+To make more complicated &lt;link&gt; tags, use the Link() function
+and pass it to start_html() in the -head argument, as in:
+
+<blockquote><pre>
+  @h = (Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/ss.css',-media=>'all'}),
+        Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/fred.css',-media=>'paper'}));
+  print start_html({-head=>\@h})
+</pre></blockquote>
 
 <a href="#contents">Table of contents</a>
 
@@ -5842,6 +5869,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sun Jun  1 15:43:57 EDT 2003
+Last modified: Fri Jun  6 15:23:02 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>

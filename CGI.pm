@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.120 2003-06-01 19:47:23 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.121 2003-06-06 19:25:22 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1511,22 +1511,21 @@ sub _style {
     if (ref($style)) {
      my($src,$code,$verbatim,$stype,@other) =
          rearrange([SRC,CODE,VERBATIM,TYPE],
-                    '-foo'=>'bar', # a trick to allow the '-' to be omitted
                     ref($style) eq 'ARRAY' ? @$style : %$style);
      $type = $stype if $stype;
-     
+
      if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
      { # If it is, push a LINK tag for each one
          foreach $src (@$src)
        {
-         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" />)
-                             : qq(<link rel="stylesheet" type="$type" href="$src">)) if $src;
+         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
+                             : qq(<link rel="stylesheet" type="$type" href="$src"@other>)) if $src;
        }
      }
      else
      { # Otherwise, push the single -src, if it exists.
-       push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" />)
-                           : qq(<link rel="stylesheet" type="$type" href="$src">)
+       push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
+                           : qq(<link rel="stylesheet" type="$type" href="$src"@other>)
             ) if $src;
       }
       if ($verbatim) {
@@ -6464,6 +6463,26 @@ This will generate an HTML header that contains this:
    <style type="text/css">
    @import url("/server-common/css/main.css");
    </style>
+
+Any additional arguments passed in the -style value will be
+incorporated into the <link> tag.  For example:
+
+ start_html(-style=>{-src=>['/styles/print.css','/styles/layout.css'],
+			  -media => 'all'});
+
+This will give:
+
+ <link rel="stylesheet" type="text/css" href="/styles/print.css" media="all"/>
+ <link rel="stylesheet" type="text/css" href="/styles/layout.css" media="all"/>
+
+<p>
+
+To make more complicated <link> tags, use the Link() function
+and pass it to start_html() in the -head argument, as in:
+
+  @h = (Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/ss.css',-media=>'all'}),
+        Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/fred.css',-media=>'paper'}));
+  print start_html({-head=>\@h})
 
 =head1 DEBUGGING
 
