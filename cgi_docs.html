@@ -7,8 +7,11 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 3.06, XX/XX/2004, L. Stein
 <p>
+
+<h1>AS OF 10 FEBRUARY 2005 (CGI.pm VERSION 3.06) THIS DOCUMENT IS NO
+LONGER BEING MAINTAINED.  PLEASE CONSULT THE CGI POD DOCUMENTATION
+USING "perldoc CGI"</h1>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
 fill-out forms on the fly and to parse their contents.  It provides a
@@ -1145,6 +1148,12 @@ All parameters are optional:
       To create an HTTP-EQUIV tag, use the <B>-head</B> argument as described below.
   <li>The <b>-encoding</b> argument can be used to specify the character set for
        XHTML.  It defaults to iso-8859-1 if not specified.
+  <li>The <b>-declare_xml</b> argument, when used in conjunction with XHTML,
+      will put a &lt;?xml&gt; declaration at the top of the HTML header. The sole
+      purpose of this declaration is to declare the character set
+      encoding. In the absence of -declare_xml, the output HTML will contain
+      a <meta> tag that specifies the encoding, allowing the HTML to pass
+      most validators.  The default for -declare_xml is false.
   <li>A <strong>-lang</strong>> argument is used to incorporate a language attribute into
       the &lt;HTM&gt;> tag.  The default if not specified is "en-US" for US English.  For example:
 <blockquote><pre>
@@ -6053,6 +6062,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Sep 29 14:13:57 EDT 2004
+Last modified: Wed Feb  9 17:41:35 EST 2005
 <!-- hhmts end -->
 </BODY> </HTML>

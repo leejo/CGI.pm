@@ -29,11 +29,8 @@ the docs for notes on your particular platform.
 
 WHERE IS THE DOCUMENTATION?
 
-You'll find very verbose documentation in the file cgi_docs.html,
-located in the top level directory.  
-
-Terser documentation is found in POD (plain old documentation) form in
-CGI.pm itself.  When you install CGI, the MakeMaker program will
+Documentation is found in POD (plain old documentation) form in CGI.pm
+itself.  When you install CGI, the MakeMaker program will
 automatically install the manual pages for you (on Unix systems, type
 "man CGI").
 
@@ -51,9 +48,6 @@ Online documentation of for CGI.pm, and notifications of new versions
 can be found at:
 
    http://search.cpan.org/~lds/
-
-A copy of the HTML documentation can be found in the package in the
-file cgi_docs.html or in the standard POD pages.
 
 WHERE CAN I LEARN MORE?
 
