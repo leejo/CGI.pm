@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.70, 8/4/2000, L. Stein
+Version 2.71, 8/13/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4645,6 +4645,16 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 
 
+<h3>Version 2.71</h3>
+<p>
+August 13, 2000
+<ol>
+  <li>Newlines in the value attributes of hidden fields and other form elements are
+      now escaped when using ISO-Latin.
+  <li>Inline script and style sections are now protected as CDATA sections when
+      XHTML mode is on (the default).
+</ol>
+
 <h3>Version 2.70</h3>
 <p>
 August 4, 2000
@@ -5490,6 +5500,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Aug  4 15:36:23 EDT 2000
+Last modified: Sun Aug 13 11:41:07 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>
