@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.71 2002-09-13 22:25:03 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.72 2002-10-05 20:45:07 lstein Exp $';
 $CGI::VERSION='2.87';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -31,6 +31,8 @@ use CGI::Util qw(rearrange make_attributes unescape escape expires);
 
 use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
+
+$TAINTED = substr($ENV{REQUEST_METHOD}.'',0,0);
 
 my @SAVED_SYMBOLS;
 
@@ -157,13 +159,19 @@ $SL = {
 $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for Doug MacEachern's modperl
-if (exists $ENV{'GATEWAY_INTERFACE'} 
-    && 
+if (exists $ENV{'GATEWAY_INTERFACE'}
+    &&
     ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//))
-{
+  {
     $| = 1;
-    require Apache;
-}
+    require mod_perl;
+    if ($mod_perl::VERSION >= 1.99) {
+      require Apache::compat;
+    } else {
+      require Apache;
+    }
+  }
+
 # Turn on special checking for ActiveState's PerlEx
 $PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
 
@@ -774,11 +782,12 @@ END_OF_FUNC
 ####
 sub delete {
     my($self,@p) = self_or_default(@_);
-    my($name) = rearrange([NAME],@p);
-    CORE::delete $self->{$name};
-    CORE::delete $self->{'.fieldnames'}->{$name};
-    @{$self->{'.parameters'}}=grep($_ ne $name,$self->param());
-    return wantarray ? () : undef;
+    my(@names) = rearrange([NAME],@p);
+    for my $name (@names) {
+      CORE::delete $self->{$name};
+      CORE::delete $self->{'.fieldnames'}->{$name};
+      @{$self->{'.parameters'}}=grep($_ ne $name,$self->param());
+    }
 }
 END_OF_FUNC
 
@@ -1543,7 +1552,7 @@ sub startform {
     $enctype = $enctype || &URL_ENCODED;
     unless (defined $action) {
        $action = $self->url(-absolute=>1,-path=>1);
-       $action .= "?".escape($ENV{QUERY_STRING}) if defined $ENV{QUERY_STRING};
+       $action .= "?".escape($ENV{QUERY_STRING}) if length($ENV{QUERY_STRING})>0;
     }
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
@@ -2992,6 +3001,7 @@ sub read_multipart {
 	}
 
 	my($param)= $header{'Content-Disposition'}=~/ name="?([^\";]*)"?/;
+        $param .= $TAINTED;
 
 	# Bug:  Netscape doesn't escape quotation marks in file names!!!
 	my($filename) = $header{'Content-Disposition'}=~/ filename="?([^\"]*)"?/;
@@ -3003,6 +3013,7 @@ sub read_multipart {
 	# to our parameter list.
 	if ( !defined($filename) || $filename eq '' ) {
 	    my($value) = $buffer->readBody;
+            $value .= $TAINTED;
 	    push(@{$self->{$param}},$value);
 	    next;
 	}
@@ -3143,7 +3154,7 @@ sub asString {
     # get rid of package name
     (my $i = $$self) =~ s/^\*(\w+::fh\d{5})+//; 
     $i =~ s/%(..)/ chr(hex($1)) /eg;
-    return $i;
+    return $i.$CGI::TAINTED;
 # BEGIN DEAD CODE
 # This was an extremely clever patch that allowed "use strict refs".
 # Unfortunately it relied on another bug that caused leaky file descriptors.
@@ -3298,14 +3309,15 @@ sub readHeader {
     substr($self->{BUFFER},0,$end+4) = '';
     my %return;
 
-    
     # See RFC 2045 Appendix A and RFC 822 sections 3.4.8
     #   (Folding Long Header Fields), 3.4.3 (Comments)
     #   and 3.4.5 (Quoted-Strings).
 
     my $token = '[-\w!\#$%&\'*+.^_\`|{}~]';
     $header=~s/$CRLF\s+/ /og;		# merge continuation lines
-    while (my ($field_name,$field_value) = $header=~/($token+):\s+([^$CRLF]*)/mgox) {
+
+    while ($header=~/($token+):\s+([^$CRLF]*)/mgox) {
+        my ($field_name,$field_value) = ($1,$2);
 	$field_name =~ s/\b(\w)/uc($1)/eg; #canonicalize
 	$return{$field_name}=$field_value;
     }
@@ -3470,7 +3482,8 @@ $MAXTRIES = 5000;
 
 sub DESTROY {
     my($self) = @_;
-    unlink $$self;              # get rid of the file
+    $$self =~ /^(.+)$/;     # untaint operation
+    unlink $1;              # get rid of the file
 }
 
 ###############################################################################
@@ -3886,11 +3899,11 @@ Perl module B<import> operator.
 
 =head2 DELETING A PARAMETER COMPLETELY:
 
-    $query->delete('foo');
+    $query->delete('foo','bar','baz');
 
-This completely clears a parameter.  It sometimes useful for
-resetting parameters that you don't want passed down between
-script invocations.
+This completely clears a list of parameters.  It sometimes useful for
+resetting parameters that you don't want passed down between script
+invocations.
 
 If you are using the function call interface, use "Delete()" instead
 to avoid conflicts with Perl's built-in delete operator.
