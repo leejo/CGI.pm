@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.153 2004-01-19 18:23:01 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.154 2004-01-19 18:37:49 lstein Exp $';
 $CGI::VERSION=3.04;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1439,12 +1439,14 @@ END_OF_FUNC
 'redirect' => <<'END_OF_FUNC',
 sub redirect {
     my($self,@p) = self_or_default(@_);
-    my($url,$target,$cookie,$nph,@other) = rearrange([[LOCATION,URI,URL],TARGET,['COOKIE','COOKIES'],NPH],@p);
+    my($url,$target,$status,$cookie,$nph,@other) = 
+         rearrange([[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES'],NPH],@p);
+    $status = '302 Moved' unless defined $status;
     $url ||= $self->self_url;
     my(@o);
     foreach (@other) { tr/\"//d; push(@o,split("=",$_,2)); }
     unshift(@o,
-	 '-Status'  => '302 Moved',
+	 '-Status'  => $status,
 	 '-Location'=> $url,
 	 '-nph'     => $nph);
     unshift(@o,'-Target'=>$target) if $target;
@@ -4748,12 +4750,25 @@ redirection requests.  Relative URLs will not work correctly.
 You can also use named arguments:
 
     print $query->redirect(-uri=>'http://somewhere.else/in/movie/land',
-			   -nph=>1);
+			   -nph=>1,
+                           -status=>301);
 
 The B<-nph> parameter, if set to a true value, will issue the correct
 headers to work with a NPH (no-parse-header) script.  This is important
 to use with certain servers, such as Microsoft IIS, which
 expect all their scripts to be NPH.
+
+The B<-status> parameter will set the status of the redirect.  HTTP
+defines three different possible redirection status codes:
+
+     301 Moved Permanently
+     302 Found
+     303 See Other
+
+The default if not specified is 302, which means "moved temporarily."
+You may change the status to another status code if you wish.  Be
+advised that changing the status to anything other than 301, 302 or
+303 will probably break redirection.
 
 =head2 CREATING THE HTML DOCUMENT HEADER
 
@@ -7079,7 +7094,7 @@ OLD VERSION
 
 NEW VERSION
     use CGI;
-    CGI::ReadParse
+    CGI::ReadParse;
     print "The value of the antique is $in{antique}.\n";
 
 CGI.pm's ReadParse() routine creates a tied variable named %in,

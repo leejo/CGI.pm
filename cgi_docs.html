@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 3.04, 01/19/2004, L. Stein
+Version 3.05, XX/XX/XXXX, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -1043,7 +1043,8 @@ An alternative syntax for <code>redirect()</code> is:
 
 <blockquote><pre>
 print $query-&gt;redirect(-location=&gt;'http://somewhere.else/',
-                          -nph=&gt;1);
+                          -nph=&gt;1,
+                          -status=&gt;301);
 </pre></blockquote>
 
 The <strong>-location</strong> parameter gives the destination URL.
@@ -1055,6 +1056,25 @@ prefer.
 The <strong>-nph</strong> parameter, if non-zero tells CGI.pm that
 this script is running as a no-parsed-header script.  See <a
 href="#nph">Using NPH Scripts</a> for more information.
+
+<p>
+
+The <strong>-status</strong> parameter will set the status of the
+redirect.  HTTP defines three different possible redirection status
+codes:
+
+<pre>
+301 Moved Permanently
+302 Found
+303 See Other
+</pre>
+
+<p>
+
+The default if not specified is 302, which means "moved temporarily."
+You may change the status to another status code if you wish.  Be
+advised that changing the status to anything other than 301, 302 or
+303 will probably break redirection.
 
 <p>
 
@@ -4859,6 +4879,11 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 3.05</h3>
+<ol>
+  <li>Fixed documentation bug in -style argument to start_html()
+  <li>Added -status argument to redirect().
+</ol>
 <h3>Version 3.04</h3>
 <ol>
   <li>Fixed the problem with mod_perl crashing when "defaults" button pressed.
@@ -5995,6 +6020,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Jan 19 20:21:19 SAST 2004
+Last modified: Mon Jan 19 20:37:19 SAST 2004
 <!-- hhmts end -->
 </BODY> </HTML>
