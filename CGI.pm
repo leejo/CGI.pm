@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.124 2003-06-16 18:40:28 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.125 2003-06-16 18:54:19 lstein Exp $';
 $CGI::VERSION='2.96';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1513,20 +1513,21 @@ sub _style {
          rearrange([SRC,CODE,VERBATIM,TYPE],
                     '-foo'=>'bar',    # trick to allow dash to be omitted
                     ref($style) eq 'ARRAY' ? @$style : %$style);
-     $type = $stype if $stype;
+     $type  = $stype if $stype;
+     my $other = @other ? join ' ',@other : '';
 
      if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
      { # If it is, push a LINK tag for each one
          foreach $src (@$src)
        {
-         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
-                             : qq(<link rel="stylesheet" type="$type" href="$src"@other>)) if $src;
+         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
+                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>)) if $src;
        }
      }
      else
      { # Otherwise, push the single -src, if it exists.
-       push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
-                           : qq(<link rel="stylesheet" type="$type" href="$src"@other>)
+       push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
+                           : qq(<link rel="stylesheet" type="$type" href="$src"$other>)
             ) if $src;
       }
       if ($verbatim) {
@@ -1535,8 +1536,8 @@ sub _style {
       push(@result,style({'type'=>$type},"$cdata_start\n$code\n$cdata_end")) if $code;
     } else {
          my $src = $style;
-         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" @other/>)
-                             : qq(<link rel="stylesheet" type="$type" href="$src"@other>));
+         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
+                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>));
     }
     @result;
 }
