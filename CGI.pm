@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.143 2003-11-21 00:54:12 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.144 2003-12-03 13:57:10 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -233,7 +233,7 @@ if ($needs_binmode) {
 		':cgi'=>[qw/param upload path_info path_translated url self_url script_name cookie Dump
 			 raw_cookie request_method query_string Accept user_agent remote_host content_type
 			 remote_addr referer server_name server_software server_port server_protocol virtual_port
-			 virtual_host remote_ident auth_type http
+			 virtual_host remote_ident auth_type http append
 			 save_parameters restore_parameters param_fetch
 			 remote_user user_name header redirect import_names put 
 			 Delete Delete_all url_param cgi_error/],
