@@ -199,9 +199,13 @@ fatalsToBrowser(), which you should never call yourself!
      warningsToBrowser().  Replaced <CODE> tags with <PRE> in
      fatalsToBrowser() output.
 
+1.23 ineval() now checks both $^S and inspects the message for the "eval" pattern
+     (hack alert!) in order to accomodate various combinations of Perl and
+     mod_perl.
+
 =head1 AUTHORS
 
-Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
+Copyright 1995-2002, Lincoln D. Stein.  All rights reserved.  
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -227,7 +231,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 $main::SIG{__DIE__}=\&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.22';
+$CGI::Carp::VERSION = '1.23';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -290,7 +294,7 @@ sub _warn {
     }
 }
 
-sub ineval { $^S }
+sub ineval { $^S || _longmess() =~ /eval [\{\']/m }
 
 # The mod_perl package Apache::Registry loads CGI programs by calling
 # eval.  These evals don't count when looking at the stack backtrace.

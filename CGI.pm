@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.60 2002-03-27 18:17:33 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.61 2002-04-03 21:05:34 lstein Exp $';
 $CGI::VERSION='2.81';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -220,8 +220,8 @@ sub import {
     my $self = shift;
 
 # This causes modules to clash.  
-#    undef %EXPORT_OK;
-#    undef %EXPORT;
+    undef %EXPORT_OK;
+    undef %EXPORT;
 
     $self->_setup_symbols(@_);
     my ($callpack, $callfile, $callline) = caller;
