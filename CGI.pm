@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.171 2004-07-17 16:37:22 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.172 2004-09-04 21:53:05 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3717,7 +3717,7 @@ sub fillBuffer {
 	$self->{ZERO_LOOP_COUNTER}=0;
     }
 
-    $self->{LENGTH} -= $bytesRead;
+    $self->{LENGTH} -= $bytesRead if $bytesRead;
 }
 END_OF_FUNC
 
