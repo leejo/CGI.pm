@@ -1,5 +1,7 @@
-CGI.pm version 2.45 is now available for your fun and edification.
+CGI.pm version 2.46 is now available for your fun and edification.
 This version includes the following bug fixes and features:
+
+In 2.45:
 
 1. Fixed leaking file descriptor during uploads (thanks to Gerald
 Richter and Doug MacEachern for pointing this one out.)
@@ -21,7 +23,13 @@ quotes.
 You don't need them any more.  Trust me!
 
 7. Fixed CGI::Carp to run better under mod_perl (somewhat -- it will never
-be perfect).
+be perfect because some faults are untrappable).
+
+In 2.46:
+
+8. Fixed qw(-compile :all) problems.
+
+9. Fixed failure of mod_perl "include" tests.
 
 Lincoln Stein
 

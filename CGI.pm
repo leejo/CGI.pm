@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.4 1998-11-26 11:01:15 lstein Exp $';
-$CGI::VERSION='2.45';
+$CGI::revision = '$Id: CGI.pm,v 1.5 1998-12-06 10:19:48 lstein Exp $';
+$CGI::VERSION='2.46';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -121,8 +121,9 @@ $SL = {
 $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for Doug MacEachern's modperl
-if (defined($ENV{'GATEWAY_INTERFACE'}) && 
-    ($MOD_PERL = exists $ENV{'MOD_PERL'}))
+if (exists $ENV{'GATEWAY_INTERFACE'} 
+    && 
+    ($MOD_PERL = $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl/))
 {
     $| = 1;
     require Apache;
@@ -162,7 +163,7 @@ if ($needs_binmode) {
 		':form'=>[qw/textfield textarea filefield password_field hidden checkbox checkbox_group 
 			  submit reset defaults radio_group popup_menu button autoEscape
 			  scrolling_list image_button start_form end_form startform endform
-			  start_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
+			  start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART/],
 		':cgi'=>[qw/param path_info path_translated url self_url script_name cookie Dump
 			 raw_cookie request_method query_string Accept user_agent remote_host 
 			 remote_addr referer server_name server_software server_port server_protocol
@@ -1429,6 +1430,11 @@ sub start_form {
 }
 END_OF_FUNC
 
+'end_multipart_form' => <<'END_OF_FUNC',
+sub end_multipart_form {
+    &endform;
+}
+END_OF_FUNC
 
 #### Method: start_multipart_form
 # synonym for startform

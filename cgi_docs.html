@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.45, 11/26/98, L. Stein
+Version 2.46, 11/26/98, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -109,7 +109,7 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
   <LI><A HREF="#book">The CGI.pm Book</A>
   <LI><A HREF="#y2000">CGI.pm and the Year 2000 Problem</A>
   <LI><A HREF="#bugs">Bug Reporting and Support</A>
-  <LI><A HREF="#new">What's new in version 2.45?</A>
+  <LI><A HREF="#new">What's new in version 2.46?</A>
 </MENU>
 
 <HR>
@@ -119,7 +119,7 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 <ul>
   <li><STRONG><A HREF="CGI.pm.tar.gz">Download gzip tar archive (Unix)</A></STRONG>
   <li><STRONG><A HREF="CGI.pm.zip">Download pkzip archive (Windows)</A></STRONG>
-  <li><STRONG><A HREF="CGI.pm.sit">Download 2.45 sit archive  (Macintosh)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.sit">Download sit archive  (Macintosh)</A></STRONG>
   <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
 </ul>
 
@@ -173,7 +173,7 @@ In the former case don't panic.  Here's a recipe that will work
 (commands are given in MS-DOS/Windows form):
 
 <pre>
-  &gt; cd CGI.pm-2.45
+  &gt; cd CGI.pm-2.46
   &gt; copy CGI.pm C:\Perl\lib
   &gt; mkdir C:\Perl\lib\CGI
   &gt; copy CGI\*.pm C:\Perl\lib\CGI
@@ -4420,6 +4420,12 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.46</h3>
+<ol>
+  <li>Fix for failure of the "include" tests under mod_perl
+  <li>Added end_multipart_form to prevent failures during qw(-compile :all)
+</ol>
+
 <h3>Version 2.45</h3>
 <ol>
   <li>Multiple small documentation fixes
@@ -5052,6 +5058,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Nov 26 11:55:32 MET 1998
+Last modified: Sun Dec  6 10:18:51 GMT 1998
 <!-- hhmts end -->
 </BODY> </HTML>
