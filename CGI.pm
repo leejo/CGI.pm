@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.59 2002-02-19 23:32:47 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.60 2002-03-27 18:17:33 lstein Exp $';
 $CGI::VERSION='2.81';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -677,6 +677,10 @@ sub _reset_globals { initialize_globals(); }
 sub _setup_symbols {
     my $self = shift;
     my $compile = 0;
+
+    # to avoid reexporting unwanted variables
+    undef %EXPORT;
+
     foreach (@_) {
 	$HEADERS_ONCE++,         next if /^[:-]unique_headers$/;
 	$NPH++,                  next if /^[:-]nph$/;
