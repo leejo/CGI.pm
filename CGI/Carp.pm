@@ -493,7 +493,7 @@ END
     }
   } else {
     my $bytes_written = eval{tell STDOUT};
-    if (defined $bytes_written & $bytes_written > 0) {
+    if (defined $bytes_written && $bytes_written > 0) {
         print STDOUT $mess;
     }
     else {

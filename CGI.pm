@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.145 2003-12-10 15:16:08 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.146 2003-12-10 17:33:34 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -210,9 +210,9 @@ if ($OS eq 'VMS') {
 }
 
 if ($needs_binmode) {
-    $CGI::DefaultClass->binmode(main::STDOUT);
-    $CGI::DefaultClass->binmode(main::STDIN);
-    $CGI::DefaultClass->binmode(main::STDERR);
+    $CGI::DefaultClass->binmode(\*main::STDOUT);
+    $CGI::DefaultClass->binmode(\*main::STDIN);
+    $CGI::DefaultClass->binmode(\*main::STDERR);
 }
 
 %EXPORT_TAGS = (
@@ -564,7 +564,15 @@ sub init {
       # Check the command line and then the standard input for data.
       # We use the shellwords package in order to behave the way that
       # UN*X programmers expect.
-      $query_string = read_from_cmdline() if $DEBUG;
+      if ($DEBUG)
+      {
+          my $cmdline_ret = read_from_cmdline();
+          $query_string = $cmdline_ret->{'query_string'};
+          if (defined($cmdline_ret->{'subpath'}))
+          {
+              $self->path_info($cmdline_ret->{'subpath'});
+          }
+      }
   }
 
 # YL: Begin Change for XML handler 10/19/2001
@@ -691,6 +699,7 @@ sub all_parameters {
 
 # put a filehandle into binary mode (DOS)
 sub binmode {
+    return unless defined($_[1]) && defined fileno($_[1]);
     CORE::binmode($_[1]);
 }
 
@@ -3115,6 +3124,7 @@ END_OF_FUNC
 sub read_from_cmdline {
     my($input,@words);
     my($query_string);
+    my($subpath);
     if ($DEBUG && @ARGV) {
 	@words = @ARGV;
     } elsif ($DEBUG > 1) {
@@ -3134,7 +3144,12 @@ sub read_from_cmdline {
     } else {
 	$query_string = join('+',@words);
     }
-    return $query_string;
+    if ($query_string =~ /^(.*?)\?(.*)$/)
+    {
+        $query_string = $2;
+        $subpath = $1;
+    }
+    return { 'query_string' => $query_string, 'subpath' => $subpath };
 }
 END_OF_FUNC
 
@@ -3209,7 +3224,8 @@ sub read_multipart {
             $seqno += int rand(100);
           }
           die "CGI open of tmpfile: $!\n" unless defined $filehandle;
-	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
+	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
+                     && defined fileno($filehandle);
 
 	  # if this is an multipart/mixed attachment, save the header
 	  # together with the body for later parsing with an external
@@ -3397,6 +3413,8 @@ END_OF_AUTOLOAD
 ######################## MultipartBuffer ####################
 package MultipartBuffer;
 
+use constant DEBUG => 0;
+
 # how many bytes to read at a time.  We use
 # a 4K buffer by default.
 $INITIAL_FILLUNIT = 1024 * 4;
@@ -3479,7 +3497,7 @@ sub readHeader {
     my($ok) = 0;
     my($bad) = 0;
 
-    local($CRLF) = "\015\012" if $CGI::OS eq 'VMS' || $EBCDIC;
+    local($CRLF) = "\015\012" if $CGI::OS eq 'VMS' || $CGI::EBCDIC;
 
     do {
 	$self->fillBuffer($FILLUNIT);
@@ -3497,9 +3515,11 @@ sub readHeader {
     substr($self->{BUFFER},0,$end+4) = '';
     my %return;
 
-    warn "untranslated header=$header\n";
-    $header = ascii2ebcdic($header) if $EBCDIC;
-    warn "translated header=$header\n";
+    if ($CGI::EBCDIC) {
+      warn "untranslated header=$header\n" if DEBUG;
+      $header = CGI::Util::ascii2ebcdic($header);
+      warn "translated header=$header\n" if DEBUG;
+    }
 
     # See RFC 2045 Appendix A and RFC 822 sections 3.4.8
     #   (Folding Long Header Fields), 3.4.3 (Comments)
@@ -3529,9 +3549,12 @@ sub readBody {
     while (defined($data = $self->read)) {
 	$returnval .= $data;
     }
-    warn "untranslated body=$returnval\n";
-    $returnval = ascii2ebcdic($returnval) if $EBCDIC;
-    warn "translated body=$returnval\n";
+
+    if ($CGI::EBCDIC) {
+      warn "untranslated body=$returnval\n" if DEBUG;
+      $returnval = CGI::Util::ascii2ebcdic($returnval);
+      warn "translated body=$returnval\n"   if DEBUG;
+    }
     return $returnval;
 }
 END_OF_FUNC
@@ -3550,13 +3573,13 @@ sub read {
     # is never split between reads.
     $self->fillBuffer($bytes);
 
-    my $boundary_start = $EBCDIC ? ebcdic2ascii($self->{BOUNDARY})      : $self->{BOUNDARY};
-    my $boundary_end   = $EBCDIC ? ebcdic2ascii($self->{BOUNDARY}.'--') : $self->{BOUNDARY}.'--';
+    my $boundary_start = $CGI::EBCDIC ? CGI::Util::ebcdic2ascii($self->{BOUNDARY})      : $self->{BOUNDARY};
+    my $boundary_end   = $CGI::EBCDIC ? CGI::Util::ebcdic2ascii($self->{BOUNDARY}.'--') : $self->{BOUNDARY}.'--';
 
     # Find the boundary in the buffer (it may not be there).
     my $start = index($self->{BUFFER},$boundary_start);
 
-    print STDERR "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n";
+    warn "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n" if DEBUG;
     # protect against malformed multipart POST operations
     die "Malformed multipart POST\n" unless ($start >= 0) || ($self->{LENGTH} > 0);
 
@@ -3616,7 +3639,7 @@ sub fillBuffer {
     my $bytesRead = $self->{INTERFACE}->read_from_client(\$self->{BUFFER},
 							 $bytesToRead,
 							 $bufferLength);
-    print STDERR "bytesToRead=$bytesToRead, bufferLength=$bufferLength, buffer=$self->{BUFFER}\n";
+    warn "bytesToRead=$bytesToRead, bufferLength=$bufferLength, buffer=$self->{BUFFER}\n" if DEBUG;
     $self->{BUFFER} = '' unless defined $self->{BUFFER};
 
     # An apparent bug in the Apache server causes the read()
@@ -6624,6 +6647,11 @@ spaces and other funny characters in your parameter=value
 pairs:
 
    your_script.pl "name1='I am a long value'" "name2=two\ words"
+
+Finally, you can set the path info for the script by prefixing the first
+name/value parameter with the path followed by a question mark (?):
+
+    your_script.pl /your/path/here?name1=value1&name2=value2
 
 =head2 DUMPING OUT ALL THE NAME/VALUE PAIRS
 

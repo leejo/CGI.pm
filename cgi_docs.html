@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 3.01, X/XX/2003, L. Stein
+Version 3.01, 12/10/2003, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4854,6 +4854,9 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.01</h3>
 <ol>
+  <li>No fix yet for upload failures when running on EBCDIC server.
+  <li>Fixed uninitialized glob warnings that appeared when file uploading under perl 5.8.2.
+  <li>Added patch from Schlomi Fish to allow debugging of PATH_INFO from command line.
   <li>Added patch from Steve Hay to correctly unlink tmp files under mod_perl/windows
   <li>Added upload_hook functionality from Jamie LeTaul
   <li>Workarounds for mod_perl 2 IO issues.  Check that file upload and state saving still working.
@@ -5966,6 +5969,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Nov 13 08:52:38 EST 2003
+Last modified: Wed Dec 10 12:03:06 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>
