@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.51, 5/3/1999, L. Stein
+Version 2.52, 6/8/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -957,8 +957,7 @@ An alternative syntax for <code>redirect()</code> is:
 
 <blockquote><pre>
 print $query-&gt;redirect(-location=&gt;'http://somewhere.else/',
-                          -nph=&gt;1,
-                          -method=&gt;GET);
+                          -nph=&gt;1);
 </pre></blockquote>
 
 The <strong>-location</strong> parameter gives the destination URL.
@@ -2668,7 +2667,7 @@ By default, all the HTML produced by these functions comes out as one
 long line without carriage returns or indentation. This is yuck, but
 it does reduce the size of the documents by 10-20%.  To get
 pretty-printed output, please use <cite>CGI::Pretty</cite>, a subclass
-contributed by <a href="bpaulsen@lehman.com">Brian Paulsen</a>.
+contributed by <a href="mailto:bpaulsen@lehman.com">Brian Paulsen</a>.
 
 <H3>Optional Utility Functions</H3>
 
@@ -4549,7 +4548,7 @@ HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>.  When sending bug
 reports, please provide the following information:
 
 <ul>
-  <li>the version of CGI.pm (<code>perl -MCGI 'print $CGI::VERSION'</code>)
+  <li>the version of CGI.pm (<code>perl -MCGI -e 'print '$CGI::VERSION'</code>)
   <li>the version of Perl (<code>perl -v</code>)
   <li>the name and version of your Web server
   <li>the name and version of the operating system you are using
@@ -4567,6 +4566,16 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.52</h3>
+<ol>
+  <li>Spurious newline in checkbox() routine removed. (courtesy John Essen)
+  <li>TEXTAREA linebreaks now respected in dump() routine. (courtesy John Essen)
+  <li>Patches for DOS ports (courtesy Robert Davies)
+  <li>Patches for VMS
+  <li>More fixes for cookie problems
+  <li>Fix CGI::Carp so that it doesn't affect eval{} blocks (courtesy Byron Brummer)
+</ol>
+
 <h3>Version 2.51</h3>
 <ol>
   <li>Fixed problems with cookies not being remembered when sent to IE 5.0 (and Netscape 5.0 too?)
@@ -5248,6 +5257,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon May  3 14:06:21 EDT 1999
+Last modified: Tue Jun  8 11:06:02 EDT 1999
 <!-- hhmts end -->
 </BODY> </HTML>

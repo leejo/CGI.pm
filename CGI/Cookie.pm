@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.08';
+$CGI::Cookie::VERSION='1.10';
 
 use CGI;
 use overload '""' => \&as_string,
@@ -96,9 +96,9 @@ sub new {
 	'value'=>[@values],
 	},$class;
 
-    # IE requires the path to be present for some reason.
-    ($path = $ENV{'SCRIPT_NAME'})=~s![^/]+$!! unless $path;
-    $domain ||= $ENV{'SERVER_NAME'};
+    # IE requires the path and domain to be present for some reason.
+    $path   ||= CGI::url(-absolute=>1);
+    $domain ||= CGI::virtual_host();
 
     $self->path($path) if defined $path;
     $self->domain($domain) if defined $domain;
