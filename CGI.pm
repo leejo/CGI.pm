@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.119 2003-06-01 19:14:13 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.120 2003-06-01 19:47:23 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -534,7 +534,8 @@ sub init {
 # YL: Begin Change for XML handler 10/19/2001
     if ($meth eq 'POST'
         && defined($ENV{'CONTENT_TYPE'})
-        && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded| ) {
+        && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
+	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
         my($param) = 'POSTDATA' ;
         $self->add_parameter($param) ;
       push (@{$self->{$param}},$query_string);
