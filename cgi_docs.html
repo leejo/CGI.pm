@@ -1870,14 +1870,12 @@ UPLOAD_HOOK facility available in Apache::Request, with the exception
 that the first argument to the callback is an Apache::Upload object,
 here it's the remote filename.
 
-<pre>
-$q = CGI-&gt;new(undef, \&hook, $data);
-</pre>
 <p>
 
 <pre>
-sub hook
- {
+ $q = CGI-&gt;new();
+ $q-&gt;upload_hook(\&hook,$data);
+ sub hook  {
         my ($filename, $buffer, $bytes_read, $data) = @_;
         print  "Read $bytes_read bytes of $filename\n";         
  }
@@ -5967,6 +5965,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sat Nov  8 11:02:17 EST 2003
+Last modified: Sat Nov  8 18:19:01 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>

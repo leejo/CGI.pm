@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.138 2003-11-08 16:02:38 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.139 2003-11-08 23:25:52 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -293,14 +293,8 @@ sub expand_tags {
 # for an existing query string, and initialize itself, if so.
 ####
 sub new {
-  my($class,$initializer, $hook, $data) = @_;
+  my($class,@initializer) = @_;
   my $self = {};
-
-  if ($hook)
-  {
-    $self->{'.upload_hook'} = $hook;
-    $self->{'.upload_data'} = $data;
-  }
 
   bless $self,ref $class || $class || $DefaultClass;
   if (ref($initializer[0])
@@ -495,24 +489,21 @@ sub init {
 	      }
 	      last METHOD;
 	  }
-	  
-	  if (defined($fh) && ($fh ne '')) {
-	    my $data;
-	    my $offset = 0;
-	    while (1) {
-	      my $bytes = $self->read_from_client($fh,\$data,1024,$offset);
-	      $offset += $bytes;
-	      last unless $bytes;
-	    }
-	    push @lines,split("\n",$data);
-	    # massage back into standard format
-	    if ("@lines" =~ /=/) {
-	      $query_string=join("&",@lines);
-	    } else {
-	      $query_string=join("+",@lines);
-	    }
-	    last METHOD;
-	  }
+
+          if (defined($fh) && ($fh ne '')) {
+              while (<$fh>) {
+                  chomp;
+                  last if /^=/;
+                  push(@lines,$_);
+              }
+              # massage back into standard format
+              if ("@lines" =~ /=/) {
+                  $query_string=join("&",@lines);
+              } else {
+                  $query_string=join("+",@lines);
+              }
+              last METHOD;
+          }
 
 	  # last chance -- treat it as a string
 	  $initializer = $$initializer if ref($initializer) eq 'SCALAR';
@@ -534,7 +525,7 @@ sub init {
       }
 
       if ($meth eq 'POST') {
-	  $self->read_from_client(\*STDIN,\$query_string,$content_length,0)
+	  $self->read_from_client(\$query_string,$content_length,0)
 	      if $content_length > 0;
 	  # Some people want to have their cake and eat it too!
 	  # Uncomment this line to have the contents of the query string
@@ -842,20 +833,19 @@ END_OF_FUNC
 'new_MultipartBuffer' => <<'END_OF_FUNC',
 # Create a new multipart buffer
 sub new_MultipartBuffer {
-    my($self,$boundary,$length,$filehandle) = @_;
-    return MultipartBuffer->new($self,$boundary,$length,$filehandle);
+    my($self,$boundary,$length) = @_;
+    return MultipartBuffer->new($self,$boundary,$length);
 }
 END_OF_FUNC
 
 'read_from_client' => <<'END_OF_FUNC',
 # Read data from a file handle
 sub read_from_client {
-    my($self, $fh, $buff, $len, $offset) = @_;
+    my($self, $buff, $len, $offset) = @_;
     local $^W=0;                # prevent a warning
-    return undef unless defined($fh);
-    return $MOD_PERL && fileno($fh) == fileno(\*STDIN||0)
+    return $MOD_PERL
         ? $self->r->read($$buff, $len, $offset)
-        : read($fh, $$buff, $len, $offset);
+        : read(\*STDIN, $$buff, $len, $offset);
 }
 END_OF_FUNC
 
@@ -3103,7 +3093,7 @@ sub read_from_cmdline {
 	@words = @ARGV;
     } elsif ($DEBUG > 1) {
 	require "shellwords.pl";
-	print STDERR "(offline mode: enter name=value pairs on standard input)\n";
+	print STDERR "(offline mode: enter name=value pairs on standard input; press ^D or ^Z when done)\n";
 	chomp(@lines = <STDIN>); # remove newlines
 	$input = join(" ",@lines);
 	@words = &shellwords($input);    
@@ -3132,8 +3122,8 @@ END_OF_FUNC
 #####
 'read_multipart' => <<'END_OF_FUNC',
 sub read_multipart {
-    my($self,$boundary,$length,$filehandle) = @_;
-    my($buffer) = $self->new_MultipartBuffer($boundary,$length,$filehandle);
+    my($self,$boundary,$length) = @_;
+    my($buffer) = $self->new_MultipartBuffer($boundary,$length);
     return unless $buffer;
     my(%header,$body);
     my $filenumber = 0;
@@ -3208,12 +3198,14 @@ sub read_multipart {
 	  my ($data);
 	  local($\) = '';
           my $totalbytes;
-           while (defined($data = $buffer->read)) {
+          while (defined($data = $buffer->read)) {
               if (defined $self->{'.upload_hook'})
                {
                   $totalbytes += length($data);
                    &{$self->{'.upload_hook'}}($filename ,$data, $totalbytes, $self->{'.upload_data'});
               }
+	      print $filehandle $data;
+          }
 
 	  # back up to beginning of file
 	  seek($filehandle,0,0);
@@ -3400,16 +3392,8 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 
 'new' => <<'END_OF_FUNC',
 sub new {
-    my($package,$interface,$boundary,$length,$filehandle) = @_;
+    my($package,$interface,$boundary,$length) = @_;
     $FILLUNIT = $INITIAL_FILLUNIT;
-    my $IN;
-    if ($filehandle) {
-	my($package) = caller;
-	# force into caller's package if necessary
-	$IN = $filehandle=~/[':]/ ? $filehandle : "$package\:\:$filehandle"; 
-    }
-    $IN = "main::STDIN" unless $IN;
-
     $CGI::DefaultClass->binmode($IN); # if $CGI::needs_binmode;  # just do it always
     
     # If the user types garbage into the file upload field,
@@ -3433,7 +3417,7 @@ sub new {
     } else { # otherwise we find it ourselves
 	my($old);
 	($old,$/) = ($/,$CRLF); # read a CRLF-delimited line
-	$boundary = <$IN>;      # BUG: This won't work correctly under mod_perl
+	$boundary = <STDIN>;      # BUG: This won't work correctly under mod_perl
 	$length -= length($boundary);
 	chomp($boundary);               # remove the CRLF
 	$/ = $old;                      # restore old line separator
@@ -3442,7 +3426,6 @@ sub new {
 
     my $self = {LENGTH=>$length,
 		BOUNDARY=>$boundary,
-		IN=>$IN,
 		INTERFACE=>$interface,
 		BUFFER=>'',
 	    };
@@ -3522,7 +3505,7 @@ sub read {
     my($self,$bytes) = @_;
 
     # default number of bytes to read
-    $bytes = $bytes || $FILLUNIT;       
+    $bytes = $bytes || $FILLUNIT;
 
     # Fill up our internal buffer in such a way that the boundary
     # is never split between reads.
@@ -3582,9 +3565,8 @@ sub fillBuffer {
     my($bytesToRead) = $bytes - $bufferLength + $boundaryLength + 2;
     $bytesToRead = $self->{LENGTH} if $self->{LENGTH} < $bytesToRead;
 
-    # Try to read some data.  We may hang here if the browser is screwed up.  
-    my $bytesRead = $self->{INTERFACE}->read_from_client($self->{IN},
-							 \$self->{BUFFER},
+    # Try to read some data.  We may hang here if the browser is screwed up.
+    my $bytesRead = $self->{INTERFACE}->read_from_client(\$self->{BUFFER},
 							 $bytesToRead,
 							 $bufferLength);
     $self->{BUFFER} = '' unless defined $self->{BUFFER};
@@ -5588,7 +5570,8 @@ UPLOAD_HOOK facility available in Apache::Request, with the exception
 that the first argument to the callback is an Apache::Upload object,
 here it's the remote filename.
 
- $q = CGI->new(undef, \&hook, $data);
+ $q = CGI->new();
+ $q->upload_hook(\&hook,$data);
 
  sub hook
  {
