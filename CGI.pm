@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.164 2004-04-05 17:38:12 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.165 2004-04-12 20:37:26 lstein Exp $';
 $CGI::VERSION=3.05;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1718,7 +1718,7 @@ sub startform {
     }
     else {
        $action = $self->escapeHTML($self->url(-absolute=>1,-path=>1));
-       if (length($ENV{QUERY_STRING})>0) {
+       if (exists $ENV{QUERY_STRING} && length($ENV{QUERY_STRING})>0) {
            $action .= "?".$self->escapeHTML($ENV{QUERY_STRING},1);
        }
     }
