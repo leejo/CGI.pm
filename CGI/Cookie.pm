@@ -75,6 +75,9 @@ sub get_raw_cookie {
   if ($r) {
     $raw_cookie = $r->headers_in->{'Cookie'};
   } else {
+    if ($MOD_PERL && !exists $ENV{REQUEST_METHOD}) {
+      die "Run $r->subprocess_env; before calling fetch()";
+    }
     $raw_cookie = $ENV{HTTP_COOKIE} || $ENV{COOKIE};
   }
 }
