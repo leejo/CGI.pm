@@ -1808,7 +1808,7 @@ by calling <A HREF="#startform">startform()</A>
 and specify an encoding type of <CODE>$CGI::MULTIPART</CODE>
 or by using the new <A HREF="#multipart">start_multipart_form()</A>
 method.  If you don't use multipart encoding, then you'll be
-able to retreive the name of the file selected by the remote
+able to retrieve the name of the file selected by the remote
 user, but you won't be able to access its contents.
 
 <P>
@@ -1985,24 +1985,6 @@ careful to use the proper capitalization for "Content-Type"!):
        unless ($type eq 'text/html') {
 	  die "HTML FILES ONLY!";
        }
-</pre>
-
-<p>
-
-You can set up a callback that will be called whenever a file upload
-is being read during the form processing. This is much like the
-UPLOAD_HOOK facility available in Apache::Request, with the exception
-that the first argument to the callback is an Apache::Upload object,
-here it's the remote filename.
-
-<pre>
- $q = CGI->new(undef, \&hook, $data);
-
- sub hook
- {
-        my ($filename, $buffer, $bytes_read, $data) = @_;
-        print  "Read $bytes_read bytes of $filename\n";         
- }
 </pre>
 
 
@@ -6065,6 +6047,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Fri Jun  4 16:21:55 EDT 2004
+Last modified: Wed Jun 16 16:05:19 EDT 2004
 <!-- hhmts end -->
 </BODY> </HTML>

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.168 2004-06-14 02:44:19 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.169 2004-07-08 19:24:26 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3706,7 +3706,7 @@ sub fillBuffer {
     # remote user aborts during a file transfer.  I don't know how
     # they manage this, but the workaround is to abort if we get
     # more than SPIN_LOOP_MAX consecutive zero reads.
-    if ($bytesRead == 0) {
+    if ($bytesRead <= 0) {
 	die  "CGI.pm: Server closed socket during multipart read (client aborted?).\n"
 	    if ($self->{ZERO_LOOP_COUNTER}++ >= $SPIN_LOOP_MAX);
     } else {
