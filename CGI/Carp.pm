@@ -239,6 +239,10 @@ non-overridden program name
 1.24 Patch from Scott Gifford (sgifford@suspectclass.com): Add support
      for overriding program name.
 
+1.26 Replaced CORE::GLOBAL::die with the evil $SIG{__DIE__} because the
+     former isn't working in some people's hands.  There is no such thing
+     as reliable exception handling in Perl.
+
 =head1 AUTHORS
 
 Copyright 1995-2002, Lincoln D. Stein.  All rights reserved.  
@@ -267,12 +271,15 @@ use File::Spec;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(confess croak carp);
-@EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message set_progname cluck ^name=);
+@EXPORT_OK = qw(carpout fatalsToBrowser warningsToBrowser wrap set_message set_progname cluck ^name= die);
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
-*CORE::GLOBAL::die = \&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.25';
+$main::SIG{__DIE__} =\&CGI::Carp::die;
+# *CORE::GLOBAL::die = \&CGI::Carp::die;
+$CGI::Carp::VERSION    = '1.26';
 $CGI::Carp::CUSTOM_MSG = undef;
+
+sub die(@);
 
 # fancy import routine detects and handles 'errorWrap' specially.
 sub import {
@@ -294,6 +301,7 @@ sub import {
     $Exporter::ExportLevel = 1;
     Exporter::import($pkg,keys %routines);
     $Exporter::ExportLevel = $oldlevel;
+#    $pkg->export('CORE::GLOBAL','die');
 }
 
 # These are the originals
@@ -367,7 +375,7 @@ sub ineval {
   (exists $ENV{MOD_PERL} ? 0 : $^S) || _longmess() =~ /eval [\{\']/m
 }
 
-sub die {
+sub die (@) {
   my ($arg) = @_;
   realdie @_ if ineval;
   if (!ref($arg)) {
@@ -442,7 +450,7 @@ END
       $outer_message = $CUSTOM_MSG;
     }
   }
-    
+
   my $mess = <<END;
 <h1>Software error:</h1>
 <pre>$msg</pre>
@@ -451,7 +459,7 @@ $outer_message
 </p>
 END
   ;
-  
+
   if ($mod_perl) {
     require mod_perl;
     if ($mod_perl::VERSION >= 1.99) {
@@ -472,15 +480,11 @@ END
       $r->print($mess);
       $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
     } else {
-      # MSIE browsers don't show the $mess when sent
-      # a custom 500 response.
+      # MSIE won't display a custom 500 response unless it is >512 bytes!
       if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
-	$r->send_http_header('text/html');
-	$r->print($mess);
-	$mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
-      } else {
-	$r->custom_response(500,$mess);
+        $mess = "<!-- " . (' ' x 513) . " -->\n$mess";
       }
+      $r->custom_response(500,$mess);
     }
   } else {
     print STDOUT $mess;
