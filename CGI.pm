@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.103 2003-04-14 18:52:26 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.104 2003-04-14 19:11:31 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1365,13 +1365,14 @@ sub redirect {
     my(@o);
     foreach (@other) { tr/\"//d; push(@o,split("=",$_,2)); }
     unshift(@o,
-	 '-Status'=>'302 Moved',
-	 '-Location'=>$url,
-	 '-nph'=>$nph);
+	 '-Status'  => '302 Moved',
+	 '-Location'=> $url,
+	 '-nph'     => $nph);
     unshift(@o,'-Target'=>$target) if $target;
-    unshift(@o,'-Cookie'=>$cookie) if $cookie;
     unshift(@o,'-Type'=>'');
-    return $self->header(map {$self->unescapeHTML($_)} @o);
+    my @unescaped;
+    unshift(@unescaped,'-Cookie'=>$cookie) if $cookie;
+    return $self->header((map {$self->unescapeHTML($_)} @o),@unescaped);
 }
 END_OF_FUNC
 
