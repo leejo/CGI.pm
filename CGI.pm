@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.114 2003-05-11 22:56:07 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.115 2003-05-12 00:22:27 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1136,12 +1136,12 @@ sub Dump {
     push(@result,"<ul>");
     foreach $param ($self->param) {
 	my($name)=$self->escapeHTML($param);
-	push(@result,"<li><strong>$param</strong>");
+	push(@result,"<li><strong>$param</strong></li>");
 	push(@result,"<ul>");
 	foreach $value ($self->param($param)) {
 	    $value = $self->escapeHTML($value);
-            $value =~ s/\n/<br>\n/g;
-	    push(@result,"<li>$value");
+            $value =~ s/\n/<br />\n/g;
+	    push(@result,"<li>$value</li>");
 	}
 	push(@result,"</ul>");
     }
