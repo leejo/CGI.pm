@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.28 2000-03-28 02:17:42 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.29 2000-03-28 02:44:24 lstein Exp $';
 $CGI::VERSION='2.61';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3193,12 +3193,14 @@ unless ($TMPDIRECTORY) {
            "${SL}WWW_ROOT", "${SL}SYS\$SCRATCH");
     unshift(@TEMP,$ENV{'TMPDIR'}) if exists $ENV{'TMPDIR'};
 
+    # this feature was supposed to provide per-user tmpfiles, but
+    # it is problematic.
     #    unshift(@TEMP,(getpwuid($<))[7].'/tmp') if $CGI::OS eq 'UNIX';
     # Rob: getpwuid() is unfortunately UNIX specific. On brain dead OS'es this
     #    : can generate a 'getpwuid() not implemented' exception, even though
     #    : it's never called.  Found under DOS/Win with the DJGPP perl port.
     #    : Refer to getpwuid() only at run-time if we're fortunate and have  UNIX.
-    unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
+    # unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
 
     foreach (@TEMP) {
 	do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;

@@ -4140,12 +4140,11 @@ directory that the script resides in.
 
 <P>
 
-If you're on a non-Unix system you may need to modify
-CGI.pm to point at a suitable temporary directory. This
-directory must be
-writable by the user ID under which the server runs (usually
-"nobody") and must have sufficient capacity to handle large
-file uploads.  Open up CGI.pm, and find the line:
+If you're on a non-Unix system you may need to modify CGI.pm to point
+at a suitable temporary directory. This directory must be writable by
+the user ID under which the server runs (usually "nobody") and must
+have sufficient capacity to handle large file uploads.  Open up
+CGI.pm, and find the line:
 
 <PRE>
       package TempFile;
@@ -4630,6 +4629,7 @@ you.
 <ol>
   <li>Moved more functions from CGI.pm proper into CGI/Util.pm.  CGI/Cookie should now be
       standalone.
+  <li>Disabled per-user temporary directories, which were causing grief.
 </ol>
 
 <h3>Version 2.60</h3>
@@ -5389,6 +5389,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Mar 27 21:14:47 EST 2000
+Last modified: Mon Mar 27 21:43:48 EST 2000
 <!-- hhmts end -->
 </BODY> </HTML>
