@@ -30,6 +30,7 @@ if (exists $ENV{MOD_PERL}) {
     if ($float >= 1.99) {
       $MOD_PERL = 2;
       require Apache::RequestUtil;
+      eval "require APR::Table";  # Changing APIs? I hope not.
     } else {
       $MOD_PERL = 1;
       require Apache;
@@ -201,7 +202,7 @@ sub value {
 sub domain {
     my $self = shift;
     my $domain = shift;
-    $self->{'domain'} = $domain if defined $domain;
+    $self->{'domain'} = lc $domain if defined $domain;
     return $self->{'domain'};
 }
 

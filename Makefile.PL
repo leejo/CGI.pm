@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
-require 5.004;
+require 5.6.0;
 
 system("perl", "t/gen-tests/gen-start-end-tags.pl");
 

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.172 2004-09-04 21:53:05 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.173 2004-09-28 20:05:03 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3279,7 +3279,7 @@ sub read_multipart {
           }
 
 	  # choose a relatively unpredictable tmpfile sequence number
-          my $seqno = unpack("%16C*",join('',localtime,values %ENV));
+          my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
 	    next unless $tmpfile = new CGITempFile($seqno);
 	    $tmp = $tmpfile->as_string;
@@ -3417,6 +3417,11 @@ $FH='fh00000';
 
 *Fh::AUTOLOAD = \&CGI::AUTOLOAD;
 
+sub DESTROY {
+    my $self = shift;
+    close $self;
+}
+
 $AUTOLOADED_ROUTINES = '';      # prevent -w error
 $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 %SUBS =  (
@@ -3460,13 +3465,6 @@ sub new {
     unlink($safe) if $delete;
     CORE::delete $Fh::{$fv};
     return bless $ref,$pack;
-}
-END_OF_FUNC
-
-'DESTROY'  => <<'END_OF_FUNC',
-sub DESTROY {
-    my $self = shift;
-    close $self;
 }
 END_OF_FUNC
 
