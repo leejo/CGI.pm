@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.167 2004-06-04 20:22:25 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.168 2004-06-14 02:44:19 lstein Exp $';
 $CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -5840,9 +5840,9 @@ Named parameter style
 
   print $query->popup_menu(-name=>'menu_name',
                   -values=>[qw/eenie meenie minie/,
-                            $q->optgroup(-name=>'optgroup_name',
-                                         -values ['moe','catch'],
-                                         -attributes=>{'catch'=>{'class'=>'red'}}),
+                            $query->optgroup(-name=>'optgroup_name',
+                                             -values ['moe','catch'],
+                                             -attributes=>{'catch'=>{'class'=>'red'}}),
                   -labels=>{'eenie'=>'one',
                             'meenie'=>'two',
                             'minie'=>'three'},
@@ -5851,8 +5851,8 @@ Named parameter style
   Old style
   print $query->popup_menu('menu_name',
                   ['eenie','meenie','minie',
-                   $q->optgroup('optgroup_name', ['moe', 'catch'],
-                         {'catch'=>{'class'=>'red'}})],'meenie',
+                   $query->optgroup('optgroup_name', ['moe', 'catch'],
+                                   {'catch'=>{'class'=>'red'}})],'meenie',
                   {'eenie'=>'one','meenie'=>'two','minie'=>'three'});
 
 optgroup creates an option group within a popup menu.
