@@ -42,3 +42,5 @@ t/function.t
 t/html.t
 t/request.t
 t/pretty.t
+t/push.t
+

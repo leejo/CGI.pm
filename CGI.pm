@@ -18,12 +18,12 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.52 2001-08-27 19:08:57 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.53 2001-09-26 01:27:10 lstein Exp $';
 $CGI::VERSION='2.78';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
-# $TempFile::TMPDIRECTORY = '/usr/tmp';
+# $CGITempFile::TMPDIRECTORY = '/usr/tmp';
 use CGI::Util qw(rearrange make_attributes unescape escape expires);
 
 use constant XHTML_DTD => ['-//W3C//DTD XHTML Basic 1.0//EN',
@@ -1826,9 +1826,9 @@ sub checkbox {
 
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined $self->param($name))) {
-	$checked = grep($_ eq $value,$self->param($name)) ? ' checked' : '';
+	$checked = grep($_ eq $value,$self->param($name)) ? ' checked="checked"' : '';
     } else {
-	$checked = $checked ? qq/ checked/ : '';
+	$checked = $checked ? qq/ checked="checked"/ : '';
     }
     my($the_label) = defined $label ? $label : $name;
     $name = $self->escapeHTML($name);
@@ -1893,7 +1893,7 @@ sub checkbox_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	$checked = $checked{$_} ? qq/ checked/ : '';
+	$checked = $checked{$_} ? qq/ checked="checked"/ : '';
 	$label = '';
 	unless (defined($nolabels) && $nolabels) {
 	    $label = $_;
@@ -2041,7 +2041,7 @@ sub radio_group {
 
     my($other) = @other ? " @other" : '';
     foreach (@values) {
-	my($checkit) = $checked eq $_ ? qq/ checked/ : '';
+	my($checkit) = $checked eq $_ ? qq/ checked="checked"/ : '';
 	my($break);
 	if ($linebreak) {
           $break = $XHTML ? "<br />" : "<br>";
@@ -2102,7 +2102,7 @@ sub popup_menu {
 
     $result = qq/<select name="$name"$other>\n/;
     foreach (@values) {
-	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected/ : '' ) : '';
+	my($selectit) = defined($selected) ? ($selected eq $_ ? qq/selected="selected"/ : '' ) : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	my($value) = $self->escapeHTML($_);
@@ -2149,14 +2149,14 @@ sub scrolling_list {
     $size = $size || scalar(@values);
 
     my(%selected) = $self->previous_or_default($name,$defaults,$override);
-    my($is_multiple) = $multiple ? qq/ multiple/ : '';
+    my($is_multiple) = $multiple ? qq/ multiple="multiple"/ : '';
     my($has_size) = $size ? qq/ size="$size"/: '';
     my($other) = @other ? " @other" : '';
 
     $name=$self->escapeHTML($name);
     $result = qq/<select name="$name"$has_size$is_multiple$other>\n/;
     foreach (@values) {
-	my($selectit) = $selected{$_} ? qq/selected/ : '';
+	my($selectit) = $selected{$_} ? qq/selected="selected"/ : '';
 	my($label) = $_;
 	$label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	$label=$self->escapeHTML($label);
@@ -2229,7 +2229,7 @@ sub image_button {
     my($name,$src,$alignment,@other) =
 	rearrange([NAME,SRC,ALIGN],@p);
 
-    my($align) = $alignment ? " align=\U$alignment" : '';
+    my($align) = $alignment ? " align=\U\"$alignment\"" : '';
     my($other) = @other ? " @other" : '';
     $name=$self->escapeHTML($name);
     return $XHTML ? qq(<input type="image" name="$name" src="$src"$align$other />)
@@ -2920,7 +2920,7 @@ sub read_multipart {
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = new TempFile($seqno);
+	    next unless $tmpfile = new CGITempFile($seqno);
 	    $tmp = $tmpfile->as_string;
 	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
@@ -3258,7 +3258,8 @@ sub read {
     substr($self->{BUFFER},0,$bytesToReturn)='';
     
     # If we hit the boundary, remove the CRLF from the end.
-    return ($start > 0) ? substr($returnval,0,-2) : $returnval;
+    return (($start > 0) && ($start <= $bytes)) 
+           ? substr($returnval,0,-2) : $returnval;
 }
 END_OF_FUNC
 
@@ -3315,7 +3316,7 @@ END_OF_AUTOLOAD
 ####################################################################################
 ################################## TEMPORARY FILES #################################
 ####################################################################################
-package TempFile;
+package CGITempFile;
 
 $SL = $CGI::SL;
 $MAC = $CGI::OS eq 'MACINTOSH';
@@ -3347,7 +3348,7 @@ $MAXTRIES = 5000;
 
 # cute feature, but overload implementation broke it
 # %OVERLOAD = ('""'=>'as_string');
-*TempFile::AUTOLOAD = \&CGI::AUTOLOAD;
+*CGITempFile::AUTOLOAD = \&CGI::AUTOLOAD;
 
 ###############################################################################
 ################# THESE FUNCTIONS ARE AUTOLOADED ON DEMAND ####################

@@ -218,6 +218,7 @@ CGI::Response
 require 5.000;
 use Exporter;
 use Carp;
+use File::Spec;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(confess croak carp);
@@ -225,7 +226,7 @@ use Carp;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 $main::SIG{__DIE__}=\&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.20';
+$CGI::Carp::VERSION = '1.21';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -248,19 +249,19 @@ sub realdie { CORE::die(@_); }
 sub id {
     my $level = shift;
     my($pack,$file,$line,$sub) = caller($level);
-    my($id) = $file=~m|([^/]+)$|;
+    my($dev,$dirs,$id) = File::Spec->splitpath($file);
     return ($file,$line,$id);
 }
 
 sub stamp {
     my $time = scalar(localtime);
     my $frame = 0;
-    my ($id,$pack,$file);
+    my ($id,$pack,$file,$dev,$dirs);
     do {
 	$id = $file;
 	($pack,$file) = caller($frame++);
     } until !$file;
-    ($id) = $id=~m|([^/]+)$|;
+    ($dev,$dirs,$id) = File::Spec->splitpath($id);
     return "[$time] $id: ";
 }
 
