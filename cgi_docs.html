@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.94, 5/11/2003, L. Stein
+Version 2.94, 6/1/2003, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4777,6 +4777,13 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.94</h3>
 <ol>
+  <li>Removed warning from reset() method.
+  <li>Moved <area> and <map> tags into the :html3 group.  Hope this
+      removes undefined CGI::Area errors.
+  <li>Changed CGI::Carp to play with mod_perl2 and to (hopefully)
+      restore reporting of compile-time errors.
+  <li>Fixed potential deadlock between web server and CGI.pm when aborting a read due to POST_MAX
+      (reported by Antti Lankila).
   <li>Fixed issue with tag-generating function not incorporating content when first variable undef.
   <li>Fixed cross-site scripting bug reported by obscure.
   <li>Fixed Dump() function to return correctly formed XHTML - bug reported by Ralph Siemsen.
@@ -5835,6 +5842,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu May 29 11:16:07 EDT 2003
+Last modified: Sun Jun  1 15:02:09 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>

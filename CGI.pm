@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.118 2003-05-29 15:16:28 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.119 2003-06-01 19:14:13 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -221,7 +221,7 @@ if ($needs_binmode) {
 			   base body Link nextid title meta kbd start_html end_html
 			   input Select option comment charset escapeHTML/],
 		':html3'=>[qw/div table caption th td TR Tr sup Sub strike applet Param 
-			   embed basefont style span layer ilayer font frameset frame script small big/],
+			   embed basefont style span layer ilayer font frameset frame script small big Area Map/],
                 ':html4'=>[qw/abbr acronym bdo col colgroup del fieldset iframe
                             ins label legend noframes noscript object optgroup Q 
                             thead tbody tfoot/], 
@@ -238,7 +238,6 @@ if ($needs_binmode) {
 			 remote_user user_name header redirect import_names put 
 			 Delete Delete_all url_param cgi_error/],
 		':ssl' => [qw/https/],
-		':imagemap' => [qw/Area Map/],
 		':cgi-lib' => [qw/ReadParse PrintHeader HtmlTop HtmlBot SplitParam Vars/],
 		':html' => [qw/:html2 :html3 :html4 :netscape/],
 		':standard' => [qw/:html2 :html3 :html4 :form :cgi/],
@@ -445,6 +444,12 @@ sub init {
 
       # avoid unreasonably large postings
       if (($POST_MAX > 0) && ($content_length > $POST_MAX)) {
+	# quietly read and discard the post
+	  my $buffer;
+	  my $max = $content_length;
+	  while ($max > 0 && (my $bytes = read(STDIN,$buffer,$max < 10000 ? $max : 10000))) {
+	    $max -= $bytes;
+	  }
 	  $self->cgi_error("413 Request entity too large");
 	  last METHOD;
       }
@@ -662,7 +667,7 @@ sub _make_tag_func {
 	    my(\@attr) = make_attributes(\$a,\$q->{'escape'});
 	    \$attr = " \@attr" if \@attr;
 	  } else {
-	    unshift \@rest,\$a;
+	    unshift \@rest,\$a if defined \$a;
 	  }
 	);
     if ($tagname=~/start_(\w+)/i) {
@@ -671,7 +676,6 @@ sub _make_tag_func {
 	$func .= qq! return "<\L/$1\E>"; } !;
     } else {
 	$func .= qq#
-\#	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest && defined(\$rest[0]);
 	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest;
 	    my(\$tag,\$untag) = ("\L<$tagname\E\$attr>","\L</$tagname>\E");
 	    my \@result = map { "\$tag\$_\$untag" } 
