@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.144 2003-12-03 13:57:10 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.145 2003-12-10 15:16:08 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3555,6 +3555,8 @@ sub read {
 
     # Find the boundary in the buffer (it may not be there).
     my $start = index($self->{BUFFER},$boundary_start);
+
+    print STDERR "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n";
     # protect against malformed multipart POST operations
     die "Malformed multipart POST\n" unless ($start >= 0) || ($self->{LENGTH} > 0);
 
@@ -3614,6 +3616,7 @@ sub fillBuffer {
     my $bytesRead = $self->{INTERFACE}->read_from_client(\$self->{BUFFER},
 							 $bytesToRead,
 							 $bufferLength);
+    print STDERR "bytesToRead=$bytesToRead, bufferLength=$bufferLength, buffer=$self->{BUFFER}\n";
     $self->{BUFFER} = '' unless defined $self->{BUFFER};
 
     # An apparent bug in the Apache server causes the read()
