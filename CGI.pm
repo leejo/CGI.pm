@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.46 2000-09-13 17:15:05 lstein Exp $';
-$CGI::VERSION='2.74';
+$CGI::revision = '$Id: CGI.pm,v 1.47 2000-10-05 18:04:12 lstein Exp $';
+$CGI::VERSION='2.75';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1657,7 +1657,7 @@ sub button {
     $script=$self->escapeHTML($script);
 
     my($name) = '';
-    $name = qq/ NAME="$label"/ if $label;
+    $name = qq/ name="$label"/ if $label;
     $value = $value || $label;
     my($val) = '';
     $val = qq/ value="$value"/ if $value;
@@ -2156,7 +2156,7 @@ sub hidden {
     $name=$self->escapeHTML($name);
     foreach (@value) {
 	$_ = defined($_) ? $self->escapeHTML($_,1) : '';
-	push @result,$XHTMl ? qq(<input type="hidden" name="$name" value="$_" />)
+	push @result,$XHTML ? qq(<input type="hidden" name="$name" value="$_" />)
                             : qq(<input type="hidden" name="$name" value="$_">);
     }
     return wantarray ? @result : join('',@result);
@@ -4342,7 +4342,7 @@ The B<-lang> argument is used to incorporate a language attribute into
 the <HTML> tag.  The default if not specified is "en-US" for US
 English.  For example:
 
-    print $q->header(-lang=>'fr-CA');
+    print $q->start_html(-lang=>'fr-CA');
 
 You can place other arbitrary HTML elements to the <HEAD> section with the
 B<-head> tag.  For example, to place the rarely-used <LINK> element in the
@@ -4364,8 +4364,8 @@ array reference:
 
 And here's how to create an HTTP-EQUIV <META> tag:
 
-      print header(-head=>meta({-http_equiv => 'Content-Type',
-                                -content    => 'text/html'}))
+      print start_html(-head=>meta({-http_equiv => 'Content-Type',
+                                    -content    => 'text/html'}))
 
 
 JAVASCRIPTING: The B<-script>, B<-noScript>, B<-onLoad>,

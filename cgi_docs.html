@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.74, 9/13/2000, L. Stein
+Version 2.75, ????/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -124,6 +124,7 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
   <li><STRONG><A HREF="CGI.pm.zip">Download pkzip archive (Windows)</A></STRONG>
   <li><STRONG><A HREF="CGI.pm.sit">Download sit archive  (Macintosh)</A></STRONG>
   <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
+  <li><strong><a href="old">Archive of Old Versions</a></strong>
 </ul>
 
 <p>
@@ -1069,7 +1070,7 @@ All parameters are optional:
   <li>A <strong>-lang</strong>> argument is used to incorporate a language attribute into
       the &lt;HTM&gt;> tag.  The default if not specified is "en-US" for US English.  For example:
 <blockquote><pre>
-    print $q->header(-lang=>'fr-CA');
+    print $q->start_html(-lang=>'fr-CA');
 </pre></blockquote>
   <LI>A <strong>-dtd</strong> parameter to make start_html()
       generate an SGML document type definition for the document.
@@ -1091,23 +1092,23 @@ All parameters are optional:
   <li>A <strong>-head</strong> parameter to define other arbitrary elements
       of the &lt;HEAD&gt; section.  For example:
       <pre>
-      print header(-head=&gt;Link({-rel=&gt;'next',
-                   -href=&gt;'http://www.capricorn.com/s2.html'}));
+      print start_html(-head=&gt;Link({-rel=&gt;'next',
+                       -href=&gt;'http://www.capricorn.com/s2.html'}));
 
       </pre>
       or even
       <pre>
-      print header(-head=&gt;[ Link({-rel=&gt;'next',
-			             -href=&gt;'http://www.capricorn.com/s2.html'}),
-			       Link({-rel=&gt;'previous',
-				     -href=&gt;'http://www.capricorn.com/s1.html'})
+      print start_html(-head=&gt;[ Link({-rel=&gt;'next',
+			                 -href=&gt;'http://www.capricorn.com/s2.html'}),
+			           Link({-rel=&gt;'previous',
+				         -href=&gt;'http://www.capricorn.com/s1.html'})
 			      ]
 		      );
       </pre>
       To create an HTTP-EQUIV tag, use something like this:
       <pre>
-      print header(-head=&gt;meta({-http_equiv=&gt;'Content-Type',
-                                   -content=&gt;'text/html'}))
+      print start_html(-head=&gt;meta({-http_equiv=&gt;'Content-Type',
+                                       -content=&gt;'text/html'}))
       </pre>
   <LI>A <strong>-script</strong> parameter to define Netscape <a
       href="#javascripting">JavaScript</a> functions
@@ -4658,6 +4659,12 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.75</h>
+<ol>
+  <li>Fixed minor XHTML bugs.
+  <li>Made escape() and unescape() symmetric with respect to EBCDIC, courtesy
+      Roca, Ignasi &lt;ignasi.roca@fujitsu.siemens.es&gt;
+</ol>
 <h3>Version 2.74</h3>
 <p>
 September 13, 2000
@@ -5540,6 +5547,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Sep 13 12:40:55 EDT 2000
+Last modified: Thu Oct  5 14:03:01 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>
