@@ -33,8 +33,8 @@ test(7,h1({-align=>'CENTER'},['fred','agnes']) eq
     test(8,h1('fred','agnes','maura') eq '<H1>fred-agnes-maura</H1>',"open/close tag \$\" interpolation");
 }
 test(9,header() eq "Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
-test(10,header(-type=>'image/gif') eq "Content-Type: image/gif; charset=ISO-8859-1\015\012\015\012","header()");
-test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif; charset=ISO-8859-1\015\012\015\012","header()");
+test(10,header(-type=>'image/gif') eq "Content-Type: image/gif\015\012\015\012","header()");
+test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif\015\012\015\012","header()");
 test(12,header(-nph=>1) eq "HTTP/1.0 200 OK\015\012Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
 test(13,start_html() ."\n" eq <<END,"start_html()");
 <!DOCTYPE HTML

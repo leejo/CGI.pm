@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.68, 5/18/2000, L. Stein
+Version 2.69, 7/27/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -131,6 +131,15 @@ master copy of this document maintained at <a
 href="http://stein.cshl.org/WWW/software/CGI/">http://stein.cshl.org/WWW/software/CGI/</a>.
 
 <P>
+
+There is also a beta of version 3.0X available, courtesy David James.  Please try and report any
+ bugs or misfeatures to <a href="mailto:lstein@cshl.org">me</a>.
+
+<ul>
+  <li><a href="CGI.pm-3.01.tar.gz">Download 3.01 BETA</a></li>
+</ul>
+
+<p>
 
 This package requires perl 5.004 or higher.  Earlier versions of Perl
 may work, but CGI.pm has not been tested with them.  If you're really
@@ -2878,11 +2887,11 @@ You can suppress this behavior in any of the following ways:
 
 <H3><A NAME="dumping">Dumping Out All The Name/Value Pairs</A></H3>
 
-The <STRONG>dump()</STRONG> method produces a string consisting of all the query's
+The <STRONG>Dump()</STRONG> method produces a string consisting of all the query's
 name/value pairs formatted nicely as a nested list.  This is useful
 for debugging purposes:
 <PRE>
-   print $query-&gt;dump
+   print $query-&gt;Dump
 </PRE>   
    Produces something that looks like this:
 <PRE>
@@ -3516,6 +3525,11 @@ print h1('CGI with Style'),
       );
 print end_html;
 </pre></blockquote>
+
+<p>
+
+Pass an array reference to <B>-style</B> in order to incorporate
+multiple stylesheets into your document.
 
 <p>
 <a href="#contents">Table of contents</a>
@@ -4631,6 +4645,12 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.69</h3>
+<ol>
+  <li>starform() now creates default ACTION for POSTs as well as GETs.
+      This may break some browsers, but it no longer violates the HTML spec.
+</ol>
+
 <h3>Version 2.68</h3>
 <ol>
   <li>No longer attempts to escape characters when dealing with non
@@ -4638,6 +4658,8 @@ you.
   <li>checkbox() function now defaults to using -value as its label,
       rather than -name.  The current behavior is what has been documented
       from the beginning.
+  <li>-style accepts array reference to incorporate multiple
+      stylesheets into document.
 </ol>
 
 <ol>
@@ -5457,6 +5479,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Jun  7 14:26:45 EDT 2000
+Last modified: Thu Jul 27 22:31:38 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>

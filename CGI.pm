@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.37 2000-07-06 03:16:57 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.38 2000-07-28 02:33:01 lstein Exp $';
 $CGI::VERSION='2.69';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -860,7 +860,8 @@ sub STORE {
     my $self = shift;
     my $tag  = shift;
     my $vals = shift;
-    my @vals = index($vals,"\0")!=-1 ? split("\0",shift) : $vals;
+    my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
+    $self->param(-name=>$tag,-value=>\@vals);
 }
 END_OF_FUNC
 
@@ -1164,7 +1165,7 @@ sub header {
     }
 
     $type ||= 'text/html' unless defined($type);
-    $type .= "; charset=$charset" if $type ne '' and $type !~ /\bcharset\b/;
+    $type .= "; charset=$charset" if $type ne '' and $type =~ m!^text/! and $type !~ /\bcharset\b/;
 
     # Maybe future compatibility.  Maybe not.
     my $protocol = $ENV{SERVER_PROTOCOL} || 'HTTP/1.0';
@@ -1328,20 +1329,32 @@ sub _style {
     my (@result);
     my $type = 'text/css';
     if (ref($style)) {
-	my($src,$code,$stype,@other) =
-	    rearrange([SRC,CODE,TYPE],
-			     '-foo'=>'bar',	# a trick to allow the '-' to be omitted
-			     ref($style) eq 'ARRAY' ? @$style : %$style);
-	$type = $stype if $stype;
-	push(@result,qq/<LINK REL="stylesheet" TYPE="$type" HREF="$src">/) if $src;
-	push(@result,style({'type'=>$type},"<!--\n$code\n-->")) if $code;
+     my($src,$code,$stype,@other) =
+         rearrange([SRC,CODE,TYPE],
+                    '-foo'=>'bar', # a trick to allow the '-' to be omitted
+                    ref($style) eq 'ARRAY' ? @$style : %$style);
+     $type = $stype if $stype;
+     #### Here is new code for checking for array reference in -src tag (6/20/00 -- JJN) #####
+     ####  This should be passed in like this --> -src=>{['style1.css','style2.css','style3.css']}
+     if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
+     { # If it is, push a LINK tag for each one.
+       foreach $src (@$src)
+       {
+         push(@result,qq/<LINK REL="stylesheet" TYPE="$type" HREF=$src>/) if $src;
+       }
+     }
+     else
+     { # Otherwise, push the single -src, if it exists.
+       push(@result,qq/<LINK REL="stylesheet" TYPE="$type" HREF="$src">/) if $src;
+      }
+   #### End new code ####
+     push(@result,style({'type'=>$type},"<!--\n$code\n-->")) if $code;
     } else {
-	push(@result,style({'type'=>$type},"<!--\n$style\n-->"));
+     push(@result,style({'type'=>$type},"<!--\n$style\n-->"));
     }
     @result;
 }
 END_OF_FUNC
-
 
 '_script' => <<'END_OF_FUNC',
 sub _script {
@@ -1430,8 +1443,8 @@ sub startform {
 
     $method = $method || 'POST';
     $enctype = $enctype || &URL_ENCODED;
-    $action = $action ? qq/ACTION="$action"/ : $method eq 'GET' ?
-	'ACTION="'.$self->script_name.'"' : '';
+#    $action = $action ? qq/ACTION="$action"/ : ($method eq 'GET' ? ACTION="'.$self->script_name.'"' : '');
+    $action = $action ? qq(ACTION="$action") : qq 'ACTION="' . $self->script_name . '"';
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
     return qq/<FORM METHOD="$method" $action ENCTYPE="$enctype"$other>\n/;
@@ -1747,7 +1760,7 @@ sub checkbox {
     } else {
 	$checked = $checked ? ' CHECKED' : '';
     }
-    my($the_label) = defined $label ? $label : $value;
+    my($the_label) = defined $label ? $label : $name;
     $name = $self->escapeHTML($name);
     $value = $self->escapeHTML($value);
     $the_label = $self->escapeHTML($the_label);
@@ -1826,28 +1839,29 @@ END_OF_FUNC
 # Escape HTML -- used internally
 'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
-    my ($self,$toencode) = self_or_default(@_);
-    return undef unless defined($toencode);
-    return $toencode if ref($self) && $self->{'dontescape'};
-    my $latin = uc($self->{'.charset'}) eq 'ISO-8859-1';
-    $toencode =~ s{(.)}{
-              if    ($1 eq '<')                            { '&lt;'    }
-              elsif ($1 eq '>')                            { '&gt;'    }
-              elsif ($1 eq '&')                            { '&amp;'   }
-              elsif ($1 eq '"')                            { '&quot;'  }
-              elsif ($latin && $1 eq "\x8b")               { '&#139;'  }
-              elsif ($latin && $1 eq "\x9b")               { '&#155;'  }
-              else                                         { $1        }
-     }gsex;
-    return $toencode;
+         my ($self,$toencode) = CGI::self_or_default(@_);
+         return undef unless defined($toencode);
+         return $toencode if ref($self) && $self->{'dontescape'};
+         $toencode =~ s{&}{&amp;}gso;
+         $toencode =~ s{<}{&lt;}gso;
+         $toencode =~ s{>}{&gt;}gso;
+         $toencode =~ s{"}{&quot;}gso;
+         if (uc $self->{'.charset'} eq 'ISO-8859-1' or
+             uc $self->{'.charset'} eq 'WINDOWS-1252') {  # bug
+                $toencode =~ s{\x8b}{&#139;}gso;
+                $toencode =~ s{\x9b}{&#155;}gso;
+          }
+         return $toencode;
 }
 END_OF_FUNC
 
 # unescape HTML -- used internally
 'unescapeHTML' => <<'END_OF_FUNC',
 sub unescapeHTML {
-    my $string = ref($_[0]) ? $_[1] : $_[0];
+    my ($self,$string) = CGI::self_or_default(@_);
     return undef unless defined($string);
+    my $latin = uc $self->{'.charset'} eq 'ISO-8859-1' or
+                uc $self->{'.charset'} eq 'WINDOWS-1252';
     # thanks to Randal Schwartz for the correct solution to this one
     $string=~ s[&(.*?);]{
 	local $_ = $1;
@@ -1855,8 +1869,8 @@ sub unescapeHTML {
 	/^quot$/i	? '"' :
         /^gt$/i		? ">" :
 	/^lt$/i		? "<" :
-	/^#(\d+)$/	? chr($1) :
-	/^#x([0-9a-f]+)$/i ? chr(hex($1)) :
+	/^#(\d+)$/ && $latin	     ? chr($1) :
+	/^#x([0-9a-f]+)$/i && $latin ? chr(hex($1)) :
 	$_
 	}gex;
     return $string;
@@ -5897,6 +5911,9 @@ http://www.w3.org/pub/WWW/TR/Wd-css-1.html for more information.
 	       "Whooo wee!"
 	       );
     print end_html;
+
+Pass an array reference to B<-style> in order to incorporate multiple
+stylesheets into your document.
 
 =head1 DEBUGGING
 

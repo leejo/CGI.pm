@@ -84,16 +84,14 @@ sub make_attributes {
 }
 
 sub simple_escape {
-  return unless defined (my $toencode = shift);
-  $toencode =~ s{(.)}{
-              if    ($1 eq '<')                            { '&lt;'    }
-              elsif ($1 eq '>')                            { '&gt;'    }
-              elsif ($1 eq '&')                            { '&amp;'   }
-              elsif ($1 eq '"')                            { '&quot;'  }
-              elsif ($1 eq "\x8b")                         { '&#139;'  }
-              elsif ($1 eq "\x9b")                         { '&#155;'  }
-              else                                         { $1        }
-       }gsex;
+  return unless defined(my $toencode = shift);
+  $toencode =~ s{&}{&amp;}gso;
+  $toencode =~ s{<}{&lt;}gso;
+  $toencode =~ s{>}{&gt;}gso;
+  $toencode =~ s{\"}{&quot;}gso;
+# Doesn't work.  Can't work.  forget it.
+#  $toencode =~ s{\x8b}{&#139;}gso;
+#  $toencode =~ s{\x9b}{&#155;}gso;
   $toencode;
 }
 
