@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.21';
+$CGI::Cookie::VERSION='1.22';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string,
@@ -340,8 +340,6 @@ sequence:
   print "Content-Type: text/html\n\n";
 
 To send more than one cookie, create several Set-Cookie: fields.
-Alternatively, you may concatenate the cookies together with "; " and
-send them in one field.
 
 If you are using CGI.pm, you send cookies by providing a -cookie
 argument to the header() method:

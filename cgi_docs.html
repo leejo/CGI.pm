@@ -533,6 +533,13 @@ represents a major security risk, as evil people could then use this
 feature to redefine central variables such as @INC.
 CGI.pm will exit with an error if you try to do this.
 
+<p><strong>NOTE:</strong>
+Variable names are transformed as necessary into legal Perl
+variable names.  All non-legal characters are transformed into
+underscores.  If you need to keep the original names, you should use
+the param() method instead to access CGI variables by name.
+</p>
+
 <P>
 
 <H3><A NAME="param_fetch">Direct Access to the Parameter List</A></H3>
@@ -1063,6 +1070,8 @@ All parameters are optional:
 <blockquote><pre>
     print $q->start_html(-lang=>'fr-CA');
 </pre></blockquote>
+      To leave off the lang attribute, as you must do if you want to generate
+      legal HTML 3.2 or earlier, pass the empty string (-lang=&gt;'').
   <LI>A <strong>-dtd</strong> parameter to make start_html()
       generate an SGML document type definition for the document.
       This is used by SGML editors and high-end Web publishing systems
@@ -1891,7 +1900,8 @@ the file upload feature.</A>
       array, as shown in the example, or a reference to a named array,
       such as <TT>\@foo</TT>.  If you pass a <em>HASH reference</em>,
       the keys will be used for the menu values, and the values will
-      be used for the menu labels (see -labels below).
+      be used for the menu labels (see -labels below).  However, the
+      menu values will be in arbitrary order.
   <LI>The optional third parameter (<strong>-default</strong>) is the name of the
        default menu choice.  
        If not specified, the first item will be the default.  The value of 
@@ -4713,6 +4723,13 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.90</h3>
 <ol>
+  <li>Patches from Alexey Mahotkin to make CGI::Carp work correctly with object-oriented exceptions.
+  <li>Removed inaccurate description of how to set multiple cookies from CGI::Cookie pod file.
+  <li>Patch from Kevin Mahony to prevent running out of filehandles when uploading lots of files.
+  <li>Documentation enhancement from Mark Fisher to note that the import_names() method transforms the
+      parameter names into valid Perl names.
+  <li>Patch from Dan Harkless to suppress lang attribute in &lt;html&gt; tag if not provided explicitly. 
+  <li>Patch from Ben Edgington to fix broken XHTML-transitional 1.0 validation on endform().
   <li>Custom html header fix from Steffen Beyer (first letter correctly upcased now)
   <li>Added a -verbatim option to stylesheet generation from Michael Dickson
   <li>Faster delete() method from Neelam Gupta
@@ -5729,6 +5746,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Dec  3 10:24:15 EST 2002
+Last modified: Fri Dec 13 20:54:45 EST 2002
 <!-- hhmts end -->
 </BODY> </HTML>

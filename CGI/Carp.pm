@@ -271,7 +271,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 *CORE::GLOBAL::die = \&CGI::Carp::die;
-$CGI::Carp::VERSION = '1.24';
+$CGI::Carp::VERSION = '1.25';
 $CGI::Carp::CUSTOM_MSG = undef;
 
 # fancy import routine detects and handles 'errorWrap' specially.
@@ -369,14 +369,15 @@ sub _longmess {
 
 sub die {
   realdie @_ if ineval;
-  my ($message) = @_;
-  my $time = scalar(localtime);
-  my($file,$line,$id) = id(1);
-  $message .= " at $file line $line." unless $message=~/\n$/;
-  &fatalsToBrowser($message) if $WRAP;
-  my $stamp = stamp;
-  $message=~s/^/$stamp/gm;
-  realdie $message;
+  if (!ref($arg)) {
+    my $time = scalar(localtime);
+    my($file,$line,$id) = id(1);
+    $arg .= " at $file line $line." unless $arg=~/\n$/;
+    &fatalsToBrowser($arg) if $WRAP;
+    my $stamp = stamp;
+    $arg=~s/^/$stamp/gm;
+  }
+  realdie $arg;
 }
 
 sub set_message {
