@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.20 1999-10-11 13:56:16 lstein Exp $';
-$CGI::VERSION='2.56';
+$CGI::revision = '$Id: CGI.pm,v 1.21 2000-01-18 02:00:16 lstein Exp $';
+$CGI::VERSION='2.57';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -31,7 +31,8 @@ sub initialize_globals {
 
     # Change this to the preferred DTD to print in start_html()
     # or use default_dtd('text of DTD to use');
-    $DEFAULT_DTD = '-//IETF//DTD HTML//EN';
+    $DEFAULT_DTD = [ '-//W3C//DTD HTML 4.01 Transitional//EN',
+		     'http://www.w3.org/TR/html4/loose.dtd' ] ;
 
     # Set this to 1 to enable NPH scripts
     # or: 
@@ -260,7 +261,8 @@ sub new {
     my $self = {};
     bless $self,ref $class || $class || $DefaultClass;
     if ($MOD_PERL) {
-	Apache->request->register_cleanup(\&CGI::_reset_globals);
+	Apache->request->register_cleanup(\&CGI::_reset_globals)
+	  if defined(Apache->request);
 	undef $NPH;
     }
     $self->_reset_globals if $PERLEX;
@@ -926,7 +928,7 @@ END_OF_FUNC
 
 'STORE' => <<'END_OF_FUNC',
 sub STORE {
-    $_[0]->param($_[1],split("\0",$_[2]));
+    $_[0]->param($_[1],split("\0",$_[2],-1)||'');
 }
 END_OF_FUNC
 
@@ -1076,13 +1078,13 @@ sub url_param {
 }
 END_OF_FUNC
 
-#### Method: dump
+#### Method: Dump
 # Returns a string in which all the known parameter/value 
 # pairs are represented as nested lists, mainly for the purposes 
 # of debugging.
 ####
-'dump' => <<'END_OF_FUNC',
-sub dump {
+'Dump' => <<'END_OF_FUNC',
+sub Dump {
     my($self) = self_or_default(@_);
     my($param,$value,@result);
     return '<UL></UL>' unless $self->param;
@@ -1109,7 +1111,7 @@ END_OF_FUNC
 ####
 'as_string' => <<'END_OF_FUNC',
 sub as_string {
-    &dump(@_);
+    &Dump(@_);
 }
 END_OF_FUNC
 
@@ -1342,8 +1344,20 @@ sub start_html {
     $title = $self->escapeHTML($title || 'Untitled Document');
     $author = $self->escape($author);
     my(@result);
-    $dtd = $DEFAULT_DTD unless $dtd && $dtd =~ m|^-//|;
-    push(@result,qq(<!DOCTYPE HTML PUBLIC "$dtd">)) if $dtd;
+    if ($dtd) {
+        if (ref $dtd && $ref eq 'ARRAY') {
+            $dtd = $DEFAULT_DTD unless $dtd->[0] =~ m|^-//|;
+        } else {
+            $dtd = $DEFAULT_DTD unless $dtd =~ m|^-//|;
+        }
+    } else {
+        $dtd = $DEFAULT_DTD;
+    }
+    if (ref($dtd) && ref($dtd) eq 'ARRAY') {
+        push(@result,qq(<!DOCTYPE HTML PUBLIC "$dtd->[0]"\n\t"$dtd->[1]">));
+    } else {
+        push(@result,qq(<!DOCTYPE HTML PUBLIC "$dtd">));
+    }
     push(@result,"<HTML><HEAD><TITLE>$title</TITLE>");
     push(@result,"<LINK REV=MADE HREF=\"mailto:$author\">") if defined $author;
 
@@ -1408,21 +1422,32 @@ sub _script {
     foreach $script (@scripts) {
 	my($src,$code,$language);
 	if (ref($script)) { # script is a hash
-	    ($src,$code,$language) =
-		$self->rearrange([SRC,CODE,LANGUAGE],
+	    ($src,$code,$language, $type) =
+		$self->rearrange([SRC,CODE,LANGUAGE,TYPE],
 				 '-foo'=>'bar',	# a trick to allow the '-' to be omitted
 				 ref($script) eq 'ARRAY' ? @$script : %$script);
-	    
+            # User may not have specified language
+            $language ||= 'JavaScript';
+            unless (defined $type) {
+                $type = lc $language;
+                # strip '1.2' from 'javascript1.2'
+                $type =~ s/^(\D+).*$/text\/$1/;
+            }
 	} else {
-	    ($src,$code,$language) = ('',$script,'JavaScript');
+	    ($src,$code,$language, $type) = ('',$script,'JavaScript', 'text/javascript');
 	}
 	my(@satts);
 	push(@satts,'src'=>$src) if $src;
-	push(@satts,'language'=>$language || 'JavaScript');
+	push(@satts,'language'=>$language);
+        push(@satts,'type'=>$type);
 	$code = "<!-- Hide script\n$code\n// End script hiding -->"
-	    if $code && $language=~/javascript/i;
+	    if $code && $type=~/javascript/i;
 	$code = "<!-- Hide script\n$code\n\# End script hiding -->"
-	    if $code && $language=~/perl/i;
+	    if $code && $type=~/perl/i;
+	$code = "<!-- Hide script\n$code\n\# End script hiding -->"
+	    if $code && $type=~/tcl/i;
+        $code = "<!-- Hide script\n$code\n' End script hiding -->"
+            if $code && $type=~/vbscript/i;
 	push(@result,script({@satts},$code || ''));
     }
     @result;
@@ -2204,8 +2229,11 @@ sub url {
         # strip query string
         substr($script_name,$index) = '' if ($index = index($script_name,'?')) >= 0;
         # and path
-        substr($script_name,$index) = '' if exists($ENV{PATH_INFO})
-                                     and ($index = rindex($script_name,$ENV{PATH_INFO})) >= 0;
+        if (exists($ENV{PATH_INFO})) {
+           my $decoded_path = unescape($ENV{PATH_INFO});
+           substr($script_name,$index) = '' if ($index = rindex($script_name,$decoded_path)) >= 0;
+         }
+
     } else {
 	$script_name = $self->script_name;
     }
@@ -2757,8 +2785,12 @@ END_OF_FUNC
 ####
 'default_dtd' => <<'END_OF_FUNC',
 sub default_dtd {
-    my ($self,$param) = self_or_CGI(@_);
-    $CGI::DEFAULT_DTD = $param if defined($param);
+    my ($self,$param,$param2) = self_or_CGI(@_);
+    if (defined $param2 && defined $param) {
+        $CGI::DEFAULT_DTD = [ $param, $param2 ];
+    } elsif (defined $param) {
+        $CGI::DEFAULT_DTD = $param;
+    }
     return $CGI::DEFAULT_DTD;
 }
 END_OF_FUNC
@@ -3010,7 +3042,9 @@ END_OF_FUNC
 sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
-    my $ref = \*{'Fh::' .  ++$FH . quotemeta($name)};
+    my $fv = ('Fh::' .  ++$FH . quotemeta($name));
+    warn unless *{$fv};
+    my $ref = \*{$fv};
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
     CORE::delete $Fh::{$FH};
@@ -3073,6 +3107,7 @@ sub new {
 
     # Netscape seems to be a little bit unreliable
     # about providing boundary strings.
+    my $boundary_read = 0;
     if ($boundary) {
 
 	# Under the MIME spec, the boundary consists of the 
@@ -3089,6 +3124,7 @@ sub new {
 	$length -= length($boundary);
 	chomp($boundary);               # remove the CRLF
 	$/ = $old;                      # restore old line separator
+        $boundary_read++;
     }
 
     my $self = {LENGTH=>$length,
@@ -3104,7 +3140,7 @@ sub new {
     my $retval = bless $self,ref $package || $package;
 
     # Read the preamble and the topmost (boundary) line plus the CRLF.
-    while ($self->read(0)) { }
+    1 while $self->read(0) unless unless $boundary_read;
     die "Malformed multipart POST\n" if $self->eof;
 
     return $retval;
@@ -3284,13 +3320,12 @@ unless ($TMPDIRECTORY) {
 	   "${SL}WWW_ROOT");
     unshift(@TEMP,$ENV{'TMPDIR'}) if exists $ENV{'TMPDIR'};
 
-    #
     #    unshift(@TEMP,(getpwuid($<))[7].'/tmp') if $CGI::OS eq 'UNIX';
     # Rob: getpwuid() is unfortunately UNIX specific. On brain dead OS'es this
     #    : can generate a 'getpwuid() not implemented' exception, even though
     #    : it's never called.  Found under DOS/Win with the DJGPP perl port.
     #    : Refer to getpwuid() only at run-time if we're fortunate and have  UNIX.
-    unshift(@TEMP,(eval {(getpwuid($<))[7]}).'/tmp') if $CGI::OS eq 'UNIX';
+    unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
 
     foreach (@TEMP) {
 	do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
@@ -4230,8 +4265,7 @@ session cookies.
 
 The B<-nph> parameter, if set to a true value, will issue the correct
 headers to work with a NPH (no-parse-header) script.  This is important
-to use with certain servers, such as Microsoft Internet Explorer, which
-expect all their scripts to be NPH.
+to use with certain servers that expect all their scripts to be NPH.
 
 =head2 GENERATING A REDIRECTION HEADER
 
@@ -5912,11 +5946,11 @@ pairs:
 
 =head2 DUMPING OUT ALL THE NAME/VALUE PAIRS
 
-The dump() method produces a string consisting of all the query's
+The Dump() method produces a string consisting of all the query's
 name/value pairs formatted nicely as a nested list.  This is useful
 for debugging purposes:
 
-    print $query->dump
+    print $query->Dump
     
 
 Produces something that looks like:

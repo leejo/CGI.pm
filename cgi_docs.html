@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.56, 9/13/1999, L. Stein
+Version 2.57, X/XX/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4050,6 +4050,20 @@ CGI.pm.  This will suppress command-line debugging completely:
 use CGI qw/:standard -no_debug/;
 </pre>
 
+<h4>CGI.pm breaks when you use "use integer"</h4>
+
+<p>
+ 
+Due to problems that integer.pm has with unary negation, calls to
+CGI.pm that use the -arg=>value format will break if you load the
+integer.pm module.  This is fixed in Perl 5.005_61 and up.
+
+<p>
+
+A workaround is to put all arguments in quotes:
+
+      '-arg'=>'value'
+
 <H4>You can't retrieve the name of the uploaded file
 using the param() method</H4>
 Most likely the remote user isn't using version 2.0 (or higher)
@@ -4567,6 +4581,15 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.57</h3>
+<ol>
+  <li>Silenced a warning on upload (patch provided by Jonas Liljegren)
+  <li>Fixed race condition in CGI::Carp when errors occur during parsing
+      (patch provided by Maurice Aubrey).
+  <li>Fixed failure of url(-path_info=>1) when path contains % signs.
+  <li>Fixed warning from CGI::Cookie when receiving foreign cookies
+      that don't use name=value format.
+</ol>
 <h3>Version 2.56</h3>
 <ol>
   <li>Fixed bugs in file upload introduced in version 2.55
@@ -5290,6 +5313,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Mon Sep 13 17:08:28 EDT 1999
+Last modified: Mon Jan 17 13:23:41 EST 2000
 <!-- hhmts end -->
 </BODY> </HTML>

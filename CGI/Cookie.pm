@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.12';
+$CGI::Cookie::VERSION='1.13';
 
 use CGI qw(-no_debug);
 use overload '""' => \&as_string,
@@ -65,6 +65,9 @@ sub parse {
 	my($key,$value) = split("=");
 	my(@values) = map CGI::unescape($_),split('&',$value);
 	$key = CGI::unescape($key);
+	# Some foreign cookies are not in name=value format, so ignore
+	# them.
+	next if !defined($value);
 	# A bug in Netscape can cause several cookies with same name to
 	# appear.  The FIRST one in HTTP_COOKIE is the most recent version.
 	$results{$key} ||= $self->new(-name=>$key,-value=>\@values);
@@ -97,7 +100,8 @@ sub new {
 	},$class;
 
     # IE requires the path and domain to be present for some reason.
-    $path   = CGI::url(-absolute=>1) unless defined $path;
+    $path   = $ENV{REQUEST_URI} || $ENV{PATH_INFO} unless defined $path;
+    $path =~ s/\?.*//;
 # however, this breaks networks which use host tables without fully qualified
 # names, so we comment it out.
 #    $domain = CGI::virtual_host()    unless defined $domain;
