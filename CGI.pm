@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.116 2003-05-15 14:42:56 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.117 2003-05-21 19:37:09 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -839,8 +839,8 @@ END_OF_FUNC
 ####
 sub delete {
     my($self,@p) = self_or_default(@_);
-    my($name) = rearrange([NAME],@p);
-    my @to_delete = ref($name) eq 'ARRAY' ? @$name : ($name);
+    my(@names) = rearrange([NAME],@p);
+    my @to_delete = ref($names[0]) eq 'ARRAY' ? @$names[0] : @names;
     my %to_delete;
     foreach my $name (@to_delete)
     {
