@@ -39,3 +39,4 @@ t/form.t
 t/function.t
 t/html.t
 t/request.t
+t/pretty.t
