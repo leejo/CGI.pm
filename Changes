@@ -1,3 +1,6 @@
+  Version 3.07
+    1. Changed way mod_perl version is calculated in CGI::Cookie.  (Bug reported, but can't reproduce it)
+
   Version 3.06
 
     1. Fixed bare call to script() in start_html
