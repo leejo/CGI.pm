@@ -1,5 +1,6 @@
 package CGI;
 require 5.004;
+use Carp 'croak';
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
@@ -17,8 +18,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.48 2001-02-02 23:11:29 lstein Exp $';
-$CGI::VERSION='2.751';
+$CGI::revision = '$Id: CGI.pm,v 1.49 2001-02-04 23:08:39 lstein Exp $';
+$CGI::VERSION='2.752';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -623,7 +624,7 @@ sub _compile {
         unless (%$sub) {
 	   my($auto) = \${"$pack\:\:AUTOLOADED_ROUTINES"};
 	   eval "package $pack; $$auto";
-	   die $@ if $@;
+	   croak("$AUTOLOAD: $@") if $@;
            $$auto = '';  # Free the unneeded storage (but don't undef it!!!)
        }
        my($code) = $sub->{$func_name};
@@ -639,11 +640,11 @@ sub _compile {
 	       $code = $CGI::DefaultClass->_make_tag_func($func_name);
 	   }
        }
-       die "Undefined subroutine $AUTOLOAD\n" unless $code;
+       croak("Undefined subroutine $AUTOLOAD\n") unless $code;
        eval "package $pack; $code";
        if ($@) {
 	   $@ =~ s/ at .*\n//;
-	   die $@;
+	   croak("$AUTOLOAD: $@");
        }
     }       
     CORE::delete($sub->{$func_name});  #free storage
@@ -3038,7 +3039,7 @@ sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
-    my $fv = ++$FH . $safename
+    my $fv = ++$FH . $safename;
     my $ref = \*{"Fh::$fv"};
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
