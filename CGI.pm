@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.33 2000-05-16 01:36:32 lstein Exp $';
-$CGI::VERSION='2.67';
+$CGI::revision = '$Id: CGI.pm,v 1.34 2000-05-25 11:48:04 lstein Exp $';
+$CGI::VERSION='2.68';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1703,7 +1703,7 @@ sub defaults {
     $label = $label || "Defaults";
     my($value) = qq/ VALUE="$label"/;
     my($other) = @other ? " @other" : '';
-    return $XHTML ? qq(<INPUT TYPE="submit" NAME=".defaults"$value$other />);
+    return $XHTML ? qq(<INPUT TYPE="submit" NAME=".defaults"$value$other />)
                   : qq/<INPUT TYPE="submit" NAME=".defaults"$value$other>/;
 }
 END_OF_FUNC
@@ -2132,7 +2132,7 @@ sub image_button {
     my($align) = $alignment ? " ALIGN=\U$alignment" : '';
     my($other) = @other ? " @other" : '';
     $name=$self->escapeHTML($name);
-    return $XHTML ? qq(<INPUT TYPE="image" NAME="$name" SRC="$src"$align$other />);
+    return $XHTML ? qq(<INPUT TYPE="image" NAME="$name" SRC="$src"$align$other />)
                   : qq/<INPUT TYPE="image" NAME="$name" SRC="$src"$align$other>/;
 }
 END_OF_FUNC
