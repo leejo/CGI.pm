@@ -289,7 +289,7 @@ sub _warn {
     }
 }
 
-sub ineval { _longmess() =~ /eval [\{\']/m }
+sub ineval { $^S }
 
 # The mod_perl package Apache::Registry loads CGI programs by calling
 # eval.  These evals don't count when looking at the stack backtrace.

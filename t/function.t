@@ -1,5 +1,7 @@
 #!/usr/local/bin/perl -w
 
+use lib qw(t/lib);
+
 # Test ability to retrieve HTTP request info
 ######################### We start with some black magic to print on failure.
 use lib '../blib/lib','../blib/arch';
@@ -30,6 +32,11 @@ my $CRLF = "\015\012";
 # Thanks to Peter Prymmer for this
 
 if ($^O eq 'VMS') { $CRLF = "\n"; }
+
+# Web servers on EBCDIC hosts are typically set up to do an EBCDIC -> ASCII
+# translation hence CRLF is used as \r\n within CGI.pm on such machines.
+
+if (ord("\t") != 9) { $CRLF = "\r\n"; }
 
 # Web servers on EBCDIC hosts are typically set up to do an EBCDIC -> ASCII
 # translation hence CRLF is used as \r\n within CGI.pm on such machines.

@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.54 2001-09-26 01:38:52 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.55 2001-09-26 02:15:52 lstein Exp $';
 $CGI::VERSION='2.78';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -112,22 +112,18 @@ unless ($OS) {
 	$OS = $Config::Config{'osname'};
     }
 }
-if ($OS=~/darwin/i) {
-  $OS = 'UNIX';
-} elsif ($OS=~/Win/i) {
+if ($OS =~ /^MSWin/i) {
   $OS = 'WINDOWS';
-} elsif ($OS=~/vms/i) {
+} elsif ($OS =~ /^VMS/i) {
   $OS = 'VMS';
-} elsif ($OS=~/bsdos/i) {
-  $OS = 'UNIX';
-} elsif ($OS=~/dos/i) {
+} elsif ($OS =~ /^dos/i) {
   $OS = 'DOS';
-} elsif ($OS=~/^MacOS$/i) {
+} elsif ($OS =~ /^MacOS/i) {
     $OS = 'MACINTOSH';
-} elsif ($OS=~/epoc/) {
-    $OS = 'EPOC';
-} elsif ($OS=~/os2/i) {
+} elsif ($OS =~ /^os2/i) {
     $OS = 'OS2';
+} elsif ($OS =~ /^epoc/i) {
+    $OS = 'EPOC';
 } else {
     $OS = 'UNIX';
 }
@@ -3582,12 +3578,18 @@ have several choices:
 
 =over 4
 
-=item 1. Use another name for the argument, if one is available.  For
-example, -value is an alias for -values.
+=item 1.
 
-=item 2. Change the capitalization, e.g. -Values
+Use another name for the argument, if one is available. 
+For example, -value is an alias for -values.
 
-=item 3. Put quotes around the argument name, e.g. '-values'
+=item 2.
+
+Change the capitalization, e.g. -Values
+
+=item 3.
+
+Put quotes around the argument name, e.g. '-values'
 
 =back
 
@@ -6294,7 +6296,9 @@ Call B<nph()> with a non-zero parameter at any point after using CGI.pm in your 
 
       CGI->nph(1)
 
-=item By using B<-nph> parameters in the B<header()> and B<redirect()>  statements:
+=item By using B<-nph> parameters
+
+in the B<header()> and B<redirect()>  statements:
 
       print $q->header(-nph=>1);
 
