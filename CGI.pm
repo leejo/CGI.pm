@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.45 2000-09-13 02:55:41 lstein Exp $';
-$CGI::VERSION='2.73';
+$CGI::revision = '$Id: CGI.pm,v 1.46 2000-09-13 17:15:05 lstein Exp $';
+$CGI::VERSION='2.74';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -3189,7 +3189,7 @@ sub read {
 	}
 
 	# just remove the boundary.
-	substr($self->{BUFFER},0,length($self->{BOUNDARY}))=''
+	substr($self->{BUFFER},0,length($self->{BOUNDARY}))='';
         $self->{BUFFER} =~ s/^\012\015?//;
 	return undef;
     }

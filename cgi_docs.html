@@ -1,12 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML> <HEAD>
+<!-- $Id -->
 <TITLE>CGI.pm - a Perl5 CGI Library</TITLE>
 </HEAD>
 
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.73, 9/12/2000, L. Stein
+Version 2.74, 9/13/2000, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -80,7 +81,8 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 <H2><A NAME="contents">Contents</A></H2>
 
 <MENU>
-  <LI><A HREF="#installation">Downloading &amp; Installation</A>
+  <LI><A HREF="#download">Downloading</A>
+  <LI><A HREF="#installation">Installation</A>
   <LI><a href="#functionvsoo">Function-Oriented vs Object-Oriented Use</a>
   <LI><A HREF="#query">Creating a new CGI query object</A>
   <LI><A HREF="#saving">Saving the state of the form</A>
@@ -115,7 +117,30 @@ examples from <cite>The Official Guide to CGI.pm</cite></a>
 
 <HR>
 
-<H2><A NAME="installation">Downloading &amp; Installation</A></H2>
+<h2><a name="download">Downloads</a></h2>
+
+<ul>
+  <li><STRONG><A HREF="CGI.pm.tar.gz">Download gzip tar archive (Unix)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.zip">Download pkzip archive (Windows)</A></STRONG>
+  <li><STRONG><A HREF="CGI.pm.sit">Download sit archive  (Macintosh)</A></STRONG>
+  <li><strong><A HREF="CGI.pm">Download just the CGI module (uncompressed)</a></strong>
+</ul>
+
+<p>
+
+<h3><font color="red">CGI.pm Version 3.01</font></h3>
+
+Version 3.0 of CGI.pm provides a modularized design and significant
+performance enhancements, courtesy David James.  Please try and report
+any bugs or misfeatures to <a href="mailto:lstein@cshl.org">me</a>.
+
+<ul>
+  <li><a href="CGI.pm-3.01.tar.gz">Download 3.01</a></li>
+</ul>
+
+<p>
+
+<H2><A NAME="installation">Installation</A></H2>
 
 <ul>
   <li><STRONG><A HREF="CGI.pm.tar.gz">Download gzip tar archive (Unix)</A></STRONG>
@@ -132,17 +157,6 @@ href="http://stein.cshl.org/WWW/software/CGI/">http://stein.cshl.org/WWW/softwar
 
 <P>
 
-<h2><font color="red">Beta Test Version</font></h2>
-
-There is a beta of version 3.0X available, courtesy David James.
-Please try and report any bugs or misfeatures to <a
-href="mailto:lstein@cshl.org">me</a>.
-
-<ul>
-  <li><a href="CGI.pm-3.01.tar.gz">Download 3.01 BETA</a></li>
-</ul>
-
-<p>
 
 This package requires perl 5.004 or higher.  Earlier versions of Perl
 may work, but CGI.pm has not been tested with them.  If you're really
@@ -2613,7 +2627,7 @@ dashes.
   <dt><b>-newstyle_urls</b>
   <dd>Separate the name=value pairs in CGI parameter query strings with
       semicolons rather than ampersands.  For example:
-      <blockquote><pre>
+      <blockquote>
       <pre>
       name=fred;age=24;favorite_color=3
       </pre>
@@ -4644,6 +4658,13 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.74</h3>
+<p>
+September 13, 2000
+<ol>
+  <li>Quashed one-character bug that caused CGI.pm to fail on file uploads.
+</ol>
+
 <h3>Version 2.73</h3>
 <p>
 September 12, 2000
@@ -5519,6 +5540,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Sep 12 22:52:02 EDT 2000
+Last modified: Wed Sep 13 12:40:55 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>

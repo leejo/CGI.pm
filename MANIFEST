@@ -8,6 +8,7 @@ CGI/Push.pm
 CGI/Switch.pm
 CGI/Util.pm
 CGI/Apache.pm
+Changes
 MANIFEST
 Makefile.PL
 README
