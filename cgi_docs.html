@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.75, ????/2000, L. Stein
+Version 2.75, 2/2/2001, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4269,7 +4269,7 @@ want it to be automatically deleted when CGI.pm exits.
 
 <h2><a name="push">Server Push</a></h2>
 
-<p> CGI.pm provides three simple functions for producing multipart
+<p> CGI.pm provides four simple functions for producing multipart
 documents of the type needed to implement server push.  To import
 these into your namespace, you must import the ":push" set.  You are
 also advised to put the script into NPH mode and to set $| to 1 to
@@ -4282,20 +4282,26 @@ avoid buffering problems.  </p>
 use CGI qw/:push -nph/;
 $| = 1;
 print multipart_init(-boundary=&gt;'----------------here we go!');
-while (1) {
+foreach (0 .. 4) {
    print multipart_start(-type=&gt;'text/plain'),
-         "The current time is ",scalar(localtime),"\n",
-         multipart_end;
+         "The current time is ",scalar(localtime),"\n";
+   if ($_ < 4) {
+      print multipart_end;
+   } else {
+      print multipart_final;
+   }
    sleep 1;
 }
 </pre></blockquote>
 
 <p> This script initializes server push by calling
-<cite>multipart_init()</cite>.  It then enters an infinite loop in
+<cite>multipart_init()</cite>.  It then enters a loop in
 which it begins a new multipart section by calling
 <cite>multipart_start()</cite>, prints the current local time, and
 ends a multipart section with <cite>multipart_end()</cite>.  It then
-sleeps a second, and begins again.</p>
+sleeps a second, and begins again. On the final iteration, it ends the
+multipart section with <cite>multipart_final()</cite> rather than with
+<cite>multipart_end()</cite>. </p>
 
 <dl>
   <dt>multipart_init()
@@ -4319,11 +4325,24 @@ multipart_start(-type=&gt;$type)
   multipart_end()
       </pre></blockquote>
       End a part.  You must remember to call multipart_end() once for each
-      multipart_start().
+      multipart_start(), except at the end of the last part of the multipart
+      document when multipart_final() should be called instead of
+      multipart_end().
+      <p>
+  <dt>multipart_final()
+  <dd><blockquote><pre>
+  multipart_final()
+      </pre></blockquote>
+      End all parts.
+      You should call multipart_final() rather than multipart_end() at the
+      end of the last part of the multipart document.
 </dl>
 
 Users interested in server push applications should also have a look
 at the CGI::Push module.
+
+<p>Only Netscape Navigator supports server push.  Internet Explorer browsers
+do not.</p>
 
 <p>
 <A HREF="#contents">Table of contents</A>
@@ -4659,16 +4678,30 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
-<h3>Version 2.75</h>
+<h3>Version 2.751</h3>
 <ol>
+  <li>Tiny tweak to filename regular expression function on line 3355.
+</ol>
+
+<h3>Version 2.75</h3>
+<ol>
+  <li>Fixed bug in server push boundary strings (CGI.pm and CGI::Push).
+  <li>Fixed bug that occurs when uploading files with funny characters in the name
+  <li>Fixed non-XHTML-compliant attributes produced by textfield()
+  <li>Added EPOC support, courtesy Olaf Flebbe
   <li>Fixed minor XHTML bugs.
   <li>Made escape() and unescape() symmetric with respect to EBCDIC, courtesy
       Roca, Ignasi &lt;ignasi.roca@fujitsu.siemens.es&gt;
+  <li>Removed uninitialized variable warning from CGI::Cookie,
+      provided by Atipat Rojnuckarin &lt;rojnuca@yahoo.com&gt;
+  <li>Fixed bug in CGI::Pretty that causes it to print partial end tags when
+      the $INDENT global is changed.
+  <li>Single quotes are changed to character entity &#39; for
+      compatibility with URLs.
 </ol>
-<h3>Version 2.74</h3>
-<p>
-September 13, 2000
-<ol>
+
+<h3>Version 2.74</h3> <p> September
+13, 2000 <ol>
   <li>Quashed one-character bug that caused CGI.pm to fail on file uploads.
 </ol>
 
@@ -4879,6 +4912,7 @@ This is the release version of 2.57.
   <li>Untainted tainted tempfile name so that script doesn't fail on terminal unlink.
   <li>Made picking of upload tempfile name more intelligent so that doesn't fail in case of name collision.
   <li>Fixed handling of expire times when passed an absolute timestamp.
+  <li>Changed dump() to Dump() to avoid name clashes.
 </ol>
 <h3>Version 2.49</h3>
 <ol>
@@ -5547,6 +5581,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Oct  5 14:03:01 EDT 2000
+Last modified: Fri Feb  2 10:49:18 EST 2001
 <!-- hhmts end -->
 </BODY> </HTML>
