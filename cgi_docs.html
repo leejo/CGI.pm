@@ -4399,15 +4399,15 @@ documentation thoroughly, read the FAQs for these newsgroups and scan
 through previous messages before you make a posting.  Respondents are
 not always friendly to people who neglect to do so!
 
-<H3>Bug Reports</H3>
+<H2><a name="bugs">Bug Reports</a></H2>
 
 Address bug reports and comments to:<BR> <A
 HREF="mailto:lstein@cshl.org">lstein@cshl.org</A>.  When sending bug
 reports, please provide the following information:
 
 <ul>
-  <li>the version of CGI.pm
-  <li>the version of Perl
+  <li>the version of CGI.pm (<code>perl -MCGI 'print $CGI::VERSION'</code>)
+  <li>the version of Perl (<code>perl -v</code>)
   <li>the name and version of your Web server
   <li>the name and version of the operating system you are using
   <li>if applicable, the name and version of the browser you are using
@@ -4417,27 +4417,9 @@ reports, please provide the following information:
 It is very important that I receive this information in order to help
 you.
 
-<P>
+<p>
 
 <A HREF="#contents">Up to table of contents</A>
-
-Please send the following information:
-
-<ol>
-  <li>The version of CGI.pm, obtained by running the command:
-      <blockquote><pre>
-perl -MCGI -e 'print $CGI::VERSION'
-      </pre></blockquote>
-      <p>
-  <li>The version of Perl, obtained by running the command:
-      <blockquote><pre>
-perl -V
-      </pre></blockquote>
-      <p>
-  <li>The name and version of the operating system you are using.
-      <p>
-  <li>The name and version of the Web server you are using.
-</ol>
 
 <HR>
 
@@ -5068,6 +5050,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Nov 24 18:36:11 MET 1998
+Last modified: Tue Nov 24 14:30:59 EST 1998
 <!-- hhmts end -->
 </BODY> </HTML>
