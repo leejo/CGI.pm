@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.66 2002-07-01 01:42:21 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.67 2002-08-28 20:18:40 lstein Exp $';
 $CGI::VERSION='2.83';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -31,6 +31,8 @@ use CGI::Util qw(rearrange make_attributes unescape escape expires);
 
 use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
+
+my @SAVED_SYMBOLS;
 
 # >>>>> Here are some globals that you might want to adjust <<<<<<
 sub initialize_globals {
@@ -714,6 +716,7 @@ sub _setup_symbols {
 	}
     }
     _compile_all(keys %EXPORT) if $compile;
+    @SAVED_SYMBOLS = @_;
 }
 
 sub charset {
@@ -3158,6 +3161,7 @@ END_OF_FUNC
 'new'  => <<'END_OF_FUNC',
 sub new {
     my($pack,$name,$file,$delete) = @_;
+    _setup_symbols(@SAVED_SYMBOLS) if @SAVED_SYMBOLS;
     require Fcntl unless defined &Fcntl::O_RDWR;
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
     my $fv = ++$FH . $safename;
@@ -3437,7 +3441,7 @@ unless ($TMPDIRECTORY) {
 	   "${vol}${SL}Temporary Items",
            "${SL}WWW_ROOT", "${SL}SYS\$SCRATCH",
 	   "C:${SL}system${SL}temp");
-    unshift(@TEMP,$ENV{'TMPDIR'}) if exists $ENV{'TMPDIR'};
+    unshift(@TEMP,$ENV{'TMPDIR'}) if defined $ENV{'TMPDIR'};
 
     # this feature was supposed to provide per-user tmpfiles, but
     # it is problematic.
@@ -4182,7 +4186,14 @@ or even
 Note that using the -compile pragma in this way will always have
 the effect of importing the compiled functions into the current
 namespace.  If you want to compile without importing use the
-compile() method instead (see below).
+compile() method instead:
+
+   use CGI();
+   CGI->compile();
+
+This is particularly useful in a mod_perl environment, in which you
+might want to precompile all CGI routines in a startup script, and
+then import the functions individually in each mod_perl script.
 
 =item -nosticky
 
