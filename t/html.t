@@ -12,6 +12,15 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
+my $CRLF = "\015\012";
+if ($^O eq 'VMS') { 
+  $CRLF = "\n";  # via web server carriage is inserted automatically
+}
+if (ord("\t") != 9) { # EBCDIC?
+  $CRLF = "\r\n";
+}
+
+
 # util
 sub test {
     local($^W) = 0;
@@ -32,10 +41,10 @@ test(7,h1({-align=>'CENTER'},['fred','agnes']) eq
     local($") = '-'; 
     test(8,h1('fred','agnes','maura') eq '<h1>fred-agnes-maura</h1>',"open/close tag \$\" interpolation");
 }
-test(9,header() eq "Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
-test(10,header(-type=>'image/gif') eq "Content-Type: image/gif\015\012\015\012","header()");
-test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks\015\012Content-Type: image/gif\015\012\015\012","header()");
-test(12,header(-nph=>1) eq "HTTP/1.0 200 OK\015\012Content-Type: text/html; charset=ISO-8859-1\015\012\015\012","header()");
+test(9,header() eq "Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","header()");
+test(10,header(-type=>'image/gif') eq "Content-Type: image/gif${CRLF}${CRLF}","header()");
+test(11,header(-type=>'image/gif',-status=>'500 Sucks') eq "Status: 500 Sucks${CRLF}Content-Type: image/gif${CRLF}${CRLF}","header()");
+test(12,header(-nph=>1) eq "HTTP/1.0 200 OK${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","header()");
 test(13,start_html() ."\n" eq <<END,"start_html()");
 <!DOCTYPE HTML
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -61,7 +70,7 @@ END
     ;
 test(16,($cookie=cookie(-name=>'fred',-value=>['chocolate','chip'],-path=>'/')) eq 'fred=chocolate&chip; path=/',"cookie()");
 my $h = header(-Cookie=>$cookie);
-test(17,$h =~ m!^Set-Cookie: fred=chocolate&chip\; path=/\015\012Date:.*\015\012Content-Type: text/html; charset=ISO-8859-1\015\012\015\012!s, 
+test(17,$h =~ m!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s, 
   "header(-cookie)");
 test(18,start_h3 eq '<h3>');
 test(19,end_h3 eq '</h3>');

@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.42 2000-08-13 16:04:43 lstein Exp $';
-$CGI::VERSION='2.71';
+$CGI::revision = '$Id: CGI.pm,v 1.43 2000-08-25 02:56:14 lstein Exp $';
+$CGI::VERSION='2.72';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1454,8 +1454,11 @@ sub startform {
 
     $method = uc($method) || 'POST';
     $enctype = $enctype || &URL_ENCODED;
-    $action = $action ? qq(action="$action") : qq 'action="' . 
-              $self->url(-absolute=>1,-path=>1,-query=>1) . '"';
+    unless (defined $action) {
+       $action = $self->url(-absolute=>1,-path=>1);
+       $action .= "?$ENV{QUERY_STRING}" if defined $ENV{QUERY_STRING};
+    }
+    $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
     return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
