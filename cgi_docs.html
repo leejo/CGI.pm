@@ -6,7 +6,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.55, 8/31/1999, L. Stein
+Version 2.56, 9/13/1999, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4567,6 +4567,13 @@ you.
 
 <H2><A NAME="new">Revision History</A></H2>
 
+<h3>Version 2.56</h3>
+<ol>
+  <li>Fixed bugs in file upload introduced in version 2.55
+  <li>Fixed long-standing bug that prevented two files with identical
+      names from being uploaded.
+</ol>
+
 <h3>Version 2.55</h3>
 <ol>
   <li>Fixed cookie regression test so as not to produce an error.
@@ -5283,6 +5290,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Aug 31 13:03:44 EDT 1999
+Last modified: Mon Sep 13 17:08:28 EDT 1999
 <!-- hhmts end -->
 </BODY> </HTML>

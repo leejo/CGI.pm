@@ -17,8 +17,8 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.19 1999-08-31 17:04:37 lstein Exp $';
-$CGI::VERSION='2.55';
+$CGI::revision = '$Id: CGI.pm,v 1.20 1999-10-11 13:56:16 lstein Exp $';
+$CGI::VERSION='2.56';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2859,7 +2859,7 @@ sub read_multipart {
 
 	# If no filename specified, then just read the data and assign it
 	# to our parameter list.
-	unless (defined $filename) {
+	if ( !defined($filename) || $filename eq '' ) {
 	    my($value) = $buffer->readBody;
 	    push(@{$self->{$param}},$value);
 	    next;
@@ -2900,7 +2900,7 @@ sub read_multipart {
 
 	  # Save some information about the uploaded file where we can get
 	  # at it later.
-	  $self->{'.tmpfiles'}->{$filename}= {
+	  $self->{'.tmpfiles'}->{fileno($filehandle)}= {
 	      name => $tmpfile,
 	      info => {%header},
 	  };
@@ -2923,8 +2923,8 @@ END_OF_FUNC
 'tmpFileName' => <<'END_OF_FUNC',
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{$filename}->{name} ?
-	$self->{'.tmpfiles'}->{$filename}->{name}->as_string
+    return $self->{'.tmpfiles'}->{fileno($filename)}->{name} ?
+	$self->{'.tmpfiles'}->{fileno($filename)}->{name}->as_string
 	    : '';
 }
 END_OF_FUNC
@@ -2932,7 +2932,7 @@ END_OF_FUNC
 'uploadInfo' => <<'END_OF_FUNC',
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{$filename}->{info};
+    return $self->{'.tmpfiles'}->{fileno($filename)}->{info};
 }
 END_OF_FUNC
 
@@ -2984,7 +2984,7 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 sub asString {
     my $self = shift;
     # get rid of package name
-    (my $i = $$self) =~ s/^\*(\w+::)+//; 
+    (my $i = $$self) =~ s/^\*(\w+::fh\d{5})+//; 
     $i =~ s/\\(.)/$1/g;
     return $i;
 # BEGIN DEAD CODE
@@ -3010,8 +3010,7 @@ END_OF_FUNC
 sub new {
     my($pack,$name,$file,$delete) = @_;
     require Fcntl unless defined &Fcntl::O_RDWR;
-    ++$FH;
-    my $ref = \*{'Fh::' . quotemeta($name)}; 
+    my $ref = \*{'Fh::' .  ++$FH . quotemeta($name)};
     sysopen($ref,$file,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($file) if $delete;
     CORE::delete $Fh::{$FH};

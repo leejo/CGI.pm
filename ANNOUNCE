@@ -1,4 +1,4 @@
-CGI.pm version 2.54 is now available for your fun and edification.
+CGI.pm version 2.56 is now available for your fun and edification.
 This will be the last version of the monolithic CGI.pm module.
 
 The new version, 3.0, will be fully modularized and optimized for
@@ -7,19 +7,13 @@ David James).
 
 Fixes in this version:
 
-1. Removed automatic domain name addition from CGI::Cookie.  This will
-BREAK some versions of Internet Explorer, but will fix problems that
-arise in internal networks when the host table-based domain names are
-not fully qualified.  To avoid breaking browsers, ALWAYS use the
--domain argument when creating cookies -- and fix your host tables!
+1. Fixed bugs in file uploaded introduced in version 2.55.
 
-2. Fixed problems in escape() handling of + signs.
-
-3. Improvements to CGI::Pretty from Brian Paulsen (*not* regression
-tested).
+2. Fixed long-standing bug which prevented two files with identical
+names from being uploaded.
 
 Lincoln Stein
-8/9/99
+9/14/99
 
 ========================================================================
 Lincoln D. Stein
