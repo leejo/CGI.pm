@@ -25,7 +25,9 @@ my $MOD_PERL = 0;
 if (exists $ENV{MOD_PERL}) {
   eval "require mod_perl";
   if (defined $mod_perl::VERSION) {
-    if ($mod_perl::VERSION >= 1.99) {
+    my $float = $mod_perl::VERSION;
+    $float = ~ s/^.+?([\d.]+).+$/$1/;
+    if ($float >= 1.99) {
       $MOD_PERL = 2;
       require Apache::RequestUtil;
     } else {

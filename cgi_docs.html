@@ -4881,6 +4881,8 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.06</h3>
 <ol>
+  <li>mod_perl 2.0 version detection patch in CGI::Cookie provided by
+      Allen Day.
   <li>autoEscape() flag is now respected when generating extra attributes.
   <li>Tests for *tag start/end generation from Shlomi Fish.
   <li>Support for can() method provided by Ron Savage.
@@ -4899,7 +4901,7 @@ you.
   <li>Patches from Dan Harkless to make CGI.pm validatable against HTML 3.2.
   <li>Fixed an extraneous "foo=bar" appearing when extra style parameters passed to
       start_html;
-  <li>Fixed potential cross-site scripting bug in startform().
+  <li>Fixed cross-site scripting bug in startform() pointed out by Dan Harkless.
   <li>Fixed documentation to discuss list context behavior of form-element generators
       explicitly.
   <li>Fixed incorrect results from end_form() when called in OO manner.
@@ -6048,6 +6050,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sat Jul 17 12:37:01 EDT 2004
+Last modified: Thu Jul 22 17:15:40 EDT 2004
 <!-- hhmts end -->
 </BODY> </HTML>
