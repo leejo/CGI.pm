@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.166 2004-05-05 14:23:33 lstein Exp $';
-$CGI::VERSION=3.05;
+$CGI::revision = '$Id: CGI.pm,v 1.167 2004-06-04 20:22:25 lstein Exp $';
+$CGI::VERSION=3.06;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -4267,7 +4267,7 @@ function calls (also see the section on CGI-LIB compatibility).
 
 =head2 SAVING THE STATE OF THE SCRIPT TO A FILE:
 
-    $query->save(FILEHANDLE)
+    $query->save(\*FILEHANDLE)
 
 This will write the current state of the form to the provided
 filehandle.  You can read it back in by providing a filehandle
@@ -4297,14 +4297,14 @@ a short example of creating multiple session records:
    foreach (0..$records) {
        my $q = new CGI;
        $q->param(-name=>'counter',-value=>$_);
-       $q->save(OUT);
+       $q->save(\*OUT);
    }
    close OUT;
 
    # reopen for reading
    open (IN,"test.out") || die;
    while (!eof(IN)) {
-       my $q = new CGI(IN);
+       my $q = new CGI(\*IN);
        print $q->param('counter'),"\n";
    }
 

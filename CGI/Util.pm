@@ -103,14 +103,14 @@ sub rearrange {
 	}
     }
 
-    push (@result,make_attributes(\%leftover,1)) if %leftover;
+    push (@result,make_attributes(\%leftover,defined $CGI::Q ? $CGI::Q->{escape} : 1)) if %leftover;
     @result;
 }
 
 sub make_attributes {
     my $attr = shift;
     return () unless $attr && ref($attr) && ref($attr) eq 'HASH';
-    my $escape = shift || 0;
+    my $escape =  shift || 0;
     my(@att);
     foreach (keys %{$attr}) {
 	my($key) = $_;

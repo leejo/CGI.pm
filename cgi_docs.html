@@ -687,7 +687,7 @@ errors may only occur the first time you call
 <H3>Saving the State to a File</H3>
 
 <PRE>
-   $query-&gt;save(FILEHANDLE)
+   $query-&gt;save(\*FILEHANDLE)
 </PRE>
 This writes the current query out to the file handle of your choice.
 The file handle must already be open and be writable, but other than
@@ -3873,7 +3873,7 @@ sub save_parameters {
     local($query) = @_;
     local($filename) = &amp;clean_name($query-&gt;param('savefile'));
     if (open(FILE,"&gt;$filename")) {
-	$query-&gt;save(FILE);
+	$query-&gt;save(\*FILE);
 	close FILE;
 	print "&lt;STRONG&gt;State has been saved to file $filename&lt;/STRONG&gt;\n";
     } else {
@@ -3885,7 +3885,7 @@ sub restore_parameters {
     local($query) = @_;
     local($filename) = &amp;clean_name($query-&gt;param('savefile'));
     if (open(FILE,$filename)) {
-	$query = new CGI(FILE);  # Throw out the old query, replace it with a new one
+	$query = new CGI(\*FILE);  # Throw out the old query, replace it with a new one
 	close FILE;
 	print "&lt;STRONG&gt;State has been restored from file $filename&lt;/STRONG&gt;\n";
     } else {
@@ -4899,6 +4899,7 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.06</h3>
 <ol>
+  <li>autoEscape() flag is now respected when generating extra attributes.
   <li>Tests for *tag start/end generation from Shlomi Fish.
   <li>Support for can() method provided by Ron Savage.
 </ol>
@@ -6064,6 +6065,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed May  5 10:23:15 EDT 2004
+Last modified: Fri Jun  4 16:21:55 EDT 2004
 <!-- hhmts end -->
 </BODY> </HTML>
