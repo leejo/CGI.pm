@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.90 2003-02-25 17:11:45 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.91 2003-02-26 22:26:09 lstein Exp $';
 $CGI::VERSION='2.92';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1518,7 +1518,7 @@ sub _script {
 
 	my(@satts);
 	push(@satts,'src'=>$src) if $src;
-	push(@satts,'language'=>$language);
+	push(@satts,'language'=>$language) unless defined $type;
         push(@satts,'type'=>$type);
 	$code = "$cdata_start$code$cdata_end" if defined $code;
 	push(@result,script({@satts},$code || ''));
