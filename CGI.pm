@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.117 2003-05-21 19:37:09 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.118 2003-05-29 15:16:28 lstein Exp $';
 $CGI::VERSION='2.94';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -671,8 +671,8 @@ sub _make_tag_func {
 	$func .= qq! return "<\L/$1\E>"; } !;
     } else {
 	$func .= qq#
-\#	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@_;
-	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest && defined(\$rest[0]);
+\#	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest && defined(\$rest[0]);
+	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest;
 	    my(\$tag,\$untag) = ("\L<$tagname\E\$attr>","\L</$tagname>\E");
 	    my \@result = map { "\$tag\$_\$untag" } 
                               (ref(\$rest[0]) eq 'ARRAY') ? \@{\$rest[0]} : "\@rest";
