@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.70 2002-09-12 03:53:38 lstein Exp $';
-$CGI::VERSION='2.86';
+$CGI::revision = '$Id: CGI.pm,v 1.71 2002-09-13 22:25:03 lstein Exp $';
+$CGI::VERSION='2.87';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -3305,8 +3305,7 @@ sub readHeader {
 
     my $token = '[-\w!\#$%&\'*+.^_\`|{}~]';
     $header=~s/$CRLF\s+/ /og;		# merge continuation lines
-    while ($header=~/($token+):\s+([^$CRLF]*)/mgox) {
-	my ($field_name,$field_value) = ($1,$2); # avoid taintedness
+    while (my ($field_name,$field_value) = $header=~/($token+):\s+([^$CRLF]*)/mgox) {
 	$field_name =~ s/\b(\w)/uc($1)/eg; #canonicalize
 	$return{$field_name}=$field_value;
     }
@@ -3488,9 +3487,10 @@ sub new {
     for (my $i = 0; $i < $MAXTRIES; $i++) {
 	last if ! -f ($filename = sprintf("${TMPDIRECTORY}${SL}CGItemp%d",$sequence++));
     }
-    # untaint the darn thing
-    return unless $filename =~ m!^([a-zA-Z0-9_ '":/.\$\\-]+)$!;
-    $filename = $1;
+    # check that it is a more-or-less valid filename
+    return unless $filename =~ m!^([a-zA-Z0-9_ \'\":/.\$\\-]+)$!;
+    # this used to untaint, now it doesn't
+    # $filename = $1;
     return bless \$filename;
 }
 END_OF_FUNC
