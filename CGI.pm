@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.135 2003-10-19 02:07:52 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.136 2003-10-31 13:33:00 lstein Exp $';
 $CGI::VERSION=3.01;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -4650,11 +4650,8 @@ The redirect() function redirects the browser to a different URL.  If
 you use redirection like this, you should B<not> print out a header as
 well.
 
-One hint I can offer is that relative links may not work correctly
-when you generate a redirection to another document on your site.
-This is due to a well-intentioned optimization that some servers use.
-The solution to this is to use the full URL (including the http: part)
-of the document you are redirecting to.
+You should always use full URLs (including the http: or ftp: part) in
+redirection requests.  Relative URLs will not work correctly.
 
 You can also use named arguments:
 

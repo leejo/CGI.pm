@@ -1027,10 +1027,8 @@ Nothing else will be displayed.
 <P>
 You can add your own headers to this as in the header() method.
 <P>
-You should always use absolute or full URLs in
-redirection requests.  Relative URLs will <strong>not</strong> work
-correctly.
-
+You should always use full URLs (including the http: or ftp: part) in
+redirection requests.  Relative URLs will <b>not</b> work correctly.
 <p>
 
 An alternative syntax for <code>redirect()</code> is:
@@ -4806,6 +4804,7 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 3.01</h3>
 <ol>
+  <li>Fixed misleading description of redirect() and relative URLs in the POD docs.
   <li>Workaround for weird interaction of CGI::Carp with Safe module reported by William McKee.
   <li>Added patches from Ilmari Karonen to improve behavior of CGI::Carp.
   <li>Fixed documentation error in -style argument.
@@ -5913,6 +5912,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sat Oct 18 22:04:47 EDT 2003
+Last modified: Fri Oct 31 08:32:48 EST 2003
 <!-- hhmts end -->
 </BODY> </HTML>
