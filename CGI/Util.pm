@@ -140,7 +140,7 @@ sub simple_escape {
   $toencode;
 }
 
-sub utf8_chr ($) {
+sub utf8_chr {
         my $c = shift(@_);
 
         if ($c < 0x80) {
