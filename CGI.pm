@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.81 2002-12-03 15:03:22 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.82 2002-12-03 15:22:26 lstein Exp $';
 $CGI::VERSION='2.90';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6325,6 +6325,23 @@ http://www.w3.org/pub/WWW/TR/Wd-css-1.html for more information.
 
 Pass an array reference to B<-style> in order to incorporate multiple
 stylesheets into your document.
+
+Should you wish to incorporate a verbatim stylesheet that includes
+arbitrary formatting in the header, you may pass a -verbatim tag to
+the -style hash, as follows:
+
+print $q->start_html (-STYLE  =>  {-verbatim => '@import
+url("/server-common/css/'.$cssFile.'");',
+                      -src      =>  '/server-common/css/core.css'});
+</blockquote></pre>
+
+
+This will generate an HTML header that contains this:
+
+ <link rel="stylesheet" type="text/css"  href="/server-common/css/core.css">
+   <style type="text/css">
+   @import url("/server-common/css/main.css");
+   </style>
 
 =head1 DEBUGGING
 

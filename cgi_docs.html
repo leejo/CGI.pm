@@ -3551,6 +3551,32 @@ Pass an array reference to <B>-style</B> in order to incorporate
 multiple stylesheets into your document.
 
 <p>
+
+Should you wish to incorporate a verbatim stylesheet that includes
+arbitrary formatting in the header, you may pass a -verbatim tag to
+the -style hash, as follows:
+
+<pre><blockquote>
+print $q-&gt;start_html (-STYLE  =&gt;  {-verbatim =&gt; '@import
+url("/server-common/css/'.$cssFile.'");',
+                      -src      =&gt;  '/server-common/css/core.css'});
+</blockquote></pre>
+
+<p>
+
+This will generate HTML like this:
+
+<pre><blockquote>
+&lt;link rel="stylesheet" type="text/css"
+ href="/server-common/css/core.css">
+
+   &lt;style type="text/css"&gt;
+   @import url("/server-common/css/main.css");
+   &lt;/style&gt;
+</blockquote></pre>
+
+<p>
+
 <a href="#contents">Table of contents</a>
 
 <hr>
@@ -4687,6 +4713,7 @@ you.
 <H2><A NAME="new">Revision History</A></H2>
 <h3>Version 2.90</h3>
 <ol>
+  <li>Added a -verbatim option to stylesheet generation from Michael Dickson
   <li>Faster delete() method from Neelam Gupta
   <li>Fixed broken Cygwin support.
   <li>Added empty charset support from Bradley Baetz
@@ -5701,6 +5728,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Dec  3 10:03:05 EST 2002
+Last modified: Tue Dec  3 10:22:19 EST 2002
 <!-- hhmts end -->
 </BODY> </HTML>
