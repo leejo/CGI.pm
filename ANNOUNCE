@@ -1,29 +1,11 @@
-CGI.pm version 2.50 is now available for your fun and edification.
+CGI.pm version 2.51 is now available for your fun and edification.
 This version includes the following bug fixes and features:
 
-1. Patch to fix file upload bug appearing in IE 3.01 for Macintosh/PowerPC.
-
-2.Replaced use of $ENV{SCRIPT_NAME} with $ENV{REQUEST_URI} when running
-  under Apache, to fix self-referencing URIs.
-
-3. Fixed bug in escapeHTML() which caused certain constructs, such as
-   CGI->image_button(), to fail.
-
-4. Fixed bug which caused strong('CGI') to fail.  Be careful to use
-   CGI::strong('CGI') and not CGI->strong('CGI').  The latter will
-   produce confusing results.
-
-5. Added upload() function, as a preferred replacement for
-   the "filehandle as string" feature.
-
-6. Added cgi_error() error-reporting function.
-
-7. Rewrote file upload handling to return undef rather than dieing
-   when an error is encountered.  Be sure to call
-   cgi_error() to find out what went wrong.
+1. Patch to fix cookie setting problems with IE 5.0 (and maybe Netscape 5.0)
+2. Documentation fixes.
 
 Lincoln Stein
-3/17/99
+5/3/99
 
 ========================================================================
 Lincoln D. Stein

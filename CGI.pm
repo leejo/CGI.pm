@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.15 1999-05-03 17:57:18 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.16 1999-05-03 18:08:11 lstein Exp $';
 $CGI::VERSION='2.51';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3881,7 +3881,7 @@ Import "standard" features, 'html2', 'html3', 'form' and 'cgi'.
 =item B<:all>
 
 Import all the available methods.  For the full list, see the CGI.pm
-code, where the variable %TAGS is defined.
+code, where the variable %EXPORT_TAGS is defined.
 
 =back
 
