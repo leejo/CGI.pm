@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.85, 9/11/2002, L. Stein
+Version 2.86, 9/11/2002, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4696,6 +4696,11 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.86</h3>
+<ol>
+  <li>Fixes for broken CGI::Cookie expiration dates introduced in
+      2.84.
+</ol>
 <h3>Version 2.85</h3>
 <ol>
   <li>Fix for broken autoEscape function introduced in 2.84.
@@ -4703,6 +4708,8 @@ you.
 <h3>Version 2.84</h3>
 <ol>
   <li>Fix for failed file uploads on Cygwin platforms.
+  <li>HTML escaping code now replaced 0x8b and 0x9b with unicode
+      references &#8249; and *#8250;
 </ol>
 
 <h3>Version 2.83</h3>
@@ -5675,6 +5682,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Wed Sep 11 09:13:47 EDT 2002
+Last modified: Wed Sep 11 23:53:30 EDT 2002
 <!-- hhmts end -->
 </BODY> </HTML>

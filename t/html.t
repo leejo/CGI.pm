@@ -85,7 +85,7 @@ test(17,$h =~ m!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Co
 test(18,start_h3 eq '<h3>');
 test(19,end_h3 eq '</h3>');
 test(20,start_table({-border=>undef}) eq '<table border>');
-test(21,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; &#139;right&#155;</h1>');
+test(21,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; &#8249;right&#8250;</h1>');
 charset('utf-8');
 if (ord("\t") == 9) {
 test(22,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; ‹right›</h1>');

@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.69 2002-09-12 03:45:05 lstein Exp $';
-$CGI::VERSION='2.85';
+$CGI::revision = '$Id: CGI.pm,v 1.70 2002-09-12 03:53:38 lstein Exp $';
+$CGI::VERSION='2.86';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1959,8 +1959,8 @@ sub escapeHTML {
                      uc $self->{'.charset'} eq 'WINDOWS-1252';
          if ($latin) {  # bug in some browsers
                 $toencode =~ s{'}{&#39;}gso;
-                $toencode =~ s{\x8b}{&#139;}gso;
-                $toencode =~ s{\x9b}{&#155;}gso;
+                $toencode =~ s{\x8b}{&#8249;}gso;
+                $toencode =~ s{\x9b}{&#8250;}gso;
                 if (defined $newlinestoo && $newlinestoo) {
                      $toencode =~ s{\012}{&#10;}gso;
                      $toencode =~ s{\015}{&#13;}gso;
@@ -4971,9 +4971,9 @@ Provided that you have specified a character set of ISO-8859-1 (the
 default), the standard HTML escaping rules will be used.  The "<"
 character becomes "&lt;", ">" becomes "&gt;", "&" becomes "&amp;", and
 the quote character becomes "&quot;".  In addition, the hexadecimal
-0x8b and 0x9b characters, which many windows-based browsers interpret
+0x8b and 0x9b characters, which some browsers incorrectly interpret
 as the left and right angle-bracket characters, are replaced by their
-numeric HTML entities ("&#139" and "&#155;").  If you manually change
+numeric character entities ("&#8249" and "&#8250;").  If you manually change
 the charset, either by calling the charset() method explicitly or by
 passing a -charset argument to header(), then B<all> characters will
 be replaced by their numeric entities, since CGI.pm has no lookup
