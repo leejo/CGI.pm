@@ -132,8 +132,11 @@ href="http://stein.cshl.org/WWW/software/CGI/">http://stein.cshl.org/WWW/softwar
 
 <P>
 
-There is also a beta of version 3.0X available, courtesy David James.  Please try and report any
- bugs or misfeatures to <a href="mailto:lstein@cshl.org">me</a>.
+<h2><font color="red">Beta Test Version</font></h2>
+
+There is a beta of version 3.0X available, courtesy David James.
+Please try and report any bugs or misfeatures to <a
+href="mailto:lstein@cshl.org">me</a>.
 
 <ul>
   <li><a href="CGI.pm-3.01.tar.gz">Download 3.01 BETA</a></li>
@@ -2582,15 +2585,11 @@ dashes.
   <dd>Turns off "sticky" behavior in fill-out forms.  Every form
       element will act as if you passed -override.
       <p>
-  <dt><b>-xhtml</b>
-  <dd>Enable support for XHTML (<a
-href="http://www.w3.org/TR/xhtml1/">http://www.w3.org/TR/xhtml1/</a>)
-      output.  This
-      changes the default DTD and adds a closing / to all unpaired tags,
-      such as &lt;BR /&gt;.
-      <p>
-      This doesn't yet (May 2000) make the document fully XHTML compliant, because
-      the tags are still in all-caps.
+  <dt><b>-no_xhtml</b>
+  <dd>By default, CGI.pm versions 2.69 and higher emit XHTML
+      (<a href="http://www.w3.org/TR/xhtml1/">http://www.w3.org/TR/xhtml1/</a>).
+      The -no_xhtml pragma disables this feature.  Thanks to Michalis Kabrianis
+      &lt;kabrianis@hellug.gr&gt; for this feature.
       <p>
   <dt><b>-nph</b>
   <dd>This makes CGI.pm produce a header appropriate for an NPH (no
@@ -4647,8 +4646,11 @@ you.
 
 <h3>Version 2.69</h3>
 <ol>
-  <li>starform() now creates default ACTION for POSTs as well as GETs.
+  <li>startform() now creates default ACTION for POSTs as well as GETs.
       This may break some browsers, but it no longer violates the HTML spec.
+  <li>CGI.pm now emits XHTML by default.  Disable with -no_xhtml.
+  <li>We no longer interpret &#ddd sequences in non-latin character
+      sets.
 </ol>
 
 <h3>Version 2.68</h3>
@@ -5479,6 +5481,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Thu Jul 27 22:31:38 EDT 2000
+Last modified: Thu Jul 27 22:59:03 EDT 2000
 <!-- hhmts end -->
 </BODY> </HTML>

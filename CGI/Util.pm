@@ -48,14 +48,14 @@ sub rearrange {
     my ($i,%pos);
     $i = 0;
     foreach (@$order) {
-	foreach (ref($_) eq 'ARRAY' ? @$_ : $_) { $pos{$_} = $i; }
+	foreach (ref($_) eq 'ARRAY' ? @$_ : $_) { $pos{lc($_)} = $i; }
 	$i++;
     }
 
     my (@result,%leftover);
     $#result = $#$order;  # preextend
     while (@param) {
-	my $key = uc(shift(@param));
+	my $key = lc(shift(@param));
 	$key =~ s/^\-//;
 	if (exists $pos{$key}) {
 	    $result[$pos{$key}] = shift(@param);
@@ -76,7 +76,7 @@ sub make_attributes {
     foreach (keys %{$attr}) {
 	my($key) = $_;
 	$key=~s/^\-//;     # get rid of initial - if present
-	$key=~tr/a-z_/A-Z-/; # parameters are upper case, use dashes
+	$key=~tr/A-Z_/a-z-/; # parameters are lower case, use dashes
 	my $value = $escape ? simple_escape($attr->{$_}) : $attr->{$_};
 	push(@att,defined($attr->{$_}) ? qq/$key="$value"/ : qq/$key/);
     }

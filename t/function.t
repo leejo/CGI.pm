@@ -81,7 +81,6 @@ if ($Config{d_fork}) {
   print "ok 23 # Skip\n";
   print "ok 24 # Skip\n";
 }
-
-test(25,redirect('http://somewhere.else') eq "Status: 302 Moved${CRLF}Location: http://somewhere.else${CRLF}${CRLF}","CGI::redirect() 1");
-test(26,redirect(-Location=>'http://somewhere.else',-Type=>'text/html') eq "Status: 302 Moved${CRLF}Location: http://somewhere.else${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","CGI::redirect() 2");
-test(27,redirect(-Location=>'http://somewhere.else/bin/foo&bar',-Type=>'text/html') eq "Status: 302 Moved${CRLF}Location: http://somewhere.else/bin/foo&bar${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","CGI::redirect() 2");
+test(25,redirect('http://somewhere.else') eq "Status: 302 Moved${CRLF}location: http://somewhere.else${CRLF}${CRLF}","CGI::redirect() 1");
+test(26,redirect(-Location=>'http://somewhere.else',-Type=>'text/html') eq "Status: 302 Moved${CRLF}location: http://somewhere.else${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","CGI::redirect() 2");
+test(27,redirect(-Location=>'http://somewhere.else/bin/foo&bar',-Type=>'text/html') eq "Status: 302 Moved${CRLF}location: http://somewhere.else/bin/foo&bar${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}","CGI::redirect() 2");

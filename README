@@ -63,6 +63,9 @@ May 1998.  If you like CGI.pm, you'll love this book.
 
 IMPORTANT NOTES:
 
+Version 2.69 emits XHTML by default.  To get the old behavior, use the
+-no_xhtml pragma.
+
 Versions 2.44-2.46 introduce two API changes that will affect
 users of previous versions:
 
