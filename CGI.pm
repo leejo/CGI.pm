@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.129 2003-07-22 17:45:18 lstein Exp $';
-$CGI::VERSION='2.98';
+$CGI::revision = '$Id: CGI.pm,v 1.130 2003-08-01 14:39:17 lstein Exp $';
+$CGI::VERSION='2.99';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1644,7 +1644,7 @@ sub startform {
            $action .= "?".$self->escapeHTML($ENV{QUERY_STRING},1);
        }
     }
-    $action =~ s/\"/%22/g;  # fix cross-site scripting bug reported by obscure
+    $action = escape($action);
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
@@ -3584,10 +3584,12 @@ END_OF_AUTOLOAD
 ####################################################################################
 package CGITempFile;
 
-$SL = $CGI::SL;
-$MAC = $CGI::OS eq 'MACINTOSH';
-my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
-unless ($TMPDIRECTORY) {
+sub find_tempdir {
+  undef $TMPDIRECTORY;
+  $SL = $CGI::SL;
+  $MAC = $CGI::OS eq 'MACINTOSH';
+  my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
+  unless ($TMPDIRECTORY) {
     @TEMP=("${SL}usr${SL}tmp","${SL}var${SL}tmp",
 	   "C:${SL}temp","${SL}tmp","${SL}temp",
 	   "${vol}${SL}Temporary Items",
@@ -3605,11 +3607,14 @@ unless ($TMPDIRECTORY) {
     # unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
 
     foreach (@TEMP) {
-	do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
+      do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
     }
+  }
+  $TMPDIRECTORY  = $MAC ? "" : "." unless $TMPDIRECTORY;
 }
 
-$TMPDIRECTORY  = $MAC ? "" : "." unless $TMPDIRECTORY;
+find_tempdir();
+
 $MAXTRIES = 5000;
 
 # cute feature, but overload implementation broke it
@@ -3634,6 +3639,7 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 sub new {
     my($package,$sequence) = @_;
     my $filename;
+    find_tempdir() unless -w $TMPDIRECTORY;
     for (my $i = 0; $i < $MAXTRIES; $i++) {
 	last if ! -f ($filename = sprintf("${TMPDIRECTORY}${SL}CGItemp%d",$sequence++));
     }

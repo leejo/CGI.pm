@@ -7,7 +7,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.99, X/XX?/2003, L. Stein
+Version 2.99, 8/1/2003, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -4807,6 +4807,9 @@ you.
   <li>Patch from Steve Hay to fix extra Content-type: appearing on browser
       screen when FatalsToBrowser invoked.
   <li>Patch from Ewann Corvellec to fix cross-site scripting vulnerability.
+  <li>Fixed tmpdir routine for file uploading to solve problem that occurs
+      under mod_perl when tmpdir is writable at startup time, but not at
+      session time.
 </ol>
 <h3>Version 2.98</h3>
 <ol>
@@ -5892,6 +5895,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Tue Jul 22 13:45:02 EDT 2003
+Last modified: Fri Aug  1 10:39:07 EDT 2003
 <!-- hhmts end -->
 </BODY> </HTML>
