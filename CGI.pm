@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.77 2002-11-05 13:40:21 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.78 2002-11-05 15:27:25 lstein Exp $';
 $CGI::VERSION='2.89';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3398,9 +3398,9 @@ sub read {
 	return undef;
     }
 
-    my $bytesToReturn;    
+    my $bytesToReturn;
     if ($start > 0) {           # read up to the boundary
-	$bytesToReturn = $start > $bytes ? $bytes : $start;
+        $bytesToReturn = $start-2 > $bytes ? $bytes : $start;
     } else {    # read the requested number of bytes
 	# leave enough bytes in the buffer to allow us to read
 	# the boundary.  Thanks to Kevin Hendrick for finding
@@ -3412,7 +3412,7 @@ sub read {
     substr($self->{BUFFER},0,$bytesToReturn)='';
     
     # If we hit the boundary, remove the CRLF from the end.
-    return (($start > 0) && ($start <= $bytes)) 
+    return ($bytesToReturn==$start)
            ? substr($returnval,0,-2) : $returnval;
 }
 END_OF_FUNC
