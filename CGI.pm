@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.5 1998-12-06 10:19:48 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.6 1999-01-22 14:24:08 lstein Exp $';
 $CGI::VERSION='2.46';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1800,8 +1800,7 @@ END_OF_FUNC
 # Escape HTML -- used internally
 'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
-    my($self,$toencode) = @_;
-    $toencode = $self unless ref($self);
+    my ($self,$toencode) = self_or_default(@_);
     return undef unless defined($toencode);
     return $toencode if ref($self) && $self->{'dontescape'};
 
@@ -2135,6 +2134,16 @@ sub url {
     my $url;
     $full++ if !($relative || $absolute);
 
+    my $path = $self->path_info;
+    my $script_name;
+    if (exists($ENV{REQUEST_URI})) {
+	$script_name = $ENV{REQUEST_URI};
+	# is this how to strip off path information?
+	$script_name =~ s/$path.*$// if defined $path;
+    } else {
+	$script_name = $self->script_name;
+    }
+
     if ($full) {
 	my $protocol = $self->protocol();
 	$url = "$protocol://";
@@ -2148,13 +2157,13 @@ sub url {
 		unless (lc($protocol) eq 'http' && $port == 80)
 		    || (lc($protocol) eq 'https' && $port == 443);
 	}
-	$url .= $self->script_name;
+	$url .= $script_name;
     } elsif ($relative) {
-	($url) = $self->script_name =~ m!([^/]+)$!;
+	($url) = $script_name =~ m!([^/]+)$!;
     } elsif ($absolute) {
-	$url = $self->script_name;
+	$url = $script_name;
     }
-    $url .= $self->path_info if $path_info and $self->path_info;
+    $url .= $path if $path_info and defined $path;
     $url .= "?" . $self->query_string if $query and $self->query_string;
     return $url;
 }
@@ -2976,7 +2985,7 @@ sub new {
 
 	# BUG: IE 3.01 on the Macintosh uses just the boundary -- not
 	# the two extra hyphens.  We do a special case here on the user-agent!!!!
-	$boundary = "--$boundary" unless CGI::user_agent('MSIE 3\.0[12];  ?Mac');
+	$boundary = "--$boundary" unless CGI::user_agent('MSIE\s+3\.0[12];\s*Mac');
 
     } else { # otherwise we find it ourselves
 	my($old);
@@ -4135,17 +4144,17 @@ You can place other arbitrary HTML elements to the <HEAD> section with the
 B<-head> tag.  For example, to place the rarely-used <LINK> element in the
 head section, use this:
 
-    print $q->start_html(-head=>Link({-rel=>'next',
-				  -href=>'http://www.capricorn.com/s2.html'}));
+    print start_html(-head=>Link({-rel=>'next',
+		     -href=>'http://www.capricorn.com/s2.html'}));
 
 To incorporate multiple HTML elements into the <HEAD> section, just pass an
 array reference:
 
-    print $q->start_html(-head=>[ 
-                              Link({-rel=>'next',
-				    -href=>'http://www.capricorn.com/s2.html'}),
-			      Link({-rel=>'previous',
-				    -href=>'http://www.capricorn.com/s1.html'})
+    print start_html(-head=>[ 
+                             Link({-rel=>'next',
+				   -href=>'http://www.capricorn.com/s2.html'}),
+		             Link({-rel=>'previous',
+				   -href=>'http://www.capricorn.com/s1.html'})
 			     ]
 		     );
 

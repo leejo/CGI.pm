@@ -50,7 +50,7 @@ WHERE IS THE ONLINE DOCUMENTATION?
 Online documentation of for CGI.pm, and notifications of new versions
 can be found at:
 
-   http://stein.cshl.org/software/WWW/CGI/
+   http://stein.cshl.org/WWW/software/CGI/
 
 A copy of the HTML documentation can be found in the package in the
 file cgi_docs.html or in the standard POD pages.

@@ -5,7 +5,7 @@
 <BODY bgcolor="#FFFFFF">
 <H1><IMG SRC="examples/dna.small.gif" ALT="[logo]">
 CGI.pm - a Perl5 CGI Library</H1>
-Version 2.46, 11/26/98, L. Stein
+Version 2.46, 12/06/98, L. Stein
 <p>
 
 <H2>Abstract</H2> This perl 5 library uses objects to create Web
@@ -994,16 +994,16 @@ All parameters are optional:
   <li>A <strong>-head</strong> parameter to define other arbitrary elements
       of the &lt;HEAD&gt; section.  For example:
       <pre>
-      print $q-&gt;header(-head=&gt;link({-rel=&gt;'next',
-                       -href=&gt;'http://www.capricorn.com/s2.html'}));
+      print header(-head=&gt;Link({-rel=&gt;'next',
+                   -href=&gt;'http://www.capricorn.com/s2.html'}));
 
       </pre>
       or even
       <pre>
-      print $q-&gt;header(-head=&gt;[ link({-rel=&gt;'next',
-				      -href=&gt;'http://www.capricorn.com/s2.html'}),
-			        link({-rel=&gt;'previous',
-				      -href=&gt;'http://www.capricorn.com/s1.html'})
+      print header(-head=&gt;[ Link({-rel=&gt;'next',
+			             -href=&gt;'http://www.capricorn.com/s2.html'}),
+			       Link({-rel=&gt;'previous',
+				     -href=&gt;'http://www.capricorn.com/s1.html'})
 			      ]
 		      );
       </pre>
@@ -4420,6 +4420,15 @@ you.
 <HR>
 
 <H2><A NAME="new">Revision History</A></H2>
+<h3>Version 2.47</h3>
+<ol>
+  <li>Patch to fix file upload bug appearing in IE 3.01 for Macintosh/PowerPC.
+  <li>Replaced use of $ENV{SCRIPT_NAME} with $ENV{REQUEST_URI} when running
+      under Apache, to fix self-referencing URIs.
+  <li>Fixed bug in escapeHTML() which caused certain constructs, such as
+      CGI->imageButton(), to fail.
+</ol>
+
 <h3>Version 2.46</h3>
 <ol>
   <li>Fix for failure of the "include" tests under mod_perl
@@ -5058,6 +5067,6 @@ v  <LI> Added string interpolation of the CGI object.
 <a href="http://www.cshl.org/">Cold Spring Harbor Laboratory</a></ADDRESS>
 <P>
 <!-- hhmts start -->
-Last modified: Sun Dec  6 10:18:51 GMT 1998
+Last modified: Tue Jan 19 08:54:15 PST 1999
 <!-- hhmts end -->
 </BODY> </HTML>

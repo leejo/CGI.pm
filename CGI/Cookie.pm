@@ -17,7 +17,7 @@ package CGI::Cookie;
 #   http://www.genome.wi.mit.edu/ftp/pub/software/WWW/cgi_docs.html
 #   ftp://ftp-genome.wi.mit.edu/pub/software/WWW/
 
-$CGI::Cookie::VERSION='1.06';
+$CGI::Cookie::VERSION='1.07';
 
 use CGI;
 use overload '""' => \&as_string,
@@ -251,10 +251,10 @@ cookie originated from.
 If you provide a cookie path attribute, the browser will check it
 against your script's URL before returning the cookie.  For example,
 if you specify the path "/cgi-bin", then the cookie will be returned
-to each of the scripts "/cgi-bin/tally.pl", "/cgi-bin/order.pl",
-and "/cgi-bin/customer_service/complain.pl", but not to the script
-"/cgi-private/site_admin.pl".  By default, path is set to "/", which
-causes the cookie to be sent to any CGI script on your site.
+to each of the scripts "/cgi-bin/tally.pl", "/cgi-bin/order.pl", and
+"/cgi-bin/customer_service/complain.pl", but not to the script
+"/cgi-private/site_admin.pl".  By default, the path is set to the
+directory that contains your script.
 
 =item B<4. secure flag>
 
