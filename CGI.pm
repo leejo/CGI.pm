@@ -17,7 +17,7 @@ require 5.004;
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.41 2000-08-13 15:41:21 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.42 2000-08-13 16:04:43 lstein Exp $';
 $CGI::VERSION='2.71';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1335,8 +1335,8 @@ sub _style {
     my (@result);
     my $type = 'text/css';
 
-    my $cdata_start = $XHTML ? "\n<![CDATA[" : '<!--';
-    my $cdata_end   = $XHTML ? "]]>\n" : '-->';
+    my $cdata_start = $XHTML ? "\n<!--/* <![CDATA[ */" : "\n<!-- ";
+    my $cdata_end   = $XHTML ? "\n/* ]]> */-->\n" : " -->\n";
 
     if (ref($style)) {
      my($src,$code,$stype,@other) =
@@ -1368,9 +1368,6 @@ sub _script {
     my ($self,$script) = @_;
     my (@result);
 
-    my $cdata_start = $XHTML ? "\n<![CDATA[" : '<!-- Hide script';
-    my $cdata_end   = $XHTML ? "]]>\n" : ' End script hiding -->';
-
     my (@scripts) = ref($script) eq 'ARRAY' ? @$script : ($script);
     foreach $script (@scripts) {
 	my($src,$code,$language);
@@ -1389,18 +1386,21 @@ sub _script {
 	} else {
 	    ($src,$code,$language, $type) = ('',$script,'JavaScript', 'text/javascript');
 	}
+
+    my $comment = '//';  # javascript by default
+    $comment = '#' if $type=~/perl|tcl/i;
+    $comment = "'" if $type=~/vbscript/i;
+
+    my $cdata_start  =  "\n<!-- Hide script\n";
+    $cdata_start    .= "$comment<![CDATA[\n"  if $XHTML; 
+    my $cdata_end    = $XHTML ? "\n$comment]]>" : $comment;
+    $cdata_end      .= " End script hiding -->\n";
+
 	my(@satts);
 	push(@satts,'src'=>$src) if $src;
 	push(@satts,'language'=>$language);
         push(@satts,'type'=>$type);
-	$code = "$cdata_start\n$code\n// $cdata_end"
-	    if $code && $type=~/javascript/i;
-	$code = "$cdata_start\n$code\n\# $cdata_end"
-	    if $code && $type=~/perl/i;
-	$code = "$cdata_start\n$code\n\# $cdata_end"
-	    if $code && $type=~/tcl/i;
-        $code = "$cdata_start\n$code\n' $cdata_end"
-            if $code && $type=~/vbscript/i;
+	$code = "$cdata_start$code$cdata_end";
 	push(@result,script({@satts},$code || ''));
     }
     @result;
