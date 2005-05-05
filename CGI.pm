@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.179 2005-04-07 22:40:37 lstein Exp $';
-$CGI::VERSION=3.08;
+$CGI::revision = '$Id: CGI.pm,v 1.180 2005-05-05 20:15:35 lstein Exp $';
+$CGI::VERSION=3.09;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -179,7 +179,7 @@ $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 if (exists $ENV{MOD_PERL}) {
   # mod_perl handlers may run system() on scripts using CGI.pm;
   # Make sure so we don't get fooled by inherited $ENV{MOD_PERL}
-  if ($ENV{MOD_PERL_API_VERSION} == 2) {
+  if (exists $ENV{MOD_PERL_API_VERSION} && $ENV{MOD_PERL_API_VERSION} == 2) {
     $MOD_PERL = 2;
     require Apache2::Response;
     require Apache2::RequestRec;
@@ -888,6 +888,7 @@ sub element_id {
 
 sub element_tab {
   my ($self,$new_value) = self_or_default(@_);
+  $self->{'.etab'} ||= 1;
   $self->{'.etab'} = $new_value if defined $new_value;
   $self->{'.etab'}++;
 }
