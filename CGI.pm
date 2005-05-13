@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.180 2005-05-05 20:15:35 lstein Exp $';
-$CGI::VERSION=3.09;
+$CGI::revision = '$Id: CGI.pm,v 1.181 2005-05-13 21:45:26 lstein Exp $';
+$CGI::VERSION=3.10;
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -184,6 +184,7 @@ if (exists $ENV{MOD_PERL}) {
     require Apache2::Response;
     require Apache2::RequestRec;
     require Apache2::RequestUtil;
+    require Apache2::RequestIO;
     require APR::Pool;
   } else {
     $MOD_PERL = 1;
