@@ -1,3 +1,6 @@
+  Version 3.11
+    1. Killed warning in CGI::Cookie about MOD_PERL_API_VERSION
+
   Version 3.10
     1. Added Apache2::RequestIO, which is necessary for mp2 interoperability.
 
