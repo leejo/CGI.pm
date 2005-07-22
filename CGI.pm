@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.182 2005-06-27 21:59:51 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.183 2005-07-22 13:17:27 lstein Exp $';
 $CGI::VERSION='3.10';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3876,9 +3876,12 @@ CGI - Simple Common Gateway Interface Class
         hr;
 
    if (param()) {
-       print "Your name is",em(param('name')),p,
-	     "The keywords are: ",em(join(", ",param('words'))),p,
-	     "Your favorite color is ",em(param('color')),
+       my $name      = param('name');
+       my $keywords  = join ', ',param('words');
+       my $color     = param('color');
+       print "Your name is",em(escapeHTML($name)),p,
+	     "The keywords are: ",em(escapeHTML($keywords)),p,
+	     "Your favorite color is ",em(escapeHTML($color)),
 	     hr;
    }
 
