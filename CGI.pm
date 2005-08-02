@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.183 2005-07-22 13:17:27 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.184 2005-08-02 18:03:26 lstein Exp $';
 $CGI::VERSION='3.10';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1134,7 +1134,7 @@ END_OF_FUNC
 ####
 'append' => <<'EOF',
 sub append {
-    my($self,@p) = @_;
+    my($self,@p) = self_or_default(@_);
     my($name,$value) = rearrange([NAME,[VALUE,VALUES]],@p);
     my(@values) = defined($value) ? (ref($value) ? @{$value} : $value) : ();
     if (@values) {
