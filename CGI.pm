@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.185 2005-08-03 21:14:55 lstein Exp $';
-$CGI::VERSION='3.11';
+$CGI::revision = '$Id: CGI.pm,v 1.186 2005-08-22 20:50:41 lstein Exp $';
+$CGI::VERSION='3.12';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -3008,8 +3008,9 @@ END_OF_FUNC
 sub virtual_port {
     my($self) = self_or_default(@_);
     my $vh = $self->http('x_forwarded_host') || $self->http('host');
+    my $protocol = $self->protocol;
     if ($vh) {
-        return ($vh =~ /:(\d+)$/)[0] || '80';
+        return ($vh =~ /:(\d+)$/)[0] || ($protocol eq 'https' ? 443 : 80);
     } else {
         return $self->server_port();
     }
@@ -5817,8 +5818,7 @@ UPLOAD_HOOK facility available in Apache::Request, with the exception
 that the first argument to the callback is an Apache::Upload object,
 here it's the remote filename.
 
- $q = CGI->new();
- $q->upload_hook(\&hook,$data);
+ $q = CGI->new(\&hook,$data);
 
  sub hook
  {
