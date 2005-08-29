@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.187 2005-08-29 16:44:36 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.188 2005-08-29 17:35:31 lstein Exp $';
 $CGI::VERSION='3.12';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2745,6 +2745,10 @@ sub _name_and_path_from_env {
    my $raw_path_info   = $ENV{PATH_INFO}   || '';
    my $uri             = $ENV{REQUEST_URI} || '';
 
+   if ($raw_script_name =~ m/$raw_path_info$/) {
+     $raw_script_name =~ s/$raw_path_info$//;
+   }
+
    my @uri_double_slashes  = $uri =~ m^(/{2,}?)^g;
    my @path_double_slashes = "$raw_script_name $raw_path_info" =~ m^(/{2,}?)^g;
 
@@ -3366,7 +3370,11 @@ sub read_multipart {
 
 	  # Save some information about the uploaded file where we can get
 	  # at it later.
-	  $self->{'.tmpfiles'}->{fileno($filehandle)}= {
+	  # Use the typeglob as the key, as this is guaranteed to be
+	  # unique for each filehandle.  Don't use the file descriptor as
+	  # this will be re-used for each filehandle if the
+	  # close_upload_files feature is used.
+	  $self->{'.tmpfiles'}->{$$filehandle}= {
               hndl => $filehandle,
 	      name => $tmpfile,
 	      info => {%header},
@@ -3389,8 +3397,8 @@ END_OF_FUNC
 'tmpFileName' => <<'END_OF_FUNC',
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{fileno($filename)}->{name} ?
-	$self->{'.tmpfiles'}->{fileno($filename)}->{name}->as_string
+    return $self->{'.tmpfiles'}->{$$filename}->{name} ?
+	$self->{'.tmpfiles'}->{$$filename}->{name}->as_string
 	    : '';
 }
 END_OF_FUNC
@@ -3398,7 +3406,7 @@ END_OF_FUNC
 'uploadInfo' => <<'END_OF_FUNC',
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{fileno($filename)}->{info};
+    return $self->{'.tmpfiles'}->{$$filename}->{info};
 }
 END_OF_FUNC
 
