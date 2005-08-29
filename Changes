@@ -2,6 +2,7 @@
     1. Fixed virtual_port so that it works properly with https protocol.
     2. Fixed documentation for upload_hook().
     3. Added POSTDATA documentation.
+    4. Made upload_hook() work in function-oriented mode.
 
   Version 3.11
     1. Killed warning in CGI::Cookie about MOD_PERL_API_VERSION
