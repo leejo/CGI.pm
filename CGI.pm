@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.186 2005-08-22 20:50:41 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.187 2005-08-29 16:44:36 lstein Exp $';
 $CGI::VERSION='3.12';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -4270,6 +4270,21 @@ that all the defaults are taken when you create a fill-out form.
 
 Use Delete_all() instead if you are using the function call interface.
 
+=head2 HANDLING NON-URLENCODED ARGUMENTS
+
+
+If POSTed data is not of type application/x-www-form-urlencoded or
+multipart/form-data, then the POSTed data will not be processed, but
+instead be returned as-is in a parameter named POSTDATA.  To retrieve
+it, use code like this:
+
+   my $data = $query->param('POSTDATA');
+
+(If you don't know what the preceding means, don't worry about it.  It
+only affects people trying to use CGI for XML processing and other
+specialized tasks.)
+
+
 =head2 DIRECT ACCESS TO THE PARAMETER LIST:
 
    $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
@@ -7384,7 +7399,7 @@ OLD VERSION
 
 NEW VERSION
     use CGI;
-    CGI::ReadParse;
+    CGI::ReadParse();
     print "The value of the antique is $in{antique}.\n";
 
 CGI.pm's ReadParse() routine creates a tied variable named %in,
