@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.189 2005-08-29 23:02:43 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.190 2005-09-07 20:22:41 lstein Exp $';
 $CGI::VERSION='3.12';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1807,7 +1807,7 @@ END_OF_FUNC
 'start_multipart_form' => <<'END_OF_FUNC',
 sub start_multipart_form {
     my($self,@p) = self_or_default(@_);
-    if (defined($param[0]) && substr($param[0],0,1) eq '-') {
+    if (defined($p[0]) && substr($p[0],0,1) eq '-') {
 	my(%p) = @p;
 	$p{'-enctype'}=&MULTIPART;
 	return $self->startform(%p);
