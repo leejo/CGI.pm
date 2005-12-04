@@ -43,6 +43,7 @@ t/fast.t
 t/form.t
 t/function.t
 t/html.t
+t/no_tabindex.t
 t/gen-tests/gen-start-end-tags.pl
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
