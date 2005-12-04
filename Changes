@@ -12,6 +12,8 @@
        rewriting. This is mostly worked around in url() and self_url(), but you
        may notice some anomalies.
     8. Removed empty (and non-validating) <div> from code emitted by end_form().
+    9. Fixed CGI::Carp to work correctly with Mod_perl 1.29 in an Apache 2 environment.
+   10. Setting $CGI::TMPDIRECTORY should now be effective.
 
   Version 3.11
     1. Killed warning in CGI::Cookie about MOD_PERL_API_VERSION

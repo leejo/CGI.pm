@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.191 2005-12-04 15:55:08 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.192 2005-12-04 16:44:03 lstein Exp $';
 $CGI::VERSION='3.12';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3813,11 +3813,10 @@ END_OF_AUTOLOAD
 package CGITempFile;
 
 sub find_tempdir {
-  undef $TMPDIRECTORY;
   $SL = $CGI::SL;
   $MAC = $CGI::OS eq 'MACINTOSH';
   my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
-  unless ($TMPDIRECTORY) {
+  unless (defined $TMPDIRECTORY) {
     @TEMP=("${SL}usr${SL}tmp","${SL}var${SL}tmp",
 	   "C:${SL}temp","${SL}tmp","${SL}temp",
 	   "${vol}${SL}Temporary Items",
