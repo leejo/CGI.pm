@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.192 2005-12-04 16:44:03 lstein Exp $';
-$CGI::VERSION='3.12';
+$CGI::revision = '$Id: CGI.pm,v 1.193 2005-12-05 13:52:24 lstein Exp $';
+$CGI::VERSION='3.13';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2655,8 +2655,8 @@ sub url {
 	$url = $uri;
     }
 
-    $url .= $path if $path_info and defined $path;
-    $url .= "?$query_str" if $query and defined $query_str;
+    $url .= $path         if $path_info and defined $path;
+    $url .= "?$query_str" if $query     and $query_str ne '';
     $url =~ s/([^a-zA-Z0-9_.%;&?\/\\:+=~-])/sprintf("%%%02X",ord($1))/eg;
     return $url;
 }
