@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.196 2005-12-27 18:55:33 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.197 2005-12-27 19:08:34 lstein Exp $';
 $CGI::VERSION='3.16';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6678,6 +6678,11 @@ simple to turn a CGI parameter into a cookie, and vice-versa:
    $c=cookie(-name=>'answers',-value=>[param('answers')]);
    # vice-versa
    param(-name=>'answers',-value=>[cookie('answers')]);
+
+If you call cookie() without any parameters, it will return a list of
+the names of all cookies passed to your script:
+
+  @cookies = cookie();
 
 See the B<cookie.cgi> example script for some ideas on how to use
 cookies effectively.

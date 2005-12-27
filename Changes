@@ -1,5 +1,7 @@
   Version 3.16 Tue Dec 27 13:54:19 EST 2005
    1. header() -charset option now works even when the MIME type is not "text".
+   2. Fixed documentation for cookie() function and fastCGI.
+   3. Upload filehandles now only closed automatically on Windows systems.
 
   Version 3.15 Wed Dec  7 15:13:22 EST 2005
    1. Remove extraneous "?" from self_url() when URI contains a ? but no query string.
