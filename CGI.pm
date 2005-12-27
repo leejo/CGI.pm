@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.197 2005-12-27 19:08:34 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.198 2005-12-27 19:16:09 lstein Exp $';
 $CGI::VERSION='3.16';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1418,10 +1418,13 @@ sub header {
                             'ATTACHMENT','P3P'],@p);
 
     $nph     ||= $NPH;
+
+    $type ||= 'text/html' unless defined($type);
+
     if (defined $charset) {
       $self->charset($charset);
     } else {
-      $charset = $self->charset;
+      $charset = $self->charset if $type =~ /^text\//;
     }
 
     # rearrange() was designed for the HTML portion, so we
@@ -1432,7 +1435,6 @@ sub header {
         ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 
-    $type ||= 'text/html' unless defined($type);
     $type .= "; charset=$charset" if $type ne '' and $type !~ /\bcharset\b/ and $charset ne '';
 
     # Maybe future compatibility.  Maybe not.
