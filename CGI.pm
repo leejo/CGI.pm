@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.195 2005-12-07 22:18:27 lstein Exp $';
-$CGI::VERSION='3.15';
+$CGI::revision = '$Id: CGI.pm,v 1.196 2005-12-27 18:55:33 lstein Exp $';
+$CGI::VERSION='3.16';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1433,7 +1433,7 @@ sub header {
     }
 
     $type ||= 'text/html' unless defined($type);
-    $type .= "; charset=$charset" if $type ne '' and $type =~ m!^text/! and $type !~ /\bcharset\b/ and $charset ne '';
+    $type .= "; charset=$charset" if $type ne '' and $type !~ /\bcharset\b/ and $charset ne '';
 
     # Maybe future compatibility.  Maybe not.
     my $protocol = $ENV{SERVER_PROTOCOL} || 'HTTP/1.0';
