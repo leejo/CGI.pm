@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.199 2006-01-14 18:07:02 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.200 2006-02-08 18:28:54 lstein Exp $';
 $CGI::VERSION='3.16';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1548,7 +1548,7 @@ sub start_html {
     $self->element_id(0);
     $self->element_tab(0);
 
-    $encoding = 'iso-8859-1' unless defined $encoding;
+    $encoding = lc($self->charset) unless defined $encoding;
 
     # Need to sort out the DTD before it's okay to call escapeHTML().
     my(@result,$xml_dtd);
