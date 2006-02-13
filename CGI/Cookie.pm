@@ -13,7 +13,7 @@ package CGI::Cookie;
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-$CGI::Cookie::VERSION='1.26';
+$CGI::Cookie::VERSION='1.27';
 
 use CGI::Util qw(rearrange unescape escape);
 use CGI;
