@@ -163,7 +163,7 @@ sub as_string {
     push(@constant_values,"secure") if $secure = $self->secure;
 
     my($key) = escape($self->name);
-    my($cookie) = join("=",($key||''),join("&",map escape($_||''),$self->value));
+    my($cookie) = join("=",(defined $key ? $key : ''),join("&",map escape(defined $_ ? $_ : ''),$self->value));
     return join("; ",$cookie,@constant_values);
 }
 
