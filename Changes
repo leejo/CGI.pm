@@ -1,8 +1,10 @@
   Version 3.17 ??
    1. Added patch from Mike Hanafey which caused 0 arguments to CGI::Cookie->new() to
 	be treated as empty.
+   2. Patch to CGI::Carp from Peter Whaite to fix the unfixable problem of CGI::Carp
+     not behaving correctly in an eval() context.
 
-  Version 3.16 Tue Dec 27 13:54:19 EST 2005
+  Version 3.16 Wed Feb  8 13:29:11 EST 2006
    1. header() -charset option now works even when the MIME type is not "text".
    2. Fixed documentation for cookie() function and fastCGI.
    3. Upload filehandles now only closed automatically on Windows systems.
