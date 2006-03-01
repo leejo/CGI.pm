@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.202 2006-02-24 19:03:29 lstein Exp $';
-$CGI::VERSION='3.17';
+$CGI::revision = '$Id: CGI.pm,v 1.203 2006-03-01 16:25:48 lstein Exp $';
+$CGI::VERSION='3.18';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1435,7 +1435,11 @@ sub header {
         ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 
-    $type .= "; charset=$charset" if $type ne '' and $type !~ /\bcharset\b/ and $charset ne '';
+    $type .= "; charset=$charset"
+      if     $type ne ''
+         and $type !~ /\bcharset\b/
+         and defined $charset
+         and $charset ne '';
 
     # Maybe future compatibility.  Maybe not.
     my $protocol = $ENV{SERVER_PROTOCOL} || 'HTTP/1.0';
@@ -6034,7 +6038,7 @@ for each option element within the optgroup.
 =item 5.
 
 An optional fifth parameter (-novals) can be set to a true value and
-indicates to suppress the val attribut in each option element within
+indicates to suppress the val attribute in each option element within
 the optgroup.
 
 See the discussion on optgroup at W3C
@@ -6746,7 +6750,7 @@ Netscape versions 2.0 and higher incorporate an interpreted language
 called JavaScript. Internet Explorer, 3.0 and higher, supports a
 closely-related dialect called JScript. JavaScript isn't the same as
 Java, and certainly isn't at all the same as Perl, which is a great
-pity. JavaScript allows you to programatically change the contents of
+pity. JavaScript allows you to programmatically change the contents of
 fill-out forms, create new windows, and pop up dialog box from within
 Netscape itself. From the point of view of CGI scripting, JavaScript
 is quite useful for validating fill-out forms prior to submitting
