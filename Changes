@@ -1,6 +1,7 @@
   Version 3.18
   1.  Doc typo fixes.
   2.  Patch from Steve Peters to default the document type to match the charset.
+  3.  Fixed param() so that param(-name=>'foo',-values=>[]) sets the parameter to empty list.
 
   Version 3.17 Fri Feb 24 14:01:27 EST 2006
    1. Added patch from Mike Hanafey which caused 0 arguments to CGI::Cookie->new() to
