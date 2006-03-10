@@ -1,3 +1,7 @@
+  Version 3.19
+  1. Added patch from Stephen Frost that allows one to suppress use of the temp file that is
+	created during uploads.
+
   Version 3.18
   1.  Doc typo fixes.
   2.  Patch from Steve Peters to default the document type to match the charset.

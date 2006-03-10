@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.204 2006-03-03 15:53:40 lstein Exp $';
-$CGI::VERSION='3.18';
+$CGI::revision = '$Id: CGI.pm,v 1.205 2006-03-10 19:54:51 lstein Exp $';
+$CGI::VERSION='3.19';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -329,6 +329,10 @@ sub new {
   my $self = {};
 
   bless $self,ref $class || $class || $DefaultClass;
+
+  # always use a tempfile
+  $self->{'use_tempfile'} = 1;
+
   if (ref($initializer[0])
       && (UNIVERSAL::isa($initializer[0],'Apache')
 	  ||
@@ -339,6 +343,7 @@ sub new {
  if (ref($initializer[0]) 
      && (UNIVERSAL::isa($initializer[0],'CODE'))) {
     $self->upload_hook(shift @initializer, shift @initializer);
+    $self->{'use_tempfile'} = shift @initializer if (@initializer > 0);
   }
   if ($MOD_PERL) {
     if ($MOD_PERL == 1) {
@@ -392,9 +397,10 @@ sub upload_hook {
   } else {
     $self = shift;
   }
-  my ($hook,$data) = @_;
+  my ($hook,$data,$use_tempfile) = @_;
   $self->{'.upload_hook'} = $hook;
   $self->{'.upload_data'} = $data;
+  $self->{'use_tempfile'} = $use_tempfile if defined $use_tempfile;
 }
 
 #### Method: param
@@ -3384,7 +3390,7 @@ sub read_multipart {
                   $totalbytes += length($data);
                    &{$self->{'.upload_hook'}}($filename ,$data, $totalbytes, $self->{'.upload_data'});
               }
-	      print $filehandle $data;
+              print $filehandle $data if ($self->{'use_tempfile'});
           }
 
 	  # back up to beginning of file
@@ -5885,7 +5891,7 @@ UPLOAD_HOOK facility available in Apache::Request, with the exception
 that the first argument to the callback is an Apache::Upload object,
 here it's the remote filename.
 
- $q = CGI->new(\&hook,$data);
+ $q = CGI->new(\&hook [,$data [,$use_tempfile]]);
 
  sub hook
  {
@@ -5893,10 +5899,19 @@ here it's the remote filename.
         print  "Read $bytes_read bytes of $filename\n";         
  }
 
+The $data field is optional; it lets you pass configuration
+information (e.g. a database handle) to your hook callback.
+
+The $use_tempfile field is a flag that lets you turn on and off
+CGI.pm's use of a temporary disk-based file during file upload. If you
+set this to a FALSE value (default true) then param('uploaded_file')
+will no longer work, and the only way to get at the uploaded data is
+via the hook you provide.
+
 If using the function-oriented interface, call the CGI::upload_hook()
 method before calling param() or any other CGI functions:
 
-  CGI::upload_hook(\&hook,$data);
+  CGI::upload_hook(\&hook [,$data [,$use_tempfile]]);
 
 This method is not exported by default.  You will have to import it
 explicitly if you wish to use it without the CGI:: prefix.
