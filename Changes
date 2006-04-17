@@ -1,6 +1,11 @@
   Version 3.19
   1. Added patch from Stephen Frost that allows one to suppress use of the temp file that is
 	created during uploads.
+  2. Fixed problem noted by Martin Foster in which regular expression meta-character terms
+	in the path information were not quoted, causing URL parsing
+	to fail on URLs that contained metacharacters (such as +).
+  3. More fixes to the url() method.
+  4. Removed "hack to fix broken PATH_INFO in MSII".
 
   Version 3.18
   1.  Doc typo fixes.
