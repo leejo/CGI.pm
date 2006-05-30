@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.208 2006-04-23 14:25:14 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.209 2006-05-30 16:08:04 lstein Exp $';
 $CGI::VERSION='3.20';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -515,17 +515,10 @@ sub init {
 
       # avoid unreasonably large postings
       if (($POST_MAX > 0) && ($content_length > $POST_MAX)) {
-	# quietly read and discard the post
-	  my $buffer;
-          my $tmplength = $content_length;
-          while($tmplength > 0) {
-                 my $maxbuffer = ($tmplength < 10000)?$tmplength:10000;
-                 my $bytesread = $MOD_PERL ? $self->r->read($buffer,$maxbuffer) : read(STDIN,$buffer,$maxbuffer);
-                 $tmplength -= $bytesread;
-          }
-          $self->cgi_error("413 Request entity too large");
-          last METHOD;
-       }
+	#discard the post, unread
+	$self->cgi_error("413 Request entity too large");
+	last METHOD;
+      }
 
       # Process multipart postings, but only if the initializer is
       # not defined.

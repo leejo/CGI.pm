@@ -1,3 +1,6 @@
+  Version 3.21
+  1. Don't try to read data at all when POST > $POST_MAX.
+
   Version 3.20
   1. Patch from David Wheeler for CGI::Cookie->bake(). Uses mod_perl headers_out->add()
 	rather than headers_out->set().
