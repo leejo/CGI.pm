@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.209 2006-05-30 16:08:04 lstein Exp $';
-$CGI::VERSION='3.20';
+$CGI::revision = '$Id: CGI.pm,v 1.210 2006-07-12 15:49:07 lstein Exp $';
+$CGI::VERSION='3.21';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -434,7 +434,7 @@ sub param {
 	    }
 	}
 	# If values is provided, then we set it.
-	if (defined $value) {
+	if (@values or defined $value) {
 	    $self->add_parameter($name);
 	    $self->{$name}=[@values];
 	}
