@@ -1,5 +1,6 @@
   Version 3.22
   1. Fixed bug in which upload() sometimes returns empty. (CPAN bug #12694).
+  2. Incorporated patch from BURAK@cpan.org to support HTTPcookies (CPAN bug 21019).
 
   Version 3.21
   1. Don't try to read data at all when POST > $POST_MAX.

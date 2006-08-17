@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.211 2006-08-17 22:55:37 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.212 2006-08-17 23:07:14 lstein Exp $';
 $CGI::VERSION='3.22';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2692,8 +2692,8 @@ END_OF_FUNC
 'cookie' => <<'END_OF_FUNC',
 sub cookie {
     my($self,@p) = self_or_default(@_);
-    my($name,$value,$path,$domain,$secure,$expires) =
-	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES],@p);
+    my($name,$value,$path,$domain,$secure,$expires,$httponly) =
+	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY],@p);
 
     require CGI::Cookie;
 
@@ -2721,6 +2721,7 @@ sub cookie {
     push(@param,'-path'=>$path) if $path;
     push(@param,'-expires'=>$expires) if $expires;
     push(@param,'-secure'=>$secure) if $secure;
+    push(@param,'-httponly'=>$httponly) if $httponly;
 
     return new CGI::Cookie(@param);
 }
