@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.210 2006-07-12 15:49:07 lstein Exp $';
-$CGI::VERSION='3.21';
+$CGI::revision = '$Id: CGI.pm,v 1.211 2006-08-17 22:55:37 lstein Exp $';
+$CGI::VERSION='3.22';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -443,7 +443,16 @@ sub param {
     }
 
     return unless defined($name) && $self->{$name};
-    return wantarray ? @{$self->{$name}} : $self->{$name}->[0];
+
+    my $charset = $self->charset || '';
+    my $utf8    = $charset eq 'utf-8';
+    if ($utf8) {
+      eval "require Encode; 1;" if $utf8 && !Encode->can('decode'); # bring in these functions
+      return wantarray ? map {Encode::decode(utf8=>$_) } @{$self->{$name}} 
+                       : Encode::decode(utf8=>$self->{$name}->[0]);
+    } else {
+      return wantarray ? @{$self->{$name}} : $self->{$name}->[0];
+    }
 }
 
 sub self_or_default {
@@ -3409,7 +3418,7 @@ END_OF_FUNC
 'upload' =><<'END_OF_FUNC',
 sub upload {
     my($self,$param_name) = self_or_default(@_);
-    my @param = grep(ref && fileno($_), $self->param($param_name));
+    my @param = grep {ref($_) && defined(fileno($_)}, $self->param($param_name));
     return unless @param;
     return wantarray ? @param : $param[0];
 }
