@@ -1,3 +1,7 @@
+  Version 3.23
+  1. Typo in upload() persisted, now fixed for real. Thanks to
+  Emanuele Zeppieri for correct patch and regression test.
+
   Version 3.22
   1. Typo in upload() function broke uploads. Now fixed (CPAN bug 21126).
 
