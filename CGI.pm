@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.215 2006-08-24 11:50:38 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.216 2006-08-25 03:02:35 lstein Exp $';
 $CGI::VERSION='3.23';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6664,6 +6664,7 @@ SSL session.
 The cookie created by cookie() must be incorporated into the HTTP
 header within the string returned by the header() method:
 
+        use CGI ':standard';
 	print header(-cookie=>$my_cookie);
 
 To create multiple cookies, give header() an array reference:
@@ -6675,12 +6676,13 @@ To create multiple cookies, give header() an array reference:
 	print header(-cookie=>[$cookie1,$cookie2]);
 
 To retrieve a cookie, request it by name by calling cookie() method
-without the B<-value> parameter:
+without the B<-value> parameter. This example uses the object-oriented
+form:
 
 	use CGI;
 	$query = new CGI;
-	$riddle = cookie('riddle_name');
-        %answers = cookie('answers');
+	$riddle = $query->cookie('riddle_name');
+        %answers = $query->cookie('answers');
 
 Cookies created with a single scalar value, such as the "riddle_name"
 cookie, will be returned in that form.  Cookies with array and hash
