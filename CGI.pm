@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.216 2006-08-25 03:02:35 lstein Exp $';
-$CGI::VERSION='3.23';
+$CGI::revision = '$Id: CGI.pm,v 1.217 2006-08-29 03:37:45 lstein Exp $';
+$CGI::VERSION='3.24';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2591,7 +2591,7 @@ sub image_button {
     my($name,$src,$alignment,@other) =
 	rearrange([NAME,SRC,ALIGN],@p);
 
-    my($align) = $alignment ? " align=\U\"$alignment\"" : '';
+    my($align) = $alignment ? " align=\L\"$alignment\"" : '';
     my($other) = @other ? " @other" : '';
     $name=$self->escapeHTML($name);
     return $XHTML ? qq(<input type="image" name="$name" src="$src"$align$other />)

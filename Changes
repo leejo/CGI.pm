@@ -1,3 +1,6 @@
+  Version 3.24
+  1. image button alignment options were mistakenly being capitalized, causing xhtml validation to fail.
+
   Version 3.23
   1. Typo in upload() persisted, now fixed for real. Thanks to
   Emanuele Zeppieri for correct patch and regression test.
