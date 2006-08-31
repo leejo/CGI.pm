@@ -1,5 +1,8 @@
   Version 3.24
-  1. image button alignment options were mistakenly being capitalized, causing xhtml validation to fail.
+  1. In startform(), if request_uri() returns undef, then falls back
+  to self_url(). This should rarely happen except when run outside of
+  the CGI environment.
+  2. image button alignment options were mistakenly being capitalized, causing xhtml validation to fail.
 
   Version 3.23
   1. Typo in upload() persisted, now fixed for real. Thanks to
