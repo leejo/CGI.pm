@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.218 2006-08-31 01:55:19 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.219 2006-09-19 21:32:14 lstein Exp $';
 $CGI::VERSION='3.24';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6725,7 +6725,7 @@ There is no specific support for creating <frameset> sections
 in CGI.pm, but the HTML is very simple to write.  See the frame
 documentation in Netscape's home pages for details 
 
-  http://home.netscape.com/assist/net_sites/frames.html
+  http://wp.netscape.com/assist/net_sites/frames.html
 
 =item 2. Specify the destination for the document in the HTTP header
 
