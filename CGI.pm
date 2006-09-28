@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.219 2006-09-19 21:32:14 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.220 2006-09-28 17:03:45 lstein Exp $';
 $CGI::VERSION='3.24';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1653,6 +1653,7 @@ sub _style {
     my ($self,$style) = @_;
     my (@result);
     my $type = 'text/css';
+    my $rel  = 'stylesheet';
 
     my $cdata_start = $XHTML ? "\n<!--/* <![CDATA[ */" : "\n<!-- ";
     my $cdata_end   = $XHTML ? "\n/* ]]> */-->\n" : " -->\n";
@@ -1661,25 +1662,26 @@ sub _style {
 
     for my $s (@s) {
       if (ref($s)) {
-       my($src,$code,$verbatim,$stype,$foo,@other) =
-           rearrange([qw(SRC CODE VERBATIM TYPE FOO)],
+       my($src,$code,$verbatim,$stype,$alternate,$foo,@other) =
+           rearrange([qw(SRC CODE VERBATIM TYPE ALTERNATE FOO)],
                       ('-foo'=>'bar',
                        ref($s) eq 'ARRAY' ? @$s : %$s));
        $type  = $stype if $stype;
+       $rel   = 'alternate stylesheet' if $alternate;
        my $other = @other ? join ' ',@other : '';
 
        if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
        { # If it is, push a LINK tag for each one
            foreach $src (@$src)
          {
-           push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
-                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>)) if $src;
+           push(@result,$XHTML ? qq(<link rel="$rel" type="$type" href="$src" $other/>)
+                             : qq(<link rel="$rel" type="$type" href="$src"$other>)) if $src;
          }
        }
        else
        { # Otherwise, push the single -src, if it exists.
-         push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
-                             : qq(<link rel="stylesheet" type="$type" href="$src"$other>)
+         push(@result,$XHTML ? qq(<link rel="$rel" type="$type" href="$src" $other/>)
+                             : qq(<link rel="$rel" type="$type" href="$src"$other>)
               ) if $src;
         }
      if ($verbatim) {
@@ -1691,8 +1693,8 @@ sub _style {
 
       } else {
            my $src = $s;
-           push(@result,$XHTML ? qq(<link rel="stylesheet" type="$type" href="$src" $other/>)
-                               : qq(<link rel="stylesheet" type="$type" href="$src"$other>));
+           push(@result,$XHTML ? qq(<link rel="$rel" type="$type" href="$src" $other/>)
+                               : qq(<link rel="$rel" type="$type" href="$src"$other>));
       }
     }
     @result;
@@ -7016,6 +7018,14 @@ and pass it to start_html() in the -head argument, as in:
   @h = (Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/ss.css',-media=>'all'}),
         Link({-rel=>'stylesheet',-type=>'text/css',-src=>'/ss/fred.css',-media=>'paper'}));
   print start_html({-head=>\@h})
+
+To create primary and  "alternate" stylesheet, use the B<-alternate> option:
+
+ start_html(-style=>{-src=>[
+                           {-src=>'/styles/print.css'},
+			   {-src=>'/styles/alt.css',-alternate=>1}
+                           ]
+		    });
 
 =head1 DEBUGGING
 

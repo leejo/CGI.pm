@@ -1,5 +1,6 @@
   Version 3.25
   1. Fixed the link to the Netscape frames page.
+  2. Added ability to specify an alternate stylesheet.
 
   Version 3.24
   1. In startform(), if request_uri() returns undef, then falls back
