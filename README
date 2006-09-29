@@ -37,10 +37,7 @@ automatically install the manual pages for you (on Unix systems, type
 WHERE ARE THE EXAMPLES?
 
 A collection of examples demonstrating various CGI features and
-techniques are in the directory "examples".  Many more examples of CGI
-scripts of various degrees of complexity can be found at:
-
-   http://www.modperl.com/WWW/examples/Ch9/
+techniques are in the directory "examples".
 
 WHERE IS THE ONLINE DOCUMENTATION?
 

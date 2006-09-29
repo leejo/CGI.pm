@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.221 2006-09-28 17:04:10 lstein Exp $';
-$CGI::VERSION='3.25';
+$CGI::revision = '$Id: CGI.pm,v 1.222 2006-09-29 17:09:09 lstein Exp $';
+$CGI::VERSION='3.26';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -1652,8 +1652,10 @@ END_OF_FUNC
 sub _style {
     my ($self,$style) = @_;
     my (@result);
+
     my $type = 'text/css';
     my $rel  = 'stylesheet';
+
 
     my $cdata_start = $XHTML ? "\n<!--/* <![CDATA[ */" : "\n<!-- ";
     my $cdata_end   = $XHTML ? "\n/* ]]> */-->\n" : " -->\n";
@@ -1666,8 +1668,8 @@ sub _style {
            rearrange([qw(SRC CODE VERBATIM TYPE ALTERNATE FOO)],
                       ('-foo'=>'bar',
                        ref($s) eq 'ARRAY' ? @$s : %$s));
-       $type  = $stype if $stype;
-       $rel   = 'alternate stylesheet' if $alternate;
+       my $type = defined $stype ? $stype : 'text/css';
+       my $rel  = $alternate ? 'alternate stylesheet' : 'stylesheet';
        my $other = @other ? join ' ',@other : '';
 
        if (ref($src) eq "ARRAY") # Check to see if the $src variable is an array reference
@@ -6986,10 +6988,8 @@ Should you wish to incorporate a verbatim stylesheet that includes
 arbitrary formatting in the header, you may pass a -verbatim tag to
 the -style hash, as follows:
 
-print start_html (-STYLE  =>  {-verbatim => '@import
-url("/server-common/css/'.$cssFile.'");',
-                      -src      =>  '/server-common/css/core.css'});
-</blockquote></pre>
+print start_html (-style  =>  {-verbatim => '@import url("/server-common/css/'.$cssFile.'");',
+                  -src    =>  '/server-common/css/core.css'});
 
 
 This will generate an HTML header that contains this:
