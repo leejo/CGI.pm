@@ -1,3 +1,6 @@
+  XForms Patch to 3.25
+  1. Add support for XForms POST submssion both as application/xml or as multipart/related
+
   Version 3.25
   1. Fixed the link to the Netscape frames page.
   2. Added ability to specify an alternate stylesheet.

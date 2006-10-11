@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.222 2006-09-29 17:09:09 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.223 2006-10-11 15:42:07 lstein Exp $';
 $CGI::VERSION='3.26';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -494,6 +494,8 @@ sub init {
   my $self = shift;
   my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
 
+  my $is_xforms;
+
   my $initializer = shift;  # for backward compatibility
   local($/) = "\n";
 
@@ -541,9 +543,50 @@ sub init {
 	  last METHOD;
       } 
 
+      # Process XForms postings. We know that we have XForms in the
+      # following cases:
+      # method eq 'POST' && content-type eq 'application/xml'
+      # method eq 'POST' && content-type =~ /multipart\/related.+start=/
+      # There are more cases, actually, but for now, we don't support other
+      # methods for XForm posts.
+      # In a XForm POST, the QUERY_STRING is parsed normally.
+      # If the content-type is 'application/xml', we just set the param
+      # XForms:Model (referring to the xml syntax) param containing the
+      # unparsed XML data.
+      # In the case of multipart/related we set XForms:Model as above, but
+      # the other parts are available as uploads with the Content-ID as the
+      # the key.
+      # See the URL below for XForms specs on this issue.
+      # http://www.w3.org/TR/2006/REC-xforms-20060314/slice11.html#submit-options
+      if ($meth eq 'POST' && defined($ENV{'CONTENT_TYPE'})) {
+              if ($ENV{'CONTENT_TYPE'} eq 'application/xml') {
+                      my($param) = 'XForms:Model';
+                      my($value) = '';
+                      $self->add_parameter($param);
+                      $self->read_from_client(\$value,$content_length,0)
+                        if $content_length > 0;
+                      push (@{$self->{$param}},$value);
+                      $is_xforms = 1;
+              } elsif ($ENV{'CONTENT_TYPE'} =~ /multipart\/related.+boundary=\"?([^\";,]+)\"?.+start=\"?\<?([^\"\>]+)\>?\"?/) {
+                      my($boundary,$start) = ($1,$2);
+                      my($param) = 'XForms:Model';
+                      $self->add_parameter($param);
+                      my($value) = $self->read_multipart_related($start,$boundary,$content_length,0);
+                      push (@{$self->{$param}},$value);
+                      if ($MOD_PERL) {
+                              $query_string = $self->r->args;
+                      } else {
+                              $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+                              $query_string ||= $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
+                      }
+                      $is_xforms = 1;
+              }
+      }
+
+
       # If initializer is defined, then read parameters
       # from it.
-      if (defined($initializer)) {
+      if (!$is_xforms && defined($initializer)) {
 	  if (UNIVERSAL::isa($initializer,'CGI')) {
 	      $query_string = $initializer->query_string;
 	      last METHOD;
@@ -594,7 +637,7 @@ sub init {
 
       # If method is GET or HEAD, fetch the query from
       # the environment.
-      if ($meth=~/^(GET|HEAD)$/) {
+      if ($is_xforms || $meth=~/^(GET|HEAD)$/) {
 	  if ($MOD_PERL) {
 	    $query_string = $self->r->args;
 	  } else {
@@ -630,7 +673,7 @@ sub init {
   }
 
 # YL: Begin Change for XML handler 10/19/2001
-    if ($meth eq 'POST'
+    if (!$is_xforms && $meth eq 'POST'
         && defined($ENV{'CONTENT_TYPE'})
         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
@@ -3419,6 +3462,110 @@ sub read_multipart {
     }
 }
 END_OF_FUNC
+
+#####
+# subroutine: read_multipart_related
+#
+# Read multipart/related data and store it into our parameters.  The
+# first parameter sets the start of the data. The part identified by
+# this Content-ID will not be stored as a file upload, but will be
+# returned by this method.  All other parts will be available as file
+# uploads accessible by their Content-ID
+#####
+'read_multipart_related' => <<'END_OF_FUNC',
+sub read_multipart_related {
+    my($self,$start,$boundary,$length) = @_;
+    my($buffer) = $self->new_MultipartBuffer($boundary,$length);
+    return unless $buffer;
+    my(%header,$body);
+    my $filenumber = 0;
+    my $returnvalue;
+    while (!$buffer->eof) {
+	%header = $buffer->readHeader;
+
+	unless (%header) {
+	    $self->cgi_error("400 Bad request (malformed multipart POST)");
+	    return;
+	}
+
+	my($param) = $header{'Content-ID'}=~/\<([^\>]*)\>/;
+        $param .= $TAINTED;
+
+	# If this is the start part, then just read the data and assign it
+	# to our return variable.
+	if ( $param eq $start ) {
+	    $returnvalue = $buffer->readBody;
+            $returnvalue .= $TAINTED;
+	    next;
+	}
+
+	# add this parameter to our list
+	$self->add_parameter($param);
+
+	my ($tmpfile,$tmp,$filehandle);
+      UPLOADS: {
+	  # If we get here, then we are dealing with a potentially large
+	  # uploaded form.  Save the data to a temporary file, then open
+	  # the file for reading.
+
+	  # skip the file if uploads disabled
+	  if ($DISABLE_UPLOADS) {
+	      while (defined($data = $buffer->read)) { }
+	      last UPLOADS;
+	  }
+
+	  # choose a relatively unpredictable tmpfile sequence number
+          my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
+          for (my $cnt=10;$cnt>0;$cnt--) {
+	    next unless $tmpfile = new CGITempFile($seqno);
+	    $tmp = $tmpfile->as_string;
+	    last if defined($filehandle = Fh->new($param,$tmp,$PRIVATE_TEMPFILES));
+            $seqno += int rand(100);
+          }
+          die "CGI open of tmpfile: $!\n" unless defined $filehandle;
+	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
+                     && defined fileno($filehandle);
+
+	  my ($data);
+	  local($\) = '';
+          my $totalbytes;
+          while (defined($data = $buffer->read)) {
+              if (defined $self->{'.upload_hook'})
+               {
+                  $totalbytes += length($data);
+                   &{$self->{'.upload_hook'}}($param ,$data, $totalbytes, $self->{'.upload_data'});
+              }
+              print $filehandle $data if ($self->{'use_tempfile'});
+          }
+
+	  # back up to beginning of file
+	  seek($filehandle,0,0);
+
+      ## Close the filehandle if requested this allows a multipart MIME
+      ## upload to contain many files, and we won't die due to too many
+      ## open file handles. The user can access the files using the hash
+      ## below.
+      close $filehandle if $CLOSE_UPLOAD_FILES;
+	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
+
+	  # Save some information about the uploaded file where we can get
+	  # at it later.
+	  # Use the typeglob as the key, as this is guaranteed to be
+	  # unique for each filehandle.  Don't use the file descriptor as
+	  # this will be re-used for each filehandle if the
+	  # close_upload_files feature is used.
+	  $self->{'.tmpfiles'}->{$$filehandle}= {
+              hndl => $filehandle,
+	      name => $tmpfile,
+	      info => {%header},
+	  };
+	  push(@{$self->{$param}},$filehandle);
+      }
+    }
+    return $returnvalue;
+}
+END_OF_FUNC
+
 
 'upload' =><<'END_OF_FUNC',
 sub upload {
