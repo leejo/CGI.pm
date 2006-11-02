@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.223 2006-10-11 15:42:07 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.224 2006-11-02 14:20:15 lstein Exp $';
 $CGI::VERSION='3.26';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -4749,7 +4749,7 @@ all.
 This causes the indicated autoloaded methods to be compiled up front,
 rather than deferred to later.  This is useful for scripts that run
 for an extended period of time under FastCGI or mod_perl, and for
-those destined to be crunched by Malcom Beattie's Perl compiler.  Use
+those destined to be crunched by Malcolm Beattie's Perl compiler.  Use
 it in conjunction with the methods or method families you plan to use.
 
    use CGI qw(-compile :standard :html3);
