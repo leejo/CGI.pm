@@ -203,9 +203,9 @@ sub escape {
   # force bytes while preserving backward compatibility -- dankogai
   $toencode = pack("C*", unpack("C*", $toencode));
     if ($EBCDIC) {
-      $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",$E2A[ord($1)])/eg;
+      $toencode=~s/([^a-zA-Z0-9_.~-])/uc sprintf("%%%02x",$E2A[ord($1)])/eg;
     } else {
-      $toencode=~s/([^a-zA-Z0-9_.-])/uc sprintf("%%%02x",ord($1))/eg;
+      $toencode=~s/([^a-zA-Z0-9_.~-])/uc sprintf("%%%02x",ord($1))/eg;
     }
   return $toencode;
 }

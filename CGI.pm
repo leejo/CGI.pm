@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.224 2006-11-02 14:20:15 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.225 2006-12-01 15:36:35 lstein Exp $';
 $CGI::VERSION='3.26';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2703,11 +2703,11 @@ sub url {
 	    $url .= $vh;
 	} else {
 	    $url .= server_name();
-	    my $port = $self->server_port;
-	    $url .= ":" . $port
-		unless (lc($protocol) eq 'http'  && $port == 80)
-		    || (lc($protocol) eq 'https' && $port == 443);
 	}
+        my $port = $self->server_port;
+	$url .= ":" . $port
+	  unless (lc($protocol) eq 'http'  && $port == 80)
+		|| (lc($protocol) eq 'https' && $port == 443);
         return $url if $base;
 	$url .= $uri;
     } elsif ($relative) {
