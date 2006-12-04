@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.225 2006-12-01 15:36:35 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.226 2006-12-04 22:33:12 lstein Exp $';
 $CGI::VERSION='3.26';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1755,19 +1755,17 @@ sub _script {
     foreach $script (@scripts) {
 	my($src,$code,$language);
 	if (ref($script)) { # script is a hash
-	    ($src,$code,$language, $type) =
-		rearrange([SRC,CODE,LANGUAGE,TYPE],
+	    ($src,$code,$type) =
+		rearrange(['SRC','CODE',['LANGUAGE','TYPE']],
 				 '-foo'=>'bar',	# a trick to allow the '-' to be omitted
 				 ref($script) eq 'ARRAY' ? @$script : %$script);
-            # User may not have specified language
-            $language ||= 'JavaScript';
-            unless (defined $type) {
-                $type = lc $language;
-                # strip '1.2' from 'javascript1.2'
-                $type =~ s/^(\D+).*$/text\/$1/;
+            $type ||= 'text/javascript';
+            unless ($type =~ m!\w+/\w+!) {
+                $type =~ s/[\d.]+$//;
+                $type = "text/$type";
             }
 	} else {
-	    ($src,$code,$language, $type) = ('',$script,'JavaScript', 'text/javascript');
+	    ($src,$code,$type) = ('',$script, 'text/javascript');
 	}
 
     my $comment = '//';  # javascript by default
@@ -1785,7 +1783,6 @@ sub _script {
    }
      my(@satts);
      push(@satts,'src'=>$src) if $src;
-     push(@satts,'language'=>$language) unless defined $type;
      push(@satts,'type'=>$type);
      $code = $cdata_start . $code . $cdata_end if defined $code;
      push(@result,$self->script({@satts},$code || ''));
@@ -5222,20 +5219,20 @@ Use the B<-noScript> parameter to pass some HTML text that will be displayed on
 browsers that do not have JavaScript (or browsers where JavaScript is turned
 off).
 
-Netscape 3.0 recognizes several attributes of the <script> tag,
-including LANGUAGE and SRC.  The latter is particularly interesting,
-as it allows you to keep the JavaScript code in a file or CGI script
-rather than cluttering up each page with the source.  To use these
-attributes pass a HASH reference in the B<-script> parameter containing
-one or more of -language, -src, or -code:
+The <script> tag, has several attributes including "type" and src.
+The latter is particularly interesting, as it allows you to keep the
+JavaScript code in a file or CGI script rather than cluttering up each
+page with the source.  To use these attributes pass a HASH reference
+in the B<-script> parameter containing one or more of -type, -src, or
+-code:
 
     print $q->start_html(-title=>'The Riddle of the Sphinx',
-			 -script=>{-language=>'JAVASCRIPT',
+			 -script=>{-type=>'JAVASCRIPT',
                                    -src=>'/javascript/sphinx.js'}
 			 );
 
     print $q->(-title=>'The Riddle of the Sphinx',
-	       -script=>{-language=>'PERLSCRIPT',
+	       -script=>{-type=>'PERLSCRIPT',
 			 -code=>'print "hello world!\n;"'}
 	       );
 
@@ -5243,32 +5240,27 @@ one or more of -language, -src, or -code:
 A final feature allows you to incorporate multiple <script> sections into the
 header.  Just pass the list of script sections as an array reference.
 this allows you to specify different source files for different dialects
-of JavaScript.  Example:     
+of JavaScript.  Example:
 
      print $q->start_html(-title=>'The Riddle of the Sphinx',
                           -script=>[
-                                    { -language => 'JavaScript1.0',
+                                    { -type => 'text/javascript',
                                       -src      => '/javascript/utilities10.js'
                                     },
-                                    { -language => 'JavaScript1.1',
+                                    { -type => 'text/javascript',
                                       -src      => '/javascript/utilities11.js'
                                     },
-                                    { -language => 'JavaScript1.2',
+                                    { -type => 'text/jscript',
                                       -src      => '/javascript/utilities12.js'
                                     },
-                                    { -language => 'JavaScript28.2',
+                                    { -type => 'text/ecmascript',
                                       -src      => '/javascript/utilities219.js'
                                     }
                                  ]
                              );
 
-If this looks a bit extreme, take my advice and stick with straight CGI scripting.  
-
-See
-
-   http://home.netscape.com/eng/mozilla/2.0/handbook/javascript/
-
-for more information about JavaScript.
+The option "-language" is a synonym for -type, and is supported for
+backwad compatibility.
 
 The old-style positional parameters are as follows:
 
