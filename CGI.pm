@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.226 2006-12-04 22:33:12 lstein Exp $';
-$CGI::VERSION='3.26';
+$CGI::revision = '$Id: CGI.pm,v 1.227 2007-02-23 23:03:16 lstein Exp $';
+$CGI::VERSION='3.27';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2334,15 +2334,14 @@ sub _box_group {
 
     my($name,$values,$defaults,$linebreak,$labels,$attributes,
        $rows,$columns,$rowheaders,$colheaders,
-       $override,$nolabels,$tabindex,@other) =
+       $override,$nolabels,$tabindex,$disabled,@other) =
        rearrange([      NAME,[VALUES,VALUE],[DEFAULT,DEFAULTS],LINEBREAK,LABELS,ATTRIBUTES,
-		        ROWS,[COLUMNS,COLS],ROWHEADERS,COLHEADERS,
-			[OVERRIDE,FORCE],NOLABELS,TABINDEX
+		        ROWS,[COLUMNS,COLS],[ROWHEADERS,ROWHEADER],[COLHEADERS,COLHEADER],
+			[OVERRIDE,FORCE],NOLABELS,TABINDEX,DISABLED
                  ],@_);
-    my($result,$checked);
 
+    my($result,$checked,@elements,@values);
 
-    my(@elements,@values);
     @values = $self->_set_values_and_labels($values,\$labels,$name);
     my %checked = $self->previous_or_default($name,$defaults,$override);
 
@@ -2362,10 +2361,21 @@ sub _box_group {
       }
     }
     %tabs = map {$_=>$self->element_tab} @values unless %tabs;
-
     my $other = @other ? "@other " : '';
     my $radio_checked;
+
+    # for disabling groups of radio/checkbox buttons
+    my %disabled;
+    foreach (@{$disabled}) {
+   	$disabled{$_}=1;
+    }
+
     foreach (@values) {
+    	 my $disable="";
+	 if ($disabled{$_}) {
+		$disable="disabled='1'";
+	 }
+
         my $checkit = $self->_checked($box_type eq 'radio' ? ($checked{$_} && !$radio_checked++)
                                                            : $checked{$_});
 	my($break);
@@ -2380,16 +2390,18 @@ sub _box_group {
 	    $label = $_;
 	    $label = $labels->{$_} if defined($labels) && defined($labels->{$_});
 	    $label = $self->escapeHTML($label,1);
+            $label = "<span style=\"color:gray\">$label</span>" if $disabled{$_};
 	}
         my $attribs = $self->_set_attributes($_, $attributes);
         my $tab     = $tabs{$_};
 	$_=$self->escapeHTML($_);
+
         if ($XHTML) {
            push @elements,
               CGI::label(
-                   qq(<input type="$box_type" name="$name" value="$_" $checkit$other$tab$attribs/>$label)).${break};
+                   qq(<input type="$box_type" name="$name" value="$_" $checkit$other$tab$attribs$disable/>$label)).${break};
         } else {
-           push(@elements,qq/<input type="$box_type" name="$name" value="$_"$checkit$other$tab$attribs>${label}${break}/);
+            push(@elements,qq/<input type="$box_type" name="$name" value="$_"$checkit$other$tab$attribs$disable>${label}${break}/);
         }
     }
     $self->register_parameter($name);
@@ -6290,6 +6302,7 @@ selected items can be retrieved with:
 				-values=>['eenie','meenie','minie','moe'],
 				-default=>['eenie','moe'],
 				-linebreak=>'true',
+                                -disabled => ['moe'],
         -labels=>\%labels,
         -attributes=>\%attributes);
 
@@ -6342,13 +6355,14 @@ printed next to them.  If not provided, the values will be used as the
 default.
 
 
-Modern browsers can take advantage of the optional parameters
-B<-rows>, and B<-columns>.  These parameters cause checkbox_group() to
-return an HTML3 compatible table containing the checkbox group
-formatted with the specified number of rows and columns.  You can
-provide just the -columns parameter if you wish; checkbox_group will
-calculate the correct number of rows for you.
+The optional parameters B<-rows>, and B<-columns> cause
+checkbox_group() to return an HTML3 compatible table containing the
+checkbox group formatted with the specified number of rows and
+columns.  You can provide just the -columns parameter if you wish;
+checkbox_group will calculate the correct number of rows for you.
 
+The option b<-disabled> takes an array of checkbox values and disables
+them by greying them out (this may not be supported by all browsers).
 
 The optional B<-attributes> argument is provided to assign any of the
 common HTML attributes to an individual menu item. It's a pointer to
@@ -6500,7 +6514,7 @@ the -columns parameter if you wish; radio_group will calculate the
 correct number of rows for you.
 
 To include row and column headings in the returned table, you
-can use the B<-rowheader> and B<-colheader> parameters.  Both
+can use the B<-rowheaders> and B<-colheaders> parameters.  Both
 of these accept a pointer to an array of headings to use.
 The headings are just decorative.  They don't reorganize the
 interpretation of the radio buttons -- they're still a single named

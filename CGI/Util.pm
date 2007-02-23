@@ -258,13 +258,13 @@ sub expire_calc {
     # specifying the date yourself
     my($offset);
     if (!$time || (lc($time) eq 'now')) {
-        $offset = 0;
+      $offset = 0;
     } elsif ($time=~/^\d+/) {
-        return $time;
-    } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([mhdMy])/) {
-        $offset = ($mult{$2} || 1)*$1;
+      return $time;
+    } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([smhdMy])/) {
+      $offset = ($mult{$2} || 1)*$1;
     } else {
-        return $time;
+      return $time;
     }
     return (time+$offset);
 }
