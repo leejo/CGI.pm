@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.228 2007-03-19 15:18:52 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.229 2007-03-29 15:35:40 lstein Exp $';
 $CGI::VERSION='3.28';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -2707,7 +2707,8 @@ sub url {
     if ($full) {
 	my $protocol = $self->protocol();
 	$url = "$protocol://";
-	my $vh = http('x_forwarded_host') || http('host');
+	my $vh = http('x_forwarded_host') || http('host') || '';
+        $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
 	if ($vh) {
 	    $url .= $vh;
 	} else {
