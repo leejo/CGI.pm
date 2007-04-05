@@ -54,6 +54,7 @@ t/request.t
 t/switch.t
 t/upload.t
 t/uploadInfo.t
+t/uploadInfo.t
 t/upload_post_text.txt
 t/util.t
 t/util-58.t
