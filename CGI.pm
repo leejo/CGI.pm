@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.231 2007-04-05 20:49:04 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.232 2007-04-11 15:24:19 lstein Exp $';
 $CGI::VERSION='3.28';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -594,21 +594,6 @@ sub init {
 	  if (ref($initializer) && ref($initializer) eq 'HASH') {
 	      foreach (keys %$initializer) {
 		  $self->param('-name'=>$_,'-value'=>$initializer->{$_});
-	      }
-	      last METHOD;
-	  }
-	  
-	  if (defined($fh) && ($fh ne '')) {
-	      while (<$fh>) {
-		  chomp;
-		  last if /^=/;
-		  push(@lines,$_);
-	      }
-	      # massage back into standard format
-	      if ("@lines" =~ /=/) {
-		  $query_string=join("&",@lines);
-	      } else {
-		  $query_string=join("+",@lines);
 	      }
 	      last METHOD;
 	  }
