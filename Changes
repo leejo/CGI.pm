@@ -1,4 +1,3 @@
-
   Version 3.29
   1. The position of file handles is now reset to zero when CGI->new is called.
     (Mark Stosberg)
