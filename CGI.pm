@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.234 2007-04-16 16:58:46 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.235 2007-04-20 16:18:32 lstein Exp $';
 $CGI::VERSION='3.29';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -641,7 +641,7 @@ sub init {
 	  last METHOD;
       }
 
-      if ($meth eq 'POST') {
+      if ($meth eq 'POST' || $meth eq 'PUT') {
 	  $self->read_from_client(\$query_string,$content_length,0)
 	      if $content_length > 0;
 	  # Some people want to have their cake and eat it too!
@@ -667,11 +667,11 @@ sub init {
   }
 
 # YL: Begin Change for XML handler 10/19/2001
-    if (!$is_xforms && $meth eq 'POST'
+    if (!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
         && defined($ENV{'CONTENT_TYPE'})
         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
-        my($param) = 'POSTDATA' ;
+        my($param) = $meth . 'DATA' ;
         $self->add_parameter($param) ;
       push (@{$self->{$param}},$query_string);
       undef $query_string ;
@@ -4476,6 +4476,10 @@ instead be returned as-is in a parameter named POSTDATA.  To retrieve
 it, use code like this:
 
    my $data = $query->param('POSTDATA');
+
+Likewise if PUTed data can be retrieved with code like this:
+
+   my $data = $query->param('PUTDATA');
 
 (If you don't know what the preceding means, don't worry about it.  It
 only affects people trying to use CGI for XML processing and other
