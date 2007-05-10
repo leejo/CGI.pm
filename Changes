@@ -1,5 +1,6 @@
   Version 3.30
   1. Patch from Mike Barry to handle POSTDATA in the same way as PUT.
+  2. Patch from Rafael Garcia-Suarez to correctly reencode unicode values as byte values.
 
   Version 3.29
   1. The position of file handles is now reset to zero when CGI->new is called.
