@@ -575,6 +575,7 @@ END
         print STDOUT $mess;
     }
     else {
+        print STDOUT "Status: 500\n";
         print STDOUT "Content-type: text/html\n\n";
         print STDOUT $mess;
     }
