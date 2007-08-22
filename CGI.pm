@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.238 2007-08-22 14:37:31 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.239 2007-08-22 16:00:43 lstein Exp $';
 $CGI::VERSION='3.30';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -110,6 +110,9 @@ sub initialize_globals {
     # Do not include undefined params parsed from query string
     # use CGI qw(-no_undef_params);
     $NO_UNDEF_PARAMS = 0;
+
+    # return everything as utf-8
+    $PARAM_UTF8      = 0;
 
     # Other globals that you shouldn't worry about.
     undef $Q;
@@ -445,9 +448,14 @@ sub param {
 
     return unless defined($name) && $self->{$name};
 
-    my $charset = $self->charset || '';
-    my $utf8    = $charset eq 'utf-8';
-      return wantarray ? @{$self->{$name}} : $self->{$name}->[0];
+    my @result = @{$self->{$name}};
+
+    if ($PARAM_UTF8) {
+      eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
+      @result = map {ref $_ ? $_ : Encode::decode(utf8=>$_) } @result;
+    }
+
+    return wantarray ?  @result : $result[0];
 }
 
 sub self_or_default {
@@ -898,6 +906,7 @@ sub _setup_symbols {
 	$DEBUG=0,                next if /^[:-]no_?[Dd]ebug$/;
 	$DEBUG=2,                next if /^[:-][Dd]ebug$/;
 	$USE_PARAM_SEMICOLONS++, next if /^[:-]newstyle_urls$/;
+	$PARAM_UTF8++,           next if /^[:-]utf8$/;
 	$XHTML++,                next if /^[:-]xhtml$/;
 	$XHTML=0,                next if /^[:-]no_?xhtml$/;
 	$USE_PARAM_SEMICOLONS=0, next if /^[:-]oldstyle_urls$/;
@@ -4809,6 +4818,16 @@ feature.
 If start_html()'s -dtd parameter specifies an HTML 2.0 or 3.2 DTD, 
 XHTML will automatically be disabled without needing to use this 
 pragma.
+
+=item -utf8
+
+This makes CGI.pm treat all parameters as UTF-8 strings. Use this with
+care, as it will interfere with the processing of binary uploads. It
+is better to manually select which fields are expected to return utf-8
+strings and convert them using code like this:
+
+ use Encode;
+ my $arg = decode utf8=>param('foo');
 
 =item -nph
 
