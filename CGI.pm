@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.237 2007-05-10 17:20:17 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.238 2007-08-22 14:37:31 lstein Exp $';
 $CGI::VERSION='3.30';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -447,13 +447,7 @@ sub param {
 
     my $charset = $self->charset || '';
     my $utf8    = $charset eq 'utf-8';
-    if ($utf8) {
-      eval "require Encode; 1;" if $utf8 && !Encode->can('decode'); # bring in these functions
-      return wantarray ? map {Encode::decode(utf8=>$_) } @{$self->{$name}} 
-                       : Encode::decode(utf8=>$self->{$name}->[0]);
-    } else {
       return wantarray ? @{$self->{$name}} : $self->{$name}->[0];
-    }
 }
 
 sub self_or_default {
