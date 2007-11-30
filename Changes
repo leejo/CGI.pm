@@ -1,5 +1,6 @@
   Version 3.31
-  1. Pach from Xavier Robin so that CGI::Carp issues a 500 Status code rather than a 200 status code.
+  1. Patch from Xavier Robin so that CGI::Carp issues a 500 Status code rather than a 200 status code.
+  2. Patch from Alexander Klink to select correct temporary directory in OSX Leopard so that upload works.
 
   Version 3.30
   1. Patch from Mike Barry to handle POSTDATA in the same way as PUT.
