@@ -1,3 +1,6 @@
+  Version 3.32
+  1. Patch from Miguel Santinho to prevent sending premature headers under mod_perl 2.0
+
   Version 3.31
   1. Patch from Xavier Robin so that CGI::Carp issues a 500 Status code rather than a 200 status code.
   2. Patch from Alexander Klink to select correct temporary directory in OSX Leopard so that upload works.
