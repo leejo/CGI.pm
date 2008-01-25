@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.243 2008-01-03 15:01:59 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.244 2008-01-25 16:52:03 lstein Exp $';
 $CGI::VERSION='3.33';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -7686,10 +7686,8 @@ of CGI.pm without rewriting your old scripts from scratch.
 
 =head1 AUTHOR INFORMATION
 
-Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+The GD.pm interface is copyright 1995-2007, Lincoln D. Stein.  It is
+distributed under GPL and the Artistic License 2.0.
 
 Address bug reports and comments to: lstein@cshl.org.  When sending
 bug reports, please provide the version of CGI.pm, the version of
