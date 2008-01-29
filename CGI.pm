@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.244 2008-01-25 16:52:03 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.245 2008-01-29 18:27:32 lstein Exp $';
 $CGI::VERSION='3.33';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1835,7 +1835,7 @@ sub startform {
     my($method,$action,$enctype,@other) = 
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
-    $method  = $self->escapeHTML(lc($method) || 'post');
+    $method  = $self->escapeHTML(lc($method || 'post'));
     $enctype = $self->escapeHTML($enctype || &URL_ENCODED);
     if (defined $action) {
        $action = $self->escapeHTML($action);
@@ -2198,9 +2198,11 @@ sub escapeHTML {
          else {
 	     $toencode =~ s{"}{&quot;}gso;
          }
-         my $latin = uc $self->{'.charset'} eq 'ISO-8859-1' ||
-                     uc $self->{'.charset'} eq 'WINDOWS-1252';
-         if ($latin) {  # bug in some browsers
+         # Handle bug in some browsers with Latin charsets
+         if ($self->{'.charset'} &&
+             (uc($self->{'.charset'}) eq 'ISO-8859-1' ||
+              uc($self->{'.charset'}) eq 'WINDOWS-1252'))
+         {
                 $toencode =~ s{'}{&#39;}gso;
                 $toencode =~ s{\x8b}{&#8249;}gso;
                 $toencode =~ s{\x9b}{&#8250;}gso;

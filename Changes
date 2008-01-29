@@ -1,5 +1,6 @@
   Version 3.33
   1. Remove uninit variable warning when calling url(-relative=>1)
+  2. Fix uninit variable warnings for two lc calls
 
   Version 3.32
   1. Patch from Miguel Santinho to prevent sending premature headers under mod_perl 2.0
