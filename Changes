@@ -1,3 +1,6 @@
+  Version 3.34
+  1. Handle Unicode %uXXXX  escapes properly -- patch from DANKOGAI@cpan.org
+
   Version 3.33
   1. Remove uninit variable warning when calling url(-relative=>1)
   2. Fix uninit variable warnings for two lc calls
