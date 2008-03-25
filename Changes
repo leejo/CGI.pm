@@ -1,5 +1,9 @@
+  Version 3.35
+  1. Resync with bleadperl, primarily fixing a bug in parsing semicolons in uploaded filenames.
+
   Version 3.34
   1. Handle Unicode %uXXXX  escapes properly -- patch from DANKOGAI@cpan.org
+  2. Fix url() method to not choke on path names that contain regex characters.
 
   Version 3.33
   1. Remove uninit variable warning when calling url(-relative=>1)
