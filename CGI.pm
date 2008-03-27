@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.249 2008-03-25 15:17:55 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.250 2008-03-27 14:24:25 lstein Exp $';
 $CGI::VERSION='3.35';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3300,7 +3300,7 @@ sub previous_or_default {
 	     (ref($defaults) eq 'ARRAY')) {
 	$selected{$_}++ for @{$defaults};
     } else {
-	$selected{$defaults}++;
+	$selected{$defaults}++ if defined($defaults);
     }
 
     return %selected;
