@@ -1,3 +1,11 @@
+  Version 3.37
+  1. Fix pragmas so that they persist over modperl invocations (e.g. RT 34761)
+  2. Fixed handling of chunked multipart uploads; thanks to Michael Bernhardt
+     who reported and fixed the problem.
+
+  Version 3.36
+  1. Fix CGI::Cookie to support cookies that are separated by "," instead of ";".
+
   Version 3.35
   1. Resync with bleadperl, primarily fixing a bug in parsing semicolons in uploaded filenames.
 
