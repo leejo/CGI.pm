@@ -1,3 +1,9 @@
+  Version 3.38
+  1. Fix annoying warning in http://rt.cpan.org/Ticket/Display.html?id=34551
+  2. Added nobr() function http://rt.cpan.org/Ticket/Display.html?id=35377
+  3. popup_menu() allows multiple items to be selected by default, satisfying
+   http://rt.cpan.org/Ticket/Display.html?id=35376
+
   Version 3.37
   1. Fix pragmas so that they persist over modperl invocations (e.g. RT 34761)
   2. Fixed handling of chunked multipart uploads; thanks to Michael Bernhardt

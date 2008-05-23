@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.251 2008-04-23 13:08:23 lstein Exp $';
-$CGI::VERSION='3.37';
+$CGI::revision = '$Id: CGI.pm,v 1.252 2008-05-23 09:17:36 lstein Exp $';
+$CGI::VERSION='3.38';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -227,7 +227,7 @@ if ($needs_binmode) {
 			   tt u i b blockquote pre img a address cite samp dfn html head
 			   base body Link nextid title meta kbd start_html end_html
 			   input Select option comment charset escapeHTML/],
-		':html3'=>[qw/div table caption th td TR Tr sup Sub strike applet Param 
+		':html3'=>[qw/div table caption th td TR Tr sup Sub strike applet Param nobr
 			   embed basefont style span layer ilayer font frameset frame script small big Area Map/],
                 ':html4'=>[qw/abbr acronym bdo col colgroup del fieldset iframe
                             ins label legend noframes noscript object optgroup Q 
@@ -2437,12 +2437,14 @@ sub popup_menu {
     my($name,$values,$default,$labels,$attributes,$override,$tabindex,@other) =
        rearrange([NAME,[VALUES,VALUE],[DEFAULT,DEFAULTS],LABELS,
        ATTRIBUTES,[OVERRIDE,FORCE],TABINDEX],@p);
-    my($result,$selected);
+    my($result,%selected);
 
     if (!$override && defined($self->param($name))) {
-	$selected = $self->param($name);
-    } else {
-	$selected = $default;
+	$selected{$self->param($name)}++;
+    } elsif ($default) {
+	%selected = map {$_=>1} ref($default) eq 'ARRAY' 
+                                ? @$default 
+                                : $default;
     }
     $name=$self->escapeHTML($name);
     my($other) = @other ? " @other" : '';
@@ -2453,20 +2455,22 @@ sub popup_menu {
     $result = qq/<select name="$name" $tabindex$other>\n/;
     foreach (@values) {
         if (/<optgroup/) {
-            foreach (split(/\n/)) {
+            for my $v (split(/\n/)) {
                 my $selectit = $XHTML ? 'selected="selected"' : 'selected';
-                s/(value="$selected")/$selectit $1/ if defined $selected;
-                $result .= "$_\n";
+		for my $selected (keys %selected) {
+		    $v =~ s/(value="$selected")/$selectit $1/;
+		}
+                $result .= "$v\n";
             }
         }
         else {
-          my $attribs = $self->_set_attributes($_, $attributes);
-	  my($selectit) = defined($selected) ? $self->_selected($selected eq $_) : '';
-	  my($label) = $_;
-	  $label = $labels->{$_} if defined($labels) && defined($labels->{$_});
-	  my($value) = $self->escapeHTML($_);
-	  $label=$self->escapeHTML($label,1);
-          $result .= "<option${attribs} ${selectit}value=\"$value\">$label</option>\n";
+          my $attribs   = $self->_set_attributes($_, $attributes);
+	  my($selectit) = $self->_selected($selected{$_});
+	  my($label)    = $_;
+	  $label        = $labels->{$_} if defined($labels) && defined($labels->{$_});
+	  my($value)    = $self->escapeHTML($_);
+	  $label        = $self->escapeHTML($label,1);
+          $result      .= "<option${attribs} ${selectit}value=\"$value\">$label</option>\n";
         }
     }
 
@@ -3379,6 +3383,8 @@ sub read_multipart {
 	    return;
 	}
 
+	$header{'Content-Disposition'} ||= ''; # quench uninit variable warning
+
 	my($param)= $header{'Content-Disposition'}=~/ name="([^"]*)"/;
         $param .= $TAINTED;
 
@@ -3387,6 +3393,9 @@ sub read_multipart {
         # content-disposition parsing fail.
         my ($filename) = $header{'Content-Disposition'}
 	               =~/ filename=(("[^"]*")|([a-z\d!\#'\*\+,\.^_\`\{\}\|\~]*))/i;
+
+	$filename ||= ''; # quench uninit variable warning
+
         $filename =~ s/^"([^"]*)"$/$1/;
 	# Test for Opera's multiple upload feature
 	my($multipart) = ( defined( $header{'Content-Type'} ) &&
@@ -6133,7 +6142,7 @@ recognized.  See textfield() for details.
 
    print popup_menu(-name=>'menu_name',
 			    -values=>['eenie','meenie','minie'],
-			    -default=>'meenie',
+			    -default=>['meenie','minie'],
           -labels=>\%labels,
           -attributes=>\%attributes);
 
@@ -6156,7 +6165,8 @@ a named array, such as "\@foo".
 
 The optional third parameter (-default) is the name of the default
 menu choice.  If not specified, the first item will be the default.
-The values of the previous choice will be maintained across queries.
+The values of the previous choice will be maintained across
+queries. Pass an array reference to select multiple defaults.
 
 =item 4.
 
