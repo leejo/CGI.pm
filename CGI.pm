@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.252 2008-05-23 09:17:36 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.253 2008-06-05 15:28:03 lstein Exp $';
 $CGI::VERSION='3.38';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -1666,12 +1666,22 @@ sub start_html {
 			: qq(<meta name="$_" content="$meta->{$_}">)); }
     }
 
-    push(@result,ref($head) ? @$head : $head) if $head;
+    my $meta_bits_set = 0;
+    if( $head ) {
+        if( ref $head ) {
+            push @result, @$head;
+            $meta_bits_set = 1 if grep { /http-equiv=["']Content-Type/i }@$head;
+        }
+        else {
+            push @result, $head;
+            $meta_bits_set = 1 if $head =~ /http-equiv=["']Content-Type/i;
+        }
+    }
 
     # handle the infrequently-used -style and -script parameters
     push(@result,$self->_style($style))   if defined $style;
     push(@result,$self->_script($script)) if defined $script;
-    push(@result,$meta_bits)              if defined $meta_bits;
+    push(@result,$meta_bits)              if defined $meta_bits and !$meta_bits_set;
 
     # handle -noscript parameter
     push(@result,<<END) if $noscript;
@@ -2946,7 +2956,9 @@ sub Accept {
     my($self,$search) = self_or_CGI(@_);
     my(%prefs,$type,$pref,$pat);
     
-    my(@accept) = split(',',$self->http('accept'));
+    my(@accept) = defined $self->http('accept') 
+                ? split(',',$self->http('accept'))
+                : ();
 
     foreach (@accept) {
 	($pref) = /q=(\d\.\d+|\d+)/;
@@ -4418,8 +4430,7 @@ selections in a scrolling list), you can ask to receive an array.  Otherwise
 the method will return a single value.
 
 If a value is not given in the query string, as in the queries
-"name1=&name2=" or "name1&name2", it will be returned as an empty
-string.  This feature is new in 2.63.
+"name1=&name2=", it will be returned as an empty string.
 
 
 If the parameter does not exist at all, then param() will return undef

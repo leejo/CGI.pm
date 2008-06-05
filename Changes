@@ -3,6 +3,10 @@
   2. Added nobr() function http://rt.cpan.org/Ticket/Display.html?id=35377
   3. popup_menu() allows multiple items to be selected by default, satisfying
    http://rt.cpan.org/Ticket/Display.html?id=35376
+  4. Patch from Renee Backer to avoid doubled <http-equiv> headers.
+  5. Fixed documentation bug that describes what happens when a
+  parameter is empty (e.g. "?test1=").
+  6. Fixed minor warning described at http://rt.cpan.org/Public/Bug/Display.html?id=36435
 
   Version 3.37
   1. Fix pragmas so that they persist over modperl invocations (e.g. RT 34761)
