@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.253 2008-06-05 15:28:03 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.254 2008-06-25 14:52:19 lstein Exp $';
 $CGI::VERSION='3.38';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -440,15 +440,15 @@ sub param {
 	# If values is provided, then we set it.
 	if (@values or defined $value) {
 	    $self->add_parameter($name);
-	    $self->{$name}=[@values];
+	    $self->{param}{$name}=[@values];
 	}
     } else {
 	$name = $p[0];
     }
 
-    return unless defined($name) && $self->{$name};
+    return unless defined($name) && $self->{param}{$name};
 
-    my @result = @{$self->{$name}};
+    my @result = @{$self->{param}{$name}};
 
     if ($PARAM_UTF8) {
       eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
@@ -576,14 +576,14 @@ sub init {
                       $self->add_parameter($param);
                       $self->read_from_client(\$value,$content_length,0)
                         if $content_length > 0;
-                      push (@{$self->{$param}},$value);
+                      push (@{$self->{param}{$param}},$value);
                       $is_xforms = 1;
               } elsif ($ENV{'CONTENT_TYPE'} =~ /multipart\/related.+boundary=\"?([^\";,]+)\"?.+start=\"?\<?([^\"\>]+)\>?\"?/) {
                       my($boundary,$start) = ($1,$2);
                       my($param) = 'XForms:Model';
                       $self->add_parameter($param);
                       my($value) = $self->read_multipart_related($start,$boundary,$content_length,0);
-                      push (@{$self->{$param}},$value);
+                      push (@{$self->{param}{$param}},$value);
                       if ($MOD_PERL) {
                               $query_string = $self->r->args;
                       } else {
@@ -675,7 +675,7 @@ sub init {
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
         my($param) = $meth . 'DATA' ;
         $self->add_parameter($param) ;
-      push (@{$self->{$param}},$query_string);
+      push (@{$self->{param}{$param}},$query_string);
       undef $query_string ;
     }
 # YL: End Change for XML handler 10/19/2001
@@ -687,7 +687,7 @@ sub init {
 	    $self->parse_params($query_string);
 	} else {
 	    $self->add_parameter('keywords');
-	    $self->{'keywords'} = [$self->parse_keywordlist($query_string)];
+	    $self->{param}{'keywords'} = [$self->parse_keywordlist($query_string)];
 	}
     }
 
@@ -754,7 +754,7 @@ sub save_request {
     @QUERY_PARAM = $self->param; # save list of parameters
     foreach (@QUERY_PARAM) {
       next unless defined $_;
-      $QUERY_PARAM{$_}=$self->{$_};
+      $QUERY_PARAM{$_}=$self->{param}{$_};
     }
     $QUERY_CHARSET = $self->charset;
     %QUERY_FIELDNAMES = %{$self->{'.fieldnames'}};
@@ -773,7 +773,7 @@ sub parse_params {
 	$param = unescape($param);
 	$value = unescape($value);
 	$self->add_parameter($param);
-	push (@{$self->{$param}},$value);
+	push (@{$self->{param}{$param}},$value);
     }
 }
 
@@ -781,7 +781,7 @@ sub add_parameter {
     my($self,$param)=@_;
     return unless defined $param;
     push (@{$self->{'.parameters'}},$param) 
-	unless defined($self->{$param});
+	unless defined($self->{param}{$param});
 }
 
 sub all_parameters {
@@ -1008,7 +1008,7 @@ sub delete {
     my %to_delete;
     foreach my $name (@to_delete)
     {
-        CORE::delete $self->{$name};
+        CORE::delete $self->{param}{$name};
         CORE::delete $self->{'.fieldnames'}->{$name};
         $to_delete{$name}++;
     }
@@ -1057,8 +1057,8 @@ END_OF_FUNC
 sub keywords {
     my($self,@values) = self_or_default(@_);
     # If values is provided, then we set it.
-    $self->{'keywords'}=[@values] if @values;
-    my(@result) = defined($self->{'keywords'}) ? @{$self->{'keywords'}} : ();
+    $self->{param}{'keywords'}=[@values] if @values;
+    my(@result) = defined($self->{param}{'keywords'}) ? @{$self->{param}{'keywords'}} : ();
     @result;
 }
 END_OF_FUNC
@@ -1203,7 +1203,7 @@ sub append {
     my(@values) = defined($value) ? (ref($value) ? @{$value} : $value) : ();
     if (@values) {
 	$self->add_parameter($name);
-	push(@{$self->{$name}},@values);
+	push(@{$self->{param}{$name}},@values);
     }
     return $self->param($name);
 }
@@ -2818,12 +2818,12 @@ END_OF_FUNC
 sub param_fetch {
     my($self,@p) = self_or_default(@_);
     my($name) = rearrange([NAME],@p);
-    unless (exists($self->{$name})) {
+    unless (exists($self->{param}{$name})) {
 	$self->add_parameter($name);
-	$self->{$name} = [];
+	$self->{param}{$name} = [];
     }
     
-    return $self->{$name};
+    return $self->{param}{$name};
 }
 END_OF_FUNC
 
@@ -3422,7 +3422,7 @@ sub read_multipart {
 	if ( ( !defined($filename) || $filename eq '' ) && !$multipart ) {
 	    my($value) = $buffer->readBody;
             $value .= $TAINTED;
-	    push(@{$self->{$param}},$value);
+	    push(@{$self->{param}{$param}},$value);
 	    next;
 	}
 
@@ -3498,7 +3498,7 @@ sub read_multipart {
 	      name => $tmpfile,
 	      info => {%header},
 	  };
-	  push(@{$self->{$param}},$filehandle);
+	  push(@{$self->{param}{$param}},$filehandle);
       }
     }
 }
@@ -3600,7 +3600,7 @@ sub read_multipart_related {
 	      name => $tmpfile,
 	      info => {%header},
 	  };
-	  push(@{$self->{$param}},$filehandle);
+	  push(@{$self->{param}{$param}},$filehandle);
       }
     }
     return $returnvalue;

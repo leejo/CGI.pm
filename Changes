@@ -7,6 +7,7 @@
   5. Fixed documentation bug that describes what happens when a
   parameter is empty (e.g. "?test1=").
   6. Fixed minor warning described at http://rt.cpan.org/Public/Bug/Display.html?id=36435
+  7. Fixed overlap of attribute and parameter space described in http://rt.perl.org/rt3//Ticket/Display.html?id=24294
 
   Version 3.37
   1. Fix pragmas so that they persist over modperl invocations (e.g. RT 34761)
