@@ -1,3 +1,6 @@
+  Version 3.39
+  1. Fixed regression in "exists" function when using tied interface to CGI via $q->Vars.
+
   Version 3.38
   1. Fix annoying warning in http://rt.cpan.org/Ticket/Display.html?id=34551
   2. Added nobr() function http://rt.cpan.org/Ticket/Display.html?id=35377
