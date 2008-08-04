@@ -12,6 +12,7 @@ WriteMakefile(
     'VERSION_FROM'   => 'CGI.pm',
      'PREREQ_PM' => {
        'File::Spec'  => .82,
+       'FCGI'        => 0.67,
     },
     'linkext'   => { LINKTYPE=>'' },	# no link needed
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',

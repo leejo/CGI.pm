@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.255 2008-07-29 15:00:05 lstein Exp $';
-$CGI::VERSION='3.39';
+$CGI::revision = '$Id: CGI.pm,v 1.256 2008-08-04 14:31:54 lstein Exp $';
+$CGI::VERSION='3.40';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
