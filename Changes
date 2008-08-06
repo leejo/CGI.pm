@@ -2,6 +2,7 @@
   1. Fixed CGI::Fast docs to eliminate references to a "special"
   version of Perl.
   2. Makefile.PL now depends on FCGI so that CGI::Fast installs properly.
+  3. Fix script_name() call from Stephane Chazelas.
 
   Version 3.39
   1. Fixed regression in "exists" function when using tied interface to CGI via $q->Vars.
