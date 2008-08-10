@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.257 2008-08-06 14:01:06 lstein Exp $';
-$CGI::VERSION='3.40';
+$CGI::revision = '$Id: CGI.pm,v 1.258 2008-08-10 13:09:32 lstein Exp $';
+$CGI::VERSION='3.41';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -3709,6 +3709,7 @@ END_OF_AUTOLOAD
 
 ################### Fh -- lightweight filehandle ###############
 package Fh;
+
 use overload 
     '""'  => \&asString,
     'cmp' => \&compare,
@@ -3766,6 +3767,14 @@ sub new {
     unlink($safe) if $delete;
     CORE::delete $Fh::{$fv};
     return bless $ref,$pack;
+}
+END_OF_FUNC
+
+'handle' => <<'END_OF_FUNC',
+sub handle {
+  my $self = shift;
+  eval "require IO::Handle" unless IO::Handle->can('new_from_fd');
+  return IO::Handle->new_from_fd(fileno $self,"<");
 }
 END_OF_FUNC
 
@@ -6066,24 +6075,27 @@ filehandle at all, but a string.
 
 To be safe, use the I<upload()> function (new in version 2.47).  When
 called with the name of an upload field, I<upload()> returns a
-filehandle, or undef if the parameter is not a valid filehandle.
+filehandle-like object, or undef if the parameter is not a valid
+filehandle.
 
      $fh = upload('uploaded_file');
      while (<$fh>) {
 	   print;
      }
 
-In an list context, upload() will return an array of filehandles.
+In a list context, upload() will return an array of filehandles.
 This makes it possible to create forms that use the same name for
 multiple upload fields.
 
 This is the recommended idiom.
 
-For robust code, consider reseting the file handle position to beginning of the
-file. Inside of larger frameworks, other code may have already used the query
-object and changed the filehandle postion:
+The lightweight filehandle returned by CGI.pm is not compatible with
+IO::Handle; for example, it does not have read() or getline()
+functions, but instead must be manipulated using read($fh) or
+<$fh>. To get a compatible IO::Handle object, call the handle's
+handle() method:
 
-  seek($fh,0,0); # reset postion to beginning of file.
+  my $real_io_handle = upload('uploaded_file')->handle;
 
 When a file is uploaded the browser usually sends along some
 information along with it in the format of headers.  The information

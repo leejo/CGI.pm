@@ -1,3 +1,7 @@
+  Version 3.41
+  1. Added a handle() method to the lightweight upload
+  filehandles. This method returns a real IO::Handle object.
+
   Version 3.40
   1. Fixed CGI::Fast docs to eliminate references to a "special"
   version of Perl.
