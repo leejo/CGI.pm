@@ -3,6 +3,7 @@
   2. Added additional windows temporary directories and environment variables, courtesy patch from Renee Baecker
   3. Added a handle() method to the lightweight upload
   filehandles. This method returns a real IO::Handle object.
+  4. Added patch from Tony Vanlingen to fix deep recursion warnings in CGI::Pretty.
 
   Version 3.40
   1. Fixed CGI::Fast docs to eliminate references to a "special"
