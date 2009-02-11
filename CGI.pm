@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.262 2008-12-01 16:06:20 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.263 2009-02-11 16:56:37 lstein Exp $';
 $CGI::VERSION='3.43';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -6802,16 +6802,13 @@ Fetch the value of the button this way:
 
 button() produces a button that is compatible with Netscape 2.0's
 JavaScript.  When it's pressed the fragment of JavaScript code
-pointed to by the B<-onClick> parameter will be executed.  On
-non-Netscape browsers this form element will probably not even
-display.
+pointed to by the B<-onClick> parameter will be executed.
 
 =head1 HTTP COOKIES
 
-Netscape browsers versions 1.1 and higher, and all versions of
-Internet Explorer, support a so-called "cookie" designed to help
-maintain state within a browser session.  CGI.pm has several methods
-that support cookies.
+Browsers support a so-called "cookie" designed to help maintain state
+within a browser session.  CGI.pm has several methods that support
+cookies.
 
 A cookie is a name=value pair much like the named parameters in a CGI
 query string.  CGI scripts create one or more cookies and send
@@ -7013,19 +7010,6 @@ create pages in which the fill-out form and the response live in
 side-by-side frames.
 
 =head1 SUPPORT FOR JAVASCRIPT
-
-Netscape versions 2.0 and higher incorporate an interpreted language
-called JavaScript. Internet Explorer, 3.0 and higher, supports a
-closely-related dialect called JScript. JavaScript isn't the same as
-Java, and certainly isn't at all the same as Perl, which is a great
-pity. JavaScript allows you to programmatically change the contents of
-fill-out forms, create new windows, and pop up dialog box from within
-Netscape itself. From the point of view of CGI scripting, JavaScript
-is quite useful for validating fill-out forms prior to submitting
-them.
-
-You'll need to know JavaScript in order to use it. There are many good
-sources in bookstores and on the web.
 
 The usual way to use JavaScript is to define a set of functions in a
 <SCRIPT> block inside the HTML header and then to register event
@@ -7368,11 +7352,9 @@ order to avoid conflict with Perl's accept() function.
 
 =item B<raw_cookie()>
 
-Returns the HTTP_COOKIE variable, an HTTP extension implemented by
-Netscape browsers version 1.1 and higher, and all versions of Internet
-Explorer.  Cookies have a special format, and this method call just
-returns the raw form (?cookie dough).  See cookie() for ways of
-setting and retrieving cooked cookies.
+Returns the HTTP_COOKIE variable.  Cookies have a special format, and
+this method call just returns the raw form (?cookie dough).  See
+cookie() for ways of setting and retrieving cooked cookies.
 
 Called with no parameters, raw_cookie() returns the packed cookie
 structure.  You can separate it into individual cookies by splitting
@@ -7386,7 +7368,7 @@ method from the CGI::Cookie module.
 Returns the HTTP_USER_AGENT variable.  If you give
 this method a single argument, it will attempt to
 pattern match on it, allowing you to do something
-like user_agent(netscape);
+like user_agent(Mozilla);
 
 =item B<path_info()>
 
@@ -7624,9 +7606,6 @@ multipart_end() at the end of the last part of the multipart document.
 
 Users interested in server push applications should also have a look
 at the CGI::Push module.
-
-Only Netscape Navigator supports server push.  Internet Explorer
-browsers do not.
 
 =head1 Avoiding Denial of Service Attacks
 
