@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.263 2009-02-11 16:56:37 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.264 2009-05-14 20:46:52 lstein Exp $';
 $CGI::VERSION='3.43';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -644,8 +644,17 @@ sub init {
       }
 
       if ($meth eq 'POST' || $meth eq 'PUT') {
-	  $self->read_from_client(\$query_string,$content_length,0)
-	      if $content_length > 0;
+	  if ( $content_length > 0 ) {
+	    $self->read_from_client(\$query_string,$content_length,0);
+	  }
+	  else {
+	    $self->read_from_stdin(\$query_string);
+	    # should this be PUTDATA in case of PUT ?
+	    my($param) = $meth . 'DATA' ;
+	    $self->add_parameter($param) ;
+	    push (@{$self->{param}{$param}},$query_string);
+	    undef $query_string ;
+	  }
 	  # Some people want to have their cake and eat it too!
 	  # Uncomment this line to have the contents of the query string
 	  # APPENDED to the POST data.
@@ -653,7 +662,8 @@ sub init {
 	  last METHOD;
       }
 
-      # If $meth is not of GET, POST or HEAD, assume we're being debugged offline.
+      # If $meth is not of GET, POST, PUT or HEAD, assume we're
+      #   being debugged offline.
       # Check the command line and then the standard input for data.
       # We use the shellwords package in order to behave the way that
       # UN*X programmers expect.
@@ -673,10 +683,10 @@ sub init {
         && defined($ENV{'CONTENT_TYPE'})
         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
-        my($param) = $meth . 'DATA' ;
-        $self->add_parameter($param) ;
-      push (@{$self->{param}{$param}},$query_string);
-      undef $query_string ;
+	    my($param) = $meth . 'DATA' ;
+	    $self->add_parameter($param) ;
+	    push (@{$self->{param}{$param}},$query_string);
+	    undef $query_string ;
     }
 # YL: End Change for XML handler 10/19/2001
 
@@ -997,6 +1007,47 @@ sub read_from_client {
 }
 END_OF_FUNC
 
+'read_from_stdin' => <<'END_OF_FUNC',
+# Read data from stdin until all is read
+sub read_from_stdin {
+    my($self, $buff) = @_;
+    local $^W=0;                # prevent a warning
+
+    #
+    # TODO: loop over STDIN until all is read
+    #
+
+    my($eoffound) = 0;
+    my($localbuf) = '';
+    my($tempbuf) = '';
+    my($bufsiz) = 1024;
+    my($res);
+    while ($eoffound == 0) {
+	if ( $MOD_PERL ) {
+	    $res = $self->r->read($tempbuf, $bufsiz, 0)
+	}
+	else {
+	    $res = read(\*STDIN, $tempbuf, $bufsiz);
+	}
+
+	if ( !defined($res) ) {
+	    # TODO: how to do error reporting ?
+	    $eoffound = 1;
+	    last;
+	}
+	if ( $res == 0 ) {
+	    $eoffound = 1;
+	    last;
+	}
+	$localbuf .= $tempbuf;
+    }
+
+    $$buff = $localbuf;
+
+    return $res;
+}
+END_OF_FUNC
+
 'delete' => <<'END_OF_FUNC',
 #### Method: delete
 # Deletes the named parameter entirely.
@@ -1129,6 +1180,12 @@ END_OF_FUNC
 'MethPost' => <<'END_OF_FUNC',
 sub MethPost {
     return request_method() eq 'POST';
+}
+END_OF_FUNC
+
+'MethPut' => <<'END_OF_FUNC',
+sub MethPut {
+    return request_method() eq 'PUT';
 }
 END_OF_FUNC
 
@@ -3185,8 +3242,12 @@ END_OF_FUNC
 'http' => <<'END_OF_FUNC',
 sub http {
     my ($self,$parameter) = self_or_CGI(@_);
-    return $ENV{$parameter} if $parameter=~/^HTTP/;
-    $parameter =~ tr/-/_/;
+    if ( defined($parameter) ) {
+	if ( $parameter =~ /^HTTP/ ) {
+	    return $ENV{$parameter};
+	}
+	$parameter =~ tr/-/_/;
+    }
     return $ENV{"HTTP_\U$parameter\E"} if $parameter;
     my(@p);
     for (keys %ENV) {
