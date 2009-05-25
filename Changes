@@ -1,5 +1,6 @@
   Version 3.44
   1.Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
+  2. Patch from Pavel merdin to fix a problem for one of the FireFox addons.
 
   Version 3.43
   1. Documentation patch from MARKSTOS@cpan.org to replace all occurrences of

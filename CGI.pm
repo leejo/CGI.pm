@@ -18,7 +18,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.264 2009-05-14 20:46:52 lstein Exp $';
+$CGI::revision = '$Id: CGI.pm,v 1.265 2009-05-25 15:49:26 lstein Exp $';
 $CGI::VERSION='3.43';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
@@ -3487,7 +3487,7 @@ sub read_multipart {
 
 	$header{'Content-Disposition'} ||= ''; # quench uninit variable warning
 
-	my($param)= $header{'Content-Disposition'}=~/ name="([^"]*)"/;
+	my($param)= $header{'Content-Disposition'}=~/[\s;]name="([^"]*)"/;
         $param .= $TAINTED;
 
         # See RFC 1867, 2183, 2045
