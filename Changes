@@ -1,6 +1,8 @@
   Version 3.44
-  1.Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
+  1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
   2. Patch from Pavel merdin to fix a problem for one of the FireFox addons.
+  3. Fixed issue in mod_perl & fastCGI environment of cookies returned from 
+     CGI->cookie() leaking from one session to another.
 
   Version 3.43
   1. Documentation patch from MARKSTOS@cpan.org to replace all occurrences of

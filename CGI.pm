@@ -18,8 +18,8 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::revision = '$Id: CGI.pm,v 1.265 2009-05-25 15:49:26 lstein Exp $';
-$CGI::VERSION='3.43';
+$CGI::revision = '$Id: CGI.pm,v 1.266 2009-07-30 16:32:34 lstein Exp $';
+$CGI::VERSION='3.44';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -2836,9 +2836,8 @@ sub cookie {
     # value of the cookie, if any.  For efficiency, we cache the parsed
     # cookies in our state variables.
     unless ( defined($value) ) {
-	$self->{'.cookies'} = CGI::Cookie->fetch
-	    unless $self->{'.cookies'};
-
+	$self->{'.cookies'} = CGI::Cookie->fetch;
+	
 	# If no name is supplied, then retrieve the names of all our cookies.
 	return () unless $self->{'.cookies'};
 	return keys %{$self->{'.cookies'}} unless $name;
