@@ -8,6 +8,7 @@
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
      bug which could use a patch. Thanks to Pete Gamache and Mark Stosberg (RT#39122)
   2. New t/user_agent.t test script has been added. Thanks to Mark Stosberg  
+  3. Several typos were fixed, Thanks to ambs. (RT#41105)
 
   Version 3.44
   1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.

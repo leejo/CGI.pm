@@ -5668,7 +5668,7 @@ This is extremely useful for creating tables.  For example:
 
    print table({-border=>undef},
            caption('When Should You Eat Your Vegetables?'),
-           Tr({-align=>CENTER,-valign=>TOP},
+           Tr({-align=>'CENTER',-valign=>'TOP'},
            [
               th(['Vegetable', 'Breakfast','Lunch','Dinner']),
               td(['Tomatoes' , 'no', 'yes', 'yes']),
@@ -5849,13 +5849,13 @@ default is to process the query with the current script.
 		    -action=>$action,
 		    -enctype=>$encoding);
       <... various form stuff ...>
-    print endform;
+    print end_form;
 
 	-or-
 
     print start_form($method,$action,$encoding);
       <... various form stuff ...>
-    print endform;
+    print end_form;
 
 start_form() will return a <form> tag with the optional method,
 action and form encoding that you specify.  The defaults are:
@@ -5864,14 +5864,14 @@ action and form encoding that you specify.  The defaults are:
     action: this script
     enctype: application/x-www-form-urlencoded
 
-endform() returns the closing </form> tag.  
+end_form() returns the closing </form> tag.  
 
 Start_form()'s enctype argument tells the browser how to package the various
 fields of the form before sending the form to the server.  Two
 values are possible:
 
-B<Note:> This method was previously named startform(), and startform()
-is still recognized as an alias.
+B<Note:> These methods were previously named startform() and endform(), and they
+are still recognized as aliases of start_form() and end_form().
 
 =over 4
 
@@ -7911,7 +7911,7 @@ for suggestions and bug fixes.
 	   print "<p>",reset;
 	   print submit('Action','Shout');
 	   print submit('Action','Scream');
-	   print endform;
+	   print end_form;
 	   print "<hr>\n";
 	}
 
