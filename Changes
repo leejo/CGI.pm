@@ -2,6 +2,10 @@
   1. Pevent warnings about "uninitialized values" for REQUEST_URI and several other environment variables.
      Patch by Callum Gibson and Mark Stosberg. (RT#24684)
 
+  [INTERNALS]  
+  1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
+     bug which could use a patch. Thanks to Pete Gamache and Mark Stosberg (RT#39122)
+
   Version 3.44
   1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
   2. Patch from Pavel merdin to fix a problem for one of the FireFox addons.
