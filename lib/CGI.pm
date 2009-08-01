@@ -2967,7 +2967,7 @@ END_OF_FUNC
 ####
 'request_method' => <<'END_OF_FUNC',
 sub request_method {
-    return $ENV{'REQUEST_METHOD'};
+    return (defined $ENV{'REQUEST_METHOD'}) ? $ENV{'REQUEST_METHOD'} : undef;
 }
 END_OF_FUNC
 
@@ -2976,7 +2976,7 @@ END_OF_FUNC
 ####
 'content_type' => <<'END_OF_FUNC',
 sub content_type {
-    return $ENV{'CONTENT_TYPE'};
+    return (defined $ENV{'CONTENT_TYPE'}) ? $ENV{'CONTENT_TYPE'} : undef;
 }
 END_OF_FUNC
 
@@ -2986,7 +2986,7 @@ END_OF_FUNC
 ####
 'path_translated' => <<'END_OF_FUNC',
 sub path_translated {
-    return $ENV{'PATH_TRANSLATED'};
+    return (defined $ENV{'PATH_TRANSLATED'}) ? $ENV{'PATH_TRANSLATED'} : undef;
 }
 END_OF_FUNC
 
@@ -2996,7 +2996,7 @@ END_OF_FUNC
 ####
 'request_uri' => <<'END_OF_FUNC',
 sub request_uri {
-    return $ENV{'REQUEST_URI'};
+    return (defined $ENV{'REQUEST_URI'}) ? $ENV{'REQUEST_URI'} : undef;
 }
 END_OF_FUNC
 
@@ -3296,7 +3296,7 @@ END_OF_FUNC
 ####
 'remote_ident' => <<'END_OF_FUNC',
 sub remote_ident {
-    return $ENV{'REMOTE_IDENT'};
+    return (defined $ENV{'REMOTE_IDENT'}) ? $ENV{'REMOTE_IDENT'} : undef;
 }
 END_OF_FUNC
 
@@ -3306,7 +3306,7 @@ END_OF_FUNC
 ####
 'auth_type' => <<'END_OF_FUNC',
 sub auth_type {
-    return $ENV{'AUTH_TYPE'};
+    return (defined $ENV{'AUTH_TYPE'}) ? $ENV{'AUTH_TYPE'} : undef;
 }
 END_OF_FUNC
 
@@ -3317,7 +3317,7 @@ END_OF_FUNC
 ####
 'remote_user' => <<'END_OF_FUNC',
 sub remote_user {
-    return $ENV{'REMOTE_USER'};
+    return (defined $ENV{'REMOTE_USER'}) ? $ENV{'REMOTE_USER'} : undef;
 }
 END_OF_FUNC
 
