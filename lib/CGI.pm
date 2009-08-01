@@ -4123,10 +4123,11 @@ sub find_tempdir {
 	   "C:${SL}system${SL}temp");
     
     if( $CGI::OS eq 'WINDOWS' ){
-       unshift @TEMP,
-           $ENV{TEMP},
-           $ENV{TMP},
-           $ENV{WINDIR} . $SL . 'TEMP';
+         # PeterH: These evars may not exist if this is invoked within a service and untainting
+         # is in effect - with 'use warnings' the undefined array entries causes Perl to die
+         unshift(@TEMP,$ENV{TEMP}) if defined $ENV{TEMP};
+         unshift(@TEMP,$ENV{TMP}) if defined $ENV{TMP};
+         unshift(@TEMP,$ENV{WINDIR} . $SL . 'TEMP') if defined $ENV{WINDIR};
     }
 
     unshift(@TEMP,$ENV{'TMPDIR'}) if defined $ENV{'TMPDIR'};

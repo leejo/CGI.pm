@@ -1,6 +1,8 @@
   [BUG FIXES]
   1. Prevent warnings about "uninitialized values" for REQUEST_URI, HTTP_USER_AGENT and other environment variables.
      Patches by Callum Gibson, heiko and Mark Stosberg. (RT#24684, RT#29065)
+  2. Avoid death in some cases when running under Taint mode on Windows. 
+     Patch by Peter Hancock (RT#43796)
 
   [INTERNALS]  
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
