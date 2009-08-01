@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Porting cgi-lib.pl Scripts to CGI.pm</title>
+</head>
+
+<body>
+<h1>Porting cgi-lib.pl Scripts to CGI.pm</h1>
+
+Steve Brenner, author of cgi-lib.pl, recently asked me to prepare a
+document that compares <a
+href="http://www.bio.cam.ac.uk/web/form.html">cgi-lib.pl</a> to <a
+href="cgi_docs.html">CGI.pm</a> and to give some advice for people
+wishing to port scripts from one to the other.
+
+<p>
+
+I heartily endorse cgi-lib.pl for people who have good reasons for
+sticking with Perl version 4.  However, sites that use Perl 5.001 and
+higher should seriously consider switching to CGI.pm or to the CGI::*
+modules.  Here are some reasons why.
+
+<h2>Why use CGI.pm instead of cgi-lib.pl?</h2>
+
+At their core, both cgi-lib.pl and CGI.pm provide convenient ways to
+get at CGI query strings.  There are a number of reasons to use CGI.pm
+in preference to cgi-lib.pl.
+
+<dl>
+  <dt>CGI.pm provides better support for multi-valued parameters.
+  <dd>Named parameters that correspond to checkboxes and selection
+      lists are frequently multi-valued.  With cgi-lib.pl, you must
+      manually split the components with split() or (in version 2.0)
+      with SplitParam():
+      <blockquote><pre>
+      @players=split("\0",$in{'players'});
+      </pre></blockquote>
+      With CGI.pm, you retrieve single or multi-valued parameters
+      with the same syntax:
+      <blockquote><pre>
+      @players=param('players');
+      </pre></blockquote>
+      <p>
+  <dt>CGI.pm provides a more elegant interface to file uploads.
+  <dd>In cgi-lib.pl you have to anticipate in advance how large 
+      Netscape file uploads may be and select whether the file is to
+      be read into main memory or spooled to disk.  CGI.pm
+      provides you with a variable that you can treat as a scalar to
+      recover the original file name, or as a file handle that you can
+      read from just as if you were reading the original file.  You
+      don't have to worry about spooling issues:
+      <blockquote><pre>
+      $in_file = param('file_to_upload');
+      while (<$in_file>) {
+         $lineCount++;
+      }
+      </pre></blockquote>
+      <p>
+  <dt>CGI.pm gives you lots of HTML and HTTP shortcuts.
+  <dd>CGI.pm includes methods that generate HTTP headers,
+      redirection requests, and HTML tags (including
+      the Netscape extensions).  These features are not included in
+      cgi-lib.pl
+      <p>
+  <dt>CGI.pm provides a simple way of creating "sticky" forms and
+      maintaining state.
+  <dd>Among the HTML tag-generating shortcuts are methods for
+      generating the elements of fill-out forms.  By default, these
+      methods use the current query string to initialize the form
+      element contents.  This gives you a simple mechanism for saving
+      the state of a session, and has the nice side effect that the
+      form doesn't revert back to its initial state every time you
+      regenerate it.  Other methods in CGI.pm allow you to save
+      state in URLs, write the state out to a file, or even store the
+      session state in an external database.
+      <p>
+  <dt>CGI.pm gives you access to advanced HTTP and HTML features.
+  <dd>Support for persistent cookies, Netscape frames and JavaScript
+      is built into the module, along with some of the more esoteric
+      HTTP features such as content negotiation.
+</dl>
+
+<h2>Reasons not to migrate to CGI.pm</h2>
+
+The main difference is performance.  On a Pentium 90 system running
+Linux, cgi-lib.pl takes 0.11 seconds to load.  CGI.pm takes 0.21
+seconds.  If that tenth of a second matters to you, then you should
+continue to use cgi-lib.pl.
+
+<h2>How do I migrate from cgi-lib.pl to CGI.pm?</h2>
+
+A compatability mode allows you to port most scripts that use
+cgi-lib.pl to CGI.pm without making extensive source code changes.
+Most of the functions defined in cgi-lib.pl version 2.10 are available
+for your use.  Missing functions are easy to work around.  Follow this
+model:
+
+<h3>Old Script</h3>
+<blockquote>
+<pre>
+require "cgi-lib.pl";
+&ReadParse;
+print "The price of your purchase is $in{price}.\n";
+</pre>
+</blockquote>
+
+<h3>New Script</h3>
+<blockquote>
+<pre>
+use CGI qw(:cgi-lib);
+&ReadParse;
+print "The price of your purchase is $in{price}.\n";
+</pre>
+</blockquote>
+
+In most cases the only change you'll need to make is the
+<cite>require</cite> line.  The line
+
+<blockquote><pre>
+use CGI qw(:cgi-lib);
+</pre></blockquote>
+
+instructs Perl to read in CGI.pm and to import into your script's name
+space the cgi-lib.pl compatability routines.  (In case you've never
+run into this syntax before, the colon in front of
+<code>cgi-lib</code> indicates that we're importing a family of
+routines identified by the tag <cite>cgi-lib</cite> rather than a
+single routine.)  The main routine that is imported is
+<cite>ReadParse</cite>, which behaves in exactly the same way as
+cgi-lib.pl's.  You can call it without any parameters, in which case
+it will place the query string in the associative array
+<code>%in</code>, or pass it the name of the associative array that
+you want to use:
+
+<blockquote>
+<pre>
+ReadParse(*Query);
+@partners = split("\0",$Query{'golf_partners'});
+</pre>
+</blockquote>
+
+CGI.pm is object-oriented, meaning that the parsed query string is
+stored inside a "CGI" object.  When you use ReadParse(), a default CGI
+object is created: behind the scenes access to the <code>%in</code>
+associative array is actually reading and writing its values to the
+CGI object.  You can get direct access to the underlying object by
+using the special key 'CGI':
+
+<blockquote>
+<pre>
+&ReadParse;
+print "The price of your purchase is $in{price}.\n";
+$q = $in{CGI};
+print $q->textfield(-name=&gt;'price',
+                -default=&gt;'$1.99');
+</pre>
+</blockquote>
+
+This allows you to start taking advantage of the CGI.pm features
+without scouring your code for all the places where you used the
+cgi-lib.pl <code>%in</code> variable.  An even simpler way to mix
+cgi-lib calls with CGI.pm calls is to import both the
+<cite>:cgi-lib</cite> and <cite>:standard</cite> method:
+
+<blockquote>
+<pre>
+use CGI qw(:cgi-lib :standard);
+&ReadParse;
+print "The price of your purchase is $in{price}.\n";
+print textfield(-name=&gt;'price',
+                -default=&gt;'$1.99');
+</pre>
+</blockquote>
+
+<h2>Cgi-lib functions that are available in CGI.pm</h2>
+
+In compatability mode, the following cgi-lib.pl functions are
+available for your use:
+
+<ol>
+  <li>ReadParse()
+  <li>PrintHeader()
+  <li>HtmlTop()
+  <li>HtmlBot()
+  <li>SplitParam()
+  <li>MethGet()
+  <li>MethPost()
+</ol>
+
+<h2>Cgi-lib functions that are not available in CGI.pm</h2>
+
+<dl>
+  <dt>Extended form of ReadParse()
+  <dd>The extended form of ReadParse() that provides for file upload
+      spooling, is not available.  However you can read the contents
+      of the file directly from %in as follows:
+      <blockquote><pre>
+      print "The name of the file is $in{uploaded_file};
+      while (<$in{uploaded_file}>) {
+         print "Next line = $_";
+      }
+      </pre></blockquote>
+      <p>
+  <dt>MyBaseURL()
+  <dd>This function is not available.  Use CGI.pm's url() method instead.
+      <p>
+  <dt>MyFullURL()
+  <dd>This function is not available.  Use CGI.pm's self_url() method
+      instead.
+      <p>
+  <dt>CgiError(), CgiDie()
+  <dd>These functions are not supported.  Look at CGI::Carp for the way I
+      prefer to handle error messages.
+      <p>
+  <dt>PrintVariables()
+  <dd>This function is not available.  To achieve the same effect,
+      just print out the CGI object:
+      <blockquote><pre>
+      use CGI qw(:standard);
+      $q = new CGI;
+      print h1("The Variables Are"),$q;
+      </pre></blockquote>
+      <p>
+  <dt>PrintEnv()
+  <dd>This function is not available.  You'll have to roll your own if
+      you really need it.
+      <p>
+  <dt>@in not supported
+  <dd>The original ReadParse() stores the individual elements of the
+      query string in an array named <code>@in</code>.  This rarely-
+      used feature is not supported.  To retrieve the keywords from an
+      oldstyle &lt;ISINDEX&gt; search, fetch the special array key
+      <cite>keywords</cite>:
+      <blockquote><pre>
+      @keywords = SplitParam($in{'keywords'});
+      </pre></blockquote>
+</dl>
+
+<h2>Caveats</h2>
+
+The compatability routines are a recent feature (added in CGI.pm
+version 2.20, released on May 22, 1996) and may contain bugs.
+<strong>Caveat emptor!</strong>
+<hr>
+
+<a href="cgi_docs.html">CGI.pm Documentation</a>
+
+<hr>
+<address>Lincoln D. Stein, lstein@genome.wi.mit.edu<br>
+<a href="/">Whitehead Institute/MIT Center for Genome Research</a></address>
+<!-- hhmts start -->
+Last modified: Wed May 22 23:33:25 EDT 1996
+<!-- hhmts end -->
+</body> </html>
