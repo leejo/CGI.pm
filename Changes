@@ -1,10 +1,11 @@
   [BUG FIXES]
-  1. Pevent warnings about "uninitialized values" for REQUEST_URI and several other environment variables.
-     Patch by Callum Gibson and Mark Stosberg. (RT#24684)
+  1. Prevent warnings about "uninitialized values" for REQUEST_URI, HTTP_USER_AGENT and other environment variables.
+     Patches by Callum Gibson, heiko and Mark Stosberg. (RT#24684, RT#29065)
 
   [INTERNALS]  
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
      bug which could use a patch. Thanks to Pete Gamache and Mark Stosberg (RT#39122)
+  2. New t/user_agent.t test script has been added. Thanks to Mark Stosberg  
 
   Version 3.44
   1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
