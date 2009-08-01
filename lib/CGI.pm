@@ -2508,7 +2508,7 @@ sub popup_menu {
 
     if (!$override && defined($self->param($name))) {
 	$selected{$self->param($name)}++;
-    } elsif ($default) {
+    } elsif (defined $default) {
 	%selected = map {$_=>1} ref($default) eq 'ARRAY' 
                                 ? @$default 
                                 : $default;
