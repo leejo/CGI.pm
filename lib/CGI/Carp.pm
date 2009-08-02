@@ -300,10 +300,6 @@ Address bug reports and comments to: lstein@cshl.org
 
 Carp, CGI::Base, CGI::BasePlus, CGI::Request, CGI::MiniSvr, CGI::Form,
 CGI::Response
-    if (defined($CGI::Carp::PROGNAME)) 
-    {
-      $file = $CGI::Carp::PROGNAME;
-    }
 
 =cut
 

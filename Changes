@@ -15,6 +15,7 @@
   2. A typo related to the nosticky pragma was fixed, thanks to Britton Kerin. (RT#43220)
   3. examples/nph-clock.cgi is now more portable, by calling localtime() rather than `/bin/date`,
      thanks to Guenter Knauf. (RT#27456).
+  4. In CGI::Carp, the SEE ALSO section was cleaned up, thanks to Slaven Rezic. (RT#32769)
 
   [INTERNALS]  
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
