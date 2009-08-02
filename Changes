@@ -8,6 +8,7 @@
      when the bug was introduced. A regression test for this was also added. (RT#37908)
   4. Allow "+" as a valid character in file names, which fixes temp file creation on OS X Leopard.  
      Thanks to Andy Armstrong, and alech for patches. (RT#30504) 
+  5. Set binmode() on the Netware platform, thanks to Guenter Knauf (RT#27455)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)

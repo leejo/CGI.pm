@@ -156,12 +156,14 @@ if ($OS =~ /^MSWin/i) {
     $OS = 'EPOC';
 } elsif ($OS =~ /^cygwin/i) {
     $OS = 'CYGWIN';
+} elsif ($OS =~ /^NetWare/i) {
+    $OS = 'NETWARE';
 } else {
     $OS = 'UNIX';
 }
 
 # Some OS logic.  Binary mode enabled on DOS, NT and VMS
-$needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin|CYGWIN)/;
+$needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin|CYGWIN|NETWARE)/;
 
 # This is the default class for the CGI object to use when all else fails.
 $DefaultClass = 'CGI' unless defined $CGI::DefaultClass;
@@ -172,7 +174,7 @@ $AutoloadClass = $DefaultClass unless defined $CGI::AutoloadClass;
 # The path separator is a slash, backslash or semicolon, depending
 # on the paltform.
 $SL = {
-     UNIX    => '/',  OS2 => '\\', EPOC      => '/', CYGWIN => '/',
+     UNIX    => '/',  OS2 => '\\', EPOC      => '/', CYGWIN => '/', NETWARE => '/',
      WINDOWS => '\\', DOS => '\\', MACINTOSH => ':', VMS    => '/'
     }->{$OS};
 
