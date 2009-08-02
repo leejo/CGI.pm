@@ -9,6 +9,8 @@
   4. Allow "+" as a valid character in file names, which fixes temp file creation on OS X Leopard.  
      Thanks to Andy Armstrong, and alech for patches. (RT#30504) 
   5. Set binmode() on the Netware platform, thanks to Guenter Knauf (RT#27455)
+  6. Don't allow a CGI::Carp error handler to die recursively. Print a warning and exit instead. 
+     Thanks to Marc Chantreux. (RT#45956)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)
