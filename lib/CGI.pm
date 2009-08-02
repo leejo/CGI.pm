@@ -7797,7 +7797,7 @@ of CGI.pm without rewriting your old scripts from scratch.
 
 =head1 AUTHOR INFORMATION
 
-The GD.pm interface is copyright 1995-2007, Lincoln D. Stein.  It is
+The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein.  It is
 distributed under GPL and the Artistic License 2.0.
 
 Address bug reports and comments to: lstein@cshl.org.  When sending
