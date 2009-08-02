@@ -6,6 +6,8 @@
   3. Allow 0 to be used as a default value in popup_menu(). This was broken starting in 3.37.
      Thanks to Haze, who was the first to report this and supply a patch, and pfschill, who pinpointed
      when the bug was introduced. A regression test for this was also added. (RT#37908)
+  4. Allow "+" as a valid character in file names, which fixes temp file creation on OS X Leopard.  
+     Thanks to Andy Armstrong, and alech for patches. (RT#30504) 
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)

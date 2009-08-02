@@ -3823,7 +3823,9 @@ sub new {
     (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
     my $fv = ++$FH . $safename;
     my $ref = \*{"Fh::$fv"};
-    $file =~ m!^([a-zA-Z0-9_\+ \'\":/.\$\\~-]+)$! || return;
+
+    # Note this same regex is also used elsewhere in the same file for CGITempFile::new
+    $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\\+-]+)$! || return;
     my $safe = $1;
     sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
     unlink($safe) if $delete;
@@ -4179,7 +4181,8 @@ sub new {
 	last if ! -f ($filename = sprintf("\%s${SL}CGItemp%d", $TMPDIRECTORY, $sequence++));
     }
     # check that it is a more-or-less valid filename
-    return unless $filename =~ m!^([a-zA-Z0-9_\+ \'\":/.\$\\~-]+)$!;
+    # Note this same regex is also used elsewhere in the same file for Fh::new
+    return unless $filename =~ m!^([a-zA-Z0-9_ \'\":/.\$\\\+-]+)$!;
     # this used to untaint, now it doesn't
     # $filename = $1;
     return bless \$filename;
