@@ -1,3 +1,10 @@
+  [NEW FEATURES]
+  1. query_string() now generates query strings in a reliable, sorted order.
+     So, these request query strings will have the same result returned by
+     query_string now: 'a=1;b=2', 'b=2&a=1'. This is helpful when you want to
+     compare two query stings to see if they are logically equivalent. 
+     Thanks to Mark Stosberg (RT#43006)
+ 
   [BUG FIXES]
   1. Prevent warnings about "uninitialized values" for REQUEST_URI, HTTP_USER_AGENT and other environment variables.
      Patches by Callum Gibson, heiko and Mark Stosberg. (RT#24684, RT#29065)
@@ -22,8 +29,8 @@
   [INTERNALS]  
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
      bug which could use a patch. Thanks to Pete Gamache and Mark Stosberg (RT#39122)
-  2. New t/user_agent.t test script has been added. Thanks to Mark Stosberg.  
-  3. New t/popup_menu.t test script has been added. Thanks to Mark Stosberg. (RT#37908)
+  2. New test scripts have been added for user_agent(), popup_menu() and query_string(),
+     Thanks to Mark Stosberg. (RT#37908, RT#43006)
 
   Version 3.44
   1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
