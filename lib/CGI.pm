@@ -61,8 +61,8 @@ sub initialize_globals {
 
     # Set this to 1 to enable NOSTICKY scripts
     # or: 
-    #    1) use CGI qw(-nosticky)
-    #    2) $CGI::nosticky(1)
+    #    1) use CGI '-nosticky';
+    #    2) $CGI::NOSTICKY = 1;
     $NOSTICKY = 0;
 
     # Set this to 1 to enable NPH scripts
@@ -5957,7 +5957,7 @@ JavaScript and DHTML.
 
 A boolean, which, if true, forces the element to take on the value
 specified by B<-value>, overriding the sticky behavior described
-earlier for the B<-no_sticky> pragma.
+earlier for the B<-nosticky> pragma.
 
 =item B<-onChange>, B<-onFocus>, B<-onBlur>, B<-onMouseOver>, B<-onMouseOut>, B<-onSelect>
 
