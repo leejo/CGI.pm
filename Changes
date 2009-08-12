@@ -33,6 +33,8 @@
      Thanks to Mark Stosberg. (RT#37908, RT#43006)
   3. CGI::Carp and CGI::Util have been updated to have non-developer version numbers. 
      Thanks to Slaven Rezic. (RT#48425)
+  4. CGI::Switch and CGI::Apache now properly set their VERSION in their own name space.  
+     Thanks to Alexey Tourbin (RT#11941,RT#11942)
 
   Version 3.44
   1. Patch from Kurt Jaeger to allow HTTP PUT even if the content length is unknown.
