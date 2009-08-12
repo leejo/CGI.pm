@@ -319,7 +319,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION     = '1.30_01';
+$CGI::Carp::VERSION     = '3.45';
 $CGI::Carp::CUSTOM_MSG  = undef;
 $CGI::Carp::DIE_HANDLER = undef;
 
