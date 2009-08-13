@@ -3011,13 +3011,13 @@ END_OF_FUNC
 sub query_string {
     my($self) = self_or_default(@_);
     my($param,$value,@pairs);
-    for $param (sort $self->param) {
-        my($eparam) = escape($param);
-        for $value (sort $self->param($param)) {
-            $value = escape($value);
+    for $param ($self->param) {
+       my($eparam) = escape($param);
+       for $value ($self->param($param)) {
+           $value = escape($value);
             next unless defined $value;
-            push(@pairs,"$eparam=$value");
-        }
+           push(@pairs,"$eparam=$value");
+       }
     }
     for (keys %{$self->{'.fieldnames'}}) {
       push(@pairs,".cgifields=".escape("$_"));
