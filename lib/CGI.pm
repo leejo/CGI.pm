@@ -1359,7 +1359,7 @@ sub Dump {
     push(@result,"<ul>");
     for $param ($self->param) {
 	my($name)=$self->escapeHTML($param);
-	push(@result,"<li><strong>$param</strong></li>");
+	push(@result,"<li><strong>$name</strong></li>");
 	push(@result,"<ul>");
 	for $value ($self->param($param)) {
 	    $value = $self->escapeHTML($value);

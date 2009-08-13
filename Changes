@@ -18,6 +18,7 @@
   5. Set binmode() on the Netware platform, thanks to Guenter Knauf (RT#27455)
   6. Don't allow a CGI::Carp error handler to die recursively. Print a warning and exit instead. 
      Thanks to Marc Chantreux. (RT#45956)
+  7. The Dump() method now is fixed to escape HTML properly. Thanks to Mark Stosberg (RT#21341)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)
@@ -29,8 +30,8 @@
   [INTERNALS]  
   1. New t/unescapeHTML.t test script has been added. It includes a TODO test for a pre-existing
      bug which could use a patch. Thanks to Pete Gamache and Mark Stosberg (RT#39122)
-  2. New test scripts have been added for user_agent(), popup_menu() and query_string(),
-     Thanks to Mark Stosberg. (RT#37908, RT#43006)
+  2. New test scripts have been added for user_agent(), popup_menu() and query_string(), and Dump()
+     Thanks to Mark Stosberg. (RT#37908, RT#43006, RT#21341)
   3. CGI::Carp and CGI::Util have been updated to have non-developer version numbers. 
      Thanks to Slaven Rezic. (RT#48425)
   4. CGI::Switch and CGI::Apache now properly set their VERSION in their own name space.  
