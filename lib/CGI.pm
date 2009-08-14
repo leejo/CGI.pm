@@ -183,8 +183,12 @@ $SL = {
 # $NPH++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
+# Turn on special checking for ActiveState's PerlEx
+$PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
+
 # Turn on special checking for Doug MacEachern's modperl
-if (exists $ENV{MOD_PERL}) {
+# PerlEx::DBI tries to fool DBI by setting MOD_PERL
+if (exists $ENV{MOD_PERL} && ! $PERLEX) {
   # mod_perl handlers may run system() on scripts using CGI.pm;
   # Make sure so we don't get fooled by inherited $ENV{MOD_PERL}
   if (exists $ENV{MOD_PERL_API_VERSION} && $ENV{MOD_PERL_API_VERSION} == 2) {
@@ -199,9 +203,6 @@ if (exists $ENV{MOD_PERL}) {
     require Apache;
   }
 }
-
-# Turn on special checking for ActiveState's PerlEx
-$PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
 
 # Define the CRLF sequence.  I can't use a simple "\r\n" because the meaning
 # of "\n" is different on different OS's (sometimes it generates CRLF, sometimes LF

@@ -16,6 +16,7 @@
   8. Support for <optgroup> with scrolling_list() now works the same way as it does for popup_menu().
      Thanks to Stuart Johnston (RT#30097)
   9. CGI::Pretty now works properly when $" is set to ''. Thanks to Jim Keenan (RT#12401)
+ 10. Fix crash when used in combination with PerlEx::DBI. Thanks to Burak Gürsoy (RT#19902)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)
