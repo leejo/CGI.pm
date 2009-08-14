@@ -15,6 +15,7 @@
   7. The Dump() method now is fixed to escape HTML properly. Thanks to Mark Stosberg (RT#21341)
   8. Support for <optgroup> with scrolling_list() now works the same way as it does for popup_menu().
      Thanks to Stuart Johnston (RT#30097)
+  9. CGI::Pretty now works properly when $" is set to ''. Thanks to Jim Keenan (RT#12401)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)
