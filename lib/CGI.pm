@@ -7484,6 +7484,11 @@ path as well.
 Returns either the remote host name or IP address.
 if the former is unavailable.
 
+=item B<remote_addr()>
+
+Returns the remote host IP address, or 
+127.0.0.1 if the address is unavailable.
+
 =item B<script_name()>
 Return the script name as a partial URL, for self-refering
 scripts.
