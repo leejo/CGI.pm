@@ -1,3 +1,7 @@
+
+  [DOCUMENTATION]
+  1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
+
 Version 3.45
   [BUG FIXES]
   1. Prevent warnings about "uninitialized values" for REQUEST_URI, HTTP_USER_AGENT and other environment variables.
