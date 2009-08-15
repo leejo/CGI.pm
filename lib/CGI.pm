@@ -2475,7 +2475,7 @@ sub _box_group {
               CGI::label($labelattributes,
                    qq(<input type="$box_type" name="$name" value="$_" $checkit$other$tab$attribs$disable/>$label)).${break};
         } else {
-            push(@elements,qq/<input type="$box_type" name="$name" value="$_"$checkit$other$tab$attribs$disable>${label}${break}/);
+            push(@elements,qq/<input type="$box_type" name="$name" value="$_" $checkit$other$tab$attribs$disable>${label}${break}/);
         }
     }
     $self->register_parameter($name);
