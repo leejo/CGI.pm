@@ -128,8 +128,6 @@ sub initialize_globals {
 
 # ------------------ START OF THE LIBRARY ------------
 
-*end_form = \&endform;
-
 # make mod_perlhappy
 initialize_globals();
 
@@ -1969,6 +1967,13 @@ sub endform {
 }
 END_OF_FUNC
 
+#### Method: end_form
+# synonym for endform
+'end_form' => <<'END_OF_FUNC',
+sub end_form {
+    &endform;
+}
+END_OF_FUNC
 
 '_textfield' => <<'END_OF_FUNC',
 sub _textfield {
