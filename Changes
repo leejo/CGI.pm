@@ -9,6 +9,7 @@
      return list of keys in list context. Thanks to riQyRoe and Rhesa Rozendaal. (RT#12909)
   5. XHTML is now automatically disabled for HTML 4, as well as HTML 2 and HTML 3. Thanks to
      Dan Harkless and Yanick Champoux. (RT#27907)
+  6. Pre-compiling 'end_form' with ':form' switch now works. Thanks to ryochin and Yanick Champoux. (RT#41530)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
