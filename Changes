@@ -7,6 +7,8 @@
      Thanks to Andrew Speer and Bob Kuo. (RT#36583)
   4. Fix case-sensitivity in http() and https() according to docs. Make https()
      return list of keys in list context. Thanks to riQyRoe and Rhesa Rozendaal. (RT#12909)
+  5. XHTML is now automatically disabled for HTML 4, as well as HTML 2 and HTML 3. Thanks to
+     Dan Harkless and Yanick Champoux. (RT#27907)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
