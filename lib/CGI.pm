@@ -3258,36 +3258,34 @@ END_OF_FUNC
 sub http {
     my ($self,$parameter) = self_or_CGI(@_);
     if ( defined($parameter) ) {
-	if ( $parameter =~ /^HTTP/ ) {
-	    return $ENV{$parameter};
-	}
-	$parameter =~ tr/-/_/;
+        $parameter =~ tr/-a-z/_A-Z/;
+        if ( $parameter =~ /^HTTP(?:_|$)/ ) {
+            return $ENV{$parameter};
+        }
+        return $ENV{"HTTP_$parameter"};
     }
-    return $ENV{"HTTP_\U$parameter\E"} if $parameter;
-    my(@p);
-    for (keys %ENV) {
-	push(@p,$_) if /^HTTP/;
-    }
-    return @p;
+    return grep { /^HTTP(?:_|$)/ } keys %ENV;
 }
 END_OF_FUNC
 
 #### Method: https
-# Return the value of HTTPS
+# Return the value of HTTPS, or
+# the value of an HTTPS variable, or
+# the list of variables
 ####
 'https' => <<'END_OF_FUNC',
 sub https {
-    local($^W)=0;
     my ($self,$parameter) = self_or_CGI(@_);
-    return $ENV{HTTPS} unless $parameter;
-    return $ENV{$parameter} if $parameter=~/^HTTPS/;
-    $parameter =~ tr/-/_/;
-    return $ENV{"HTTPS_\U$parameter\E"} if $parameter;
-    my(@p);
-    for (keys %ENV) {
-	push(@p,$_) if /^HTTPS/;
+    if ( defined($parameter) ) {
+        $parameter =~ tr/-a-z/_A-Z/;
+        if ( $parameter =~ /^HTTPS(?:_|$)/ ) {
+            return $ENV{$parameter};
+        }
+        return $ENV{"HTTPS_$parameter"};
     }
-    return @p;
+    return wantarray
+        ? grep { /^HTTPS(?:_|$)/ } keys %ENV
+        : $ENV{'HTTPS'};
 }
 END_OF_FUNC
 
