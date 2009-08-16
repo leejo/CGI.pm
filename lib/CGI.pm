@@ -1695,7 +1695,7 @@ sub start_html {
     $title = $self->escapeHTML($title || 'Untitled Document');
     $author = $self->escape($author);
 
-    if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2)/i) {
+    if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2|4\.01?)/i) {
 	$lang = "" unless defined $lang;
 	$XHTML = 0;
     }
@@ -4961,7 +4961,8 @@ By default, CGI.pm versions 2.69 and higher emit XHTML
 feature.  Thanks to Michalis Kabrianis <kabrianis@hellug.gr> for this
 feature.
 
-If start_html()'s -dtd parameter specifies an HTML 2.0 or 3.2 DTD, 
+If start_html()'s -dtd parameter specifies an HTML 2.0, 
+3.2, 4.0 or 4.01 DTD, 
 XHTML will automatically be disabled without needing to use this 
 pragma.
 

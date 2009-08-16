@@ -10,7 +10,7 @@ $loaded = 1;
 print "ok 1\n";
 
 BEGIN {
-   $| = 1; print "1..28\n";
+   $| = 1; print "1..32\n";
   if( $] > 5.006 ) {
     # no utf8
     require utf8; # we contain Latin-1
@@ -77,37 +77,59 @@ test(14,start_html(-Title=>'The world of foo') eq <<END,"start_html()");
 <body>
 END
     ;
-# Note that this test will turn off XHTML until we make a new CGI object.
-test(15,start_html(-dtd=>"-//IETF//DTD HTML 3.2//FR",-lang=>'fr') eq <<END,"start_html()");
+
+my $test_nbr = 15;
+
+for my $v (qw/ 2.0 3.2 4.0 4.01 /) {
+    local $CGI::XHTML = 1;
+    test(
+        $test_nbr++,
+        start_html( -dtd => "-//IETF//DTD HTML $v//FR", -lang => 'fr' ) eq
+          <<"END", 'start_html()' );
 <!DOCTYPE html
-	PUBLIC "-//IETF//DTD HTML 3.2//FR">
+	PUBLIC "-//IETF//DTD HTML $v//FR">
 <html lang="fr"><head><title>Untitled Document</title>
 </head>
 <body>
 END
-    ;
-test(16,($cookie=cookie(-name=>'fred',-value=>['chocolate','chip'],-path=>'/')) eq 'fred=chocolate&chip; path=/',"cookie()");
+}
+
+test(
+    19,
+    start_html( -dtd => "-//IETF//DTD HTML 9.99//FR", -lang => 'fr' ) eq
+      <<"END", 'start_html()' );
+<!DOCTYPE html
+	PUBLIC "-//IETF//DTD HTML 9.99//FR">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+END
+
+test(20,($cookie=cookie(-name=>'fred',-value=>['chocolate','chip'],-path=>'/')) eq 'fred=chocolate&chip; path=/',"cookie()");
 my $h = header(-Cookie=>$cookie);
-test(17,$h =~ m!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s, 
+test(21,$h =~ m!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s, 
   "header(-cookie)");
-test(18,start_h3 eq '<h3>');
-test(19,end_h3 eq '</h3>');
-test(20,start_table({-border=>undef}) eq '<table border>');
-test(21,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; &#8249;right&#8250;</h1>');
+test(22,start_h3 eq '<h3>');
+test(23,end_h3 eq '</h3>');
+test(24,start_table({-border=>undef}) eq '<table border>');
+test(25,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; &#8249;right&#8250;</h1>');
 charset('utf-8');
 if (ord("\t") == 9) {
-test(22,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; ‹right›</h1>');
+test(26,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; ‹right›</h1>');
 }
 else {
-test(22,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; »rightº</h1>');
+test(26,h1(escapeHTML("this is <not> \x8bright\x9b")) eq '<h1>this is &lt;not&gt; »rightº</h1>');
 }
-test(23,i(p('hello there')) eq '<i><p>hello there</p></i>');
+test(27,i(p('hello there')) eq '<i><p>hello there</p></i>');
 my $q = new CGI;
-test(24,$q->h1('hi') eq '<h1>hi</h1>');
+test(28,$q->h1('hi') eq '<h1>hi</h1>');
 
 $q->autoEscape(1);
-test(25,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');
+test(29,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');
 $q->autoEscape(0);
-test(26,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&egrave;">hello &aacute;</p>');
-test(27,p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');
-test(28,header(-type=>'image/gif',-charset=>'UTF-8') eq "Content-Type: image/gif; charset=UTF-8${CRLF}${CRLF}","header()");
+test(30,$q->p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&egrave;">hello &aacute;</p>');
+test(31,p({title=>"hello world&egrave;"},'hello &aacute;') eq '<p title="hello world&amp;egrave;">hello &aacute;</p>');
+test(32,header(-type=>'image/gif',-charset=>'UTF-8') eq "Content-Type: image/gif; charset=UTF-8${CRLF}${CRLF}","header()");
