@@ -1,6 +1,8 @@
   [BUG FIXES]
   1. In CGI::Pretty, we no longer add line breaks after tags we claim not to format. Thanks to rrt, bubaflub and
      and markstos. (RT#42114). 
+  2. unescapeHTML() no longer falsely recognizes certain text as entities. Thanks to Pete Gamanche, Mark Stosberg  
+     and bubaflub. (RT#39122)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
