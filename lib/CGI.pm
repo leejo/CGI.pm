@@ -613,7 +613,7 @@ sub init {
           if (defined($fh) && ($fh ne '')) {
               while (<$fh>) {
                   chomp;
-                  last if /^=/;
+                  last if /^=$/;
                   push(@lines,$_);
               }
               # massage back into standard format
@@ -1397,7 +1397,8 @@ sub save {
 	my($escaped_param) = escape($param);
 	my($value);
 	for $value ($self->param($param)) {
-	    print $filehandle "$escaped_param=",escape("$value"),"\n";
+	    print $filehandle "$escaped_param=",escape("$value"),"\n"
+	        if length($escaped_param) or length($value);
 	}
     }
     for (keys %{$self->{'.fieldnames'}}) {
