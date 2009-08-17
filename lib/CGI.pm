@@ -128,8 +128,6 @@ sub initialize_globals {
 
 # ------------------ START OF THE LIBRARY ------------
 
-*end_form = \&endform;
-
 # make mod_perlhappy
 initialize_globals();
 
@@ -1695,7 +1693,7 @@ sub start_html {
     $title = $self->escapeHTML($title || 'Untitled Document');
     $author = $self->escape($author);
 
-    if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2)/i) {
+    if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2|4\.01?)/i) {
 	$lang = "" unless defined $lang;
 	$XHTML = 0;
     }
@@ -1969,6 +1967,13 @@ sub endform {
 }
 END_OF_FUNC
 
+#### Method: end_form
+# synonym for endform
+'end_form' => <<'END_OF_FUNC',
+sub end_form {
+    &endform;
+}
+END_OF_FUNC
 
 '_textfield' => <<'END_OF_FUNC',
 sub _textfield {
@@ -4959,7 +4964,8 @@ By default, CGI.pm versions 2.69 and higher emit XHTML
 feature.  Thanks to Michalis Kabrianis <kabrianis@hellug.gr> for this
 feature.
 
-If start_html()'s -dtd parameter specifies an HTML 2.0 or 3.2 DTD, 
+If start_html()'s -dtd parameter specifies an HTML 2.0, 
+3.2, 4.0 or 4.01 DTD, 
 XHTML will automatically be disabled without needing to use this 
 pragma.
 
