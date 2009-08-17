@@ -6895,7 +6895,7 @@ Fetch the value of the button this way:
 
 	-or-
 
-     print button('button_name',"do_something()");
+     print button('button_name',"user visible value","do_something()");
 
 button() produces a button that is compatible with Netscape 2.0's
 JavaScript.  When it's pressed the fragment of JavaScript code
