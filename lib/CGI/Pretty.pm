@@ -281,10 +281,6 @@ the following:
 
     $CGI::Pretty::INDENT = $CGI::Pretty::LINEBREAK = "";
 
-=head1 BUGS
-
-This section intentionally left blank.
-
 =head1 AUTHOR
 
 Brian Paulsen <Brian@ThePaulsens.com>, with minor modifications by
