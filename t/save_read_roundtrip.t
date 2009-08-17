@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+# Reference: RT#13158: Needs test: empty name/value, when saved, prevents proper restore from filehandle.
+#                      https://rt.cpan.org/Ticket/Display.html?id=13158
+
 use lib 't/lib';
 use Test::More tests => 3;
 
