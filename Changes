@@ -10,6 +10,8 @@
   5. XHTML is now automatically disabled for HTML 4, as well as HTML 2 and HTML 3. Thanks to
      Dan Harkless and Yanick Champoux. (RT#27907)
   6. Pre-compiling 'end_form' with ':form' switch now works. Thanks to ryochin and Yanick Champoux. (RT#41530)
+  7. Empty name/values pairs are now properly saved and restored from filehandles. Thanks to rlucas and
+     Rhesa Rozendaal (RT#13158).
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
