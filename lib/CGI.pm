@@ -5781,12 +5781,12 @@ passing a -charset argument to header(), then B<all> characters will
 be replaced by their numeric entities, since CGI.pm has no lookup
 table for all the possible encodings.
 
-escapeHTML expects the supplied string to be a character string. This means you
+C<escapeHTML()> expects the supplied string to be a character string. This means you
 should Encode::decode data received from "outside" and Encode::encode your
-strings before sending them back outside. To upgrade string literals in your
-source to character strings, you can use "use encoding" or "use utf8". See
-perlunitut and perlunicode for more information on how Perl handles the
-difference between bytes and characters.
+strings before sending them back outside. If your source code UTF-8 encoded and
+you want to upgrade string literals in your source to character strings, you
+can use "use utf8". See L<perlunitut>, L<perlunifaq> and L<perlunicode> for more
+information on how Perl handles the difference between bytes and characters.
 
 The automatic escaping does not apply to other shortcuts, such as
 h1().  You should call escapeHTML() yourself on untrusted data in
