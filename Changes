@@ -1,6 +1,7 @@
+Version 3.46
   [BUG FIXES]
   1. In CGI::Pretty, we no longer add line breaks after tags we claim not to format. Thanks to rrt, Bob Kuo and
-     and markstos. (RT#42114). 
+     and Mark Stosberg. (RT#42114). 
   2. unescapeHTML() no longer falsely recognizes certain text as entities. Thanks to Pete Gamanche, Mark Stosberg  
      and Bob Kuo. (RT#39122)
   3. checkbox_group() now correctly includes a space before the "checked" attribute.
@@ -14,7 +15,7 @@
      Rhesa Rozendaal (RT#13158).
 
   [DOCUMENTATION]
-  1. remote_addr() is now documented. Thanks to yanick. (RT#38884)
+  1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
   2. In CGI::Pretty in the list of tags left unformatted was updated to match the code. Thanks to Mark Stosberg. (RT#42114)
   3. In CGI::Pretty, performance concerns are now documented. Thanks to Jochen, Rhesa Rozendaal and Mark Stosberg (RT#13223)
 
