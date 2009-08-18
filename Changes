@@ -18,6 +18,7 @@ Version 3.46
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
   2. In CGI::Pretty in the list of tags left unformatted was updated to match the code. Thanks to Mark Stosberg. (RT#42114)
   3. In CGI::Pretty, performance concerns are now documented. Thanks to Jochen, Rhesa Rozendaal and Mark Stosberg (RT#13223)
+  4. A number of outdated Netscape references have been removed. (Mark Stosberg)
 
 Version 3.45
   [BUG FIXES]
