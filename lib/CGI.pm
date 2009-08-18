@@ -4810,12 +4810,11 @@ Import all methods that generate HTML 4 elements (such as
 
 =item B<:netscape>
 
-Import all methods that generate Netscape-specific HTML extensions.
+Import the <blink>, <fontsize> and <center> tags. 
 
 =item B<:html>
 
-Import all HTML-generating shortcuts (i.e. 'html2' + 'html3' +
-'netscape')...
+Import all HTML-generating shortcuts (i.e. 'html2', 'html3', 'html4' and 'netscape')
 
 =item B<:standard>
 
@@ -4898,7 +4897,7 @@ The current list of pragmas is as follows:
 
 When you I<use CGI -any>, then any method that the query object
 doesn't recognize will be interpreted as a new HTML tag.  This allows
-you to support the next I<ad hoc> Netscape or Microsoft HTML
+you to support the next I<ad hoc> HTML
 extension.  This lets you go wild with new and unsupported tags:
 
    use CGI qw(-any);
@@ -5189,7 +5188,7 @@ indicated expiration date.  The following forms are all valid for the
 
 The B<-cookie> parameter generates a header that tells the browser to provide
 a "magic cookie" during all subsequent transactions with your script.
-Netscape cookies have a special format that includes interesting attributes
+Some cookies have a special format that includes interesting attributes
 such as expiration time.  Use the cookie() method to create and retrieve
 session cookies.
 
@@ -5281,7 +5280,7 @@ This method returns a canned HTML header and the opening <body> tag.
 All parameters are optional.  In the named parameter form, recognized
 parameters are -title, -author, -base, -xbase, -dtd, -lang and -target
 (see below for the explanation).  Any additional parameters you
-provide, such as the Netscape unofficial BGCOLOR attribute, are added
+provide, such as the unofficial BGCOLOR attribute, are added
 to the <body> tag.  Additional parameters must be proceeded by a
 hyphen.
 
@@ -5294,9 +5293,7 @@ All relative links will be interpreted relative to this tag.
 
 The argument B<-target> allows you to provide a default target frame
 for all the links and fill-out forms on the page.  B<This is a
-non-standard HTTP feature which only works with Netscape browsers!>
-See the Netscape documentation on frames for details of how to
-manipulate this.
+non-standard HTTP feature which only works with some browsers!>
 
     -target=>"answer_window"
 
@@ -5362,7 +5359,7 @@ And here's how to create an HTTP-EQUIV <meta> tag:
 
 JAVASCRIPTING: The B<-script>, B<-noScript>, B<-onLoad>,
 B<-onMouseOver>, B<-onMouseOut> and B<-onUnload> parameters are used
-to add Netscape JavaScript calls to your pages.  B<-script> should
+to add JavaScript calls to your pages.  B<-script> should
 point to a block of text containing JavaScript function definitions.
 This block will be placed within a <script> block inside the HTML (not
 HTTP) header.  The block is placed in the header in order to give your
@@ -5469,7 +5466,7 @@ but makes the document hierarchy non-portable.  Use with care!
 =item 4, 5, 6...
 
 Any other parameters you want to include in the <body> tag.  This is a good
-place to put Netscape extensions, such as colors and wallpaper patterns.
+place to put HTML extensions, such as colors and wallpaper patterns.
 
 =back
 
@@ -5912,18 +5909,17 @@ are still recognized as aliases of start_form() and end_form().
 
 =item B<application/x-www-form-urlencoded>
 
-This is the older type of encoding used by all browsers prior to
-Netscape 2.0.  It is compatible with many CGI scripts and is
+This is the older type of encoding.  It is compatible with many CGI scripts and is
 suitable for short fields containing text data.  For your
 convenience, CGI.pm stores the name of this encoding
 type in B<&CGI::URL_ENCODED>.
 
 =item B<multipart/form-data>
 
-This is the newer type of encoding introduced by Netscape 2.0.
+This is the newer type of encoding.
 It is suitable for forms that contain very large fields or that
 are intended for transferring binary data.  Most importantly,
-it enables the "file upload" feature of Netscape 2.0 forms.  For
+it enables the "file upload" feature.  For
 your convenience, CGI.pm stores the name of this encoding type
 in B<&CGI::MULTIPART>
 
@@ -6093,7 +6089,7 @@ will be starred out on the web page.
 
     print filefield('uploaded_file','starting value',50,80);
 
-filefield() will return a file upload field for Netscape 2.0 browsers.
+filefield() will return a file upload field.
 In order to take full advantage of this I<you must use the new 
 multipart encoding scheme> for the form.  You can do this either
 by calling B<start_form()> with an encoding type of B<&CGI::MULTIPART>,
@@ -6897,9 +6893,9 @@ Fetch the value of the button this way:
 
      print button('button_name',"user visible value","do_something()");
 
-button() produces a button that is compatible with Netscape 2.0's
-JavaScript.  When it's pressed the fragment of JavaScript code
-pointed to by the B<-onClick> parameter will be executed.
+button() produces an C<< <input> >> tag with C<type="button">.  When it's
+pressed the fragment of JavaScript code pointed to by the B<-onClick> parameter
+will be executed.
 
 =head1 HTTP COOKIES
 
@@ -7071,10 +7067,7 @@ document that defines the frames on the page.  Specify your script(s)
 (with appropriate parameters) as the SRC for each of the frames.
 
 There is no specific support for creating <frameset> sections 
-in CGI.pm, but the HTML is very simple to write.  See the frame
-documentation in Netscape's home pages for details 
-
-  http://wp.netscape.com/assist/net_sites/frames.html
+in CGI.pm, but the HTML is very simple to write.  
 
 =item 2. Specify the destination for the document in the HTTP header
 
@@ -7086,8 +7079,7 @@ This will tell the browser to load the output of your script into the
 frame named "ResultsWindow".  If a frame of that name doesn't already
 exist, the browser will pop up a new window and load your script's
 document into that.  There are a number of magic names that you can
-use for targets.  See the frame documents on Netscape's home pages for
-details.
+use for targets.  See the HTML C<< <frame> >> documentation for details.
 
 =item 3. Specify the destination for the document in the <form> tag
 
