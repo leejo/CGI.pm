@@ -3,7 +3,6 @@
 # Test ability to escape() and unescape() punctuation characters
 # except for qw(- . _).
 ######################### We start with some black magic to print on failure.
-use lib '../blib/lib','../blib/arch';
 
 BEGIN {$| = 1; print "1..57\n"; }
 END {print "not ok 1\n" unless $loaded;}

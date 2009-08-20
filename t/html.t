@@ -1,9 +1,5 @@
 #!/usr/local/bin/perl -w
 
-# Test ability to retrieve HTTP request info
-######################### We start with some black magic to print on failure.
-use lib '../blib/lib', '../blib/arch';
-
 use Test::More tests => 33;
 
 END { ok $loaded; }

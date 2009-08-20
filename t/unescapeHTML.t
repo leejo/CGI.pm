@@ -1,4 +1,3 @@
-use lib 't/lib';
 use Test::More tests => 4;
 use CGI 'unescapeHTML';
 

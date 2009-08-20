@@ -1,6 +1,5 @@
 #!perl
 # Tests for popup_menu();
-use lib 't/lib';
 use Test::More 'no_plan';
 use CGI;
 
