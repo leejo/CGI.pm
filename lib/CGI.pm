@@ -128,6 +128,10 @@ sub initialize_globals {
 
 # ------------------ START OF THE LIBRARY ------------
 
+#### Method: endform
+# This method is DEPRECATED
+*endform = \&end_form;
+
 # make mod_perlhappy
 initialize_globals();
 
@@ -1892,6 +1896,7 @@ END_OF_FUNC
 
 
 #### Method: startform
+# This method is DEPRECATED
 # Start a form
 # Parameters:
 #   $method -> optional submission method to use (GET or POST)
@@ -1919,62 +1924,82 @@ sub startform {
 }
 END_OF_FUNC
 
-
 #### Method: start_form
-# synonym for startform
+# Start a form
+# Parameters:
+#   $method -> optional submission method to use (GET or POST)
+#   $action -> optional URL of script to run
+#   $enctype ->encoding to use (URL_ENCODED or MULTIPART)
 'start_form' => <<'END_OF_FUNC',
 sub start_form {
-    $XHTML ? &start_multipart_form : &startform;
-}
-END_OF_FUNC
+    my($self,@p) = self_or_default(@_);
 
-'end_multipart_form' => <<'END_OF_FUNC',
-sub end_multipart_form {
-    &endform;
+    my($method,$action,$enctype,@other) = 
+	rearrange([METHOD,ACTION,ENCTYPE],@p);
+
+    $method  = $self->escapeHTML(lc($method || 'post'));
+
+    if( $XHTML ){
+        $enctype = $self->escapeHTML($enctype || &MULTIPART);
+    }else{
+        $enctype = $self->escapeHTML($enctype || &URL_ENCODED);
+    }
+
+    if (defined $action) {
+       $action = $self->escapeHTML($action);
+    }
+    else {
+       $action = $self->escapeHTML($self->request_uri || $self->self_url);
+    }
+    $action = qq(action="$action");
+    my($other) = @other ? " @other" : '';
+    $self->{'.parametersToAdd'}={};
+    return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
 }
 END_OF_FUNC
 
 #### Method: start_multipart_form
-# synonym for startform
 'start_multipart_form' => <<'END_OF_FUNC',
 sub start_multipart_form {
     my($self,@p) = self_or_default(@_);
     if (defined($p[0]) && substr($p[0],0,1) eq '-') {
-      return $self->startform(-enctype=>&MULTIPART,@p);
+      return $self->start_form(-enctype=>&MULTIPART,@p);
     } else {
 	my($method,$action,@other) = 
 	    rearrange([METHOD,ACTION],@p);
-	return $self->startform($method,$action,&MULTIPART,@other);
+	return $self->start_form($method,$action,&MULTIPART,@other);
     }
 }
 END_OF_FUNC
 
 
-#### Method: endform
-# End a form
-'endform' => <<'END_OF_FUNC',
-sub endform {
-    my($self,@p) = self_or_default(@_);
-    if ( $NOSTICKY ) {
-    return wantarray ? ("</form>") : "\n</form>";
-    } else {
-      if (my @fields = $self->get_fields) {
-         return wantarray ? ("<div>",@fields,"</div>","</form>")
-                          : "<div>".(join '',@fields)."</div>\n</form>";
-      } else {
-         return "</form>";
-      }
-    }
-}
-END_OF_FUNC
 
 #### Method: end_form
-# synonym for endform
+# End a form
 'end_form' => <<'END_OF_FUNC',
 sub end_form {
-    &endform;
+    my($self,@p) = self_or_default(@_);
+    if ( $NOSTICKY ) {
+        return wantarray ? ("</form>") : "\n</form>";
+    } else {
+        if (my @fields = $self->get_fields) {
+            return wantarray ? ("<div>",@fields,"</div>","</form>")
+                             : "<div>".(join '',@fields)."</div>\n</form>";
+        } else {
+            return "</form>";
+        }
+    }
 }
 END_OF_FUNC
+
+#### Method: end_multipart_form
+# end a multipart form
+'end_multipart_form' => <<'END_OF_FUNC',
+sub end_multipart_form {
+    &end_form;
+}
+END_OF_FUNC
+
 
 '_textfield' => <<'END_OF_FUNC',
 sub _textfield {
@@ -5894,7 +5919,8 @@ action and form encoding that you specify.  The defaults are:
 
     method: POST
     action: this script
-    enctype: application/x-www-form-urlencoded
+    enctype: application/x-www-form-urlencoded for non-XHTML
+             multipart/form-data for XHTML, see mulitpart/form-data below.
 
 end_form() returns the closing </form> tag.  
 
@@ -5902,8 +5928,9 @@ Start_form()'s enctype argument tells the browser how to package the various
 fields of the form before sending the form to the server.  Two
 values are possible:
 
-B<Note:> These methods were previously named startform() and endform(), and they
-are still recognized as aliases of start_form() and end_form().
+B<Note:> These methods were previously named startform() and endform().
+These methods are now DEPRECATED.
+Please use start_form() and end_form() instead.
 
 =over 4
 
@@ -5932,10 +5959,11 @@ created using this type of encoding.
 
 =back
 
-For compatibility, the start_form() method uses the older form of
-encoding by default.  If you want to use the newer form of encoding
-by default, you can call B<start_multipart_form()> instead of
-B<start_form()>.
+The start_form() method uses the older form of encoding by
+default unless XHTML is requested.  If you want to use the
+newer form of encoding by default, you can call
+B<start_multipart_form()> instead of B<start_form()>.  The
+method B<end_multipart_form()> is an alias to B<end_form()>.
 
 JAVASCRIPTING: The B<-name> and B<-onSubmit> parameters are provided
 for use with JavaScript.  The -name parameter gives the
