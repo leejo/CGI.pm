@@ -7,7 +7,7 @@ BEGIN {
 	$fcgi = $@ ? 0 : 1;
 }
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 # Shut up "used only once" warnings.
 () = $CGI::Q;
@@ -16,16 +16,16 @@ use Test::More tests => 7;
 SKIP: {
 	skip( 'FCGI not installed, cannot continue', 7 ) unless $fcgi;
 
-	use_ok( CGI::Fast );
+	use CGI::Fast;
 	ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
 	is( $q, $CGI::Q, 'checking to see if the object was stored properly' );
 	is( $q->param(), (), 'no params' );
 
-	ok( $q = CGI::Fast->new({ foo => 'bar' }), 'creating obect with params' );
+	ok( $q = CGI::Fast->new({ foo => 'bar' }), 'creating object with params' );
 	is( $q->param('foo'), 'bar', 'checking passed param' );
 
 	# if this is false, the package var will be empty
 	$ENV{FCGI_SOCKET_PATH} = 0;
-	is( $CGI::Fast::Ext_Request, '', 'checking no active request' );
+	is( $CGI::Fast::Ext_Request, undef, 'checking no active request' );
 
-}
+};
