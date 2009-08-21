@@ -13,6 +13,8 @@ Version 3.46
   6. Pre-compiling 'end_form' with ':form' switch now works. Thanks to ryochin and Yanick Champoux. (RT#41530)
   7. Empty name/values pairs are now properly saved and restored from filehandles. Thanks to rlucas and
      Rhesa Rozendaal (RT#13158).
+  8. Some differences between startform() and start_form() have been fixed. Thanks to Slaven Rezic and
+     Shawn Corey. (RT#22046);
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
