@@ -1,10 +1,15 @@
-#!/usr/local/bin/perl -w
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use CGI ();
+use Config;
+
+my $loaded = 1;
 
 BEGIN {$| = 1; print "1..34\n"; }
 END {print "not ok 1\n" unless $loaded;}
-use CGI ();
-use Config;
-$loaded = 1;
 print "ok 1\n";
 
 ######################### End of black magic.
@@ -28,7 +33,7 @@ $ENV{SERVER_NAME}     = 'the.good.ship.lollypop.com';
 $ENV{REQUEST_URI}     = "$ENV{SCRIPT_NAME}$ENV{PATH_INFO}?$ENV{QUERY_STRING}";
 $ENV{HTTP_LOVE}       = 'true';
 
-$q = new CGI;
+my $q = new CGI;
 test(2,$q,"CGI::new()");
 test(3,$q->request_method eq 'GET',"CGI::request_method()");
 test(4,$q->query_string eq 'game=chess;game=checkers;weather=dull',"CGI::query_string()");
@@ -75,7 +80,7 @@ test(31,exists $p->{bar});
 # test posting
 $q->_reset_globals;
 if ($Config{d_fork}) {
-  $test_string = 'game=soccer&game=baseball&weather=nice';
+  my $test_string = 'game=soccer&game=baseball&weather=nice';
   $ENV{REQUEST_METHOD}='POST';
   $ENV{CONTENT_LENGTH}=length($test_string);
   $ENV{QUERY_STRING}='big_balls=basketball&small_balls=golf';
