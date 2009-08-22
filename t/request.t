@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 41;
 
 use CGI ();
 use Config;
@@ -103,4 +103,13 @@ $q->_reset_globals;
     ok !$q->param,     'param() is false if no parameters';
     ok !$q->url_param, 'url_param() is false if no parameters';
 
+    $ENV{QUERY_STRING} = 'tiger dragon';
+    CGI::_reset_globals;
+    $q = CGI->new;
+
+    is_deeply [$q->$_] => [ 'keywords' ], "$_ with QS='$ENV{QUERY_STRING}'" 
+        for qw/ param url_param /;
+
+    is_deeply [ sort $q->$_( 'keywords' ) ], [ qw/ dragon tiger / ],
+        "$_ keywords" for qw/ param url_param /;
 }
