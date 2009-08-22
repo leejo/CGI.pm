@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 37;
 
 use CGI ();
 use Config;
@@ -74,9 +74,9 @@ ok exists $p->{bar};
 $q->_reset_globals;
 {
   my $test_string = 'game=soccer&game=baseball&weather=nice';
-  $ENV{REQUEST_METHOD}='POST';
-  $ENV{CONTENT_LENGTH}=length($test_string);
-  $ENV{QUERY_STRING}='big_balls=basketball&small_balls=golf';
+  local $ENV{REQUEST_METHOD}='POST';
+  local $ENV{CONTENT_LENGTH}=length($test_string);
+  local $ENV{QUERY_STRING}='big_balls=basketball&small_balls=golf';
 
   local *STDIN;
   open STDIN, '<', \$test_string;
@@ -84,4 +84,23 @@ $q->_reset_globals;
   ok $q=new CGI,"CGI::new() from POST";
   is $q->param('weather'), 'nice',"CGI::param() from POST";
   is $q->url_param('big_balls'), 'basketball',"CGI::url_param()";
+}
+
+# test url_param 
+{
+    local $ENV{QUERY_STRING} = 'game=chess&game=checkers&weather=dull';
+
+    CGI::_reset_globals;
+    my $q = CGI->new;
+    # params present, param and url_param should return true
+    ok $q->param,     'param() is true if parameters';
+    ok $q->url_param, 'url_param() is true if parameters';
+
+    $ENV{QUERY_STRING} = '';
+
+    CGI::_reset_globals;
+    $q = CGI->new;
+    ok !$q->param,     'param() is false if no parameters';
+    ok !$q->url_param, 'url_param() is false if no parameters';
+
 }
