@@ -1,8 +1,10 @@
-#!/usr/local/bin/perl -w
+#!perl -w
 
-use Test::More tests => 32;
+# Form-related tests for CGI.pm
+# If you are adding or updated tests, please put tests for each methods in
+# their own file, rather than growing this file any larger. 
 
-BEGIN { use_ok('CGI'); };
+use Test::More 'no_plan';
 use CGI (':standard','-no_debug','-tabindex');
 
 my $CRLF = "\015\012";
@@ -179,7 +181,6 @@ is(scrolling_list(-name=>'menu_name',
 # The following tests were added for
 # https://rt.cpan.org/Public/Bug/Display.html?id=22046
 #     SHCOREY at cpan.org
-
 # Saved whether working with XHTML because need to test both
 # with it and without.
 my $saved_XHTML = $CGI::XHTML;
@@ -242,5 +243,3 @@ is(start_multipart_form("GET", "/foobar","name=\"foobar\""),
 
 # restoring value
 $CGI::XHTML = $saved_XHTML;
-
-# ---------- END 22046 ----------

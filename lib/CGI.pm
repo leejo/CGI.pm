@@ -2738,6 +2738,7 @@ sub hidden {
 	for ($default,$override,@other) {
 	    push(@value,$_) if defined($_);
 	}
+        undef @other;
     }
 
     # use previous values if override is not set
