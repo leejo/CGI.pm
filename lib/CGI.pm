@@ -1339,7 +1339,8 @@ sub url_param {
 		push(@{$self->{'.url_param'}->{$param}},$value);
 	    }
 	} else {
-	    $self->{'.url_param'}->{'keywords'} = [$self->parse_keywordlist($ENV{QUERY_STRING})];
+        my @keywords = $self->parse_keywordlist($ENV{QUERY_STRING});
+	    $self->{'.url_param'}{'keywords'} = \@keywords if @keywords;
 	}
     }
     return keys %{$self->{'.url_param'}} unless defined($name);
