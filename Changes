@@ -17,6 +17,8 @@ Version 3.46
      Shawn Corey. (RT#22046)
   9. url_param() has been updated to be more consistent with the documentation and param().
      Thanks to Britton Kerin and Yanick Campoux. (RT#43587)
+  10.hidden() now correctly supports multiple defaule values.
+     Thanks to david@dierauer.net and Russell Jenkins. (RT#20436)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
@@ -29,6 +31,7 @@ Version 3.46
   [INTERNALS]
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
      is now a dependency. Thanks to Ansgar and Mark Stosberg (RT#48811)
+  2. Automated tests for hidden() have been added, thanks to Russel Jenkins and Mark Stosberg (RT#20436)
 
 Version 3.45
   [BUG FIXES]
