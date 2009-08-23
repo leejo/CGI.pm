@@ -21,6 +21,7 @@ Version 3.46
   2. In CGI::Pretty in the list of tags left unformatted was updated to match the code. Thanks to Mark Stosberg. (RT#42114)
   3. In CGI::Pretty, performance concerns are now documented. Thanks to Jochen, Rhesa Rozendaal and Mark Stosberg (RT#13223)
   4. A number of outdated Netscape references have been removed. Thanks to Mark Stosberg.
+  5. The documentation has been purged of examples of using indirect object notation. Thanks to Mark Stosberg.
 
   [INTERNALS]
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
