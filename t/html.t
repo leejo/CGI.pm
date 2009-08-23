@@ -151,7 +151,7 @@ is h1( escapeHTML("this is <not> \x8bright\x9b") ),
 
 is i( p('hello there') ), '<i><p>hello there</p></i>';
 
-my $q = new CGI;
+my $q = CGI->new;
 is $q->h1('hi'), '<h1>hi</h1>';
 
 $q->autoEscape(1);

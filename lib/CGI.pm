@@ -2903,7 +2903,7 @@ sub cookie {
     push(@param,'-secure'=>$secure) if $secure;
     push(@param,'-httponly'=>$httponly) if $httponly;
 
-    return new CGI::Cookie(@param);
+    return CGI::Cookie->new(@param);
 }
 END_OF_FUNC
 
@@ -3580,7 +3580,7 @@ sub read_multipart {
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = new CGITempFile($seqno);
+	    next unless $tmpfile = CGITempFile->new($seqno);
 	    $tmp = $tmpfile->as_string;
 	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
@@ -3692,7 +3692,7 @@ sub read_multipart_related {
 	  # choose a relatively unpredictable tmpfile sequence number
           my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
           for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = new CGITempFile($seqno);
+	    next unless $tmpfile = CGITempFile->new($seqno);
 	    $tmp = $tmpfile->as_string;
 	    last if defined($filehandle = Fh->new($param,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
@@ -4330,7 +4330,7 @@ a simple "Hello World" HTML page:
 
    #!/usr/local/bin/perl -w
    use CGI;                             # load CGI routines
-   $q = new CGI;                        # create new CGI object
+   $q = CGI->new;                        # create new CGI object
    print $q->header,                    # create the HTTP header
          $q->start_html('hello world'), # start the HTML
          $q->h1('hello world'),         # level 1 header
@@ -4469,7 +4469,7 @@ HTML "standards".
 
 =head2 CREATING A NEW QUERY OBJECT (OBJECT-ORIENTED STYLE):
 
-     $query = new CGI;
+     $query = CGI->new;
 
 This will parse the input (from both POST and GET methods) and store
 it into a perl5 object called $query. 
@@ -4479,7 +4479,7 @@ the beginning of the file.
 
 =head2 CREATING A NEW QUERY OBJECT FROM AN INPUT FILE
 
-     $query = new CGI(INPUTFILE);
+     $query = CGI->new(INPUTFILE);
 
 If you provide a file handle to the new() method, it will read
 parameters from the file (or STDIN, or whatever).  The file can be in
@@ -4492,7 +4492,7 @@ Perl purists will be pleased to know that this syntax accepts
 references to file handles, or even references to filehandle globs,
 which is the "official" way to pass a filehandle:
 
-    $query = new CGI(\*STDIN);
+    $query = CGI->new(\*STDIN);
 
 You can also initialize the CGI object with a FileHandle or IO::File
 object.
@@ -4509,29 +4509,29 @@ default CGI object from the indicated file handle.
 You can also initialize the query object from a hash
 reference:
 
-    $query = new CGI( {'dinosaur'=>'barney',
+    $query = CGI->new( {'dinosaur'=>'barney',
 		       'song'=>'I love you',
 		       'friends'=>[qw/Jessica George Nancy/]}
 		    );
 
 or from a properly formatted, URL-escaped query string:
 
-    $query = new CGI('dinosaur=barney&color=purple');
+    $query = CGI->new('dinosaur=barney&color=purple');
 
 or from a previously existing CGI object (currently this clones the
 parameter list, but none of the other object-specific fields, such as
 autoescaping):
 
-    $old_query = new CGI;
-    $new_query = new CGI($old_query);
+    $old_query = CGI->new;
+    $new_query = CGI->new($old_query);
 
 To create an empty query, initialize it from an empty string or hash:
 
-   $empty_query = new CGI("");
+   $empty_query = CGI->new("");
 
        -or-
 
-   $empty_query = new CGI({});
+   $empty_query = CGI->new({});
 
 =head2 FETCHING A LIST OF KEYWORDS FROM THE QUERY:
 
@@ -4737,7 +4737,7 @@ a short example of creating multiple session records:
    open (OUT,">>test.out") || die;
    $records = 5;
    for (0..$records) {
-       my $q = new CGI;
+       my $q = CGI->new;
        $q->param(-name=>'counter',-value=>$_);
        $q->save(\*OUT);
    }
@@ -4746,7 +4746,7 @@ a short example of creating multiple session records:
    # reopen for reading
    open (IN,"test.out") || die;
    while (!eof(IN)) {
-       my $q = new CGI(\*IN);
+       my $q = CGI->new(\*IN);
        print $q->param('counter'),"\n";
    }
 
@@ -4926,7 +4926,7 @@ you to support the next I<ad hoc> HTML
 extension.  This lets you go wild with new and unsupported tags:
 
    use CGI qw(-any);
-   $q=new CGI;
+   $q=CGI->new;
    print $q->gradient({speed=>'fast',start=>'red',end=>'blue'});
 
 Since using <cite>any</cite> causes any mistyped method name
@@ -5400,7 +5400,7 @@ code to execute when the page is respectively opened and closed by the
 browser.  Usually these parameters are calls to functions defined in the
 B<-script> field:
 
-      $query = new CGI;
+      $query = CGI->new;
       print header;
       $JSCRIPT=<<END;
       // Ask a silly question
@@ -5870,7 +5870,7 @@ your ability to incorporate special HTML character sequences, such as &Aacute;,
 into your fields.  If you wish to turn off automatic escaping, call the
 autoEscape() method with a false value immediately after creating the CGI object:
 
-   $query = new CGI;
+   $query = CGI->new;
    autoEscape(undef);
 
 I<A Lurking Trap!> Some of the form-element generating methods return
@@ -7053,7 +7053,7 @@ without the B<-value> parameter. This example uses the object-oriented
 form:
 
 	use CGI;
-	$query = new CGI;
+	$query = CGI->new;
 	$riddle = $query->cookie('riddle_name');
         %answers = $query->cookie('answers');
 
@@ -7445,7 +7445,7 @@ Produces something that looks like:
 As a shortcut, you can interpolate the entire CGI object into a string
 and it will be replaced with the a nice HTML dump shown above:
 
-    $query=new CGI;
+    $query=CGI->new;
     print "<h2>Current Values</h2> $query\n";
 
 =head1 FETCHING ENVIRONMENT VARIABLES
