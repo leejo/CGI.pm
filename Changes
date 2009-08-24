@@ -19,6 +19,8 @@ Version 3.46
      Thanks to Britton Kerin and Yanick Campoux. (RT#43587)
   10.hidden() now correctly supports multiple defaule values.
      Thanks to david@dierauer.net and Russell Jenkins. (RT#20436)
+  11.Calling CGI->new() no longer clobbers the value of $_ in the current scope. 
+     Thanks to Alexey Tourbin, Bob Kuo and Mark Stosberg. (RT#25131)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
