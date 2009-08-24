@@ -615,6 +615,7 @@ sub init {
 	  }
 
           if (defined($fh) && ($fh ne '')) {
+              local $_;
               while (<$fh>) {
                   chomp;
                   last if /^=$/;
