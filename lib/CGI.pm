@@ -615,11 +615,10 @@ sub init {
 	  }
 
           if (defined($fh) && ($fh ne '')) {
-              local $_;
-              while (<$fh>) {
-                  chomp;
-                  last if /^=$/;
-                  push(@lines,$_);
+              while (my $line = <$fh>) {
+                  chomp $line;
+                  last if $line =~ /^=$/;
+                  push(@lines,$line);
               }
               # massage back into standard format
               if ("@lines" =~ /=/) {
