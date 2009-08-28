@@ -1,6 +1,8 @@
-#!perl -wT
+#!perl -T
 
 use strict;
+use warnings;
+
 use utf8;
 
 use Test::More tests => 7;
@@ -10,7 +12,10 @@ use_ok( 'CGI' );
 
 ok( my $q = CGI->new, 'create a new CGI object' );
 
-$CGI::PARAM_UTF8 = 1;
+{
+    no warnings qw/ once /;
+    $CGI::PARAM_UTF8 = 1;
+}
 
 my $data = 'áéíóúµ';
 ok Encode::is_utf8($data), "created UTF-8 encoded data string";
