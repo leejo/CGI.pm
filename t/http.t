@@ -7,7 +7,6 @@ use lib qw(t/lib);
 use Test::More tests => 7;
 use CGI;
 
-warn $Test::More::VERSION;
 my $cgi = CGI->new();
 
 {
