@@ -457,10 +457,21 @@ sub param {
 
     if ($PARAM_UTF8) {
       eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
-      @result = map {ref $_ ? $_ : Encode::decode(utf8=>$_) } @result;
+      @result = map {ref $_ ? $_ : $self->_decode_utf8($_) } @result;
     }
 
     return wantarray ?  @result : $result[0];
+}
+
+sub _decode_utf8 {
+    my ($self, $val) = @_;
+
+    if (Encode::is_utf8($val)) {
+        return $val;
+    }
+    else {
+        return Encode::decode(utf8 => $val);
+    }
 }
 
 sub self_or_default {
