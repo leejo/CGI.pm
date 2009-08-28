@@ -3,7 +3,7 @@
 
 use strict;
 
-use Test::More tests => 41;
+use Test::More tests => 47;
 use IO::Handle;
 
 BEGIN { use_ok('CGI::Carp') };
@@ -273,3 +273,58 @@ ok( defined buffer( $fh ),         '$fh returns proper filehandle');
 ok( defined buffer('::STDOUT'),    'STDIN returns proper filehandle');
 ok( defined buffer(*main::STDOUT), 'STDIN returns proper filehandle');
 ok(!defined buffer("WIBBLE"),      '"WIBBLE" doesn\'t returns proper filehandle');
+
+# Calling die with code refs
+{
+    local $CGI::Carp::WRAP = 1;
+
+    tie *STDOUT, 'StoreStuff';
+
+    my %result;   # store results because stdout is kidnapped
+
+    CGI::Carp::die( 'regular string' );
+    $result{string} .= $_ while <STDOUT>;
+
+    CGI::Carp::die( [ 1..10 ] );
+    $result{array_ref} .= $_ while <STDOUT>;
+
+    CGI::Carp::die( { a => 1 } );
+    $result{hash_ref} .= $_ while <STDOUT>;
+
+    CGI::Carp::die( sub { 'Farewell' } );
+    $result{code_ref} .= $_ while <STDOUT>;
+
+    CGI::Carp::die( My::Plain::Object->new );
+    $result{plain_object} .= $_ while <STDOUT>;
+
+    CGI::Carp::die( My::Stringified::Object->new );
+    $result{string_object} .= $_ while <STDOUT>;
+
+    untie *STDOUT;
+
+    like $result{string}        => qr/regular string/,    'regular string';
+    like $result{array_ref}     => qr/ARRAY\(\w+?\)/,     'array ref';
+    like $result{hash_ref}      => qr/HASH\(\w+?\)/,      'hash ref';
+    like $result{code_ref}      => qr/CODE\(\w+?\)/,      'code ref';
+    like $result{plain_object}  => qr/My::Plain::Object/, 'plain object';
+    like $result{string_object} => qr/stringified/,       'stringified object';
+
+}
+
+{
+    package My::Plain::Object;
+
+    sub new {
+        return bless {}, shift;
+    }
+}
+
+{
+    package My::Stringified::Object;
+
+    use overload '""' => sub { 'stringified' };
+
+    sub new {
+        return bless {}, shift;
+    }
+}
