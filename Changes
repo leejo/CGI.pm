@@ -23,6 +23,8 @@ Version 3.46
      Thanks to Alexey Tourbin, Bob Kuo and Mark Stosberg. (RT#25131)
   12.UTF-8 params should not get double-decoded now.
      Thanks to Yves, Bodo, Burak Gürsoy, and Michael Schout. (RT#19913)
+  13.We now give objects passed to CGI::Carp::die a chance to be stringified.
+     Thanks to teek and Yanick Champoux (RT#41530)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
