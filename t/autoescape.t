@@ -13,6 +13,8 @@ my $after = escapeHTML("test<");
 
 is ($before, $after, "passing undef to autoEscape doesn't break escapeHTML"); 
 
+autoEscape(1);
+
 $before = escapeHTML("test<");
 autoEscape(0);
 $after = escapeHTML("test<");
