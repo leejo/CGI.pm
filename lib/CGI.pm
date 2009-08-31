@@ -7269,7 +7269,7 @@ start_html() method provides a convenient way to create this section.
 Similarly, you can create a form that checks itself over for
 consistency and alerts the user if some essential value is missing by
 creating it this way: 
-  print startform(-onSubmit=>"validateMe(this)");
+  print start_form(-onSubmit=>"validateMe(this)");
 
 See the javascript.cgi script for a demonstration of how this all
 works.
