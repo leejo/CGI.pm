@@ -33,6 +33,8 @@ Version 3.46
   4. A number of outdated Netscape references have been removed. Thanks to Mark Stosberg.
   5. The documentation has been purged of examples of using indirect object notation. Thanks to Mark Stosberg.
   6. Some POD formatting was fixed. Thanks to Dave Mitchell (RT#48935).
+  7. Docs and examples were updated to highlight start_form instead of startform.
+     Thanks to Slaven Rezic.
 
   [INTERNALS]
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
