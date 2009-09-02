@@ -2294,37 +2294,37 @@ END_OF_FUNC
 # Escape HTML -- used internally
 'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
-         # hack to work around  earlier hacks
-         push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
-         my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
-         return undef unless defined($toencode);
-         return $toencode if ref($self) && !$self->{'escape'};
-         $toencode =~ s{&}{&amp;}gso;
-         $toencode =~ s{<}{&lt;}gso;
-         $toencode =~ s{>}{&gt;}gso;
-	 if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
+    # hack to work around  earlier hacks
+    push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
+    my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
+    return undef unless defined($toencode);
+    return $toencode if ref($self) && !$self->{'escape'};
+    $toencode =~ s{&}{&amp;}gso;
+    $toencode =~ s{<}{&lt;}gso;
+    $toencode =~ s{>}{&gt;}gso;
+	if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
 	     # $quot; was accidentally omitted from the HTML 3.2 DTD -- see
 	     # <http://validator.w3.org/docs/errors.html#bad-entity> /
 	     # <http://lists.w3.org/Archives/Public/www-html/1997Mar/0003.html>.
 	     $toencode =~ s{"}{&#34;}gso;
-         }
-         else {
+    }
+    else {
 	     $toencode =~ s{"}{&quot;}gso;
-         }
-         # Handle bug in some browsers with Latin charsets
-         if ($self->{'.charset'} &&
-             (uc($self->{'.charset'}) eq 'ISO-8859-1' ||
-              uc($self->{'.charset'}) eq 'WINDOWS-1252'))
-         {
+    }
+
+    # Handle bug in some browsers with Latin charsets
+    if ($self->{'.charset'} 
+            && (uc($self->{'.charset'}) eq 'ISO-8859-1' 
+            || uc($self->{'.charset'}) eq 'WINDOWS-1252')) {
                 $toencode =~ s{'}{&#39;}gso;
                 $toencode =~ s{\x8b}{&#8249;}gso;
                 $toencode =~ s{\x9b}{&#8250;}gso;
-                if (defined $newlinestoo && $newlinestoo) {
-                     $toencode =~ s{\012}{&#10;}gso;
-                     $toencode =~ s{\015}{&#13;}gso;
-                }
-         }
-         return $toencode;
+          if (defined $newlinestoo && $newlinestoo) {
+            $toencode =~ s{\012}{&#10;}gso;
+            $toencode =~ s{\015}{&#13;}gso;
+          }
+   }
+   return $toencode;
 }
 END_OF_FUNC
 
