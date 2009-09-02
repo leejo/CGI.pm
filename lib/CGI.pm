@@ -1373,11 +1373,11 @@ sub Dump {
     return '<ul></ul>' unless $self->param;
     push(@result,"<ul>");
     for $param ($self->param) {
-	my($name)=$self->escapeHTML($param);
+	my($name)=$self->_maybe_escapeHTML($param);
 	push(@result,"<li><strong>$name</strong></li>");
 	push(@result,"<ul>");
 	for $value ($self->param($param)) {
-	    $value = $self->escapeHTML($value);
+	    $value = $self->_maybe_escapeHTML($value);
             $value =~ s/\n/<br \/>\n/g;
 	    push(@result,"<li>$value</li>");
 	}
@@ -1707,7 +1707,7 @@ sub start_html {
     # Now that we know whether we're using the HTML 3.2 DTD or not, it's okay to
     # call escapeHTML().  Strangely enough, the title needs to be escaped as
     # HTML while the author needs to be escaped as a URL.
-    $title = $self->escapeHTML($title || 'Untitled Document');
+    $title = $self->_maybe_escapeHTML($title || 'Untitled Document');
     $author = $self->escape($author);
 
     if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML (2\.0|3\.2|4\.01?)/i) {
@@ -1921,13 +1921,13 @@ sub startform {
     my($method,$action,$enctype,@other) = 
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
-    $method  = $self->escapeHTML(lc($method || 'post'));
-    $enctype = $self->escapeHTML($enctype || &URL_ENCODED);
+    $method  = $self->_maybe_escapeHTML(lc($method || 'post'));
+    $enctype = $self->_maybe_escapeHTML($enctype || &URL_ENCODED);
     if (defined $action) {
-       $action = $self->escapeHTML($action);
+       $action = $self->_maybe_escapeHTML($action);
     }
     else {
-       $action = $self->escapeHTML($self->request_uri || $self->self_url);
+       $action = $self->_maybe_escapeHTML($self->request_uri || $self->self_url);
     }
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
@@ -1949,19 +1949,19 @@ sub start_form {
     my($method,$action,$enctype,@other) = 
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
-    $method  = $self->escapeHTML(lc($method || 'post'));
+    $method  = $self->_maybe_escapeHTML(lc($method || 'post'));
 
     if( $XHTML ){
-        $enctype = $self->escapeHTML($enctype || &MULTIPART);
+        $enctype = $self->_maybe_escapeHTML($enctype || &MULTIPART);
     }else{
-        $enctype = $self->escapeHTML($enctype || &URL_ENCODED);
+        $enctype = $self->_maybe_escapeHTML($enctype || &URL_ENCODED);
     }
 
     if (defined $action) {
-       $action = $self->escapeHTML($action);
+       $action = $self->_maybe_escapeHTML($action);
     }
     else {
-       $action = $self->escapeHTML($self->request_uri || $self->self_url);
+       $action = $self->_maybe_escapeHTML($self->request_uri || $self->self_url);
     }
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
@@ -2022,8 +2022,8 @@ sub _textfield {
     my $current = $override ? $default : 
 	(defined($self->param($name)) ? $self->param($name) : $default);
 
-    $current = defined($current) ? $self->escapeHTML($current,1) : '';
-    $name = defined($name) ? $self->escapeHTML($name) : '';
+    $current = defined($current) ? $self->_maybe_escapeHTML($current,1) : '';
+    $name = defined($name) ? $self->_maybe_escapeHTML($name) : '';
     my($s) = defined($size) ? qq/ size="$size"/ : '';
     my($m) = defined($maxlength) ? qq/ maxlength="$maxlength"/ : '';
     my($other) = @other ? " @other" : '';
@@ -2107,8 +2107,8 @@ sub textarea {
     my($current)= $override ? $default :
 	(defined($self->param($name)) ? $self->param($name) : $default);
 
-    $name = defined($name) ? $self->escapeHTML($name) : '';
-    $current = defined($current) ? $self->escapeHTML($current) : '';
+    $name = defined($name) ? $self->_maybe_escapeHTML($name) : '';
+    $current = defined($current) ? $self->_maybe_escapeHTML($current) : '';
     my($r) = $rows ? qq/ rows="$rows"/ : '';
     my($c) = $cols ? qq/ cols="$cols"/ : '';
     my($other) = @other ? " @other" : '';
@@ -2135,9 +2135,9 @@ sub button {
     my($label,$value,$script,$tabindex,@other) = rearrange([NAME,[VALUE,LABEL],
 						            [ONCLICK,SCRIPT],TABINDEX],@p);
 
-    $label=$self->escapeHTML($label);
-    $value=$self->escapeHTML($value,1);
-    $script=$self->escapeHTML($script);
+    $label=$self->_maybe_escapeHTML($label);
+    $value=$self->_maybe_escapeHTML($value,1);
+    $script=$self->_maybe_escapeHTML($script);
 
     my($name) = '';
     $name = qq/ name="$label"/ if $label;
@@ -2168,8 +2168,8 @@ sub submit {
 
     my($label,$value,$tabindex,@other) = rearrange([NAME,[VALUE,LABEL],TABINDEX],@p);
 
-    $label=$self->escapeHTML($label);
-    $value=$self->escapeHTML($value,1);
+    $label=$self->_maybe_escapeHTML($label);
+    $value=$self->_maybe_escapeHTML($value,1);
 
     my $name = $NOSTICKY ? '' : 'name=".submit" ';
     $name = qq/name="$label" / if defined($label);
@@ -2195,8 +2195,8 @@ END_OF_FUNC
 sub reset {
     my($self,@p) = self_or_default(@_);
     my($label,$value,$tabindex,@other) = rearrange(['NAME',['VALUE','LABEL'],TABINDEX],@p);
-    $label=$self->escapeHTML($label);
-    $value=$self->escapeHTML($value,1);
+    $label=$self->_maybe_escapeHTML($label);
+    $value=$self->_maybe_escapeHTML($value,1);
     my ($name) = ' name=".reset"';
     $name = qq/ name="$label"/ if defined($label);
     $value = defined($value) ? $value : $label;
@@ -2227,7 +2227,7 @@ sub defaults {
 
     my($label,$tabindex,@other) = rearrange([[NAME,VALUE],TABINDEX],@p);
 
-    $label=$self->escapeHTML($label,1);
+    $label=$self->_maybe_escapeHTML($label,1);
     $label = $label || "Defaults";
     my($value) = qq/ value="$label"/;
     my($other) = @other ? " @other" : '';
@@ -2277,9 +2277,9 @@ sub checkbox {
 	$checked = $self->_checked($checked);
     }
     my($the_label) = defined $label ? $label : $name;
-    $name = $self->escapeHTML($name);
-    $value = $self->escapeHTML($value,1);
-    $the_label = $self->escapeHTML($the_label);
+    $name = $self->_maybe_escapeHTML($name);
+    $value = $self->_maybe_escapeHTML($value,1);
+    $the_label = $self->_maybe_escapeHTML($the_label);
     my($other) = @other ? "@other " : '';
     $tabindex = $self->element_tab($tabindex);
     $self->register_parameter($name);
@@ -2291,18 +2291,17 @@ END_OF_FUNC
 
 
 
-# Escape HTML -- used internally
+# Escape HTML
 'escapeHTML' => <<'END_OF_FUNC',
 sub escapeHTML {
-    # hack to work around  earlier hacks
-    push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
-    my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
-    return undef unless defined($toencode);
-    return $toencode if ref($self) && !$self->{'escape'};
-    $toencode =~ s{&}{&amp;}gso;
-    $toencode =~ s{<}{&lt;}gso;
-    $toencode =~ s{>}{&gt;}gso;
-	if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
+         # hack to work around  earlier hacks
+         push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
+         my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
+         return undef unless defined($toencode);
+         $toencode =~ s{&}{&amp;}gso;
+         $toencode =~ s{<}{&lt;}gso;
+         $toencode =~ s{>}{&gt;}gso;
+	 if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
 	     # $quot; was accidentally omitted from the HTML 3.2 DTD -- see
 	     # <http://validator.w3.org/docs/errors.html#bad-entity> /
 	     # <http://lists.w3.org/Archives/Public/www-html/1997Mar/0003.html>.
@@ -2465,7 +2464,7 @@ sub _box_group {
     # If no check array is specified, check the first by default
     $checked{$values[0]}++ if $box_type eq 'radio' && !%checked;
 
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
 
     my %tabs = ();
     if ($TABINDEX && $tabindex) {
@@ -2506,12 +2505,12 @@ sub _box_group {
 	unless (defined($nolabels) && $nolabels) {
 	    $label = $_;
 	    $label = $labels->{$_} if defined($labels) && defined($labels->{$_});
-	    $label = $self->escapeHTML($label,1);
+	    $label = $self->_maybe_escapeHTML($label,1);
             $label = "<span style=\"color:gray\">$label</span>" if $disabled{$_};
 	}
         my $attribs = $self->_set_attributes($_, $attributes);
         my $tab     = $tabs{$_};
-	$_=$self->escapeHTML($_);
+	$_=$self->_maybe_escapeHTML($_);
 
         if ($XHTML) {
            push @elements,
@@ -2559,7 +2558,7 @@ sub popup_menu {
                                 ? @$default 
                                 : $default;
     }
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
     my($other) = @other ? " @other" : '';
 
     my(@values);
@@ -2581,8 +2580,8 @@ sub popup_menu {
 	  my($selectit) = $self->_selected($selected{$_});
 	  my($label)    = $_;
 	  $label        = $labels->{$_} if defined($labels) && defined($labels->{$_});
-	  my($value)    = $self->escapeHTML($_);
-	  $label        = $self->escapeHTML($label,1);
+	  my($value)    = $self->_maybe_escapeHTML($_);
+	  $label        = $self->_maybe_escapeHTML($label,1);
           $result      .= "<option${attribs} ${selectit}value=\"$value\">$label</option>\n";
         }
     }
@@ -2625,7 +2624,7 @@ sub optgroup {
     @values = $self->_set_values_and_labels($values,\$labels,$name,$labeled,$novals);
     my($other) = @other ? " @other" : '';
 
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
     $result = qq/<optgroup label="$name"$other>\n/;
     for (@values) {
         if (/<optgroup/) {
@@ -2639,8 +2638,8 @@ sub optgroup {
             my $attribs = $self->_set_attributes($_, $attributes);
             my($label) = $_;
             $label = $labels->{$_} if defined($labels) && defined($labels->{$_});
-            $label=$self->escapeHTML($label);
-            my($value)=$self->escapeHTML($_,1);
+            $label=$self->_maybe_escapeHTML($label);
+            my($value)=$self->_maybe_escapeHTML($_,1);
             $result .= $labeled ? $novals ? "<option$attribs label=\"$value\">$label</option>\n"
                                           : "<option$attribs label=\"$value\" value=\"$value\">$label</option>\n"
                                 : $novals ? "<option$attribs>$label</option>\n"
@@ -2691,7 +2690,7 @@ sub scrolling_list {
     my($has_size) = $size ? qq/ size="$size"/: '';
     my($other) = @other ? " @other" : '';
 
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
     $tabindex = $self->element_tab($tabindex);
     $result = qq/<select name="$name" $tabindex$has_size$is_multiple$other>\n/;
     for (@values) {
@@ -2709,8 +2708,8 @@ sub scrolling_list {
 	  my($selectit) = $self->_selected($selected{$_});
 	  my($label)    = $_;
 	  $label        = $labels->{$_} if defined($labels) && defined($labels->{$_});
-	  my($value)    = $self->escapeHTML($_);
-	  $label        = $self->escapeHTML($label,1);
+	  my($value)    = $self->_maybe_escapeHTML($_);
+	  $label        = $self->_maybe_escapeHTML($label,1);
           $result      .= "<option${attribs} ${selectit}value=\"$value\">$label</option>\n";
         }
     }
@@ -2756,9 +2755,9 @@ sub hidden {
     my @prev = $self->param($name);
     @value = @prev if !$do_override && @prev;
 
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
     for (@value) {
-	$_ = defined($_) ? $self->escapeHTML($_,1) : '';
+	$_ = defined($_) ? $self->_maybe_escapeHTML($_,1) : '';
 	push @result,$XHTML ? qq(<input type="hidden" name="$name" value="$_" @other />)
                             : qq(<input type="hidden" name="$name" value="$_" @other>);
     }
@@ -2784,7 +2783,7 @@ sub image_button {
 
     my($align) = $alignment ? " align=\L\"$alignment\"" : '';
     my($other) = @other ? " @other" : '';
-    $name=$self->escapeHTML($name);
+    $name=$self->_maybe_escapeHTML($name);
     return $XHTML ? qq(<input type="image" name="$name" src="$src"$align$other />)
                   : qq/<input type="image" name="$name" src="$src"$align$other>/;
 }
@@ -3451,6 +3450,17 @@ sub default_dtd {
 END_OF_FUNC
 
 # -------------- really private subroutines -----------------
+'_maybe_escapeHTML' => <<'END_OF_FUNC',
+sub _maybe_escapeHTML {
+    # hack to work around  earlier hacks
+    push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
+    my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
+    return undef unless defined($toencode);
+    return $toencode if ref($self) && !$self->{'escape'};
+    return escapeHTML($toencode, $newlinestoo);
+}
+END_OF_FUNC
+
 'previous_or_default' => <<'END_OF_FUNC',
 sub previous_or_default {
     my($self,$name,$defaults,$override) = @_;

@@ -3,18 +3,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 
-use CGI qw/ autoEscape escapeHTML /;
+use CGI qw/ autoEscape escapeHTML button/;
 
 my $before = escapeHTML("test<");
 autoEscape(undef);
 my $after = escapeHTML("test<");
 
 is ($before, $after, "passing undef to autoEscape doesn't break escapeHTML"); 
-
+is (button(-name => 'test<'), '<input type="button"  name="test<" value="test<" />', "turning off autoescape actually works");
 autoEscape(1);
-
+is (button(-name => 'test<'), '<input type="button"  name="test&lt;" value="test&lt;" />', "autoescape turns back on");
 $before = escapeHTML("test<");
 autoEscape(0);
 $after = escapeHTML("test<");
