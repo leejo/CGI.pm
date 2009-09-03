@@ -3457,7 +3457,7 @@ sub _maybe_escapeHTML {
     my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
     return undef unless defined($toencode);
     return $toencode if ref($self) && !$self->{'escape'};
-    return escapeHTML($toencode, $newlinestoo);
+    return $self->escapeHTML($toencode, $newlinestoo);
 }
 END_OF_FUNC
 
