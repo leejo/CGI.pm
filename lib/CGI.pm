@@ -5894,7 +5894,11 @@ into your fields.  If you wish to turn off automatic escaping, call the
 autoEscape() method with a false value immediately after creating the CGI object:
 
    $query = CGI->new;
-   autoEscape(undef);
+   $query->autoEscape(0);
+
+Note that autoEscape() is exclusively used to effect the behavior of how some
+CGI.pm HTML generation fuctions handle escaping. Calling escapeHTML()
+explicitly will always escape the HTML.
 
 I<A Lurking Trap!> Some of the form-element generating methods return
 multiple tags.  In a scalar context, the tags will be concatenated
