@@ -28,6 +28,8 @@ Version 3.46
   14.Turning off autoEscape() now only affects the behavior of built-in HTML
      generation fuctions. Explicit calls to escapeHTML() always escape HTML regardless
      of the setting. Thanks to vindex, Bob Kuo and Mark Stosberg (RT#40748)
+  15.In CGI::Fast, preferences set via pragmas are now preserved.
+     Thanks to heinst and Mark Stosberg (RT#32119)
 
   [DOCUMENTATION]
   1. remote_addr() is now documented. Thanks to Yanick Champoux. (RT#38884)
