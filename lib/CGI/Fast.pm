@@ -1,6 +1,6 @@
 package CGI::Fast;
 use strict;
- $^W=1; # A way to say "use warnings" that's compatible with even older perls.
+$^W=1; # A way to say "use warnings" that's compatible with even older perls.
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
