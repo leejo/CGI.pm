@@ -1,4 +1,6 @@
 package CGI::Fast;
+use strict;
+ $^W=1; # A way to say "use warnings" that's compatible with even older perls.
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
@@ -17,6 +19,11 @@ $CGI::Fast::VERSION='1.07';
 
 use CGI;
 use FCGI;
+# use vars works like "our", but is compatible with older Perls.
+use vars qw(
+    @ISA
+    $ignore
+); 
 @ISA = ('CGI');
 
 # workaround for known bug in libfcgi
@@ -55,7 +62,7 @@ sub new {
      }
      }
      CGI->_reset_globals;
-     $self->_setup_symbols(@SAVED_SYMBOLS) if @CGI::SAVED_SYMBOLS;
+     $self->_setup_symbols(@CGI::SAVED_SYMBOLS) if @CGI::SAVED_SYMBOLS;
      return $CGI::Q = $self->SUPER::new($initializer, @param);
 }
 
