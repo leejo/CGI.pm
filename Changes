@@ -45,6 +45,7 @@ Version 3.46
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
      is now a dependency. Thanks to Ansgar and Mark Stosberg (RT#48811)
   2. Automated tests for hidden() have been added, thanks to Russel Jenkins and Mark Stosberg (RT#20436)
+  3. t/util.t has been updated to use Test::More instead of a home-grown test function. Thanks to Bob Kuo.
 
 Version 3.45
   [BUG FIXES]
