@@ -40,6 +40,8 @@ Version 3.46
   6. Some POD formatting was fixed. Thanks to Dave Mitchell (RT#48935).
   7. Docs and examples were updated to highlight start_form instead of startform.
      Thanks to Slaven Rezic.
+  8. Note that CGI::Carp::carpout() doesn't work with in-memory filehandles. 
+     Thanks to rhubbell and Mark Stosberg. 
 
   [INTERNALS]
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
