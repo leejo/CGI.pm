@@ -5042,7 +5042,7 @@ semicolons rather than ampersands.  For example:
    ?name=fred;age=24;favorite_color=3
 
 Semicolon-delimited query strings are always accepted, and will be emitted by
-self_url() and query_string(). newstyle_urls become the default in version
+self_url() and query_string(). newstyle_urls became the default in version
 2.64.
 
 =item -oldstyle_urls
