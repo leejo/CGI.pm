@@ -42,6 +42,8 @@ Version 3.46
      Thanks to Slaven Rezic.
   8. Note that CGI::Carp::carpout() doesn't work with in-memory filehandles. 
      Thanks to rhubbell and Mark Stosberg. 
+  9. The documentation for the -newstyle_urls is now less confusing.
+     Thanks to Ryan Tate and Mark Stosberg (RT#49454)
 
   [INTERNALS]
   1. Quit bundling an ancient copy of Test::More and and using a custom 'lib' path for the tests. Instead, Test::More
