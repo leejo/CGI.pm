@@ -13,6 +13,7 @@ my $before = escapeHTML("test<");
 autoEscape(undef);
 my $after = escapeHTML("test<");
 
+
 is($before, "test&lt;", "reality check escapeHTML");
 
 is ($before, $after, "passing undef to autoEscape doesn't break escapeHTML"); 

@@ -2139,6 +2139,8 @@ sub button {
     $value=$self->_maybe_escapeHTML($value,1);
     $script=$self->_maybe_escapeHTML($script);
 
+    $script ||= '';
+
     my($name) = '';
     $name = qq/ name="$label"/ if $label;
     $value = $value || $label;

@@ -32,7 +32,7 @@ SKIP: {
 	import CGI::Fast '-private_tempfiles';
     CGI::Fast->new;
     is($CGI::PRIVATE_TEMPFILES,1, "pragma in subclass set package variable in parent class. ");
-    my $q = CGI::Fast->new({ a => 1 });
+    $q = CGI::Fast->new({ a => 1 });
     ok($q, "reality check: something was returned from CGI::Fast->new besides undef");
     is($CGI::PRIVATE_TEMPFILES,1, "package variable in parent class persists through multiple calls to CGI::Fast->new ");
 
