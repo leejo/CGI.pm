@@ -17,7 +17,7 @@ Version 3.46
      Shawn Corey. (RT#22046)
   9. url_param() has been updated to be more consistent with the documentation and param().
      Thanks to Britton Kerin and Yanick Campoux. (RT#43587)
-  10.hidden() now correctly supports multiple defaule values.
+  10.hidden() now correctly supports multiple default values.
      Thanks to david@dierauer.net and Russell Jenkins. (RT#20436)
   11.Calling CGI->new() no longer clobbers the value of $_ in the current scope.
      Thanks to Alexey Tourbin, Bob Kuo and Mark Stosberg. (RT#25131)
