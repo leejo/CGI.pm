@@ -6182,12 +6182,16 @@ field will accept (-maxlength).
 
 =back
 
+JAVASCRIPTING: The B<-onChange>, B<-onFocus>, B<-onBlur>,
+B<-onMouseOver>, B<-onMouseOut> and B<-onSelect> parameters are
+recognized.  See textfield() for details.
+
 =head2 PROCESSING A FILE UPLOAD FIELD
 
 When the form is processed, you can retrieve the entered filename
 by calling param():
 
-       $filename = param('uploaded_file');
+       $filename = $q->param('uploaded_file');
 
 Different browsers will return slightly different things for the
 name.  Some browsers return the filename only.  Others return the full
@@ -6218,12 +6222,12 @@ seriously, it is possible for the remote user to type garbage into the
 upload field, in which case what you get from param() is not a
 filehandle at all, but a string.
 
-To be safe, use the I<upload()> function.  When
+To be safe, use the I<upload()> method  When
 called with the name of an upload field, I<upload()> returns a
 filehandle-like object, or undef if the parameter is not a valid
 filehandle.
 
-     $fh = upload('uploaded_file');
+     $fh = $q->upload('uploaded_file');
      while (<$fh>) {
 	   print;
      }
@@ -6240,7 +6244,7 @@ functions, but instead must be manipulated using read($fh) or
 <$fh>. To get a compatible IO::Handle object, call the handle's
 handle() method:
 
-  my $real_io_handle = upload('uploaded_file')->handle;
+  my $real_io_handle = $q->upload('uploaded_file')->handle;
 
 When a file is uploaded the browser usually sends along some
 information along with it in the format of headers.  The information
@@ -6249,10 +6253,10 @@ other information as well (such as modification date and size). To
 retrieve this information, call uploadInfo().  It returns a reference to
 a hash containing all the document headers.
 
-       $filename = param('uploaded_file');
-       $type = uploadInfo($filename)->{'Content-Type'};
+       $filename = $q->param('uploaded_file');
+       $type = $q->uploadInfo($filename)->{'Content-Type'};
        unless ($type eq 'text/html') {
-	  die "HTML FILES ONLY!";
+        die "HTML FILES ONLY!";
        }
 
 If you are using a machine that recognizes "text" and "binary" data
@@ -6268,9 +6272,9 @@ uploaded file and set I<cgi_error()> to the string "400 Bad request
 you can incorporate it into a status code to be sent to the browser.
 Example:
 
-   $file = upload('uploaded_file');
-   if (!$file && cgi_error) {
-      print header(-status=>cgi_error);
+   $file = $q->upload('uploaded_file');
+   if (!$file && $q->cgi_error) {
+      print $q->header(-status=>$q->cgi_error);
       exit 0;
    }
 
@@ -6313,10 +6317,6 @@ files get slightly larger when uploaded but that text files remain the
 same, then you have forgotten to activate binary mode on the output
 filehandle.  Be sure to call binmode() on any handle that you create
 to write the uploaded file to disk.
-
-JAVASCRIPTING: The B<-onChange>, B<-onFocus>, B<-onBlur>,
-B<-onMouseOver>, B<-onMouseOut> and B<-onSelect> parameters are
-recognized.  See textfield() for details.
 
 =head2 CREATING A POPUP MENU
 
