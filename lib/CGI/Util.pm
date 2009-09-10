@@ -248,7 +248,7 @@ sub escape {
   shift() if @_ > 1 and ( ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass));
   my $toencode = shift;
   return undef unless defined($toencode);
-  utf8::encode($toencode) if ($] > 5.007 && utf8::is_utf8($toencode));
+  utf8::encode($toencode) if ($] > 5.008001 && utf8::is_utf8($toencode));
     if ($EBCDIC) {
       $toencode=~s/([^a-zA-Z0-9_.~-])/uc sprintf("%%%02x",$E2A[ord($1)])/eg;
     } else {
@@ -259,107 +259,4 @@ sub escape {
 
 # This internal routine creates date strings suitable for use in
 # cookies and HTTP headers.  (They differ, unfortunately.)
-# Thanks to Mark Fisher for this.
-sub expires {
-    my($time,$format) = @_;
-    $format ||= 'http';
-
-    my(@MON)=qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
-    my(@WDAY) = qw/Sun Mon Tue Wed Thu Fri Sat/;
-
-    # pass through preformatted dates for the sake of expire_calc()
-    $time = expire_calc($time);
-    return $time unless $time =~ /^\d+$/;
-
-    # make HTTP/cookie date string from GMT'ed time
-    # (cookies use '-' as date separator, HTTP uses ' ')
-    my($sc) = ' ';
-    $sc = '-' if $format eq "cookie";
-    my($sec,$min,$hour,$mday,$mon,$year,$wday) = gmtime($time);
-    $year += 1900;
-    return sprintf("%s, %02d$sc%s$sc%04d %02d:%02d:%02d GMT",
-                   $WDAY[$wday],$mday,$MON[$mon],$year,$hour,$min,$sec);
-}
-
-# This internal routine creates an expires time exactly some number of
-# hours from the current time.  It incorporates modifications from 
-# Mark Fisher.
-sub expire_calc {
-    my($time) = @_;
-    my(%mult) = ('s'=>1,
-                 'm'=>60,
-                 'h'=>60*60,
-                 'd'=>60*60*24,
-                 'M'=>60*60*24*30,
-                 'y'=>60*60*24*365);
-    # format for time can be in any of the forms...
-    # "now" -- expire immediately
-    # "+180s" -- in 180 seconds
-    # "+2m" -- in 2 minutes
-    # "+12h" -- in 12 hours
-    # "+1d"  -- in 1 day
-    # "+3M"  -- in 3 months
-    # "+2y"  -- in 2 years
-    # "-3m"  -- 3 minutes ago(!)
-    # If you don't supply one of these forms, we assume you are
-    # specifying the date yourself
-    my($offset);
-    if (!$time || (lc($time) eq 'now')) {
-      $offset = 0;
-    } elsif ($time=~/^\d+/) {
-      return $time;
-    } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([smhdMy])/) {
-      $offset = ($mult{$2} || 1)*$1;
-    } else {
-      return $time;
-    }
-    return (time+$offset);
-}
-
-sub ebcdic2ascii {
-  my $data = shift;
-  $data =~ s/(.)/chr $E2A[ord($1)]/ge;
-  $data;
-}
-
-sub ascii2ebcdic {
-  my $data = shift;
-  $data =~ s/(.)/chr $A2E[ord($1)]/ge;
-  $data;
-}
-
-1;
-
-__END__
-
-=head1 NAME
-
-CGI::Util - Internal utilities used by CGI module
-
-=head1 SYNOPSIS
-
-none
-
-=head1 DESCRIPTION
-
-no public subroutines
-
-=head1 AUTHOR INFORMATION
-
-Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-Address bug reports and comments to: lstein@cshl.org.  When sending
-bug reports, please provide the version of CGI.pm, the version of
-Perl, the name and version of your Web server, and the name and
-version of the operating system you are using.  If the problem is even
-remotely browser dependent, please provide information about the
-affected browers as well.
-
-=head1 SEE ALSO
-
-L<CGI>
-
-=cut
+# Than
