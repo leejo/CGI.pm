@@ -6182,6 +6182,8 @@ field will accept (-maxlength).
 
 =back
 
+=head2 PROCESSING A FILE UPLOAD FIELD
+
 When the form is processed, you can retrieve the entered filename
 by calling param():
 
