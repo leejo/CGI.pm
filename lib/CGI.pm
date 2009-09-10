@@ -6216,7 +6216,7 @@ seriously, it is possible for the remote user to type garbage into the
 upload field, in which case what you get from param() is not a
 filehandle at all, but a string.
 
-To be safe, use the I<upload()> function (new in version 2.47).  When
+To be safe, use the I<upload()> function.  When
 called with the name of an upload field, I<upload()> returns a
 filehandle-like object, or undef if the parameter is not a valid
 filehandle.
