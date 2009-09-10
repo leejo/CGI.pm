@@ -6188,10 +6188,31 @@ recognized.  See textfield() for details.
 
 =head2 PROCESSING A FILE UPLOAD FIELD
 
-When the form is processed, you can retrieve the entered filename
-by calling param():
+=head3 Basics
 
-       $filename = $q->param('uploaded_file');
+When the form is processed, you can retrieve an L<IO::Handle> compatibile
+handle for a file upload field like this:
+
+  $lightweight_fh  = $q->upload('field_name');
+
+  # undef may be returned if it's not a valid file handle
+  if (defined $lightweight_fh) {
+    # Upgrade the handle to one compatible with IO::Handle:
+     my $io_handle = $lightweight_fh->handle;
+
+	open (OUTFILE,">>/usr/local/web/users/feedback");
+   while ($bytesread = $io_handle->read($buffer,1024)) {
+	   print OUTFILE $buffer;
+	}
+  }
+
+In a list context, upload() will return an array of filehandles.
+This makes it possible to process forms that use the same name for
+multiple upload fields.
+
+If you want the entered file name for the file, you can just call param():
+
+  $filename = $q->param('field_name');
 
 Different browsers will return slightly different things for the
 name.  Some browsers return the filename only.  Others return the full
@@ -6200,56 +6221,9 @@ Regardless, the name returned is always the name of the file on the
 I<user's> machine, and is unrelated to the name of the temporary file
 that CGI.pm creates during upload spooling (see below).
 
-The filename returned is also a file handle.  You can read the contents
-of the file using standard Perl file reading calls:
-
-	# Read a text file and print it out
-	while (<$filename>) {
-	   print;
-	}
-
-	# Copy a binary file to somewhere safe
-	open (OUTFILE,">>/usr/local/web/users/feedback");
-	while ($bytesread=read($filename,$buffer,1024)) {
-	   print OUTFILE $buffer;
-	}
-
-However, there are problems with the dual nature of the upload fields.
-If you C<use strict>, then Perl will complain when you try to use a
-string as a filehandle.  You can get around this by placing the file
-reading code in a block containing the C<no strict> pragma.  More
-seriously, it is possible for the remote user to type garbage into the
-upload field, in which case what you get from param() is not a
-filehandle at all, but a string.
-
-To be safe, use the I<upload()> method  When
-called with the name of an upload field, I<upload()> returns a
-filehandle-like object, or undef if the parameter is not a valid
-filehandle.
-
-     $fh = $q->upload('uploaded_file');
-     while (<$fh>) {
-	   print;
-     }
-
-In a list context, upload() will return an array of filehandles.
-This makes it possible to create forms that use the same name for
-multiple upload fields.
-
-This is the recommended idiom.
-
-The lightweight filehandle returned by CGI.pm is not compatible with
-IO::Handle; for example, it does not have read() or getline()
-functions, but instead must be manipulated using read($fh) or
-<$fh>. To get a compatible IO::Handle object, call the handle's
-handle() method:
-
-  my $real_io_handle = $q->upload('uploaded_file')->handle;
-
 When a file is uploaded the browser usually sends along some
 information along with it in the format of headers.  The information
-usually includes the MIME content type.  Future browsers may send
-other information as well (such as modification date and size). To
+usually includes the MIME content type. To
 retrieve this information, call uploadInfo().  It returns a reference to
 a hash containing all the document headers.
 
@@ -6263,6 +6237,9 @@ If you are using a machine that recognizes "text" and "binary" data
 modes, be sure to understand when and how to use them (see the Camel book).  
 Otherwise you may find that binary files are corrupted during file
 uploads.
+
+
+=head3 Handling interrupted file uploads
 
 There are occasionally problems involving parsing the uploaded file.
 This usually happens when the user presses "Stop" before the upload is
@@ -6281,26 +6258,30 @@ Example:
 You are free to create a custom HTML page to complain about the error,
 if you wish.
 
-You can set up a callback that will be called whenever a file upload
-is being read during the form processing. This is much like the
-UPLOAD_HOOK facility available in Apache::Request, with the exception
-that the first argument to the callback is an Apache::Upload object,
-here it's the remote filename.
+=head3 Progress bars for file uploads and avoiding temp files
+
+CGI.pm gives you low-level access to file upload management through
+a file upload hook. You can use this feature to completely turn off
+the temp file storage of file uploads, or potentially write your own
+file upload progess meter.
+
+This is much like the UPLOAD_HOOK facility available in L<Apache::Request>, with
+the exception that the first argument to the callback is an L<Apache::Upload>
+object, here it's the remote filename.
 
  $q = CGI->new(\&hook [,$data [,$use_tempfile]]);
 
- sub hook
- {
+ sub hook {
         my ($filename, $buffer, $bytes_read, $data) = @_;
-        print  "Read $bytes_read bytes of $filename\n";         
+        print  "Read $bytes_read bytes of $filename\n";
  }
 
-The $data field is optional; it lets you pass configuration
+The C<< $data >> field is optional; it lets you pass configuration
 information (e.g. a database handle) to your hook callback.
 
-The $use_tempfile field is a flag that lets you turn on and off
+The C<< $use_tempfile >> field is a flag that lets you turn on and off
 CGI.pm's use of a temporary disk-based file during file upload. If you
-set this to a FALSE value (default true) then param('uploaded_file')
+set this to a FALSE value (default true) then $q->param('uploaded_file')
 will no longer work, and the only way to get at the uploaded data is
 via the hook you provide.
 
@@ -6312,11 +6293,34 @@ method before calling param() or any other CGI functions:
 This method is not exported by default.  You will have to import it
 explicitly if you wish to use it without the CGI:: prefix.
 
+=head3 Troubleshooting file uploads on Windows
+
 If you are using CGI.pm on a Windows platform and find that binary
 files get slightly larger when uploaded but that text files remain the
 same, then you have forgotten to activate binary mode on the output
 filehandle.  Be sure to call binmode() on any handle that you create
 to write the uploaded file to disk.
+
+=head3 Older ways to process file uploads
+
+( This section is here for completeness. if you are building a new application with CGI.pm, you can skip it. )
+
+The original way to process file uploads with CGI.pm was to use param(). The
+value it returns has a dual nature as both a file name and a lightweight
+filehandle. This dual nature is problematic if you following the recommended
+practice of having C<use strict> in your code. Perl will complain when you try
+to use a string as a filehandle.  More seriously, it is possible for the remote
+user to type garbage into the upload field, in which case what you get from
+param() is not a filehandle at all, but a string.
+
+To solve this problem the upload() method was added, which always returns a
+lightweight filehandle. This generally works well, but will have trouble
+interoperating with some other modules because the file handle is not derived
+from L<IO::Handle>. So that brings us to current recommedation given above,
+which is to call the handle() method on the file handle returned by upload().
+That upgrades the handle to an IO::Handle. It's a big win for compatibility for
+a small penalty of loading IO::Handle the first time you call it.
+
 
 =head2 CREATING A POPUP MENU
 
