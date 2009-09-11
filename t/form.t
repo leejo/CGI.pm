@@ -1,12 +1,10 @@
-#!/usr/local/bin/perl -w
+#!perl -w
 
-# Due to a bug in older versions of MakeMaker & Test::Harness, we must
-# ensure the blib's are in @INC, else we might use the core CGI.pm
-use lib qw(. ./blib/lib ./blib/arch);
+# Form-related tests for CGI.pm
+# If you are adding or updated tests, please put tests for each methods in
+# their own file, rather than growing this file any larger. 
 
-use Test::More tests => 19;
-
-BEGIN { use_ok('CGI'); };
+use Test::More 'no_plan';
 use CGI (':standard','-no_debug','-tabindex');
 
 my $CRLF = "\015\012";
@@ -134,3 +132,114 @@ is(checkbox_group(-name   => 'game',
    qq(<label><input type="checkbox" name="game" value="checkers" checked="checked" tabindex="23" disabled='1'/><span style="color:gray">checkers</span></label> <label><input type="checkbox" name="game" value="chess" checked="checked" tabindex="24" />chess</label> <label><input type="checkbox" name="game" value="cribbage" tabindex="25" />cribbage</label>),
    'checkbox_group()');
 
+my $optgroup = optgroup(-name=>'optgroup_name',
+                        -Values => ['moe','catch'],
+                        -attributes=>{'catch'=>{'class'=>'red'}});
+
+is($optgroup, 
+    qq(<optgroup label="optgroup_name">
+<option value="moe">moe</option>
+<option class="red" value="catch">catch</option>
+</optgroup>),
+    'optgroup()');
+
+is(popup_menu(-name=>'menu_name',
+              -Values=>[qw/eenie meenie minie/, $optgroup],
+              -labels=>{'eenie'=>'one',
+                        'meenie'=>'two',
+                        'minie'=>'three'},
+              -default=>'meenie'),
+    qq(<select name="menu_name" tabindex="26" >
+<option value="eenie">one</option>
+<option selected="selected" value="meenie">two</option>
+<option value="minie">three</option>
+<optgroup label="optgroup_name">
+<option value="moe">moe</option>
+<option class="red" value="catch">catch</option>
+</optgroup>
+</select>),
+    'popup_menu() + optgroup()');
+
+is(scrolling_list(-name=>'menu_name',
+              -Values=>[qw/eenie meenie minie/, $optgroup],
+              -labels=>{'eenie'=>'one',
+                        'meenie'=>'two',
+                        'minie'=>'three'},
+              -default=>'meenie'),
+    qq(<select name="menu_name" tabindex="27"  size="4">
+<option value="eenie">one</option>
+<option selected="selected" value="meenie">two</option>
+<option value="minie">three</option>
+<optgroup label="optgroup_name">
+<option value="moe">moe</option>
+<option class="red" value="catch">catch</option>
+</optgroup>
+</select>),
+    'scrolling_list() + optgroup()');
+
+# ---------- START 22046 ----------
+# The following tests were added for
+# https://rt.cpan.org/Public/Bug/Display.html?id=22046
+#     SHCOREY at cpan.org
+# Saved whether working with XHTML because need to test both
+# with it and without.
+my $saved_XHTML = $CGI::XHTML;
+
+# set XHTML
+$CGI::XHTML = 1;
+
+is(start_form("GET","/foobar"),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data">
+},
+    'start_form() + XHTML');
+
+is(start_form("GET", "/foobar",&CGI::URL_ENCODED),
+    qq{<form method="get" action="/foobar" enctype="application/x-www-form-urlencoded">
+},
+    'start_form() + XHTML + URL_ENCODED');
+
+is(start_form("GET", "/foobar",&CGI::MULTIPART),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data">
+},
+    'start_form() + XHTML + MULTIPART');
+
+is(start_multipart_form("GET", "/foobar"),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data">
+},
+    'start_multipart_form() + XHTML');
+
+is(start_multipart_form("GET", "/foobar","name=\"foobar\""),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data" name="foobar">
+},
+    'start_multipart_form() + XHTML + additional args');
+
+# set no XHTML
+$CGI::XHTML = 0;
+
+is(start_form("GET","/foobar"),
+    qq{<form method="get" action="/foobar" enctype="application/x-www-form-urlencoded">
+},
+    'start_form() + NO_XHTML');
+
+is(start_form("GET", "/foobar",&CGI::URL_ENCODED),
+    qq{<form method="get" action="/foobar" enctype="application/x-www-form-urlencoded">
+},
+    'start_form() + NO_XHTML + URL_ENCODED');
+
+is(start_form("GET", "/foobar",&CGI::MULTIPART),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data">
+},
+    'start_form() + NO_XHTML + MULTIPART');
+
+is(start_multipart_form("GET", "/foobar"),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data">
+},
+    'start_multipart_form() + NO_XHTML');
+
+is(start_multipart_form("GET", "/foobar","name=\"foobar\""),
+    qq{<form method="get" action="/foobar" enctype="multipart/form-data" name="foobar">
+},
+    'start_multipart_form() + NO_XHTML + additional args');
+
+# restoring value
+$CGI::XHTML = $saved_XHTML;
