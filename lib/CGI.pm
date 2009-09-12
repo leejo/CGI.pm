@@ -2572,7 +2572,7 @@ sub popup_menu {
             for my $v (split(/\n/)) {
                 my $selectit = $XHTML ? 'selected="selected"' : 'selected';
 		for my $selected (keys %selected) {
-		    $v =~ s/(value="$selected")/$selectit $1/;
+		    $v =~ s/(value="\Q$selected\E")/$selectit $1/;
 		}
                 $result .= "$v\n";
             }
