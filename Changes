@@ -1,3 +1,10 @@
+Version 3.47
+  Released September 9th, 2009.
+  No code changes. 
+
+  [INTERNALS]
+    Re-release of 3.46, which did not contain a proper MANIFEST
+
 Version 3.46
   [BUG FIXES]
   1. In CGI::Pretty, we no longer add line breaks after tags we claim not to format. Thanks to rrt, Bob Kuo and
