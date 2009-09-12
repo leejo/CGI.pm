@@ -423,32 +423,35 @@ sub ineval {
 sub die {
   my ($arg,@rest) = @_;
 
-  &$DIE_HANDLER($arg,@rest) if $DIE_HANDLER;
-
-  # if $arg is a reference, give it a chance to
-  # be stringified
-  $arg = "$arg" if ref $arg;
-
-  $arg = join '' => $arg, @rest ;
-  
-  my($file,$line,$id) = id(1);
-
-  if ( ineval() )  {
-
-    $arg ||= 'Died';
-
-    $arg .= " at $file line $line.\n" unless $arg=~/\n$/;
-
-    realdie($arg);
+  if ($DIE_HANDLER) {
+      &$DIE_HANDLER($arg,@rest);
   }
 
-  $arg .= " at $file line $line." unless $arg=~/\n$/;
-  &fatalsToBrowser($arg) if $WRAP;
+  if ( ineval() )  {
+    if (!ref($arg)) {
+      $arg = join("",($arg,@rest)) || "Died";
+      my($file,$line,$id) = id(1);
+      $arg .= " at $file line $line.\n" unless $arg=~/\n$/;
+      realdie($arg);
+    }
+    else {
+      realdie($arg,@rest);
+    }
+  }
 
-  $arg=~s/^/ stamp() /gme if $arg =~ /\n$/ or not exists $ENV{MOD_PERL};
-
-  $arg .= "\n" unless $arg =~ /\n$/;
-
+  if (!ref($arg)) {
+    $arg = join("", ($arg,@rest));
+    my($file,$line,$id) = id(1);
+    $arg .= " at $file line $line." unless $arg=~/\n$/;
+    &fatalsToBrowser($arg) if $WRAP;
+    if (($arg =~ /\n$/) || !exists($ENV{MOD_PERL})) {
+      my $stamp = stamp;
+      $arg=~s/^/$stamp/gm;
+    }
+    if ($arg !~ /\n$/) {
+      $arg .= "\n";
+    }
+  }
   realdie $arg;
 }
 
