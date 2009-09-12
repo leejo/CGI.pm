@@ -1,8 +1,11 @@
 Version 3.48
 
   [BUG FIXES]
-  1.  <optgroup> default values are now properly escaped.
-        Thanks to #raleigh.pm and Mark Stosberg. (RT#49606)
+  1. <optgroup> default values are now properly escaped.
+     Thanks to #raleigh.pm and Mark Stosberg. (RT#49606)
+  2. The change to exception handling in CGI::Carp introduced in 3.47 has been
+     reverted for now. It caused regressions reported in RT#49630. 
+     Thanks to mkanat for the report.
 
   [DOCUMENTATION]
   1. Documentation for upload() has been overhauled, thanks to Mark Stosberg. 
