@@ -7347,7 +7347,7 @@ section of text:
 Note that you must import the ":html3" definitions to have the
 B<span()> method available.  Here's a quick and dirty example of using
 CSS's.  See the CSS specification at
-http://www.w3.org/pub/WWW/TR/Wd-css-1.html for more information.
+http://www.w3.org/Style/CSS/ for more information.
 
     use CGI qw/:standard :html3/;
 
@@ -7679,7 +7679,7 @@ note that if you have applied Service Pack 6, much of the
 functionality of NPH scripts, including the ability to redirect while
 setting a cookie, B<do not work at all> on IIS without a special patch
 from Microsoft.  See
-http://support.microsoft.com/support/kb/articles/Q280/3/41.ASP:
+http://web.archive.org/web/20010812012030/http://support.microsoft.com/support/kb/articles/Q280/3/41.ASP
 Non-Parsed Headers Stripped From CGI Applications That Have nph-
 Prefix in Name.
 
