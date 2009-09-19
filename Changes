@@ -10,6 +10,7 @@ Version 3.48
   [DOCUMENTATION]
   1. Documentation for upload() has been overhauled, thanks to Mark Stosberg. 
   2. Documentation for tmpFileName has been added. Thanks to Mark Stosberg and Nathaniel K. Smith.
+  3. URLS were updated, thanks to Leon Brocard and Yanick Champoux. (RT#49770)
 
   [INTERNALS]
   1. More tests were added for autoescape, thanks to Bob Kuo. (RT#25485)
