@@ -2566,6 +2566,7 @@ sub popup_menu {
     my(@values);
     @values = $self->_set_values_and_labels($values,\$labels,$name);
     $tabindex = $self->element_tab($tabindex);
+    $name = q{} if ! defined $name;
     $result = qq/<select name="$name" $tabindex$other>\n/;
     for (@values) {
         if (/<optgroup/) {
@@ -2626,7 +2627,7 @@ sub optgroup {
     @values = $self->_set_values_and_labels($values,\$labels,$name,$labeled,$novals);
     my($other) = @other ? " @other" : '';
 
-    $name=$self->_maybe_escapeHTML($name);
+    $name = $self->_maybe_escapeHTML($name) || q{};
     $result = qq/<optgroup label="$name"$other>\n/;
     for (@values) {
         if (/<optgroup/) {
