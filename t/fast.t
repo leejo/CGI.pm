@@ -7,14 +7,14 @@ BEGIN {
 	$fcgi = $@ ? 0 : 1;
 }
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # Shut up "used only once" warnings.
 () = $CGI::Q;
 () = $CGI::Fast::Ext_Request;
 
 SKIP: {
-	skip( 'FCGI not installed, cannot continue', 10 ) unless $fcgi;
+	skip( 'FCGI not installed, cannot continue', 11 ) unless $fcgi;
 
 	use_ok( CGI::Fast );
 	ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
