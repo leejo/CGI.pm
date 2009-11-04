@@ -663,7 +663,7 @@ sub init {
 	  if ( $content_length > 0 ) {
 	    $self->read_from_client(\$query_string,$content_length,0);
 	  }
-	  else {
+	  elsif (not defined $ENV{CONTENT_LENGTH}) {
 	    $self->read_from_stdin(\$query_string);
 	    # should this be PUTDATA in case of PUT ?
 	    my($param) = $meth . 'DATA' ;
