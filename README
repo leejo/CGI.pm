@@ -15,7 +15,7 @@ file and type the following:
 
 If this doesn't work for you, try:
 
-   cp CGI.pm /usr/local/lib/perl5
+   cp lib/CGI.pm /usr/local/lib/perl5
 
 If you have trouble installing CGI.pm because you have insufficient
 access privileges to add to the perl library directory, you can still
