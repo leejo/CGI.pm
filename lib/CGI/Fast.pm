@@ -1,6 +1,10 @@
 package CGI::Fast;
 use strict;
-$^W=1; # A way to say "use warnings" that's compatible with even older perls.
+
+# A way to say "use warnings" that's compatible with even older perls.
+# making it local will not affect the code that loads this module
+# and since we're not in a BLOCK, warnings are enabled until the EOF
+local $^W = 1;
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
