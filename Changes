@@ -1,3 +1,14 @@
+Version 3.49
+
+  [BUG FIXES]
+  1. Fix a regression since 3.44 involving a case when the header includes "Content-Length: 0". 
+     Thanks to Alex Vandiver (RT#51109)
+  2. Suppress uninitialized warnings under -w. Thanks to burak.  (RT#50301)
+
+  [DOCUMENTATION]
+  1. README was updated to reflect that CGI.pm was moved under ./lib. 
+     Thanks to Alex Vandiver.
+
 Version 3.48
 
   [BUG FIXES]
