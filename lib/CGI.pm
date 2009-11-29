@@ -2843,21 +2843,22 @@ sub url {
 #    $uri            =~ s/\Q$path\E$//      if defined $path;      # remove path
 
     if ($full) {
-	my $protocol = $self->protocol();
-	$url = "$protocol://";
-	my $vh = http('x_forwarded_host') || http('host') || '';
-        $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
-	if ($vh) {
-	    $url .= $vh;
-	} else {
-	    $url .= server_name();
-	}
-        my $port = $self->server_port;
-	$url .= ":" . $port
-	  unless (lc($protocol) eq 'http'  && $port == 80)
-		|| (lc($protocol) eq 'https' && $port == 443);
+        my $protocol = $self->protocol();
+        $url = "$protocol://";
+        my $vh = http('x_forwarded_host') || http('host') || '';
+            $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
+
+        $url .= $vh || server_name();
+
+        my $port = $self->virtual_port;
+
+        # add the port to the url unless it's the protocol's default port
+        $url .= ':' . $port unless (lc($protocol) eq 'http'  && $port == 80)
+                                or (lc($protocol) eq 'https' && $port == 443);
+
         return $url if $base;
-	$url .= $uri;
+
+        $url .= $uri;
     } elsif ($relative) {
 	($url) = $uri =~ m!([^/]+)$!;
     } elsif ($absolute) {
