@@ -1542,6 +1542,9 @@ sub header {
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
 
+    # CR escaping for values
+    s/(?<=\n)/ /g for $type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other;
+
     $nph     ||= $NPH;
 
     $type ||= 'text/html' unless defined($type);
@@ -1557,7 +1560,7 @@ sub header {
     # need to fix it up a little.
     for (@other) {
         # Don't use \s because of perl bug 21951
-        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
+        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
         ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 
@@ -5266,6 +5269,19 @@ For example:
 In either case, the outgoing header will be formatted as:
 
   P3P: policyref="/w3c/p3p.xml" cp="CAO DSP LAW CURa"
+
+Note that if a header value contains a carriage return, a 
+leading space will be added to each new line as specified by 
+RFC2616 section 4.2.
+For example:
+
+    print header( -ingredients => "ham\neggs\nbacon" );
+
+will generate
+
+    Ingredients: ham
+     eggs
+     bacon
 
 =head2 GENERATING A REDIRECTION HEADER
 
