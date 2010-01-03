@@ -1542,8 +1542,13 @@ sub header {
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
 
-    # CR escaping for values
-    s/(?<=\n)/ /g for $type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other;
+    # CR escaping for values, per RFC 822
+    for my $header ($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
+        $header =~ s/
+            (?<=\n)    # For any character proceeded by a newline
+            ([^\s])    # ... that is not whitespace
+        / $1/mxg;      # ... inject a leading in the new line
+    }
 
     $nph     ||= $NPH;
 
