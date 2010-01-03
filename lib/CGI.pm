@@ -1546,8 +1546,8 @@ sub header {
     for my $header ($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
         $header =~ s/
             (?<=\n)    # For any character proceeded by a newline
-            ([^\s])    # ... that is not whitespace
-        / $1/mxg;      # ... inject a leading in the new line
+            (?=\S)     # ... that is not whitespace
+        / /xg;         # ... inject a leading space in the new line
     }
 
     $nph     ||= $NPH;
