@@ -1,6 +1,8 @@
 
 # Test that header generation is spec compliant.
-# Reference: http://www.w3.org/Protocols/rfc2616/rfc2616.html
+# References:
+#   http://www.w3.org/Protocols/rfc2616/rfc2616.html
+#   http://www.w3.org/Protocols/rfc822/3_Lexical.html
 
 use strict;
 use warnings;
