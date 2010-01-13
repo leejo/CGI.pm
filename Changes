@@ -10,6 +10,10 @@ Version 3.49
   1. README was updated to reflect that CGI.pm was moved under ./lib. 
      Thanks to Alex Vandiver.
 
+  [INTERNALS]
+  1. More tests were added for autoescape, thanks to Bob Kuo. (RT#25485)
+  2. Attempt to avoid test failures with t/fast, thanks to Steve Hay. (RT#49599)
+
 Version 3.48
 
   [BUG FIXES]
