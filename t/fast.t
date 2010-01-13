@@ -1,4 +1,4 @@
-#!./perl -w
+#!perl -w
 
 my $fcgi;
 BEGIN {
@@ -7,16 +7,16 @@ BEGIN {
 	$fcgi = $@ ? 0 : 1;
 }
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 # Shut up "used only once" warnings.
 () = $CGI::Q;
 () = $CGI::Fast::Ext_Request;
 
 SKIP: {
-	skip( 'FCGI not installed, cannot continue', 11 ) unless $fcgi;
+	skip( 'FCGI not installed, cannot continue', 10 ) unless $fcgi;
 
-	use_ok( CGI::Fast );
+	require CGI::Fast;
 	ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
 	is( $q, $CGI::Q, 'checking to see if the object was stored properly' );
 	is( $q->param(), (), 'no params' );
