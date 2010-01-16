@@ -4761,7 +4761,7 @@ a short example of creating multiple session records:
 
    use CGI;
 
-   open (OUT,">>test.out") || die;
+   open (OUT,'>>','test.out') || die;
    $records = 5;
    for (0..$records) {
        my $q = CGI->new;
@@ -4771,7 +4771,7 @@ a short example of creating multiple session records:
    close OUT;
 
    # reopen for reading
-   open (IN,"test.out") || die;
+   open (IN,'<','test.out') || die;
    while (!eof(IN)) {
        my $q = CGI->new(\*IN);
        print $q->param('counter'),"\n";
@@ -8026,13 +8026,12 @@ for suggestions and bug fixes.
 	}
 
 	sub do_work {
-	   my(@values,$key);
 
 	   print "<h2>Here are the current settings in this form</h2>";
 
-	   for $key (param) {
+	   for my $key (param) {
 	      print "<strong>$key</strong> -> ";
-	      @values = param($key);
+	      my @values = param($key);
 	      print join(", ",@values),"<br>\n";
 	  }
 	}
