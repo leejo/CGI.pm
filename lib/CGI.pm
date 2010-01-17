@@ -19,7 +19,7 @@ use Carp 'croak';
 #   http://stein.cshl.org/WWW/software/CGI/
 
 $CGI::revision = '$Id: CGI.pm,v 1.266 2009/07/30 16:32:34 lstein Exp $';
-$CGI::VERSION='3.48';
+$CGI::VERSION='3.49';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -663,7 +663,7 @@ sub init {
 	  if ( $content_length > 0 ) {
 	    $self->read_from_client(\$query_string,$content_length,0);
 	  }
-	  else {
+	  elsif (not defined $ENV{CONTENT_LENGTH}) {
 	    $self->read_from_stdin(\$query_string);
 	    # should this be PUTDATA in case of PUT ?
 	    my($param) = $meth . 'DATA' ;
@@ -1542,6 +1542,16 @@ sub header {
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
 
+    # CR escaping for values, per RFC 822
+    for my $header ($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
+        if (defined $header) {
+            $header =~ s/
+                (?<=\n)    # For any character proceeded by a newline
+                (?=\S)     # ... that is not whitespace
+            / /xg;         # ... inject a leading space in the new line
+        }
+    }
+
     $nph     ||= $NPH;
 
     $type ||= 'text/html' unless defined($type);
@@ -1557,7 +1567,7 @@ sub header {
     # need to fix it up a little.
     for (@other) {
         # Don't use \s because of perl bug 21951
-        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
+        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
         ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
     }
 
@@ -2566,6 +2576,7 @@ sub popup_menu {
     my(@values);
     @values = $self->_set_values_and_labels($values,\$labels,$name);
     $tabindex = $self->element_tab($tabindex);
+    $name = q{} if ! defined $name;
     $result = qq/<select name="$name" $tabindex$other>\n/;
     for (@values) {
         if (/<optgroup/) {
@@ -2626,7 +2637,7 @@ sub optgroup {
     @values = $self->_set_values_and_labels($values,\$labels,$name,$labeled,$novals);
     my($other) = @other ? " @other" : '';
 
-    $name=$self->_maybe_escapeHTML($name);
+    $name = $self->_maybe_escapeHTML($name) || q{};
     $result = qq/<optgroup label="$name"$other>\n/;
     for (@values) {
         if (/<optgroup/) {
@@ -2842,21 +2853,22 @@ sub url {
 #    $uri            =~ s/\Q$path\E$//      if defined $path;      # remove path
 
     if ($full) {
-	my $protocol = $self->protocol();
-	$url = "$protocol://";
-	my $vh = http('x_forwarded_host') || http('host') || '';
-        $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
-	if ($vh) {
-	    $url .= $vh;
-	} else {
-	    $url .= server_name();
-	}
-        my $port = $self->server_port;
-	$url .= ":" . $port
-	  unless (lc($protocol) eq 'http'  && $port == 80)
-		|| (lc($protocol) eq 'https' && $port == 443);
+        my $protocol = $self->protocol();
+        $url = "$protocol://";
+        my $vh = http('x_forwarded_host') || http('host') || '';
+            $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
+
+        $url .= $vh || server_name();
+
+        my $port = $self->virtual_port;
+
+        # add the port to the url unless it's the protocol's default port
+        $url .= ':' . $port unless (lc($protocol) eq 'http'  && $port == 80)
+                                or (lc($protocol) eq 'https' && $port == 443);
+
         return $url if $base;
-	$url .= $uri;
+
+        $url .= $uri;
     } elsif ($relative) {
 	($url) = $uri =~ m!([^/]+)$!;
     } elsif ($absolute) {
@@ -5264,6 +5276,18 @@ For example:
 In either case, the outgoing header will be formatted as:
 
   P3P: policyref="/w3c/p3p.xml" cp="CAO DSP LAW CURa"
+
+Note that if a header value contains a carriage return, a leading space will be
+added to each new line that doesn't already have one as specified by RFC2616
+section 4.2.  For example:
+
+    print header( -ingredients => "ham\neggs\nbacon" );
+
+will generate
+
+    Ingredients: ham
+     eggs
+     bacon
 
 =head2 GENERATING A REDIRECTION HEADER
 

@@ -68,6 +68,7 @@ t/upload.t
 t/upload_post_text.txt
 t/uploadInfo.t
 t/user_agent.t
+t/url.t
 t/utf8.t
 t/util-58.t
 t/util.t

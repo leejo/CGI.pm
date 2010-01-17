@@ -1,4 +1,4 @@
-#!./perl -w
+#!perl -w
 
 my $fcgi;
 BEGIN {
@@ -14,9 +14,9 @@ use Test::More tests => 10;
 () = $CGI::Fast::Ext_Request;
 
 SKIP: {
-	skip( 'FCGI not installed, cannot continue', 7 ) unless $fcgi;
+	skip( 'FCGI not installed, cannot continue', 10 ) unless $fcgi;
 
-	use CGI::Fast;
+	require CGI::Fast;
 	ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
 	is( $q, $CGI::Q, 'checking to see if the object was stored properly' );
 	is( $q->param(), (), 'no params' );
