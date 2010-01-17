@@ -6,6 +6,10 @@ Version 3.49
   2. Suppress uninitialized warnings under -w. Thanks to burak.  (RT#50301)
   3. url() now uses virtual_port() instead of server_port(). Thanks to MKANAT and Yanick Champoux. (RT#51562)
 
+  [SECURITY]
+  1. embedded newlines are now filtered out of header values in header(). 
+     Thanks to Mark Stosberg and Yanick Champoux.
+
   [DOCUMENTATION]
   1. README was updated to reflect that CGI.pm was moved under ./lib. 
      Thanks to Alex Vandiver.
