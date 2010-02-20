@@ -1,3 +1,6 @@
+Version XXX
+  1. Fixing https test in http.t. (RT#54768)
+
 Version 3.49
 
   [BUG FIXES]
