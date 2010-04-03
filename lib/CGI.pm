@@ -4707,9 +4707,10 @@ specialized tasks.)
    unshift @{$q->param_fetch(-name=>'address')},'George Munster';
 
 If you need access to the parameter list in a way that isn't covered
-by the methods above, you can obtain a direct reference to it by
-calling the B<param_fetch()> method with the name of the .  This
-will return an array reference to the named parameters, which you then
+by the methods given in the previous sections, you can obtain a direct 
+reference to it by
+calling the B<param_fetch()> method with the name of the parameter.  This
+will return an array reference to the named parameter, which you then
 can manipulate in any way you like.
 
 You can also use a named argument style using the B<-name> argument.
