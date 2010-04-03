@@ -1,6 +1,10 @@
 Version XXX
   1. Fixing https test in http.t. (RT#54768)
 
+  [DOCUMENTATION]
+  1. Correcting/clarifying documentation for param_fetch(). Thanks to 
+        Renée Bäcker. (RT#59132)
+
 Version 3.49
 
   [BUG FIXES]
