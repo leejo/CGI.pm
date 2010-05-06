@@ -3,7 +3,7 @@
 
 use strict;
 
-use Test::More tests => 59;
+use Test::More tests => 60;
 use IO::Handle;
 
 BEGIN { use_ok('CGI::Carp') };
@@ -337,8 +337,13 @@ ok(!defined buffer("WIBBLE"),      '"WIBBLE" doesn\'t returns proper filehandle'
     CGI::Carp::die( My::Stringified::Object->new );
     $result{string_object} .= $_ while <STDOUT>;
 
+    undef $@;
     CGI::Carp::die();
     $result{no_args} .= $_ while <STDOUT>;
+
+    $@ = "I think I caught a virus";
+    CGI::Carp::die();
+    $result{propagated} .= $_ while <STDOUT>;
 
     untie *STDOUT;
 
@@ -351,6 +356,9 @@ ok(!defined buffer("WIBBLE"),      '"WIBBLE" doesn\'t returns proper filehandle'
     like $result{string_object} => qr/stringified/,
       'stringified object, wrapped';
     like $result{no_args} => qr/Died at/, 'no args, wrapped';
+
+    like $result{propagated} => qr/I think I caught a virus\t\.{3}propagated/, 
+        'propagating $@ if no argument';
 
 }
 

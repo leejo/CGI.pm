@@ -421,7 +421,12 @@ sub ineval {
 }
 
 sub die {
-  my ($arg,@rest) = @_;
+    # if no argument is passed, propagate $@ like
+    # the real die
+  my ($arg,@rest) = @_ ? @_ 
+                  : $@ ? "$@\t...propagated" 
+                  :      "Died"
+                  ;
 
   &$DIE_HANDLER($arg,@rest) if $DIE_HANDLER;
 
