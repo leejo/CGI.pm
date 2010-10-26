@@ -1545,11 +1545,9 @@ sub header {
     # CR escaping for values, per RFC 822
     for my $header ($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
         if (defined $header) {
-            $header =~ s/
-                (?<=\n)    # For any character proceeded by a newline
-                (?=\S)     # ... that is not whitespace
-            / /xg;         # ... inject a leading space in the new line
-        }
+	    $header =~ s/[\r\n]/ /g;
+            $header =~ s/(.{998})/$1$CRLF /g;
+	}
     }
 
     $nph     ||= $NPH;
