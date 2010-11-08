@@ -72,3 +72,4 @@ t/url.t
 t/utf8.t
 t/util-58.t
 t/util.t
+META.yml                                 Module meta-data (added by MakeMaker)
