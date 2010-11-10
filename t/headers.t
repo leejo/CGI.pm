@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More 'no_plan';
 
 use CGI;
 
@@ -16,17 +16,29 @@ my $cgi = CGI->new;
 like $cgi->header( -type => "text/html" ),
     qr#Type: text/html#, 'known header, basic case: type => "text/html"';
 
-like $cgi->header( -type => "text/html\nevil: stuff" ),
-    qr#Type: text/html\n evil: stuff#, 'known header';
+eval { like $cgi->header( -type => "text/html".$CGI::CRLF."evil: stuff" ),
+    qr#Type: text/html evil: stuff#, 'known header'; };
+like($@,qr/contains a newline/,'invalid header blows up');
 
-like $cgi->header( -type => "text/html\n evil: stuff " ),
-    qr#Content-Type: text/html\n evil: stuff#, 'known header, with leading and trailing whitespace on the continuation line';
+like $cgi->header( -type => "text/html".$CGI::CRLF." evil: stuff " ),
+    qr#Content-Type: text/html evil: stuff#, 'known header, with leading and trailing whitespace on the continuation line';
 
-like $cgi->header( -foobar => "text/html\nevil: stuff" ),
-    qr#Foobar: text/html\n evil: stuff#, 'unknown header';
+eval { like $cgi->header( -foobar => "text/html".$CGI::CRLF."evil: stuff" ),
+    qr#Foobar: text/htmlevil: stuff#, 'unknown header'; };
+like($@,qr/contains a newline/,'unknown header with CRLF embedded blows up');
 
-like $cgi->redirect( -type => "text/html\nevil: stuff" ),
-    qr#Type: text/html\n evil: stuff#, 'redirect w/ known header';
+like $cgi->header( -foobar => "Content-type: evil/header" ),
+    qr#^Foobar: Content-type: evil/header#m, 'unknown header with leading newlines';
 
-like $cgi->redirect( -foobar => "text/html\nevil: stuff" ),
-    qr#Foobar: text/html\n evil: stuff#, 'redirect w/ unknown header';
+eval { like $cgi->redirect( -type => "text/html".$CGI::CRLF."evil: stuff" ),
+    qr#Type: text/htmlevil: stuff#, 'redirect w/ known header'; };
+like($@,qr/contains a newline/,'redirect with known header with CRLF embedded blows up');
+
+eval { like $cgi->redirect( -foobar => "text/html".$CGI::CRLF."evil: stuff" ),
+    qr#Foobar: text/htmlevil: stuff#, 'redirect w/ unknown header'; };
+like($@,qr/contains a newline/,'redirect with unknown header with CRLF embedded blows up');
+
+eval { like $cgi->redirect( $CGI::CRLF.$CGI::CRLF."Content-Type: text/html"),
+    qr#Location: Content-Type#, 'redirect w/ leading newline '; };
+like($@,qr/contains a newline/,'redirect with leading newlines blows up');
+
