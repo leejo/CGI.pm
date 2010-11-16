@@ -2,6 +2,9 @@
   [DOCUMENTATION]
   - quit referring to the <link> tag as being "rarely used".  (Victor Sanders)
 
+  [INTERNALS]
+  - Re-fixing https test in http.t. (RT#54768, thanks to SPROUT)
+
 Version 3.50
   
   [SECURITY]
