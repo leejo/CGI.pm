@@ -5421,11 +5421,11 @@ a <meta> tag that specifies the encoding, allowing the HTML to pass
 most validators.  The default for -declare_xml is false.
 
 You can place other arbitrary HTML elements to the <head> section with the
-B<-head> tag.  For example, to place the rarely-used <link> element in the
+B<-head> tag.  For example, to place a <link> element in the
 head section, use this:
 
-    print start_html(-head=>Link({-rel=>'next',
-		                  -href=>'http://www.capricorn.com/s2.html'}));
+    print start_html(-head=>Link({-rel=>'shortcut icon',
+		                  -href=>'favicon.ico'}));
 
 To incorporate multiple HTML elements into the <head> section, just pass an
 array reference:
