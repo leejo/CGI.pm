@@ -5528,7 +5528,7 @@ of JavaScript.  Example:
                              );
 
 The option "-language" is a synonym for -type, and is supported for
-backwad compatibility.
+backwards compatibility.
 
 The old-style positional parameters are as follows:
 
@@ -5936,7 +5936,7 @@ autoEscape() method with a false value immediately after creating the CGI object
    $query->autoEscape(0);
 
 Note that autoEscape() is exclusively used to effect the behavior of how some
-CGI.pm HTML generation fuctions handle escaping. Calling escapeHTML()
+CGI.pm HTML generation functions handle escaping. Calling escapeHTML()
 explicitly will always escape the HTML.
 
 I<A Lurking Trap!> Some of the form-element generating methods return
@@ -5986,7 +5986,7 @@ action and form encoding that you specify.  The defaults are:
     method: POST
     action: this script
     enctype: application/x-www-form-urlencoded for non-XHTML
-             multipart/form-data for XHTML, see mulitpart/form-data below.
+             multipart/form-data for XHTML, see multipart/form-data below.
 
 end_form() returns the closing </form> tag.  
 
@@ -6229,7 +6229,7 @@ recognized.  See textfield() for details.
 
 =head3 Basics
 
-When the form is processed, you can retrieve an L<IO::Handle> compatibile
+When the form is processed, you can retrieve an L<IO::Handle> compatible
 handle for a file upload field like this:
 
   $lightweight_fh  = $q->upload('field_name');
@@ -6317,7 +6317,7 @@ if you wish.
 CGI.pm gives you low-level access to file upload management through
 a file upload hook. You can use this feature to completely turn off
 the temp file storage of file uploads, or potentially write your own
-file upload progess meter.
+file upload progress meter.
 
 This is much like the UPLOAD_HOOK facility available in L<Apache::Request>, with
 the exception that the first argument to the callback is an L<Apache::Upload>
@@ -6370,7 +6370,7 @@ param() is not a filehandle at all, but a string.
 To solve this problem the upload() method was added, which always returns a
 lightweight filehandle. This generally works well, but will have trouble
 interoperating with some other modules because the file handle is not derived
-from L<IO::Handle>. So that brings us to current recommedation given above,
+from L<IO::Handle>. So that brings us to current recommendation given above,
 which is to call the handle() method on the file handle returned by upload().
 That upgrades the handle to an IO::Handle. It's a big win for compatibility for
 a small penalty of loading IO::Handle the first time you call it.
@@ -7609,7 +7609,7 @@ Returns the remote host IP address, or
 127.0.0.1 if the address is unavailable.
 
 =item B<script_name()>
-Return the script name as a partial URL, for self-refering
+Return the script name as a partial URL, for self-referring
 scripts.
 
 =item B<referer()>
@@ -7726,7 +7726,7 @@ Prefix in Name.
 
 =item In the B<use> statement 
 
-Simply add the "-nph" pragmato the list of symbols to be imported into
+Simply add the "-nph" pragma to the list of symbols to be imported into
 your script:
 
       use CGI qw(:standard -nph)
@@ -7912,11 +7912,13 @@ To make it easier to port existing programs that use cgi-lib.pl the
 compatibility routine "ReadParse" is provided.  Porting is simple:
 
 OLD VERSION
+
     require "cgi-lib.pl";
     &ReadParse;
     print "The value of the antique is $in{antique}.\n";
 
 NEW VERSION
+
     use CGI;
     CGI::ReadParse();
     print "The value of the antique is $in{antique}.\n";
@@ -7947,7 +7949,7 @@ bug reports, please provide the version of CGI.pm, the version of
 Perl, the name and version of your Web server, and the name and
 version of the operating system you are using.  If the problem is even
 remotely browser dependent, please provide information about the
-affected browers as well.
+affected browsers as well.
 
 =head1 CREDITS
 

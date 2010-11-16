@@ -7,7 +7,7 @@ require Exporter;
 @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape 
 		expires ebcdic2ascii ascii2ebcdic);
 
-$VERSION = '3.48';
+$VERSION = '3.51';
 
 $EBCDIC = "\t" ne "\011";
 # (ord('^') == 95) for codepage 1047 as on os390, vmesa
@@ -373,7 +373,7 @@ no public subroutines
 
 =head1 AUTHOR INFORMATION
 
-Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
+Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -383,7 +383,7 @@ bug reports, please provide the version of CGI.pm, the version of
 Perl, the name and version of your Web server, and the name and
 version of the operating system you are using.  If the problem is even
 remotely browser dependent, please provide information about the
-affected browers as well.
+affected browsers as well.
 
 =head1 SEE ALSO
 
