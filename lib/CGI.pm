@@ -5488,12 +5488,10 @@ Use the B<-noScript> parameter to pass some HTML text that will be displayed on
 browsers that do not have JavaScript (or browsers where JavaScript is turned
 off).
 
-The <script> tag, has several attributes including "type", "src" and "charset".
-The latter is particularly interesting, as it allows you to keep the
-JavaScript code in a file or CGI script rather than cluttering up each
-page with the source.  To use these attributes pass a HASH reference
-in the B<-script> parameter containing one or more of -type, -src, or
--code:
+The <script> tag, has several attributes including "type", "charset" and "src".
+"src" allows you to keep JavaScript code in an external file. To use these
+attributes pass a HASH reference in the B<-script> parameter containing one or
+more of -type, -src, or -code:
 
     print $q->start_html(-title=>'The Riddle of the Sphinx',
 			 -script=>{-type=>'JAVASCRIPT',
