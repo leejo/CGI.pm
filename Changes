@@ -1,4 +1,8 @@
 
+  [PERFORMANCE]
+  - Make EBCDIC a compile-time constant so there's zero overhead (and less
+    compiled code) in subroutines that test for it. (Tim Bunce) 
+
   [DOCUMENTATION]
   - quit referring to the <link> tag as being "rarely used".  (Victor Sanders)
   - typo and whitespace fixes (RT#62785, thanks to  scop@cpan.org) 
