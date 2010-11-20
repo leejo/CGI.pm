@@ -1861,20 +1861,20 @@ sub _script {
 
     my (@scripts) = ref($script) eq 'ARRAY' ? @$script : ($script);
     for $script (@scripts) {
-	my($src,$code,$language);
-	if (ref($script)) { # script is a hash
-	    ($src,$code,$type) =
-		rearrange(['SRC','CODE',['LANGUAGE','TYPE']],
-				 '-foo'=>'bar',	# a trick to allow the '-' to be omitted
-				 ref($script) eq 'ARRAY' ? @$script : %$script);
+    my($src,$code,$language,$charset);
+    if (ref($script)) { # script is a hash
+        ($src,$code,$type,$charset) =
+        rearrange(['SRC','CODE',['LANGUAGE','TYPE'],'CHARSET'],
+                 '-foo'=>'bar', # a trick to allow the '-' to be omitted
+                 ref($script) eq 'ARRAY' ? @$script : %$script);
             $type ||= 'text/javascript';
             unless ($type =~ m!\w+/\w+!) {
                 $type =~ s/[\d.]+$//;
                 $type = "text/$type";
             }
-	} else {
-	    ($src,$code,$type) = ('',$script, 'text/javascript');
-	}
+    } else {
+        ($src,$code,$type,$charset) = ('',$script, 'text/javascript', '');
+    }
 
     my $comment = '//';  # javascript by default
     $comment = '#' if $type=~/perl|tcl/i;
@@ -1892,6 +1892,7 @@ sub _script {
      my(@satts);
      push(@satts,'src'=>$src) if $src;
      push(@satts,'type'=>$type);
+     push(@satts,'charset'=>$charset) if ($src && $charset);
      $code = $cdata_start . $code . $cdata_end if defined $code;
      push(@result,$self->script({@satts},$code || ''));
     }
@@ -5487,7 +5488,7 @@ Use the B<-noScript> parameter to pass some HTML text that will be displayed on
 browsers that do not have JavaScript (or browsers where JavaScript is turned
 off).
 
-The <script> tag, has several attributes including "type" and src.
+The <script> tag, has several attributes including "type", "src" and "charset".
 The latter is particularly interesting, as it allows you to keep the
 JavaScript code in a file or CGI script rather than cluttering up each
 page with the source.  To use these attributes pass a HASH reference
