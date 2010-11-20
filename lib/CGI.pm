@@ -5412,6 +5412,18 @@ off in other cases by passing an empty string (-lang=>'').
 The B<-encoding> argument can be used to specify the character set for
 XHTML.  It defaults to iso-8859-1 if not specified.
 
+The B<-dtd> argument can be used to specify a public DTD identifier string. For example:
+
+    -dtd => '-//W3C//DTD HTML 4.01 Transitional//EN')
+
+Alternatively, it can take public and system DTD identifiers as an array:
+
+    dtd => [ '-//W3C//DTD HTML 4.01 Transitional//EN', 'http://www.w3.org/TR/html4/loose.dtd' ]
+
+For the public DTD identifier to be considered, it must be valid. Otherwise it
+will be replaced by the default DTD. If the public DTD contains 'XHTML', CGI.pm
+will emit XML.
+
 The B<-declare_xml> argument, when used in conjunction with XHTML,
 will put a <?xml> declaration at the top of the HTML header. The sole
 purpose of this declaration is to declare the character set
