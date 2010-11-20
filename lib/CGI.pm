@@ -5358,8 +5358,7 @@ advised that changing the status to anything other than 301, 302 or
 			    -style=>{'src'=>'/styles/style1.css'},
 			    -BGCOLOR=>'blue');
 
-After creating the HTTP header, most CGI scripts will start writing
-out an HTML document.  The start_html() routine creates the top of the
+The start_html() routine creates the top of the
 page, along with a lot of optional information that controls the
 page's appearance and behavior.
 
