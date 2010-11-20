@@ -16,7 +16,7 @@ use Carp 'croak';
 # listing the modifications you have made.
 
 # The most recent version and complete docs are available at:
-#   http://stein.cshl.org/WWW/software/CGI/
+#   http://search.cpan.org/dist/CGI.pm
 
 # The revision is no longer being updated since moving to git. 
 $CGI::revision = '$Id: CGI.pm,v 1.266 2009/07/30 16:32:34 lstein Exp $';
