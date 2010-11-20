@@ -1,7 +1,11 @@
+  - A new option to set $CGI::Carp::TO_BROWSER = 0, allows you to explicitly  
+    exclude a particular scope from triggering printing to the browser when
+    fatatlsToBrowser is set. (RT#62783, Thanks to papowell) 
 
   [DOCUMENTATION]
   - quit referring to the <link> tag as being "rarely used".  (Victor Sanders)
   - typo and whitespace fixes (RT#62785, thanks to  scop@cpan.org) 
+  - CGI::Carp doc are updated to reflect that it can work with mod_perl 2.0. 
 
   [INTERNALS]
   - Re-fixing https test in http.t. (RT#54768, thanks to SPROUT)
