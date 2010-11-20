@@ -42,3 +42,11 @@ eval { like $cgi->redirect( $CGI::CRLF.$CGI::CRLF."Content-Type: text/html"),
     qr#Location: Content-Type#, 'redirect w/ leading newline '; };
 like($@,qr/contains a newline/,'redirect with leading newlines blows up');
 
+{
+    my $cgi = CGI->new('t=bogus%0A%0A<html>');
+    my $out;
+    eval { $out = $cgi->redirect( $cgi->param('t') ) };
+    like($@,qr/contains a newline/, "redirect does not allow double-newline injection");
+}
+
+

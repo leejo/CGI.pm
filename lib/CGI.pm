@@ -1559,7 +1559,7 @@ sub header {
             $header =~ s/$CRLF(\s)/$1/g;
 
             # All other uses of newlines are invalid input. 
-            if ($header =~ m/$CRLF/) {
+            if ($header =~ m/$CRLF|\015|\012/) {
                 # shorten very long values in the diagnostic
                 $header = substr($header,0,72).'...' if (length $header > 72);
                 die "Invalid header value contains a newline not followed by whitespace: $header";
