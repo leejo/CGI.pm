@@ -39,6 +39,7 @@ t/apache.t
 t/autoescape.t
 t/can.t
 t/carp.t
+t/charset.t
 t/checkbox_group.t
 t/cookie.t
 t/Dump.t

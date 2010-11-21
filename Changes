@@ -1,3 +1,6 @@
+  [BUG FIXES]  
+  - Setting charset() now works for all content types, not just "text/*". 
+    (RT#57945, Thanks to Yanick and Gerv.
 
   [PERFORMANCE]
   - Make EBCDIC a compile-time constant so there's zero overhead (and less
