@@ -1571,12 +1571,8 @@ sub header {
 
     $type ||= 'text/html' unless defined($type);
 
-    if (defined $charset) {
-      $self->charset($charset);
-    } else {
-      $charset = $self->charset if $type =~ /^text\//;
-    }
-   $charset ||= '';
+    # sets if $charset is given, gets if not
+    $charset = $self->charset( $charset );
 
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.

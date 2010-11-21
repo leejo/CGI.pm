@@ -63,11 +63,14 @@ is h1( { -align => 'CENTER' }, [ 'fred', 'agnes' ] ),
 is header(), "Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}",
   "header()";
 
-is header( -type => 'image/gif' ), "Content-Type: image/gif${CRLF}${CRLF}",
+is header( -type => 'image/gif', -charset => '' ), "Content-Type: image/gif${CRLF}${CRLF}",
   "header()";
 
 is header( -type => 'image/gif', -status => '500 Sucks' ),
   "Status: 500 Sucks${CRLF}Content-Type: image/gif${CRLF}${CRLF}", "header()";
+ 
+# return to normal 
+charset( 'ISO-8859-1' );
 
 like header( -nph => 1 ),
   qr!HTTP/1.0 200 OK${CRLF}Server: cmdline${CRLF}Date:.+${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!,
