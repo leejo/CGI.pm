@@ -214,7 +214,7 @@ sub unescape {
     if (EBCDIC) {
       $todecode =~ s/%([0-9a-fA-F]{2})/chr $A2E[hex($1)]/ge;
     } else {
-	# handle surrogate pairs first -- dankogai
+	# handle surrogate pairs first -- dankogai. Ref: http://unicode.org/faq/utf_bom.html#utf16-2
 	$todecode =~ s{
 			%u([Dd][89a-bA-B][0-9a-fA-F]{2}) # hi
 		        %u([Dd][c-fC-F][0-9a-fA-F]{2})   # lo
@@ -273,6 +273,7 @@ EOR
 }
 
 sub escape {
+  # If we being called in an OO-context, discard the first argument.
   shift() if @_ > 1 and ( ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass));
   my $toencode = shift;
   return undef unless defined($toencode);
