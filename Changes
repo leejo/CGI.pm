@@ -14,6 +14,7 @@
 
   [INTERNALS]
   - Re-fixing https test in http.t. (RT#54768, thanks to SPROUT)
+  - param_fetch no longer triggers a warning when called with no arguments (ysth, Mark Stosberg)
 
 Version 3.50
   
