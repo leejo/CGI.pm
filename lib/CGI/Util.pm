@@ -1,18 +1,17 @@
 package CGI::Util;
 
 use strict;
-use vars qw($VERSION @EXPORT_OK @ISA @A2E @E2A);
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape 
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape 
 		expires ebcdic2ascii ascii2ebcdic);
 
-$VERSION = '3.51';
+our $VERSION = '3.51';
 
 use constant EBCDIC => "\t" ne "\011";
 
 # (ord('^') == 95) for codepage 1047 as on os390, vmesa
-@A2E = (
+our @A2E = (
    0,  1,  2,  3, 55, 45, 46, 47, 22,  5, 21, 11, 12, 13, 14, 15,
   16, 17, 18, 19, 60, 61, 50, 38, 24, 25, 63, 39, 28, 29, 30, 31,
   64, 90,127,123, 91,108, 80,125, 77, 93, 92, 78,107, 96, 75, 97,
@@ -30,7 +29,7 @@ use constant EBCDIC => "\t" ne "\011";
   68, 69, 66, 70, 67, 71,156, 72, 84, 81, 82, 83, 88, 85, 86, 87,
  140, 73,205,206,203,207,204,225,112,221,222,219,220,141,142,223
 	 );
-@E2A = (
+our @E2A = (
    0,  1,  2,  3,156,  9,134,127,151,141,142, 11, 12, 13, 14, 15,
   16, 17, 18, 19,157, 10,  8,135, 24, 25,146,143, 28, 29, 30, 31,
  128,129,130,131,132,133, 23, 27,136,137,138,139,140,  5,  6,  7,
