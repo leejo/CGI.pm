@@ -3,10 +3,10 @@
 
 use strict;
 
-use Test::More tests => 59;
+use Test::More tests => 61;
 use IO::Handle;
 
-BEGIN { use_ok('CGI::Carp') };
+use CGI::Carp;
 
 #-----------------------------------------------------------------------------
 # Test id
@@ -371,3 +371,20 @@ ok(!defined buffer("WIBBLE"),      '"WIBBLE" doesn\'t returns proper filehandle'
         return bless {}, shift;
     }
 }
+
+
+@result = ();
+tie *STDOUT, 'StoreStuff' or die "Can't tie STDOUT";
+ {
+ 	eval {
+ 		$CGI::Carp::TO_BROWSER = 0;
+ 		die 'Message ToBrowser = 0';
+	};
+ 	$result[0] = $@;
+ 	$result[1] .= $_ while (<STDOUT>);
+ }
+untie *STDOUT;
+
+ like $result[0] => qr/Message ToBrowser/, 'die message for ToBrowser = 0 is OK';
+ ok !$result[1], 'No output for ToBrowser = 0';
+
