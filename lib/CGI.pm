@@ -5681,14 +5681,8 @@ method, the results will not be what you expect.
 
 =head1 CREATING STANDARD HTML ELEMENTS:
 
-CGI.pm defines general HTML shortcut methods for most, if not all of
-the HTML 3 and HTML 4 tags.  HTML shortcuts are named after a single
-HTML element and return a fragment of HTML text that you can then
-print or manipulate as you like.  Each shortcut returns a fragment of
-HTML code that you can append to a string, save to a file, or, most
-commonly, print out so that it displays in the browser window.
-
-This example shows how to use the HTML methods:
+CGI.pm defines general HTML shortcut methods for many HTML tags.  HTML shortcuts are named after a single
+HTML element and return a fragment of HTML text. Example:
 
    print $q->blockquote(
 		     "Many years ago on the island of",
