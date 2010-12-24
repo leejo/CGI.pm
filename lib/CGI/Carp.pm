@@ -446,16 +446,20 @@ sub ineval {
 }
 
 sub die {
-  my ($arg,@rest) = @_;
+    # if no argument is passed, propagate $@ like
+    # the real die
+  my ($arg,@rest) = @_ ? @_ 
+                  : $@ ? "$@\t...propagated" 
+                  :      "Died"
+                  ;
 
   &$DIE_HANDLER($arg,@rest) if $DIE_HANDLER;
 
+  # the "$arg" is done on purpose!
   # if called as die( $object, 'string' ),
   # all is stringified, just like with
   # the real 'die'
   $arg = join '' => "$arg", @rest if @rest;
-
-  $arg ||= 'Died';
 
   my($file,$line,$id) = id(1);
 
