@@ -11,12 +11,24 @@
   - Make EBCDIC a compile-time constant so there's zero overhead (and less
     compiled code) in subroutines that test for it. (Tim Bunce) 
 
+  [BUG FIXES]
+  - support for user temporary directories ($HOME/tmp) was commented out
+    in 2.61 but the documentation wasn't updated (Peter Gervai, Niko Tyni)
+  - setting $CGITempFile::TMPDIRECTORY before loading CGI.pm has been
+    working but undocumented since 3.12 (which listed it in Changes as
+    $CGI::TMPDIRECTORY) (Peter Gervai, Niko Tyni)
+  - unfortunately the previous change broke the runtime check for looking
+    for a new temporary directory if the current one suddenly became
+    unwritable (Peter Gervai, Niko Tyni)
+
   [DOCUMENTATION]
   - quit referring to the <link> tag as being "rarely used".  (Victor Sanders)
   - typo and whitespace fixes (RT#62785, thanks to  scop@cpan.org) 
   - The -dtd argument to start_html() is now documented 
     (RT#60473, Thanks to giecrilj and steve@fisharerojo.org) 
   - CGI::Carp doc are updated to reflect that it can work with mod_perl 2.0. 
+  - when creating a temporary file in the directory fails, the error message
+    could indicate the root of the problem better (Peter Gervai, Niko Tyni)
 
   [INTERNALS]
   - Re-fixing https test in http.t. (RT#54768, thanks to SPROUT)

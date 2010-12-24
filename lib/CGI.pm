@@ -3635,7 +3635,7 @@ sub read_multipart {
 	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
             $seqno += int rand(100);
           }
-          die "CGI open of tmpfile: $!\n" unless defined $filehandle;
+          die "CGI.pm open of tmpfile $tmp/$filename failed: $!\n" unless defined $filehandle;
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
                      && defined fileno($filehandle);
 
@@ -4270,7 +4270,10 @@ $AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
 sub new {
     my($package,$sequence) = @_;
     my $filename;
-    find_tempdir() unless -w $TMPDIRECTORY;
+    unless (-w $TMPDIRECTORY) {
+        $TMPDIRECTORY = undef;
+        find_tempdir();
+    }
     for (my $i = 0; $i < $MAXTRIES; $i++) {
 	last if ! -f ($filename = sprintf("\%s${SL}CGItemp%d", $TMPDIRECTORY, $sequence++));
     }
@@ -5128,8 +5131,7 @@ file is created with mode 0600 (neither world nor group readable).
 
 The temporary directory is selected using the following algorithm:
 
-    1. if the current user (e.g. "nobody") has a directory named
-    "tmp" in its home directory, use that (Unix systems only).
+    1. if $CGITempFile::TMPDIRECTORY is already set, use that
 
     2. if the environment variable TMPDIR exists, use the location
     indicated.

@@ -66,6 +66,7 @@ t/start_end_asterisk.t
 t/start_end_end.t
 t/start_end_start.t
 t/switch.t
+t/tmpfile.t
 t/unescapeHTML.t
 t/upload.t
 t/upload_post_text.txt
