@@ -1,7 +1,6 @@
 WHAT IS THIS?
 
-This is CGI.pm, an easy-to-use Perl5 library for writing World
-Wide Web CGI scripts.
+This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
 
 HOW DO I INSTALL IT?
 
@@ -13,62 +12,31 @@ file and type the following:
    make test
    make install
 
-If this doesn't work for you, try:
-
-   cp lib/CGI.pm /usr/local/lib/perl5
-
-If you have trouble installing CGI.pm because you have insufficient
-access privileges to add to the perl library directory, you can still
-use CGI.pm.  See the docs for details.
-
 WHAT SYSTEMS DOES IT WORK WITH?
 
-This module works with NT, Windows, Macintosh, OS/2 and VMS servers,
-although it hasn't been tested as extensively as it should be.  See
-the docs for notes on your particular platform.
+This module works with Linux, Windows, OSX, FreeBSD, VMS and other platforms.
 
 WHERE IS THE DOCUMENTATION?
 
 Documentation is found in POD (plain old documentation) form in CGI.pm
-itself.  When you install CGI, the MakeMaker program will
-automatically install the manual pages for you (on Unix systems, type
-"man CGI").
+itself.  When you install CGI, manaul pages will automatically be installed.
+on Unix systems, type "man CGI" or "perldoc CGI").
 
 WHERE ARE THE EXAMPLES?
 
-A collection of examples demonstrating various CGI features and
-techniques are in the directory "examples".
+A collection of examples demonstrating various CGI features and techniques are
+in the directory "examples". These are now rather old examples of Perl code and
+should not be considered as best practices.
 
 WHERE IS THE ONLINE DOCUMENTATION?
 
 Online documentation of for CGI.pm, and notifications of new versions
 can be found at:
 
-   http://search.cpan.org/~lds/
+   http://search.cpan.org/dist/CGI.pm/
 
 WHERE CAN I LEARN MORE?
 
-I have written a book about CGI.pm called "The Official Guide to
+Lincoln Stein wrote a book about CGI.pm called "The Official Guide to
 Programming with CGI.pm" which was published by John Wiley & Sons in
-May 1998.  If you like CGI.pm, you'll love this book.
-
-IMPORTANT NOTES:
-
-Version 2.69 emits XHTML by default.  To get the old behavior, use the
--no_xhtml pragma.
-
-Versions 2.44-2.46 introduce two API changes that will affect
-users of previous versions:
-
-1) The accept() function has been renamed Accept() to avoid conflicting with
-Perl's built-in function of the same name.
-
-2) The sub() function has been renamed Sub() for similar reasons.
-
-My apologies for these changes, but they were necessary in order for
-CGI to pass the perl5.005 regression tests!
-
-Have fun, and let me know how it turns out!
-
-Lincoln D. Stein
-lstein@cshl.org
+May 1998.

@@ -48,12 +48,14 @@ t/fast.t
 t/form.t
 t/function.t
 t/gen-tests/gen-start-end-tags.pl
+t/headers.t
 t/hidden.t
 t/html.t
 t/http.t
 t/init.t
 t/init_test.txt
 t/no_tabindex.t
+t/param_fetch.t
 t/popup_menu.t
 t/pretty.t
 t/push.t
