@@ -175,8 +175,7 @@ sub as_string {
 }
 
 sub compare {
-    my $self = shift;
-    my $value = shift;
+    my ( $self, $value ) = @_;
     return "$self" cmp $value;
 }
 
@@ -198,15 +197,13 @@ sub bake {
 
 # accessors
 sub name {
-    my $self = shift;
-    my $name = shift;
+    my ( $self, $name ) = @_;
     $self->{'name'} = $name if defined $name;
     return $self->{'name'};
 }
 
 sub value {
-    my $self = shift;
-    my $value = shift;
+  my ( $self, $value ) = @_;
       if (defined $value) {
               my @values;
         if (ref($value)) {
@@ -224,44 +221,38 @@ sub value {
 }
 
 sub domain {
-    my $self = shift;
-    my $domain = shift;
+    my ( $self, $domain ) = @_;
     $self->{'domain'} = lc $domain if defined $domain;
     return $self->{'domain'};
 }
 
 sub secure {
-    my $self = shift;
-    my $secure = shift;
+    my ( $self, $secure ) = @_;
     $self->{'secure'} = $secure if defined $secure;
     return $self->{'secure'};
 }
 
 sub expires {
-    my $self = shift;
-    my $expires = shift;
+    my ( $self, $expires ) = @_;
     $self->{'expires'} = CGI::Util::expires($expires,'cookie') if defined $expires;
     return $self->{'expires'};
 }
 
 sub max_age {
-  my $self    = shift;
-  my $max_age = shift;
-  $self->{'max-age'} = CGI::Util::expire_calc($max_age)-time() if defined $max_age;
-  return $self->{'max-age'};
+    my ( $self, $max_age ) = @_;
+    $self->{'max-age'} = CGI::Util::expire_calc($max_age)-time() if defined $max_age;
+    return $self->{'max-age'};
 }
 
 sub path {
-    my $self = shift;
-    my $path = shift;
+    my ( $self, $path ) = @_;
     $self->{'path'} = $path if defined $path;
     return $self->{'path'};
 }
 
 
 sub httponly { # HttpOnly
-    my $self     = shift;
-    my $httponly = shift;
+    my ( $self, $httponly ) = @_;
     $self->{'httponly'} = $httponly if defined $httponly;
     return $self->{'httponly'};
 }
