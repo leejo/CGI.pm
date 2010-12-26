@@ -289,11 +289,11 @@ CGI::Cookie - Interface to Netscape Cookies
     print header(-cookie=>[$cookie1,$cookie2]);
 
     # fetch existing cookies
-    %cookies = fetch CGI::Cookie;
+    %cookies = CGI::Cookie->fetch;
     $id = $cookies{'ID'}->value;
 
     # create cookies returned from an external source
-    %cookies = parse CGI::Cookie($ENV{COOKIE});
+    %cookies = CGI::Cookie->parse($ENV{COOKIE});
 
 =head1 DESCRIPTION
 
@@ -459,13 +459,13 @@ representation.  You may call as_string() yourself if you prefer:
 
 =head2 Recovering Previous Cookies
 
-	%cookies = fetch CGI::Cookie;
+	%cookies = CGI::Cookie->fetch;
 
 B<fetch> returns an associative array consisting of all cookies
 returned by the browser.  The keys of the array are the cookie names.  You
 can iterate through the cookies this way:
 
-	%cookies = fetch CGI::Cookie;
+	%cookies = CGI::Cookie->fetch;
 	for (keys %cookies) {
 	   do_something($cookies{$_});
         }
@@ -482,7 +482,7 @@ You may also retrieve cookies that were stored in some external
 form using the parse() class method:
 
        $COOKIES = `cat /usr/tmp/Cookie_stash`;
-       %cookies = parse CGI::Cookie($COOKIES);
+       %cookies = CGI::Cookie->parse($COOKIES);
 
 If you are in a mod_perl environment, you can save some overhead by
 passing the request object to fetch() like this:
