@@ -118,14 +118,22 @@ sub parse {
 }
 
 sub new {
-  my $class = shift;
-  $class = ref($class) if ref($class);
+  my ( $class, @params ) = @_;
+  $class = ref( $class ) || $class;
   # Ignore mod_perl request object--compatability with Apache::Cookie.
   shift if ref $_[0]
         && eval { $_[0]->isa('Apache::Request::Req') || $_[0]->isa('Apache') };
-  my($name,$value,$path,$domain,$secure,$expires,$max_age, $httponly) =
-    rearrange([ 'NAME', ['VALUE','VALUES'], qw/ PATH DOMAIN SECURE EXPIRES
-        MAX-AGE HTTPONLY / ], @_);
+  my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly )
+   = rearrange(
+    [
+      'NAME', [ 'VALUE', 'VALUES' ],
+      'PATH',   'DOMAIN',
+      'SECURE', 'EXPIRES',
+      'MAX-AGE','HTTPONLY'
+    ],
+    @params
+   );
+
 
   # Pull out our parameters.
   my @values = !ref $value           ? $value
