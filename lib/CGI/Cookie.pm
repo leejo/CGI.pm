@@ -212,20 +212,14 @@ sub name {
 
 sub value {
   my ( $self, $value ) = @_;
-      if (defined $value) {
-              my @values;
-        if (ref($value)) {
-            if (ref($value) eq 'ARRAY') {
-                @values = @$value;
-            } elsif (ref($value) eq 'HASH') {
-                @values = %$value;
-            }
-        } else {
-            @values = ($value);
-        }
-      $self->{'value'} = [@values];
+  if ( defined $value ) {
+    my @values
+     = ref $value eq 'ARRAY' ? @$value
+     : ref $value eq 'HASH'  ? %$value
+     :                         ( $value );
+    $self->{'value'} = [@values];
   }
-  return wantarray ? @{$self->{'value'}} : $self->{'value'}->[0]
+  return wantarray ? @{ $self->{'value'} } : $self->{'value'}->[0];
 }
 
 sub domain {
