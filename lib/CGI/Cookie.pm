@@ -12,7 +12,7 @@ use warnings;
 
 # Copyright 1995-1999, Lincoln D. Stein.  All rights reserved.
 # It may be used and modified freely, but I do request that this copyright
-# notice remain attached to the file.  You may modify this module as you 
+# notice remain attached to the file.  You may modify this module as you
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
@@ -27,7 +27,7 @@ my $PERLEX = 0;
 # Turn on special checking for ActiveState's PerlEx
 $PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
 
-# Turn on special checking for Doug MacEachern's modperl
+# Turn on special checking for mod_perl
 # PerlEx::DBI tries to fool DBI by setting MOD_PERL
 my $MOD_PERL = 0;
 if (exists $ENV{MOD_PERL} && ! $PERLEX) {
