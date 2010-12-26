@@ -60,7 +60,7 @@ sub fetch {
    my($key,$value);
    
    my @pairs = split("[;,] ?",$raw_cookie);
-   foreach (@pairs) {
+   for (@pairs) {
      s/\s*(.*?)\s*/$1/;
      if (/^([^=]+)=(.*)/) {
        $key = $1;
@@ -96,7 +96,7 @@ sub parse {
   my %results;
 
   my @pairs = split("[;,] ?",$raw_cookie);
-  foreach (@pairs) {
+  for (@pairs) {
     s/\s*(.*?)\s*/$1/;
     my($key,$value) = split("=",$_,2);
 
@@ -466,7 +466,7 @@ returned by the browser.  The keys of the array are the cookie names.  You
 can iterate through the cookies this way:
 
 	%cookies = fetch CGI::Cookie;
-	foreach (keys %cookies) {
+	for (keys %cookies) {
 	   do_something($cookies{$_});
         }
 
