@@ -133,7 +133,7 @@ sub new {
     ],
     @params
    );
-
+  return undef unless defined $name and defined $value;
 
   # Pull out our parameters.
   my @values = !ref $value           ? $value

@@ -17,6 +17,9 @@
   - A bug was fixed in CGI::Carp triggered by certain death cases in
     the BEGIN phase of parent classes. 
     (RT#57224, Thanks to UNERA, Yanick Champoux, Mark Stosberg)
+  - CGI::Cookie->new() now follows the documentation and returns undef 
+    if the -name and -value args aren't provided. This new behavior is also
+    consistent with the docs and code of CGI::Simple::Cookie. (Mark Stosberg)
 
   [SECURITY]
   - Further improvements have been made to guard against newline injections
