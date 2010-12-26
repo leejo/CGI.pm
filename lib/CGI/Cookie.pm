@@ -120,9 +120,9 @@ sub parse {
 sub new {
   my ( $class, @params ) = @_;
   $class = ref( $class ) || $class;
-  # Ignore mod_perl request object--compatability with Apache::Cookie.
-  shift if ref $_[0]
-        && eval { $_[0]->isa('Apache::Request::Req') || $_[0]->isa('Apache') };
+  # Ignore mod_perl request object--compatibility with Apache::Cookie.
+  shift if ref $params[0]
+        && eval { $params[0]->isa('Apache::Request::Req') || $params[0]->isa('Apache') };
   my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly )
    = rearrange(
     [
