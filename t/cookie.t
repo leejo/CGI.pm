@@ -144,7 +144,8 @@ my @test_cookie = (
                -expires => '+3M',
                -domain  => '.capricorn.com',
                -path    => '/cgi-bin/database',
-               -secure  => 1
+               -secure  => 1,
+               -httponly=> 1
               );
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'foo',               'name is correct');
@@ -153,6 +154,7 @@ my @test_cookie = (
   is($c->domain , '.capricorn.com',    'domain is correct');
   is($c->path   , '/cgi-bin/database', 'path is correct');
   ok($c->secure , 'secure attribute is set');
+  ok( $c->httponly, 'httponly attribute is set' );
 
   # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Cookie->new(-name    =>  'baz',
@@ -165,6 +167,7 @@ my @test_cookie = (
   ok(!defined $c->domain ,       'domain attributeis not set');
   is($c->path, '/',      'path atribute is set to default');
   ok(!defined $c->secure ,       'secure attribute is set');
+  ok( !defined $c->httponly, 'httponly attribute is not set' );
 
 # I'm really not happy about the restults of this section.  You pass
 # the new method invalid arguments and it just merilly creates a
@@ -195,7 +198,8 @@ my @test_cookie = (
                -expires => '+3M',
                -domain  => '.pie-shop.com',
                -path    => '/',
-               -secure  => 1
+               -secure  => 1,
+               -httponly=> 1
               );
 
   my $name = $c->name;
@@ -215,6 +219,9 @@ my @test_cookie = (
 
   like($c->as_string, '/secure/', "Stringified cookie contains secure");
 
+  like( $c->as_string, '/HttpOnly/',
+    "Stringified cookie contains HttpOnly" );
+
   $c = CGI::Cookie->new(-name    =>  'Hamster-Jam',
             -value   =>  'Tulip',
                );
@@ -233,6 +240,9 @@ my @test_cookie = (
   like($c->as_string, "/$path/", "Stringified cookie contains path");
 
   ok($c->as_string !~ /secure/, "Stringified cookie does not contain secure");
+
+  ok( $c->as_string !~ /HttpOnly/,
+    "Stringified cookie does not contain HttpOnly" );
 }
 
 #-----------------------------------------------------------------------------
