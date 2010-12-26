@@ -1,23 +1,28 @@
-#!/usr/local/bin/perl -w
+#!perl -w
 
 use strict;
 
-use Test::More tests => 96;
+# to have a consistent baseline, we nail the current time
+# to 100 seconds after the epoch
+BEGIN {
+    *CORE::GLOBAL::time = sub { 100 };
+}
+
+use Test::More 'no_plan';
 use CGI::Util qw(escape unescape);
 use POSIX qw(strftime);
+use CGI::Cookie;
 
 #-----------------------------------------------------------------------------
 # make sure module loaded
 #-----------------------------------------------------------------------------
 
-BEGIN {use_ok('CGI::Cookie');}
-
 my @test_cookie = (
-		   'foo=123; bar=qwerty; baz=wibble; qux=a1',
-		   'foo=123; bar=qwerty; baz=wibble;',
-		   'foo=vixen; bar=cow; baz=bitch; qux=politician',
-		   'foo=a%20phrase; bar=yes%2C%20a%20phrase; baz=%5Ewibble; qux=%27',
-		   );
+           'foo=123; bar=qwerty; baz=wibble; qux=a1',
+           'foo=123; bar=qwerty; baz=wibble;',
+           'foo=vixen; bar=cow; baz=bitch; qux=politician',
+           'foo=a%20phrase; bar=yes%2C%20a%20phrase; baz=%5Ewibble; qux=%27',
+           );
 
 #-----------------------------------------------------------------------------
 # Test parse
@@ -135,12 +140,12 @@ my @test_cookie = (
 {
   # Try new with full information provided
   my $c = CGI::Cookie->new(-name    => 'foo',
-			   -value   => 'bar',
-			   -expires => '+3M',
-			   -domain  => '.capricorn.com',
-			   -path    => '/cgi-bin/database',
-			   -secure  => 1
-			  );
+               -value   => 'bar',
+               -expires => '+3M',
+               -domain  => '.capricorn.com',
+               -path    => '/cgi-bin/database',
+               -secure  => 1
+              );
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'foo',               'name is correct');
   is($c->value  , 'bar',               'value is correct');
@@ -151,8 +156,8 @@ my @test_cookie = (
 
   # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Cookie->new(-name    =>  'baz',
-			-value   =>  'qux',
-		       );
+            -value   =>  'qux',
+               );
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'baz', 'name is correct');
   is($c->value  , 'qux', 'value is correct');
@@ -186,12 +191,12 @@ my @test_cookie = (
 
 {
   my $c = CGI::Cookie->new(-name    => 'Jam',
-			   -value   => 'Hamster',
-			   -expires => '+3M',
-			   -domain  => '.pie-shop.com',
-			   -path    => '/',
-			   -secure  => 1
-			  );
+               -value   => 'Hamster',
+               -expires => '+3M',
+               -domain  => '.pie-shop.com',
+               -path    => '/',
+               -secure  => 1
+              );
 
   my $name = $c->name;
   like($c->as_string, "/$name/", "Stringified cookie contains name");
@@ -211,8 +216,8 @@ my @test_cookie = (
   like($c->as_string, '/secure/', "Stringified cookie contains secure");
 
   $c = CGI::Cookie->new(-name    =>  'Hamster-Jam',
-			-value   =>  'Tulip',
-		       );
+            -value   =>  'Tulip',
+               );
 
   $name = $c->name;
   like($c->as_string, "/$name/", "Stringified cookie contains name");
@@ -236,38 +241,38 @@ my @test_cookie = (
 
 {
   my $c1 = CGI::Cookie->new(-name    => 'Jam',
-			    -value   => 'Hamster',
-			    -expires => '+3M',
-			    -domain  => '.pie-shop.com',
-			    -path    => '/',
-			    -secure  => 1
-			   );
+                -value   => 'Hamster',
+                -expires => '+3M',
+                -domain  => '.pie-shop.com',
+                -path    => '/',
+                -secure  => 1
+               );
 
   # have to use $c1->expires because the time will occasionally be
   # different between the two creates causing spurious failures.
   my $c2 = CGI::Cookie->new(-name    => 'Jam',
-			    -value   => 'Hamster',
-			    -expires => $c1->expires,
-			    -domain  => '.pie-shop.com',
-			    -path    => '/',
-			    -secure  => 1
-			   );
+                -value   => 'Hamster',
+                -expires => $c1->expires,
+                -domain  => '.pie-shop.com',
+                -path    => '/',
+                -secure  => 1
+               );
 
   # This looks titally whacked, but it does the -1, 0, 1 comparison
   # thing so 0 means they match
   is($c1->compare("$c1"), 0, "Cookies are identical");
-  is($c1->compare("$c2"), 0, "Cookies are identical");
+  is( "$c1", "$c2", "Cookies are identical");
 
   $c1 = CGI::Cookie->new(-name   => 'Jam',
-			 -value  => 'Hamster',
-			 -domain => '.foo.bar.com'
-			);
+             -value  => 'Hamster',
+             -domain => '.foo.bar.com'
+            );
 
   # have to use $c1->expires because the time will occasionally be
   # different between the two creates causing spurious failures.
   $c2 = CGI::Cookie->new(-name    =>  'Jam',
-			 -value   =>  'Hamster',
-			);
+             -value   =>  'Hamster',
+            );
 
   # This looks titally whacked, but it does the -1, 0, 1 comparison
   # thing so 0 (i.e. false) means they match
@@ -284,12 +289,12 @@ my @test_cookie = (
 
 {
   my $c = CGI::Cookie->new(-name    => 'Jam',
-			   -value   => 'Hamster',
-			   -expires => '+3M',
-			   -domain  => '.pie-shop.com',
-			   -path    => '/',
-			   -secure  => 1
-			   );
+               -value   => 'Hamster',
+               -expires => '+3M',
+               -domain  => '.pie-shop.com',
+               -path    => '/',
+               -secure  => 1
+               );
 
   is($c->name,          'Jam',   'name is correct');
   is($c->name('Clash'), 'Clash', 'name is set correctly');
@@ -320,6 +325,27 @@ my @test_cookie = (
   ok(!$c->secure(0), 'secure attribute is cleared');
   ok(!$c->secure,    'secure attribute is cleared');
 }
+
+#----------------------------------------------------------------------------
+# Max-age
+#----------------------------------------------------------------------------
+
+MAX_AGE: {
+    my $cookie = CGI::Cookie->new( '-expires' => 'now',);
+    is $cookie->expires, 'Thu, 01-Jan-1970 00:01:40 GMT';
+    is $cookie->max_age => undef, 'max-age is undefined when setting expires';
+
+    my $cookie = CGI::Cookie->new();
+    $cookie->max_age( '+4d' );
+
+    is $cookie->expires, undef, 'expires is undef when setting max_age';
+    is $cookie->max_age => 4*24*60*60, 'setting via max-age';
+
+    $cookie->max_age( '113' );
+    is $cookie->max_age => 13, 'max_age(num) as delta';
+}
+
+
 
 #-----------------------------------------------------------------------------
 # Apache2?::Cookie compatibility.

@@ -123,26 +123,21 @@ sub new {
   # Ignore mod_perl request object--compatability with Apache::Cookie.
   shift if ref $_[0]
         && eval { $_[0]->isa('Apache::Request::Req') || $_[0]->isa('Apache') };
-  my($name,$value,$path,$domain,$secure,$expires,$httponly) =
+  my($name,$value,$path,$domain,$secure,$expires,$max_age, $httponly) =
     rearrange([ 'NAME', ['VALUE','VALUES'], qw/ PATH DOMAIN SECURE EXPIRES
-        HTTPONLY / ], @_);
-  
+        MAX-AGE HTTPONLY / ], @_);
+
   # Pull out our parameters.
-  my @values;
-  if (ref($value)) {
-    if (ref($value) eq 'ARRAY') {
-      @values = @$value;
-    } elsif (ref($value) eq 'HASH') {
-      @values = %$value;
-    }
-  } else {
-    @values = ($value);
-  }
-  
+  my @values = !ref $value           ? $value
+             : ref $value eq 'ARRAY' ? @$value
+             : ref $value eq 'HASH'  ? %$value
+             :                         ()
+             ;
+
   bless my $self = {
-		    'name'=>$name,
-		    'value'=>[@values],
-		   },$class;
+            'name'  => $name,
+            'value' => \@values,
+           },$class;
 
   # IE requires the path and domain to be present for some reason.
   $path   ||= "/";
@@ -150,12 +145,12 @@ sub new {
   # names, so we comment it out.
   #    $domain = CGI::virtual_host()    unless defined $domain;
 
-  $self->path($path)     if defined $path;
-  $self->domain($domain) if defined $domain;
-  $self->secure($secure) if defined $secure;
-  $self->expires($expires) if defined $expires;
+  $self->path($path)         if defined $path;
+  $self->domain($domain)     if defined $domain;
+  $self->secure($secure)     if defined $secure;
+  $self->expires($expires)   if defined $expires;
+  $self->max_age($expires)   if defined $max_age;
   $self->httponly($httponly) if defined $httponly;
-#  $self->max_age($expires) if defined $expires;
   return $self;
 }
 
@@ -165,12 +160,12 @@ sub as_string {
 
     my(@constant_values,$domain,$path,$expires,$max_age,$secure,$httponly);
 
-    push(@constant_values,"domain=$domain")   if $domain = $self->domain;
-    push(@constant_values,"path=$path")       if $path = $self->path;
-    push(@constant_values,"expires=$expires") if $expires = $self->expires;
-    push(@constant_values,"max-age=$max_age") if $max_age = $self->max_age;
-    push(@constant_values,"secure") if $secure = $self->secure;
-    push(@constant_values,"HttpOnly") if $httponly = $self->httponly;
+    push(@constant_values,"domain=$domain")   if $domain   = $self->domain;
+    push(@constant_values,"path=$path")       if $path     = $self->path;
+    push(@constant_values,"expires=$expires") if $expires  = $self->expires;
+    push(@constant_values,"max-age=$max_age") if $max_age  = $self->max_age;
+    push(@constant_values,"secure")           if $secure   = $self->secure;
+    push(@constant_values,"HttpOnly")         if $httponly = $self->httponly;
 
     my($key) = escape($self->name);
     my($cookie) = join("=",(defined $key ? $key : ''),join("&",map escape(defined $_ ? $_ : ''),$self->value));
@@ -222,8 +217,8 @@ sub value {
             @values = ($value);
         }
       $self->{'value'} = [@values];
-      }
-    return wantarray ? @{$self->{'value'}} : $self->{'value'}->[0]
+  }
+  return wantarray ? @{$self->{'value'}} : $self->{'value'}->[0]
 }
 
 sub domain {
@@ -248,9 +243,9 @@ sub expires {
 }
 
 sub max_age {
-  my $self = shift;
-  my $expires = shift;
-  $self->{'max-age'} = CGI::Util::expire_calc($expires)-time() if defined $expires;
+  my $self    = shift;
+  my $max_age = shift;
+  $self->{'max-age'} = CGI::Util::expire_calc($max_age)-time() if defined $max_age;
   return $self->{'max-age'};
 }
 
@@ -392,6 +387,15 @@ object serialization protocols for full generality).
 B<-expires> accepts any of the relative or absolute date formats
 recognized by CGI.pm, for example "+3M" for three months in the
 future.  See CGI.pm's documentation for details.
+
+B<-max-age> accepts the same data formats as B<< -expires >>, but sets a
+relative value instead of absolute like B<< -expires >>. This is intended to be
+more secure since a clock could be changed to fake an absolute time. In
+practice, as of 2011, C<< -max-age >> still does not enjoy the wide support
+that C<< -expires >> has. You can set both, and browsers that support
+C<< -max-age >> should ignore the C<< Expires >> header. The drawback
+to this approach is the bit of bandwidth for sending an extra header on each cookie.
+
 
 B<-domain> points to a domain name or to a fully qualified host name.
 If not specified, the cookie will be returned only to the Web server
@@ -548,5 +552,7 @@ This section intentionally left blank.
 =head1 SEE ALSO
 
 L<CGI::Carp>, L<CGI>
+
+L<RFC 2109|http://www.ietf.org/rfc/rfc2109.txt>, L<RFC 2695|http://www.ietf.org/rfc/rfc2965.txt>
 
 =cut
