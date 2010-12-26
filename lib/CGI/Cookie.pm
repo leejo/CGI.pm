@@ -382,13 +382,12 @@ recognized by CGI.pm, for example "+3M" for three months in the
 future.  See CGI.pm's documentation for details.
 
 B<-max-age> accepts the same data formats as B<< -expires >>, but sets a
-relative value instead of absolute like B<< -expires >>. This is intended to be
+relative value instead of an absolute like B<< -expires >>. This is intended to be
 more secure since a clock could be changed to fake an absolute time. In
-practice, as of 2011, C<< -max-age >> still does not enjoy the wide support
+practice, as of 2011, C<< -max-age >> still does not enjoy the widespread support
 that C<< -expires >> has. You can set both, and browsers that support
 C<< -max-age >> should ignore the C<< Expires >> header. The drawback
 to this approach is the bit of bandwidth for sending an extra header on each cookie.
-
 
 B<-domain> points to a domain name or to a fully qualified host name.
 If not specified, the cookie will be returned only to the Web server
