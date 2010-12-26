@@ -281,8 +281,8 @@ CGI::Cookie - Interface to Netscape Cookies
     use CGI::Cookie;
 
     # Create new cookies and send them
-    $cookie1 = new CGI::Cookie(-name=>'ID',-value=>123456);
-    $cookie2 = new CGI::Cookie(-name=>'preferences',
+    $cookie1 = CGI::Cookie->new(-name=>'ID',-value=>123456);
+    $cookie2 = CGI::Cookie->new(-name=>'preferences',
                                -value=>{ font => Helvetica,
                                          size => 12 } 
                                );
@@ -375,7 +375,7 @@ See these URLs for more information:
 
 =head2 Creating New Cookies
 
-	my $c = new CGI::Cookie(-name    =>  'foo',
+	my $c = CGI::Cookie->new(-name    =>  'foo',
                              -value   =>  'bar',
                              -expires =>  '+3M',
                              -domain  =>  '.capricorn.com',
@@ -412,7 +412,7 @@ For compatibility with Apache::Cookie, you may optionally pass in
 a mod_perl request object as the first argument to C<new()>. It will
 simply be ignored:
 
-  my $c = new CGI::Cookie($r,
+  my $c = CGI::Cookie->new($r,
                           -name    =>  'foo',
                           -value   =>  ['bar','baz']);
 
@@ -431,7 +431,7 @@ If you want to set the cookie yourself, Within a CGI script you can send
 a cookie to the browser by creating one or more Set-Cookie: fields in the
 HTTP header.  Here is a typical sequence:
 
-  my $c = new CGI::Cookie(-name    =>  'foo',
+  my $c = CGI::Cookie->new(-name    =>  'foo',
                           -value   =>  ['bar','baz'],
                           -expires =>  '+3M');
 
