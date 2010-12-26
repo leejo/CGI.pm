@@ -134,31 +134,17 @@ sub new {
     @params
    );
   return undef unless defined $name and defined $value;
-
-  # Pull out our parameters.
-  my @values = !ref $value           ? $value
-             : ref $value eq 'ARRAY' ? @$value
-             : ref $value eq 'HASH'  ? %$value
-             :                         ()
-             ;
-
-  bless my $self = {
-            'name'  => $name,
-            'value' => \@values,
-           },$class;
-
-  # IE requires the path and domain to be present for some reason.
-  $path   ||= "/";
-  # however, this breaks networks which use host tables without fully qualified
-  # names, so we comment it out.
-  #    $domain = CGI::virtual_host()    unless defined $domain;
-
-  $self->path($path)         if defined $path;
-  $self->domain($domain)     if defined $domain;
-  $self->secure($secure)     if defined $secure;
-  $self->expires($expires)   if defined $expires;
-  $self->max_age($expires)   if defined $max_age;
-  $self->httponly($httponly) if defined $httponly;
+  my $self = {};
+  bless $self, $class;
+  $self->name( $name );
+  $self->value( $value );
+  $path ||= "/";
+  $self->path( $path )         if defined $path;
+  $self->domain( $domain )     if defined $domain;
+  $self->secure( $secure )     if defined $secure;
+  $self->expires( $expires )   if defined $expires;
+  $self->max_age($expires)     if defined $max_age;
+  $self->httponly( $httponly ) if defined $httponly;
   return $self;
 }
 
