@@ -19,7 +19,6 @@ use warnings;
 $CGI::Cookie::VERSION='1.30';
 
 use CGI::Util qw(rearrange unescape escape);
-use CGI;
 use overload '""' => \&as_string,
     'cmp' => \&compare,
     'fallback'=>1;
