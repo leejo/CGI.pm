@@ -158,18 +158,20 @@ sub as_string {
     my $self = shift;
     return "" unless $self->name;
 
-    my(@constant_values,$domain,$path,$expires,$max_age,$secure,$httponly);
+    no warnings; # some things may be undefined, that's OK.
 
-    push(@constant_values,"domain=$domain")   if $domain   = $self->domain;
-    push(@constant_values,"path=$path")       if $path     = $self->path;
-    push(@constant_values,"expires=$expires") if $expires  = $self->expires;
-    push(@constant_values,"max-age=$max_age") if $max_age  = $self->max_age;
-    push(@constant_values,"secure")           if $secure   = $self->secure;
-    push(@constant_values,"HttpOnly")         if $httponly = $self->httponly;
+    my $name  = escape( $self->name );
+    my $value = join "&", map { escape($_) } $self->value;
+    my @cookie = ( "$name=$value" );
 
-    my($key) = escape($self->name);
-    my($cookie) = join("=",(defined $key ? $key : ''),join("&",map escape(defined $_ ? $_ : ''),$self->value));
-    return join("; ",$cookie,@constant_values);
+    push @cookie,"domain=".$self->domain   if $self->domain;
+    push @cookie,"path=".$self->path       if $self->path;
+    push @cookie,"expires=".$self->expires if $self->expires;
+    push @cookie,"max-age=".$self->max_age if $self->max_age;
+    push @cookie,"secure"                  if $self->secure;
+    push @cookie,"HttpOnly"                if $self->httponly;
+
+    return join "; ", @cookie;
 }
 
 sub compare {
