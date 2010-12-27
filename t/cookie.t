@@ -131,6 +131,10 @@ my @test_cookie = (
   is($result{bar}, 'yes%2C%20a%20phrase', "cookie bar is correct");
   is($result{baz}, '%5Ewibble', "cookie baz is correct");
   is($result{qux}, '%27', "cookie qux is correct");
+
+  $ENV{COOKIE} = '$Version=1; foo; $Path="/test"';
+  %result = CGI::Cookie->raw_fetch();
+  is($result{foo}, '', 'no value translates to empty string');
 }
 
 #-----------------------------------------------------------------------------
