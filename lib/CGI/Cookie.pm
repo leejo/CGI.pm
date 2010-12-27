@@ -59,20 +59,14 @@ sub fetch {
    my($key,$value);
    
    my @pairs = split("[;,] ?",$raw_cookie);
-   for (@pairs) {
-     s/\s*(.*?)\s*/$1/;
-     if (/^([^=]+)=(.*)/) {
-       $key = $1;
-       $value = $2;
-     }
-     else {
-       $key = $_;
-       $value = '';
-     }
-     $results{$key} = $value;
-   }
-   return \%results unless wantarray;
-   return %results;
+  for my $pair ( @pairs ) {
+    $pair =~ s/^\s+|\s+$//g;    # trim leading trailing whitespace
+    my ( $key, $value ) = split "=", $pair;
+
+    $value = defined $value ? $value : '';
+    $results{$key} = $value;
+  }
+  return wantarray ? %results : \%results;
 }
 
 sub get_raw_cookie {
