@@ -18,7 +18,8 @@ use CGI::Cookie;
 #-----------------------------------------------------------------------------
 
 my @test_cookie = (
-           'foo=123; bar=qwerty; baz=wibble; qux=a1',
+           # including leading and trailing whitespace in first cookie
+           ' foo=123 ; bar=qwerty; baz=wibble; qux=a1',
            'foo=123; bar=qwerty; baz=wibble;',
            'foo=vixen; bar=cow; baz=bitch; qux=politician',
            'foo=a%20phrase; bar=yes%2C%20a%20phrase; baz=%5Ewibble; qux=%27',

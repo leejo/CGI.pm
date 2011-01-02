@@ -90,7 +90,9 @@ sub parse {
 
   my @pairs = split("[;,] ?",$raw_cookie);
   for (@pairs) {
-    s/\s*(.*?)\s*/$1/;
+    s/^\s+//;
+    s/\s+$//;
+
     my($key,$value) = split("=",$_,2);
 
     # Some foreign cookies are not in name=value format, so ignore
