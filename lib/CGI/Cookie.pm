@@ -19,9 +19,7 @@ use warnings;
 our $VERSION='1.30';
 
 use CGI::Util qw(rearrange unescape escape);
-use overload '""' => \&as_string,
-    'cmp' => \&compare,
-    'fallback'=>1;
+use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;
 
 my $PERLEX = 0;
 # Turn on special checking for ActiveState's PerlEx
