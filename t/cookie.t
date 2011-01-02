@@ -30,19 +30,15 @@ my @test_cookie = (
 
 {
   my $result = CGI::Cookie->parse($test_cookie[0]);
-
   is(ref($result), 'HASH', "Hash ref returned in scalar context");
 
   my @result = CGI::Cookie->parse($test_cookie[0]);
-
   is(@result, 8, "returns correct number of fields");
 
   @result = CGI::Cookie->parse($test_cookie[1]);
-
   is(@result, 6, "returns correct number of fields");
 
   my %result = CGI::Cookie->parse($test_cookie[0]);
-
   is($result{foo}->value, '123', "cookie foo is correct");
   is($result{bar}->value, 'qwerty', "cookie bar is correct");
   is($result{baz}->value, 'wibble', "cookie baz is correct");
