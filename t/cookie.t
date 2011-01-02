@@ -43,6 +43,16 @@ my @test_cookie = (
   is($result{bar}->value, 'qwerty', "cookie bar is correct");
   is($result{baz}->value, 'wibble', "cookie baz is correct");
   is($result{qux}->value, 'a1', "cookie qux is correct");
+
+  my @array   = CGI::Cookie->parse('');
+  my $scalar  = CGI::Cookie->parse('');
+  is_deeply(\@array, [], " parse('') returns an empty array   in list context   (undocumented)");
+  is_deeply($scalar, {}, " parse('') returns an empty hashref in scalar context (undocumented)");
+
+  my @array   = CGI::Cookie->parse(undef);
+  my $scalar  = CGI::Cookie->parse(undef);
+  is_deeply(\@array, [], " parse(undef) returns an empty array   in list context   (undocumented)");
+  is_deeply($scalar, {}, " parse(undef) returns an empty hashref in scalar context (undocumented)");
 }
 
 #-----------------------------------------------------------------------------

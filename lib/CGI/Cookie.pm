@@ -84,7 +84,7 @@ sub get_raw_cookie {
 
 sub parse {
   my ($self,$raw_cookie) = @_;
-  return unless $raw_cookie;
+  return wantarray ? () : {} unless $raw_cookie;
 
   my %results;
 
@@ -465,6 +465,9 @@ If you are in a mod_perl environment, you can save some overhead by
 passing the request object to fetch() like this:
 
    CGI::Cookie->fetch($r);
+
+The value passed to parse is undefined, an empty array will returned in list
+contact, and an empty hashref will be returned in scalar context.
 
 =head2 Manipulating Cookies
 
