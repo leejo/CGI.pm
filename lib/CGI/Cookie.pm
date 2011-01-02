@@ -84,6 +84,8 @@ sub get_raw_cookie {
 
 sub parse {
   my ($self,$raw_cookie) = @_;
+  return unless $raw_cookie;
+
   my %results;
 
   my @pairs = split("[;,] ?",$raw_cookie);
