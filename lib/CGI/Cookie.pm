@@ -178,6 +178,7 @@ sub bake {
   if ($r) {
       $r->headers_out->add('Set-Cookie' => $self->as_string);
   } else {
+      require CGI;
       print CGI::header(-cookie => $self);
   }
 
@@ -400,6 +401,10 @@ The simplest way to send a cookie to the browser is by calling the bake()
 method:
 
   $c->bake;
+
+This will print the Set-Cookie HTTP header to STDOUT using CGI.pm. CGI.pm
+will be loaded for this purpose if it is not already. Otherwise CGI.pm is not
+required or used by this module.
 
 Under mod_perl, pass in an Apache request object:
 

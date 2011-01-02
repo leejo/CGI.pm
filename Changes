@@ -31,6 +31,8 @@
   [PERFORMANCE]
   - Make EBCDIC a compile-time constant so there's zero overhead (and less
     compiled code) in subroutines that test for it. (Tim Bunce) 
+  - If you just want to use CGI::Cookie, CGI.pm will no longer be loaded
+    unless you call the bake() method, which requires it. (Mark Stosberg)
 
   [DOCUMENTATION]
   - quit referring to the <link> tag as being "rarely used".  (Victor Sanders)
