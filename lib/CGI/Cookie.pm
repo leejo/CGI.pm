@@ -108,8 +108,7 @@ sub parse {
     # appear.  The FIRST one in HTTP_COOKIE is the most recent version.
     $results{$key} ||= $self->new(-name=>$key,-value=>\@values);
   }
-  return \%results unless wantarray;
-  return %results;
+  return wantarray ? %results : \%results;
 }
 
 sub new {
