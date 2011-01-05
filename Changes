@@ -1,7 +1,13 @@
+Version 3.51
+
   [NEW FEATURES]  
   - A new option to set $CGI::Carp::TO_BROWSER = 0, allows you to explicitly  
     exclude a particular scope from triggering printing to the browser when
     fatatlsToBrowser is set. (RT#62783, Thanks to papowell) 
+  - The <script> tag now supports the "charset" attribute. 
+    (RT#62907, Thanks to Fabrice Metge)
+  - In CGI::Cookie, "Max-Age" is now supported for better spec compliance. 
+    (Mark Stosberg)
 
   [BUG FIXES]  
   - Setting charset() now works for all content types, not just "text/*". 
@@ -23,6 +29,7 @@
   - CGI::Cookie->parse() now trims leading and trailing whitespace from cookie  
     elements as intended. The change also makes this part of the parsing 
     identical to CGI::Simple::Cookie (Mark Stosberg) 
+  - Temp file handling was improved (RT#62762)  
 
   [SECURITY]
   - Further improvements have been made to guard against newline injections
