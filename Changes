@@ -1,4 +1,8 @@
 Version 3.52
+  
+  [DOCUMENTATION]
+  - The documentation for multi-line header handling was been updated to reflect
+    the changes in 3.51. (Mark Stosberg, ntyni@iki.fi) 
 
   [INTERNALS]
   - Add missing t/tmpfile.t file. (RT#64949)  
