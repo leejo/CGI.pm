@@ -1,3 +1,8 @@
+Version 3.52
+
+  [INTERNALS]
+  - Add missing t/tmpfile.t file. (RT#64949)  
+
 Version 3.51
 
   [NEW FEATURES]  
