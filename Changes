@@ -7,6 +7,7 @@ Version 3.52
   [INTERNALS]
   - Add missing t/tmpfile.t file. (RT#64949)  
   - Fix warning in t/cookie.t (RT#64570, Chris Williams, Rainer Tammer, Mark Stosberg)     
+  - Fixed logic bug in t/multipart_init.t (RT#64261, Niko Tyni)
 
 Version 3.51
 
