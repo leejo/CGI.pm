@@ -15,5 +15,8 @@ $sv = $q->multipart_init( -boundary => 'this_is_another_boundary' );
 like($sv,
      qr/boundary="this_is_another_boundary"/, "multipart_init( -boundary => 'this_is_another_boundary')");
 
-my $sv2 = $q->multipart_init;
-isnt($sv,$sv2,"due to random boundaries, multiple calls produce different results");
+{
+    my $sv = $q->multipart_init;
+    my $sv2 = $q->multipart_init;
+    isnt($sv,$sv2,"due to random boundaries, multiple calls produce different results");
+}
