@@ -6,7 +6,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape 
 		expires ebcdic2ascii ascii2ebcdic);
 
-our $VERSION = '3.51';
+our $VERSION = '3.53';
 
 use constant EBCDIC => "\t" ne "\011";
 
