@@ -1,5 +1,5 @@
 package CGI::Util;
-require 5.008;
+require 5.008001;
 use strict;
 require Exporter;
 our @ISA = qw(Exporter);
@@ -198,7 +198,7 @@ sub unescape {
 # We cannot use the %u escapes, they were rejected by W3C, so the official
 # way is %XX-escaped utf-8 encoding.
 # Naturally, Unicode strings have to be converted to their utf-8 byte
-# representation.  (No action is required on 5.6.)
+# representation. 
 # Byte strings were traditionally used directly as a sequence of octets.
 # This worked if they actually represented binary data (i.e. in CGI::Compress).
 # This also worked if these byte strings were actually utf-8 encoded; e.g.,
@@ -207,39 +207,13 @@ sub unescape {
 # was always so and cannot be fixed without breaking the binary data case.
 # -- Stepan Kasal <skasal@redhat.com>
 #
-if ($] == 5.008) {
-   package utf8;
-
-   no warnings 'redefine'; # needed for Perl 5.8.1+
-
-   my $is_utf8_redefinition = <<'EOR';
-      sub is_utf8 {
-         my ($text) = @_;
-
-         my $ctext = pack q{C0a*}, $text;
-
-         return ($text ne $ctext) && ($ctext =~ m/^(
-          [\x09\x0A\x0D\x20-\x7E]
-          | [\xC2-\xDF][\x80-\xBF]
-          | \xE0[\xA0-\xBF][\x80-\xBF]
-          | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}
-          | \xED[\x80-\x9F][\x80-\xBF]
-          | \xF0[\x90-\xBF][\x80-\xBF]{2}
-          | [\xF1-\xF3][\x80-\xBF]{3}
-          | \xF4[\x80-\x8F][\x80-\xBF]{2}
-          )*$/xo);
-      }
-EOR
-
-   eval $is_utf8_redefinition;
-}
 
 sub escape {
   # If we being called in an OO-context, discard the first argument.
   shift() if @_ > 1 and ( ref($_[0]) || (defined $_[1] && $_[0] eq $CGI::DefaultClass));
   my $toencode = shift;
   return undef unless defined($toencode);
-  utf8::encode($toencode) if ($] >= 5.008 && utf8::is_utf8($toencode));
+  utf8::encode($toencode) if utf8::is_utf8($toencode);
     if (EBCDIC) {
       $toencode=~s/([^a-zA-Z0-9_.~-])/uc sprintf("%%%02x",$E2A[ord($1)])/eg;
     } else {

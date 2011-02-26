@@ -2,8 +2,9 @@ Version 3.53
 
   [INTERNALS]  
   - Correct t/tmpdir.t MANIFEST entry. (RT#64949)
-  - Update minimum required Perl version to be Perl 5.8, which
-    has been out nearly 10 years. (Mark Stosberg)
+  - Update minimum required Perl version to be Perl 5.8.1, which
+    has been out since 2003. This allows us to drop some hacks
+    and exceptions (Mark Stosberg)
 
 Version 3.52, Jan 24, 2011
   

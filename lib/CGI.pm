@@ -1,5 +1,5 @@
 package CGI;
-require 5.008;
+require 5.008001;
 use Carp 'croak';
 
 # See the bottom of this file for the POD documentation.  Search for the
