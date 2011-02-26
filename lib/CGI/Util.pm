@@ -1,5 +1,5 @@
 package CGI::Util;
-
+require 5.008;
 use strict;
 require Exporter;
 our @ISA = qw(Exporter);
