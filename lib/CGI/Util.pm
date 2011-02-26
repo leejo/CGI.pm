@@ -161,12 +161,10 @@ sub simple_escape {
 }
 
 sub utf8_chr {
-        my $c = shift(@_);
-	if ($] >= 5.006){
-	    my $u = chr($c);
-	    utf8::encode($u); # drop utf8 flag
-	    return $u;
-	}
+    my $c = shift(@_);
+    my $u = chr($c);
+    utf8::encode($u); # drop utf8 flag
+    return $u;
 }
 
 # unescape URL-encoded data
