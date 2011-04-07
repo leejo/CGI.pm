@@ -648,9 +648,9 @@ sub init {
 	  last METHOD;
       }
 
-      # If method is GET or HEAD, fetch the query from
+      # If method is GET, HEAD or DELETE, fetch the query from
       # the environment.
-      if ($is_xforms || $meth=~/^(GET|HEAD)$/) {
+      if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
 	  if ($MOD_PERL) {
 	    $query_string = $self->r->args;
 	  } else {
@@ -4524,7 +4524,7 @@ HTML "standards".
 
      $query = CGI->new;
 
-This will parse the input (from both POST and GET methods) and store
+This will parse the input (from POST, GET and DELETE methods) and store
 it into a perl5 object called $query. 
 
 Any filehandles from file uploads will have their position reset to 
