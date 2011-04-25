@@ -41,6 +41,7 @@ t/carp.t
 t/charset.t
 t/checkbox_group.t
 t/cookie.t
+t/delete.t
 t/Dump.t
 t/end_form.t
 t/fast.t
