@@ -1,4 +1,8 @@
-Version 3.53
+Version 3.53, Apr 25, 2011
+  
+  [NEW FEATURES]
+  - The DELETE HTTP verb is now supported. 
+    (RT#52614, James Robson, Eduardo Ariño de la Rubia) 
 
   [INTERNALS]  
   - Correct t/tmpdir.t MANIFEST entry. (RT#64949)
