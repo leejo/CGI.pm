@@ -1,8 +1,15 @@
+Version 3.54, Apr 28, 2011
+   No code changes
+
+   [INTERNALS]
+   - Address test failures in t/tmpdir.t, thanks to Niko Tyni.
+     Some tests here are failing on some platforms and have been marked as TODO.
+
 Version 3.53, Apr 25, 2011
   
   [NEW FEATURES]
   - The DELETE HTTP verb is now supported. 
-    (RT#52614, James Robson, Eduardo Ariño de la Rubia) 
+    (RT#52614, James Robson, Eduardo Ariï¿½o de la Rubia) 
 
   [INTERNALS]  
   - Correct t/tmpdir.t MANIFEST entry. (RT#64949)
@@ -85,11 +92,11 @@ Version 3.50, Nov 8, 2010
   2. Further improvements to handling of newlines embedded in header values. 
      An exception is thrown if header values contain invalid newlines. 
      Thanks to Michal Zalewski, Max Kanat-Alexander, Yanick Champoux,
-     Lincoln Stein, Frédéric Buclin and Mark Stosberg
+     Lincoln Stein, Frï¿½dï¿½ric Buclin and Mark Stosberg
 
   [DOCUMENTATION]
   1. Correcting/clarifying documentation for param_fetch(). Thanks to 
-        Renée Bäcker. (RT#59132)
+        Renï¿½e Bï¿½cker. (RT#59132)
 
   [INTERNALS]
   1. Fixing https test in http.t. (RT#54768)
@@ -165,7 +172,7 @@ Version 3.46
   11.Calling CGI->new() no longer clobbers the value of $_ in the current scope.
      Thanks to Alexey Tourbin, Bob Kuo and Mark Stosberg. (RT#25131)
   12.UTF-8 params should not get double-decoded now.
-     Thanks to Yves, Bodo, Burak Gürsoy, and Michael Schout. (RT#19913)
+     Thanks to Yves, Bodo, Burak Gï¿½rsoy, and Michael Schout. (RT#19913)
   13.We now give objects passed to CGI::Carp::die a chance to be stringified.
      Thanks to teek and Yanick Champoux (RT#41530)
   14.Turning off autoEscape() now only affects the behavior of built-in HTML
@@ -213,7 +220,7 @@ Version 3.45, Aug 14, 2009
   8. Support for <optgroup> with scrolling_list() now works the same way as it does for popup_menu().
      Thanks to Stuart Johnston (RT#30097)
   9. CGI::Pretty now works properly when $" is set to ''. Thanks to Jim Keenan (RT#12401)
- 10. Fix crash when used in combination with PerlEx::DBI. Thanks to Burak Gürsoy (RT#19902)
+ 10. Fix crash when used in combination with PerlEx::DBI. Thanks to Burak Gï¿½rsoy (RT#19902)
 
   [DOCUMENTATION]
   1. Several typos were fixed, Thanks to ambs. (RT#41105)
@@ -745,7 +752,7 @@ Version 3.00, Aug 18, 2003
   Version 2.83
 
     1. Fixed autoEscape() documentation inconsistencies.
-    2. Patch from Ville Skyttä to fix a number of XHTML inconsistencies.
+    2. Patch from Ville Skyttï¿½ to fix a number of XHTML inconsistencies.
     3. Added Max-Age to list of CGI::Cookie headers.
 
   Version 2.82
