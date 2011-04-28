@@ -8,7 +8,7 @@ BEGIN {
  $testdir = "CGItest";
  $testdir2 = "CGItest2";
  for ($testdir, $testdir2) {
- ( -d ) || mkdir;
+ ( -d ) || mkdir $_;
  ( ! -w ) || chmod 0700, $_;
  }
  $CGITempFile::TMPDIRECTORY = $testdir;
