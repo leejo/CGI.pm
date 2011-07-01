@@ -386,7 +386,7 @@ sub new {
 # user is still holding any reference to them as well.
 sub DESTROY {
   my $self = shift;
-  if ($OS eq 'WINDOWS') {
+  if ($OS eq 'WINDOWS' || $OS eq 'VMS') {
     for my $href (values %{$self->{'.tmpfiles'}}) {
       $href->{hndl}->DESTROY if defined $href->{hndl};
       $href->{name}->DESTROY if defined $href->{name};

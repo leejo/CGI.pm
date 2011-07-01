@@ -1,4 +1,7 @@
 
+    [INTERNALS]
+    - tmp files are now cleaned up on VMS ( RT#69210, thanks to cberry@cpan.org )
+
 Version 3.55 June 3rd, 2011
 
     [THINGS THAT MAY BREAK YOUR CODE]
