@@ -1,6 +1,10 @@
 
+Version 3.56 July 20th, 2011
+    No code changes.
+
     [INTERNALS]
     - tmp files are now cleaned up on VMS ( RT#69210, thanks to cberry@cpan.org )
+    - Test::More requirement has been bumped to 0.98 to fix install failures on 5.10.1
 
 Version 3.55 June 3rd, 2011
 

@@ -13,7 +13,7 @@ WriteMakefile(
     'DISTNAME'  => 'CGI.pm',
     'VERSION_FROM'   => 'lib/CGI.pm',
      'PREREQ_PM' => {
-       'Test::More'  => 0.80, # Ideally, this could be just a "test_requires"
+       'Test::More'  => 0.98, # Ideally, this could be just a "test_requires". Version requirement is for 'subtest' support.
        'File::Spec'  => .82,
        'FCGI'        => 0.67,
     },
