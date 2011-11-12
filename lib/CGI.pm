@@ -5590,7 +5590,10 @@ method instead.
 
 You can also retrieve the unprocessed query string with query_string():
 
-    $the_string = $q->query_string;
+    $the_string = $q->query_string();
+
+The behavior of calling query_string is currently undefined when the HTTP method is
+something other than GET.
 
 =head2 OBTAINING THE SCRIPT'S URL
 
