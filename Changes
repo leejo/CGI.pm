@@ -1,3 +1,8 @@
+Version 3.57 Nov 9th, 2011
+    [INTERNALS]
+    - test failure in t/fast.t introduced in 3.56 is fixed. (Thanks to zefram and chansen).
+    - Test::More requirement has been bumped to 0.98
+
 Version 3.56 Nov 8th, 2011
 
     [SECURITY]
