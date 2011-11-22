@@ -7950,7 +7950,7 @@ C<:cgi-lib> and C<:standard> method:
 
 =head2 Cgi-lib functions that are available in CGI.pm
 
-In compatability mode, the following cgi-lib.pl functions are
+In compatibility mode, the following cgi-lib.pl functions are
 available for your use:
 
  ReadParse()

@@ -1259,7 +1259,7 @@ Version 3.00, Aug 18, 2003
    21. Fixed warning in initialize_globals() under mod_perl.
    22. File uploads from Macintosh versions of MSIE should now work.
    23. Pragmas now preceded by dashes (-nph) rather than colons (:nph).
-       Old style is supported for backward compatability.
+       Old style is supported for backward compatibility.
    24. Can now pass arguments to all functions using {} brackets,
        resolving historical inconsistencies.
    25. Removed autoloader warnings about absent MultipartBuffer::DESTROY.
@@ -1491,7 +1491,7 @@ Version 3.00, Aug 18, 2003
 
     1. Added cookie() support routines.
     2. Added -expires parameter to header().
-    3. Added cgi-lib.pl compatability mode.
+    3. Added cgi-lib.pl compatibility mode.
     4. Made the module more configurable for different operating systems.
     5. Fixed a dumb bug in JavaScript button() method.
 
@@ -1621,7 +1621,7 @@ Version 3.00, Aug 18, 2003
 
     1. The user_agent() method is now documented;
     2. A potential security hole in import() is now plugged.
-    3. Changed name of import() to import_names() for compatability with
+    3. Changed name of import() to import_names() for compatibility with
        CGI:: modules.
 
   Bug fixes in version 1.53
