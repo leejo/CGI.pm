@@ -525,7 +525,7 @@ sub init {
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
     # if it was read from STDIN originally.)
-    if (defined(@QUERY_PARAM) && !defined($initializer)) {
+    if (@QUERY_PARAM && !defined($initializer)) {
         for my $name (@QUERY_PARAM) {
             my $val = $QUERY_PARAM{$name}; # always an arrayref;
             $self->param('-name'=>$name,'-value'=> $val);
