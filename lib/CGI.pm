@@ -3530,11 +3530,11 @@ sub read_from_cmdline {
     if ($DEBUG && @ARGV) {
 	@words = @ARGV;
     } elsif ($DEBUG > 1) {
-	require "shellwords.pl";
+	require Text::ParseWords;
 	print STDERR "(offline mode: enter name=value pairs on standard input; press ^D or ^Z when done)\n";
 	chomp(@lines = <STDIN>); # remove newlines
 	$input = join(" ",@lines);
-	@words = &shellwords($input);    
+	@words = &Text::ParseWords::old_shellwords($input);    
     }
     for (@words) {
 	s/\\=/%3D/g;
