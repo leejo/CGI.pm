@@ -1,3 +1,12 @@
+Version 3.59 Dec 29th, 2011
+
+ [INTERNALS]
+ - remove tmpdirs more aggressively. Thanks to rjbs (RT#73288)
+ - use Text::ParseWords instead of ancient shellwords.pl. Thanks to AlexBio.
+ - remove use of define(@arr). Thanks to rjbs.
+ - spelling fixes. Thanks to Gregor Herrmann and Alessandro Ghedini.
+ - fix test count and warning in t/fast.t. Thanks to Yanick.
+
 Version 3.58 Nov 11th, 2011
 
     [DOCUMENTATION]
