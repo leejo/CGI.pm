@@ -1,5 +1,13 @@
 Version 3.59 Dec 29th, 2011
 
+ [BUG FIXES]
+ - We no longer read from STDIN when the Content-Length is not set, preventing
+   requests with no Content-Length from freezing in some cases. This is consistent
+   with the CGI RFC 3875, and is also consistent with CGI::Simple. However, the old
+   behavior may have been expected by some command-line uses of CGI.pm.
+   Thanks to Philip Potter and Yanick Champoux. See RT#52469 for details:
+   https://rt.cpan.org/Public/Bug/Display.html?id=52469
+
  [INTERNALS]
  - remove tmpdirs more aggressively. Thanks to rjbs (RT#73288)
  - use Text::ParseWords instead of ancient shellwords.pl. Thanks to AlexBio.
