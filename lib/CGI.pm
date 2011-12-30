@@ -664,14 +664,6 @@ sub init {
 	  if ( $content_length > 0 ) {
 	    $self->read_from_client(\$query_string,$content_length,0);
 	  }
-	  elsif (not defined $ENV{CONTENT_LENGTH}) {
-	    $self->read_from_stdin(\$query_string);
-	    # should this be PUTDATA in case of PUT ?
-	    my($param) = $meth . 'DATA' ;
-	    $self->add_parameter($param) ;
-	    push (@{$self->{param}{$param}},$query_string);
-	    undef $query_string ;
-	  }
 	  # Some people want to have their cake and eat it too!
 	  # Uncomment this line to have the contents of the query string
 	  # APPENDED to the POST data.
@@ -1021,47 +1013,6 @@ sub read_from_client {
     return $MOD_PERL
         ? $self->r->read($$buff, $len, $offset)
         : read(\*STDIN, $$buff, $len, $offset);
-}
-END_OF_FUNC
-
-'read_from_stdin' => <<'END_OF_FUNC',
-# Read data from stdin until all is read
-sub read_from_stdin {
-    my($self, $buff) = @_;
-    local $^W=0;                # prevent a warning
-
-    #
-    # TODO: loop over STDIN until all is read
-    #
-
-    my($eoffound) = 0;
-    my($localbuf) = '';
-    my($tempbuf) = '';
-    my($bufsiz) = 1024;
-    my($res);
-    while ($eoffound == 0) {
-	if ( $MOD_PERL ) {
-	    $res = $self->r->read($tempbuf, $bufsiz, 0)
-	}
-	else {
-	    $res = read(\*STDIN, $tempbuf, $bufsiz);
-	}
-
-	if ( !defined($res) ) {
-	    # TODO: how to do error reporting ?
-	    $eoffound = 1;
-	    last;
-	}
-	if ( $res == 0 ) {
-	    $eoffound = 1;
-	    last;
-	}
-	$localbuf .= $tempbuf;
-    }
-
-    $$buff = $localbuf;
-
-    return $res;
 }
 END_OF_FUNC
 
