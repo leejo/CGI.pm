@@ -11,10 +11,9 @@ use Test::More tests => 9;
 
 # Shut up "used only once" warnings.
 () = $CGI::Q;
-() = $CGI::Fast::Ext_Request;
 
 SKIP: {
-    skip( 'FCGI not installed, cannot continue', 10 ) unless $fcgi;
+    skip( 'FCGI not installed, cannot continue', 9 ) unless $fcgi;
 
     require CGI::Fast;
     ok( my $q = CGI::Fast->new(), 'created new CGI::Fast object' );
