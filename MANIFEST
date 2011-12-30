@@ -60,6 +60,7 @@ t/popup_menu.t
 t/pretty.t
 t/push.t
 t/query_string.t
+t/rt-52469.t
 t/request.t
 t/save_read_roundtrip.t
 t/start_end_asterisk.t
