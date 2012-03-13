@@ -2319,7 +2319,7 @@ sub unescapeHTML {
 	/^lt$/i		? "<" :
 	/^#(\d+)$/ && $latin	     ? chr($1) :
 	/^#x([0-9a-f]+)$/i && $latin ? chr(hex($1)) :
-	$_
+	"&$_;"
 	}gex;
     return $string;
 }
