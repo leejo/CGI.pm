@@ -2311,7 +2311,7 @@ sub unescapeHTML {
     my $latin = defined $self->{'.charset'} ? $self->{'.charset'} =~ /^(ISO-8859-1|WINDOWS-1252)$/i
                                             : 1;
     # thanks to Randal Schwartz for the correct solution to this one
-    $string=~ s[&(\S*?);]{
+    $string=~ s[&([^\s&]*?);]{
 	local $_ = $1;
 	/^amp$/i	? "&" :
 	/^quot$/i	? '"' :
