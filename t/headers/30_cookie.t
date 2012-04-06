@@ -5,15 +5,22 @@ use Test::More;
 {
     my $q = CGI->new;
     my $got = $q->header( -cookie => 'foo' );
-    my $expected = qr{^Set-Cookie: foo};
-    like $got, $expected, 'cookie';
+    my $expected = "^Set-Cookie: foo$CGI::CRLF"
+                 . "Date: [^$CGI::CRLF]+$CGI::CRLF"
+                 . 'Content-Type: text/html; charset=ISO-8859-1'
+                 . $CGI::CRLF x 2;
+    like $got, qr($expected), 'cookie';
 }
 
 {
     my $q = CGI->new;
     my $got = $q->header( -cookie => [ 'foo', 'bar' ]  );
-    my $expected = qr!^Set-Cookie: foo${CGI::CRLF}Set-Cookie: bar!;
-    like $got, $expected, 'cookie arrayref';
+    my $expected = "^Set-Cookie: foo$CGI::CRLF"
+                 . "Set-Cookie: bar$CGI::CRLF"
+                 . "Date: [^$CGI::CRLF]+$CGI::CRLF"
+                 . 'Content-Type: text/html; charset=ISO-8859-1'
+                 . $CGI::CRLF x 2;
+    like $got, qr($expected), 'cookie arrayref';
 }
 
 {
@@ -32,7 +39,9 @@ use Test::More;
     );
     my $expected = "^Set-Cookie: foo$CGI::CRLF"
                  . "Date: [^$CGI::CRLF]+$CGI::CRLF"
-                 . "Set-cookie: bar$CGI::CRLF";
+                 . "Set-cookie: bar$CGI::CRLF"
+                 . 'Content-Type: text/html; charset=ISO-8859-1'
+                 . $CGI::CRLF x 2;
     like $got, qr($expected), 'cookie & set-cookie';
 }
 
@@ -45,7 +54,9 @@ use Test::More;
     my $expected = "^Set-Cookie: foo$CGI::CRLF"
                  . "Set-Cookie: bar$CGI::CRLF"
                  . "Date: [^$CGI::CRLF]+$CGI::CRLF"
-                 . "Set-cookie: baz$CGI::CRLF";
+                 . "Set-cookie: baz$CGI::CRLF"
+                 . 'Content-Type: text/html; charset=ISO-8859-1'
+                 . $CGI::CRLF x 2;
     like $got, qr($expected), 'cookie & set-cookie, cookie is arrayref';
 }
 

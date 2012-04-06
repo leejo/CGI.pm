@@ -3,31 +3,31 @@ use CGI;
 use Test::More;
 
 {
-    my $q = CGI->new;
-    my $got = $q->header( -type => 'text/plain' );
+    my $cgi = CGI->new;
+    my $got = $cgi->header( -type => 'text/plain' );
     my $expected = 'Content-Type: text/plain; charset=ISO-8859-1'
                  . $CGI::CRLF x 2;
     is $got, $expected, 'type';
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header( -type => q{} );
+    my $cgi = CGI->new;
+    my $got = $cgi->header( -type => q{} );
     my $expected = $CGI::CRLF x 2;
     is $got, $expected, 'type empty string';
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header( -type => 'text/plain; charset=utf-8' );
+    my $cgi = CGI->new;
+    my $got = $cgi->header( -type => 'text/plain; charset=utf-8' );
     my $expected = 'Content-Type: text/plain; charset=utf-8'
                  . $CGI::CRLF x 2;
     is $got, $expected, 'type defines charset';
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'         => 'text/html',
         '-Content-Type' => 'text/plain',
     );
@@ -37,8 +37,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-Content-Type' => 'text/plain',
         '-type'         => 'text/html',
     );
@@ -48,18 +48,18 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-Content-Type' => 'text/plain',
-        '-type'        => q{}, 
+        '-type'         => q{}, 
     );
     my $expected = $CGI::CRLF x 2;
     is $got, $expected, 'content-type and type, type is empty';
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-Content-Type' => q{},
         '-type'         => 'text/plain',
     );
@@ -69,8 +69,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-Content-Type' => 'text/plain; charset=utf-8',
         '-type'         => 'text/html',
     );
@@ -80,8 +80,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-Content-Type' => 'text/plain',
         '-type'         => 'text/html; charset=utf-8',
     );
@@ -91,8 +91,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'    => 'text/plain',
         '-charset' => 'utf-8',
     );
@@ -102,8 +102,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'    => q{},
         '-charset' => 'utf-8',
     );
@@ -112,8 +112,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'    => 'text/plain',
         '-charset' => q{},
     );
@@ -122,8 +122,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'    => 'text/plain; charset=utf-8',
         '-charset' => 'EUC-JP',
     );
@@ -133,19 +133,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
-        '-type'    => 'text/plain; charset=utf-8',
-        '-charset' => 'EUC-JP',
-    );
-    my $expected = 'Content-Type: text/plain; charset=utf-8'
-                 . $CGI::CRLF x 2;
-    is $got, $expected, 'type and charset, type defines charset';
-}
-
-{
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'         => 'text/plain',
         '-charset'      => 'EUC-JP',
         '-Content-Type' => 'text/html; charset=Shift_JIS',
@@ -156,8 +145,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'         => 'text/plain; charset=utf-8',
         '-charset'      => 'EUC-JP',
         '-Content-Type' => 'text/html; charset=Shift_JIS',
@@ -168,8 +157,8 @@ use Test::More;
 }
 
 {
-    my $q = CGI->new;
-    my $got = $q->header(
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
         '-type'         => q{},
         '-charset'      => 'EUC-JP',
         '-Content-Type' => 'text/html; charset=Shift_JIS',
