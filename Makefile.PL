@@ -17,6 +17,7 @@ WriteMakefile(
        'File::Spec'  => .82,
        'FCGI'        => 0.67,
     },
+    test => { TESTS => 't/*.t t/headers/*.t' },
     'linkext'   => { LINKTYPE=>'' },	# no link needed
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
 	            'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
