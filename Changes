@@ -1,3 +1,6 @@
+  [INTERNALS]
+  - More tests for header(), thanks to Ryo Anazawa.
+
 Version 3.59 Dec 29th, 2011
 
  [BUG FIXES]
