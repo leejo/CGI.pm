@@ -1,5 +1,11 @@
+  [DOCUMENTATION] 
+  - Clarify that when -status is used, the human-readable phase should be included, per RFC 2616.
+    Thanks to SREZIC@cpan.org (RT#76691). 
+
   [INTERNALS]
   - More tests for header(), thanks to Ryo Anazawa.
+  - t/url.t has been fixed on VMS. Thanks to cberry@cpan.org (RT#72380)
+  - MANIFEST patched so that t/multipart_init.t is included again. Thanks to shay@cpan.org (RT#76189)
 
 Version 3.59 Dec 29th, 2011
 

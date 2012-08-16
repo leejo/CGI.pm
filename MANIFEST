@@ -54,6 +54,7 @@ t/html.t
 t/http.t
 t/init.t
 t/init_test.txt
+t/multipart_init.t
 t/no_tabindex.t
 t/param_fetch.t
 t/popup_menu.t
