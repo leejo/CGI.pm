@@ -1,3 +1,6 @@
+  [INTERNALS]
+   - formatting of CGI::Carp documentation was improved. Thanks to benkasminbullock.
+
 Version 3.60 Aug 15th, 2012
 
   [BUG FIXES]  
