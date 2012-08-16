@@ -1,3 +1,13 @@
+  [BUG FIXES]  
+  - In some caes, When unescapeHTML() hit something it didn't recognize with an ampersand and
+    and semicolon, it would throw away the semicolon and ampersand. It now does a better job.
+    of preserving content it doesn't recognize. Thanks to CEBJYRE@cpan.org (RT#75595)
+
+f it hits something that it doesn't 
+recognise (in the above example 'param2=value2&amp' is what it sees as the [stuff] 
+component) it keeps this section but throws away the leading ampersand and the trailing 
+semicolon. 
+
   [DOCUMENTATION] 
   - Clarify that when -status is used, the human-readable phase should be included, per RFC 2616.
     Thanks to SREZIC@cpan.org (RT#76691). 
