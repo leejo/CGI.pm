@@ -1,3 +1,5 @@
+Version 3.60 Aug 15th, 2012
+
   [BUG FIXES]  
   - In some caes, When unescapeHTML() hit something it didn't recognize with an ampersand and
     and semicolon, it would throw away the semicolon and ampersand. It now does a better job.
