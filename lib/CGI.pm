@@ -530,7 +530,7 @@ sub init {
             my $val = $QUERY_PARAM{$name}; # always an arrayref;
             $self->param('-name'=>$name,'-value'=> $val);
             if (defined $val and ref $val eq 'ARRAY') {
-                for my $fh (grep {defined(fileno($_))} @$val) {
+                for my $fh (grep {defined($_) && ref($_) && defined(fileno($_))} @$val) {
                    seek($fh,0,0); # reset the filehandle.  
                 }
 
@@ -812,7 +812,7 @@ sub all_parameters {
 
 # put a filehandle into binary mode (DOS)
 sub binmode {
-    return unless defined($_[1]) && defined fileno($_[1]);
+    return unless defined($_[1]) && ref ($_[1]) && defined fileno($_[1]);
     CORE::binmode($_[1]);
 }
 
