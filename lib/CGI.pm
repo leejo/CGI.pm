@@ -1904,7 +1904,7 @@ sub startform {
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
-    return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
+    return qq/<form method="$method" $action enctype="$enctype"$other>/;
 }
 END_OF_FUNC
 
@@ -1938,7 +1938,7 @@ sub start_form {
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
     $self->{'.parametersToAdd'}={};
-    return qq/<form method="$method" $action enctype="$enctype"$other>\n/;
+    return qq/<form method="$method" $action enctype="$enctype"$other>/;
 }
 END_OF_FUNC
 
