@@ -1,11 +1,11 @@
 package CGI::Util;
-use base 'Exporter'
+use base 'Exporter';
 require 5.008001;
 use strict;
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
-our $VERSION = '3.53';
+our $VERSION = '3.62';
 
 use constant EBCDIC => "\t" ne "\011";
 
