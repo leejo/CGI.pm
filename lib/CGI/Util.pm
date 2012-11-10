@@ -9,6 +9,11 @@ our $VERSION = '3.62';
 
 use constant EBCDIC => "\t" ne "\011";
 
+# This option is not documented and may change or go away.
+# The HTML spec does not require attributes to be sorted,
+# but it's useful for testing to get a predictable order back.
+our $SORT_ATTRIBUTES;
+
 # (ord('^') == 95) for codepage 1047 as on os390, vmesa
 our @A2E = (
    0,  1,  2,  3, 55, 45, 46, 47, 22,  5, 21, 11, 12, 13, 14, 15,
@@ -131,8 +136,12 @@ sub make_attributes {
 
     my $quote = $do_not_quote ? '' : '"';
 
+    my @attr_keys= keys %$attr;
+    if ($SORT_ATTRIBUTES) {
+        @attr_keys= sort @attr_keys;
+    }
     my(@att);
-    foreach (keys %{$attr}) {
+    foreach (@attr_keys) {
     my($key) = $_;
     $key=~s/^\-//;     # get rid of initial - if present
 
