@@ -1497,10 +1497,19 @@ sub header {
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
 
+    # Since $cookie and $p3p may be array references,
+    # we must stringify them before CR escaping is done.
+    my @cookie;
+    if ($cookie) {
+        for (ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie) {
+            my $cs = UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_;
+            push(@cookie,$cs) if $cs ne '';
+        }
+    }
     $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
 
     # CR escaping for values, per RFC 822
-    for my $header ($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
+    for my $header ($type,$status,@cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
         if (defined $header) {
             # From RFC 822:
             # Unfolding  is  accomplished  by regarding   CRLF   immediately
@@ -1546,13 +1555,7 @@ sub header {
     push(@header,"Window-Target: $target") if $target;
     push(@header,"P3P: policyref=\"/w3c/p3p.xml\", CP=\"$p3p\"") if $p3p;
     # push all the cookies -- there may be several
-    if ($cookie) {
-	my(@cookie) = ref($cookie) && ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie;
-	for (@cookie) {
-            my $cs = UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_;
-	    push(@header,"Set-Cookie: $cs") if $cs ne '';
-	}
-    }
+    push(@header,map {"Set-Cookie: $_"} @cookie);
     # if the user indicates an expiration time, then we need
     # both an Expires and a Date header (so that the browser is
     # uses OUR clock)

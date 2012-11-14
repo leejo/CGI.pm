@@ -25,6 +25,9 @@ like $cgi->header( -type => "text/html".$CGI::CRLF." evil: stuff " ),
 eval { $cgi->header( -p3p => ["foo".$CGI::CRLF."bar"] ) };
 like($@,qr/contains a newline/,'P3P header with CRLF embedded blows up');
 
+eval { $cgi->header( -cookie => ["foo".$CGI::CRLF."bar"] ) };
+like($@,qr/contains a newline/,'Set-Cookie header with CRLF embedded blows up');
+
 eval { $cgi->header( -foobar => "text/html".$CGI::CRLF."evil: stuff" ) };
 like($@,qr/contains a newline/,'unknown header with CRLF embedded blows up');
 
