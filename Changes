@@ -1,4 +1,7 @@
 
+    [BUG FIXES]
+    - CR escaping for Set-Cookie and P3P headers were improved.
+
 Version 3.62, Nov 9th, 2012
 
     [INTERNALS]
