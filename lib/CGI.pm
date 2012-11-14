@@ -1500,11 +1500,9 @@ sub header {
     # Since $cookie and $p3p may be array references,
     # we must stringify them before CR escaping is done.
     my @cookie;
-    if ($cookie) {
-        for (ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie) {
-            my $cs = UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_;
-            push(@cookie,$cs) if $cs ne '';
-        }
+    for (ref($cookie) eq 'ARRAY' ? @{$cookie} : $cookie) {
+        my $cs = UNIVERSAL::isa($_,'CGI::Cookie') ? $_->as_string : $_;
+        push(@cookie,$cs) if defined $cs and $cs ne '';
     }
     $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
 
