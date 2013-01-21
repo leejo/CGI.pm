@@ -3131,7 +3131,7 @@ END_OF_FUNC
 sub user_agent {
     my($self,$match)=self_or_CGI(@_);
     my $user_agent = $self->http('user_agent');
-    return $user_agent unless $match && $user_agent;
+    return $user_agent unless defined $match && $match && $user_agent;
     return $user_agent =~ /$match/i;
 }
 END_OF_FUNC
