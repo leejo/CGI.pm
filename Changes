@@ -1,4 +1,7 @@
 
+    [INTERNALS]
+    - Avoiding warning about "unitialized value" in when calling user_agent() in some cases. (RT#72882, perl@max-maurer.de)
+
     [DOCUMENTATION]    
     - Update CGI::Cookie docs to reflect that HttpOnly is widely supported now.
 
