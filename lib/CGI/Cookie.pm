@@ -334,13 +334,12 @@ If the "httponly" attribute is set, the cookie will only be accessible
 through HTTP Requests. This cookie will be inaccessible via JavaScript
 (to prevent XSS attacks).
 
-This feature is only supported by recent browsers like Internet Explorer
-6 Service Pack 1, Firefox 3.0 and Opera 9.5 (and later of course).
+This feature is supported by nearly all modern browsers.
 
 See these URLs for more information:
 
 	http://msdn.microsoft.com/en-us/library/ms533046.aspx
-	http://www.owasp.org/index.php/HTTPOnly#Browsers_Supporting_HTTPOnly
+    http://www.browserscope.org/?category=security&v=top
 
 =back
 
