@@ -1,6 +1,8 @@
 
     [INTERNALS]
     - Avoiding warning about "unitialized value" in when calling user_agent() in some cases. (RT#72882, perl@max-maurer.de)
+    - Update minimum required version in Makefile.PL to 5.8.1. It had already been
+      updated to 5.8.1 in the CGI.pm module in 3.53.
 
     [DOCUMENTATION]    
     - Update CGI::Cookie docs to reflect that HttpOnly is widely supported now.

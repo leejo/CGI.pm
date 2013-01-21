@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 my $mm = $ExtUtils::MakeMaker::VERSION;
 
-require 5.6.0;
+require 5.008001;
 
 system("perl", "t/gen-tests/gen-start-end-tags.pl");
 
@@ -24,7 +24,7 @@ WriteMakefile(
    (   $mm < 6.46
         ? ()
         : ( META_MERGE => {
-                requires  => {perl => '5.006000'},
+                requires  => {perl => '5.008001'},
                 resources => {
                     # homepage => 'http://FIXME.org',
                     # license  => 'http://dev.perl.org/licenses/',
