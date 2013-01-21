@@ -65,6 +65,7 @@ subtest 'rewrite_interactions' => sub {
     is( $q->url(-rewrite=>1,-path=>1), 'http://example.com/real/path/info',
                                                 '$q->url(-rewrite=>1,-path=>1), with rewriting detected' );
     is( $q->url(-rewrite=>0,-path=>0), 'http://example.com/real/cgi-bin/dispatch.cgi',
+                                                '$q->url(-rewrite=>0,-path=>1), with rewriting detected' );
 };
 
 subtest 'RT#58377: + in PATH_INFO' => sub {
