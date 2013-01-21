@@ -1,3 +1,7 @@
+
+    [DOCUMENTATION]    
+    - Update CGI::Cookie docs to reflect that HttpOnly is widely supported now.
+
 Version 3.63 Nov 12, 2012
 
     [SECURITY]
