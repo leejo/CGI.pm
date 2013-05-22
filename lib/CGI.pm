@@ -171,7 +171,7 @@ $DefaultClass = 'CGI' unless defined $CGI::DefaultClass;
 $AutoloadClass = $DefaultClass unless defined $CGI::AutoloadClass;
 
 # The path separator is a slash, backslash or semicolon, depending
-# on the paltform.
+# on the platform.
 $SL = {
      UNIX    => '/',  OS2 => '\\', EPOC      => '/', CYGWIN => '/', NETWARE => '/',
      WINDOWS => '\\', DOS => '\\', MACINTOSH => ':', VMS    => '/'
@@ -4320,7 +4320,7 @@ submissions, file uploads, reading and writing cookies, query string generation
 and manipulation, and processing and preparing HTTP headers. Some HTML
 generation utilities are included as well.
 
-CGI.pm performs very well in in a vanilla CGI.pm environment and also comes
+CGI.pm performs very well in a vanilla CGI.pm environment and also comes
 with built-in support for mod_perl and mod_perl2 as well as FastCGI.
 
 It has the benefit of having developed and refined over 10 years with input
