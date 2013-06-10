@@ -1,4 +1,5 @@
 package CGI::Push;
+use if $] >= 5.019, 'deprecate';
 
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.

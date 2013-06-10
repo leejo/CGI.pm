@@ -3,6 +3,8 @@ package CGI::Cookie;
 use strict;
 use warnings;
 
+use if $] >= 5.019, 'deprecate';
+
 # See the bottom of this file for the POD documentation.  Search for the
 # string '=head'.
 

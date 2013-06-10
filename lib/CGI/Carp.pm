@@ -1,4 +1,5 @@
 package CGI::Carp;
+use if $] >= 5.019, 'deprecate';
 
 =head1 NAME
 

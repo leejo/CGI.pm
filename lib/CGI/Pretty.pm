@@ -8,6 +8,7 @@ package CGI::Pretty;
 # Perl 5 distribution).
 
 use strict;
+use if $] >= 5.019, 'deprecate';
 use CGI ();
 
 $CGI::Pretty::VERSION = '3.46';
