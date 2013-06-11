@@ -1,5 +1,6 @@
 package CGI;
 require 5.008001;
+use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
 # See the bottom of this file for the POD documentation.  Search for the

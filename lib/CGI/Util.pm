@@ -2,6 +2,7 @@ package CGI::Util;
 use base 'Exporter';
 require 5.008001;
 use strict;
+use if $] >= 5.019, 'deprecate';
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
