@@ -5507,9 +5507,9 @@ backwards compatibility.
 
 The old-style positional parameters are as follows:
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -5525,12 +5525,11 @@ A 'true' flag if you want to include a <base> tag in the header.  This
 helps resolve relative addresses to absolute ones when the document is moved, 
 but makes the document hierarchy non-portable.  Use with care!
 
-=item 4, 5, 6...
-
-Any other parameters you want to include in the <body> tag.  This is a good
-place to put HTML extensions, such as colors and wallpaper patterns.
-
 =back
+
+Other parameters you want to include in the <body> tag may be appended
+to these.  This is a good place to put HTML extensions, such as colors and
+wallpaper patterns.
 
 =head2 ENDING THE HTML DOCUMENT:
 
@@ -6077,9 +6076,9 @@ supported.
 
 textfield() will return a text input field. 
 
-=over 4
+B<Parameters>
 
-=item B<Parameters>
+=over 4
 
 =item 1.
 
@@ -6160,9 +6159,9 @@ by calling B<start_form()> with an encoding type of B<&CGI::MULTIPART>,
 or by calling the new method B<start_multipart_form()> instead of
 vanilla B<start_form()>.
 
-=over 4
+B<Parameters>
 
-=item B<Parameters>
+=over 4
 
 =item 1.
 
@@ -6515,9 +6514,9 @@ attribute's value as the value.
 
 scrolling_list() creates a scrolling list.  
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6591,9 +6590,9 @@ selected items can be retrieved with:
 checkbox_group() creates a list of checkboxes that are related
 by the same name.
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6617,7 +6616,6 @@ line breaks between the checkboxes so that they appear as a vertical
 list.  Otherwise, they will be strung together on a horizontal line.
 
 =back
-
 
 The optional B<-labels> argument is a pointer to a hash
 relating the checkbox values to the user-visible labels that will be
@@ -6684,9 +6682,9 @@ or in other creative ways:
 checkbox() is used to create an isolated checkbox that isn't logically
 related to any others.
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6741,9 +6739,9 @@ The value of the checkbox can be retrieved using:
 radio_group() creates a set of logically-related radio buttons
 (turning one member of the group on turns the others off)
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6777,7 +6775,6 @@ used in the display.  If not provided, the values themselves are
 displayed.
 
 =back
-
 
 All modern browsers can take advantage of the optional parameters
 B<-rows>, and B<-columns>.  These parameters cause radio_group() to
@@ -6841,9 +6838,9 @@ or in other creative ways:
 submit() will create the query submission button.  Every form
 should have one of these.
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6902,9 +6899,9 @@ hidden() produces a text field that can't be seen by the user.  It
 is useful for passing state variable information from one invocation
 of the script to the next.
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6945,9 +6942,9 @@ position of the click is returned to your script as "button_name.x"
 and "button_name.y", where "button_name" is the name you've assigned
 to it.
 
-=over 4
+B<Parameters:>
 
-=item B<Parameters:>
+=over 4
 
 =item 1.
 
@@ -6959,6 +6956,7 @@ field.
 The second argument (-src) is also required and specifies the URL
 
 =item 3.
+
 The third option (-align, optional) is an alignment type, and may be
 TOP, BOTTOM or MIDDLE
 
