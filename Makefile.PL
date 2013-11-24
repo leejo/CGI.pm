@@ -8,7 +8,7 @@ system("perl", "t/gen-tests/gen-start-end-tags.pl");
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-'INSTALLDIRS' => 'perl',
+'INSTALLDIRS' => ( $] >= 5.012 ? 'site' : 'perl' ),
     'NAME'	=> 'CGI',
     'DISTNAME'  => 'CGI.pm',
     'VERSION_FROM'   => 'lib/CGI.pm',
