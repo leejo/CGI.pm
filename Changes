@@ -1,6 +1,9 @@
 
 Version 3.64 Nov 23, 2013
 
+    [BUG FIXES]
+    - Avoid warning about "undefined variable in user_agent in some cases (RT#72882)
+
     [INTERNALS]
     - Avoiding warning about "unitialized value" in when calling user_agent() in some cases. (RT#72882, perl@max-maurer.de)
     - Update minimum required version in Makefile.PL to 5.8.1. It had already been
@@ -11,6 +14,7 @@ Version 3.64 Nov 23, 2013
 
     [DOCUMENTATION]    
     - Update CGI::Cookie docs to reflect that HttpOnly is widely supported now.
+
 
 Version 3.63 Nov 12, 2012
 
