@@ -17,7 +17,7 @@ use if $] >= 5.019, 'deprecate';
 # The most recent version and complete docs are available at:
 #   http://stein.cshl.org/WWW/software/CGI/
 
-$CGI::Push::VERSION='1.05';
+$CGI::Push::VERSION='1.06';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');

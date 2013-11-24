@@ -18,7 +18,7 @@ use if $] >= 5.019, 'deprecate';
 # wish, but if you redistribute a modified version, please attach a note
 # listing the modifications you have made.
 
-our $VERSION='1.30';
+our $VERSION='1.31';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;
