@@ -41,8 +41,7 @@ WriteMakefile(
                     },
 
                 },
-       },
-                no_index => {directory => [qw/t/]}
+                no_index => {directory => [qw/t/]},
             },
             META_ADD => {
                 build_requires     => {},
