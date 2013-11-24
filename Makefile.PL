@@ -30,8 +30,18 @@ WriteMakefile(
                     # homepage => 'http://FIXME.org',
                     # license  => 'http://dev.perl.org/licenses/',
                     # MailingList => 'http://FIXME',
-                    repository => 'http://github.com/markstos/CGI.pm/tree/master'
+                    repository => {
+                        type => 'git',
+                        url  => 'git://github.com/markstos/CGI.pm.git',
+                        web  => 'https://github.com/markstos/CGI.pm/tree/master',
+                    },
+                    bugtracker => {
+                        # mailto => '...',
+                        web => 'https://github.com/markstos/CGI.pm/issues',
+                    },
+
                 },
+       },
                 no_index => {directory => [qw/t/]}
             },
             META_ADD => {
