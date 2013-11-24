@@ -8,6 +8,7 @@ package CGI::Pretty;
 # Perl 5 distribution).
 
 use strict;
+use if $] >= 5.019, 'deprecate';
 use CGI ();
 
 $CGI::Pretty::VERSION = '3.46';
@@ -168,7 +169,7 @@ sub initialize_globals {
     # This is the string used for indentation of tags
     $CGI::Pretty::INDENT = "\t";
     
-    # This is the string used for seperation between tags
+    # This is the string used for separation between tags
     $CGI::Pretty::LINEBREAK = $/;
 
     # These tags are not prettify'd.
