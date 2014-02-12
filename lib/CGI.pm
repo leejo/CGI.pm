@@ -1785,8 +1785,10 @@ sub _style {
            my @v = ref($verbatim) eq 'ARRAY' ? @$verbatim : $verbatim;
            push(@result, "<style type=\"text/css\">\n$_\n</style>") for @v;
       }
-      my @c = ref($code) eq 'ARRAY' ? @$code : $code if $code;
-      push(@result,style({'type'=>$type},"$cdata_start\n$_\n$cdata_end")) for @c;
+       if ($code) {
+         my @c = ref($code) eq 'ARRAY' ? @$code : $code;
+         push(@result,style({'type'=>$type},"$cdata_start\n$_\n$cdata_end")) for @c;
+       }
 
       } else {
            my $src = $s;
