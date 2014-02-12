@@ -1,4 +1,10 @@
 
+Version 3.65 Feb 11, 2014
+
+    [INTERNALS]
+    - Update Makefile to refine where CGI.pm gets installed 
+      (Thanks to bingo, rjbs: https://github.com/markstos/CGI.pm/pull/30)
+
 Version 3.64 Nov 23, 2013
 
     [BUG FIXES]
