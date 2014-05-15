@@ -27,19 +27,10 @@ WriteMakefile(
         : ( META_MERGE => {
                 requires  => {perl => '5.008001'},
                 resources => {
-                    # homepage => 'http://FIXME.org',
-                    # license  => 'http://dev.perl.org/licenses/',
-                    # MailingList => 'http://FIXME',
-                    repository => {
-                        type => 'git',
-                        url  => 'git://github.com/markstos/CGI.pm.git',
-                        web  => 'https://github.com/markstos/CGI.pm/tree/master',
-                    },
-                    bugtracker => {
-                        # mailto => '...',
-                        web => 'https://github.com/markstos/CGI.pm/issues',
-                    },
-
+                    license    => 'http://dev.perl.org/licenses/',
+                    homepage => 'https://metacpan.org/module/CGI',
+                    repository => 'https://github.com/leejo/CGI.pm',
+                    bugtracker => 'https://github.com/leejo/CGI.pm/issues',
                 },
                 no_index => {directory => [qw/t/]},
             },

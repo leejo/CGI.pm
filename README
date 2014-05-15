@@ -35,6 +35,18 @@ can be found at:
 
    http://search.cpan.org/dist/CGI.pm/
 
+WHERE CAN I VIEW OR SUBMIT BUGS / ISSUES / REQUESTS?
+
+The new bug tracker can be found on github:
+
+   https://github.com/leejo/CGI.pm/issues
+
+Existing issues will be migrated to this tracker, but in the meantime the old bug
+trackers can be found at rt.cpan.org:
+
+   https://rt.cpan.org/Dist/Display.html?Name=CGI
+   https://rt.cpan.org/Dist/Display.html?Queue=CGI.pm
+
 WHERE CAN I LEARN MORE?
 
 Lincoln Stein wrote a book about CGI.pm called "The Official Guide to
