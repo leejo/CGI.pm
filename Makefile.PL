@@ -16,7 +16,6 @@ WriteMakefile(
        'if'          => 0, # core in 5.6.2 and later, for deprecate.pm
        'Test::More'  => 0.98, # Ideally, this could be just a "test_requires". Version requirement is for 'subtest' support.
        'File::Spec'  => .82,
-       'FCGI'        => 0.67,
     },
     test => { TESTS => 't/*.t t/headers/*.t' },
     'linkext'   => { LINKTYPE=>'' },	# no link needed

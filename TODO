@@ -1,16 +1,11 @@
-- point bugtracker at github
-
 - migrate RT tickets to github:
+	+ http://www.dagolden.com/index.php/1938/how-to-move-cpan-rt-tickets-to-github/
 	+ https://gist.github.com/markstos/5096483
 	+ https://rt.cpan.org/Dist/Display.html?Name=CGI
 	+ https://rt.cpan.org/Dist/Display.html?Queue=CGI.pm
+	+ any CGI::Fast tickets to the CGI-Fast tracker
 
 - move this TODO list to github issues
-
-- split out CGI::Fast into its own distribution
-	+ to remove the dependency on FCGI from CGI.pm, this is a blocker for removing CGI.pm from core
-	+ those wishing to install/upgrade CGI.pm when it is removed from core may have problems due to the FCGI dependency
-	+ http://markmail.org/message/eocov45j55kdtccx
 
 - check test coverage and increase/fix where necessary
 

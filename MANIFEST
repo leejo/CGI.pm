@@ -26,7 +26,6 @@ lib/CGI.pm
 lib/CGI/Apache.pm
 lib/CGI/Carp.pm
 lib/CGI/Cookie.pm
-lib/CGI/Fast.pm
 lib/CGI/Pretty.pm
 lib/CGI/Push.pm
 lib/CGI/Switch.pm
@@ -44,7 +43,6 @@ t/cookie.t
 t/delete.t
 t/Dump.t
 t/end_form.t
-t/fast.t
 t/form.t
 t/function.t
 t/gen-tests/gen-start-end-tags.pl
@@ -78,4 +76,3 @@ t/url.t
 t/utf8.t
 t/util-58.t
 t/util.t
-META.yml                                 Module meta-data (added by MakeMaker)
