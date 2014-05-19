@@ -1,5 +1,6 @@
 vim.sess
 Makefile
+Makefile.old
 blib
 cover_db
 *.orig
