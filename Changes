@@ -1,3 +1,9 @@
+Version 3.65_03 May 20, 2014
+
+    [DEVELOPER RELEASE]
+    - Update perldoc to explain that CGI.pm has/will be removed from perl core
+    - Make =head2 perldoc less shouty (RT #91140)
+
 Version 3.65_02 May 16, 2014
 
     [DEVELOPER RELEASE]
