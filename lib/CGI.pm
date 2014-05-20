@@ -4331,7 +4331,7 @@ from dozens of contributors and being deployed on thousands of websites.
 CGI.pm has been included in the Perl distribution since Perl 5.4, and has
 become a de-facto standard.
 
-=head1 CGI HAS BEEN RMOVED FROM THE PERL CORE
+=head1 CGI HAS BEEN REMOVED FROM THE PERL CORE
 
 As of perl v5.19.7 (dev) CGI.pm has been removed from the perl core; this means
 that if you upgrade to perl v5.20.0 (stable) or higher, or if you rely on a
@@ -7735,7 +7735,7 @@ in the B<header()> and B<redirect()>  statements:
 
 =back
 
-=head1 Server Push
+=head1 SERVER PUSH
 
 CGI.pm provides four simple functions for producing multipart
 documents of the type needed to implement server push.  These
@@ -7806,7 +7806,7 @@ multipart_end() at the end of the last part of the multipart document.
 Users interested in server push applications should also have a look
 at the CGI::Push module.
 
-=head1 Avoiding Denial of Service Attacks
+=head1 AVOIDING DENIAL OF SERVICE ATTACKS
 
 A potential problem with CGI.pm is that, by default, it attempts to
 process form POSTings no matter how large they are.  A wily hacker
