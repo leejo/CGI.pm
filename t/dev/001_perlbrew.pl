@@ -2,6 +2,9 @@
 
 # this is a .pl to stop it running under prove
 # do not add this file to MANIFEST (yet)
+# you will need to make sure all your versions of perl
+# have the minimum required versions of the modules
+# specified by Makefile.PL
 
 use strict;
 use warnings;
