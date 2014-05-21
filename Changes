@@ -1,3 +1,7 @@
+Version 3.65_02 May 16, 2014
+
+    [DEVELOPER RELEASE]
+    - CGI::Fast split out into its own distribution, related files and tests removed
 
 Version 3.65_01 May 15, 2014
 
