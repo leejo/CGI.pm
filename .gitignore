@@ -1,8 +1,10 @@
 vim.sess
 Makefile
+Makefile.old
 blib
 cover_db
 *.orig
 pm_to_blib
 MYMETA.*
 CGI.pm*tar*
+.DS_Store
