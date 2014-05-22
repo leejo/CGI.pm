@@ -2,6 +2,26 @@ WHAT IS THIS?
 
 This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
 
+CGI HAS BEEN REMOVED FROM THE PERL CORE
+
+As of perl v5.19.7 (dev) CGI.pm has been removed from the perl core; this means
+that if you upgrade to perl v5.20.0 (stable) or higher, or if you rely on a
+system or vendor perl and get an updated version of perl through a system
+update, then you will have to install CGI.pm yourself with cpan/cpanm/a vendor
+package/manually. To make this a little easier the L<CGI::Fast> module has been
+split into its own distribution, meaning you do not need acces to a compiler
+to install CGI.pm
+
+The rational for this decision is that CGI.pm is no longer considered good
+practice for developing web applications, B<including> quick prototyping and
+small web scripts. There are far better, cleaner, quicker, easier, safer,
+more scalable, more extensible, more modern alternatives available at this point
+in time. These will be documented with a specific CPAN dist: CGI::Alternatives.
+
+For more discussion on the removal of CGI.pm from core please see:
+
+http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html
+
 HOW DO I INSTALL IT?
 
 To install this module, cd to the directory that contains this README
@@ -35,17 +55,22 @@ can be found at:
 
    http://search.cpan.org/dist/CGI.pm/
 
-WHERE CAN I VIEW OR SUBMIT BUGS / ISSUES / REQUESTS?
+WHERE CAN I VIEW OR SUBMIT BUGS / ISSUES / REQUESTS / CONTRIBUTE?
 
 The new bug tracker can be found on github:
 
    https://github.com/leejo/CGI.pm/issues
 
-Existing issues will be migrated to this tracker, but in the meantime the old bug
-trackers can be found at rt.cpan.org:
+Existing issues have been migrated from rt.cpan.org:
 
    https://rt.cpan.org/Dist/Display.html?Name=CGI
    https://rt.cpan.org/Dist/Display.html?Queue=CGI.pm
+
+These tickets are still considered active, they will be closed when
+the issues on github are closed.
+
+If you would like to contribute then please comment on issues, raise
+issues, pull requests, etc.
 
 WHERE CAN I LEARN MORE?
 

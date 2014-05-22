@@ -1,20 +1,15 @@
-Version 3.65_03 May 20, 2014
+Version 4.00 May 21, 2014
 
-    [DEVELOPER RELEASE]
-    - Update perldoc to explain that CGI.pm has/will be removed from perl core
+    [DOCUMENTATION]
+    - Update perldoc to explain that CGI.pm has been removed from perl core
     - Make =head2 perldoc less shouty (RT #91140)
+    - Tickets migrated from RT to github issues (both CGI and CGI.pm distributions)
+    - Repointing bugtracker at newly forked github repo and note that Lee Johnson
+      is the current maintainer.
 
-Version 3.65_02 May 16, 2014
-
-    [DEVELOPER RELEASE]
+    [INTERNALS]
     - CGI::Fast split out into its own distribution, related files and tests removed
-
-Version 3.65_01 May 15, 2014
-
-    [DEVELOPER RELEASE]
-    - Repointing bugtracker at newly forked github repo
-    - Tickets to be migrated from RT to github issues (both CGI and CGI.pm distributions)
-    - TODO file added, to be added to github issues
+    - developer test added for building with perlbrew
 
 Version 3.65 Feb 11, 2014
 
