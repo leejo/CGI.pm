@@ -7,3 +7,4 @@ cover_db
 pm_to_blib
 MYMETA.*
 CGI.pm*tar*
+.DS_Store
