@@ -19,7 +19,7 @@ use Carp 'croak';
 # The most recent version and complete docs are available at:
 #   http://search.cpan.org/dist/CGI.pm
 
-$CGI::VERSION='4.00';
+$CGI::VERSION='4.01';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -4329,10 +4329,11 @@ from dozens of contributors and being deployed on thousands of websites.
 CGI.pm has been included in the Perl distribution since Perl 5.4, and has
 become a de-facto standard.
 
-=head1 CGI HAS BEEN REMOVED FROM THE PERL CORE
+=head1 CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-As of perl v5.19.7 (dev) CGI.pm has been removed from the perl core; this means
-that if you upgrade to perl v5.20.0 (stable) or higher, or if you rely on a
+	http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
+
+If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
 update, then you will have to install CGI.pm yourself with cpan/cpanm/a vendor
 package/manually. To make this a little easier the L<CGI::Fast> module has been

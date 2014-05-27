@@ -2,10 +2,11 @@ WHAT IS THIS?
 
 This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
 
-CGI HAS BEEN REMOVED FROM THE PERL CORE
+CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-As of perl v5.19.7 (dev) CGI.pm has been removed from the perl core; this means
-that if you upgrade to perl v5.20.0 (stable) or higher, or if you rely on a
+	http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
+
+If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
 update, then you will have to install CGI.pm yourself with cpan/cpanm/a vendor
 package/manually. To make this a little easier the L<CGI::Fast> module has been

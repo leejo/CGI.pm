@@ -1,3 +1,9 @@
+Version 4.01 May 27, 2014
+
+    [DOCUMENTATION]
+    - CGI.pm hasn't been removed from core *just* yet, but will be soon:
+      http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80 
+
 Version 4.00 May 22, 2014
 
     [INTERNALS]
