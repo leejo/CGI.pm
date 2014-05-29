@@ -266,7 +266,7 @@ You can set the program back to the default by calling
 Note that this override doesn't happen until after the program has
 compiled, so any compile-time errors will still show up with the
 non-overridden program name
-  
+
 =head1 CHANGE LOG
 
 3.51 Added $CGI::Carp::TO_BROWSER
