@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-use Test::More tests => 33;
+use Test::More tests => 40;
 
 END { ok $loaded; }
 use CGI ( ':standard', '-no_debug', '*h3', 'start_table' );
@@ -141,6 +141,40 @@ my $h = header( -Cookie => $cookie );
 like $h,
   qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
   "header(-cookie)";
+
+$h = header( '-set-cookie' => $cookie );
+like $h,
+  qr!^Set-[Cc]ookie: fred=chocolate&chip\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-set-cookie)";
+
+my $cookie2 =
+  cookie( -name => 'ginger', -value => 'snap' , -path => '/' );
+is $cookie2, 'ginger=snap; path=/', "cookie2()";
+
+$h = header( -cookie => [ $cookie, $cookie2 ] );
+like $h,
+  qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Set-Cookie: ginger=snap\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-cookie=>[cookies])";
+
+$h = header( '-set-cookie' => [ $cookie, $cookie2 ] );
+like $h,
+  qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Set-Cookie: ginger=snap\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-set-cookie=>[cookies])";
+
+$h = redirect('http://elsewhere.org/');
+like $h,
+  qr!Status: 302 Found${CRLF}Location: http://elsewhere.org/!s,
+  "redirect";
+
+$h = redirect(-url=>'http://elsewhere.org/', -cookie=>[$cookie,$cookie2]);
+like $h,
+  qr!Status: 302 Found${CRLF}Set-[Cc]ookie: \Q$cookie\E${CRLF}Set-[Cc]ookie: \Q$cookie2\E${CRLF}(Date:.*${CRLF})?Location: http://elsewhere.org/!s,
+  "redirect with cookies";
+
+$h = redirect(-url=>'http://elsewhere.org/', '-set-cookie'=>[$cookie,$cookie2]);
+like $h,
+  qr!Status: 302 Found${CRLF}Set-[Cc]ookie: \Q$cookie\E${CRLF}Set-[Cc]ookie: \Q$cookie2\E${CRLF}(Date:.*${CRLF})?Location: http://elsewhere.org/!s,
+  "redirect with set-cookies";
 
 is start_h3, '<h3>';
 

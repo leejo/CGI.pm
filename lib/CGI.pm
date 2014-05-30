@@ -1492,7 +1492,7 @@ sub header {
 
     my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) = 
 	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
-			    'STATUS',['COOKIE','COOKIES'],'TARGET',
+			    'STATUS',['COOKIE','COOKIES','SET-COOKIE'],'TARGET',
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
 
@@ -1596,7 +1596,7 @@ END_OF_FUNC
 sub redirect {
     my($self,@p) = self_or_default(@_);
     my($url,$target,$status,$cookie,$nph,@other) = 
-         rearrange([[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES'],NPH],@p);
+         rearrange([[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES','SET-COOKIE'],NPH],@p);
     $status = '302 Found' unless defined $status;
     $url ||= $self->self_url;
     my(@o);

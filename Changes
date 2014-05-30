@@ -1,3 +1,9 @@
+Next Version
+
+    [INTERNALS]
+    - Support multiple cookies when passing an ARRAY ref with -set-cookie
+      (RT#15065, JWILLIAMS@cpan.org)
+
 Version 4.01 May 27, 2014
 
     [DOCUMENTATION]
