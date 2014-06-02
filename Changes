@@ -4,6 +4,10 @@ Next Version
     - Support multiple cookies when passing an ARRAY ref with -set-cookie
       (RT#15065, JWILLIAMS@cpan.org)
 
+    [DOCUMENTATION]
+    - Made licencing information consistent and remove duplicate comments
+      about licence details, corrected location to report bugs (RT #38285)
+
 Version 4.01 May 27, 2014
 
     [DOCUMENTATION]

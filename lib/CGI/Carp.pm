@@ -315,12 +315,20 @@ non-overridden program name
 
 1.27 Replaced tell STDOUT with bytes=tell STDOUT.
 
-=head1 AUTHORS
+=head1 AUTHOR INFORMATION
 
-Copyright 1995-2002, Lincoln D. Stein.  All rights reserved.  
+The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
+distributed under GPL and the Artistic License 2.0. It is currently
+maintained by Lee Johnson with help from many contributors.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Address bug reports and comments to: https://github.com/leejo/CGI.pm/issues
+
+The original bug tracker can be found at: https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm
+
+When sending bug reports, please provide the version of CGI.pm, the version of
+Perl, the name and version of your Web server, and the name and version of the
+operating system you are using.  If the problem is even remotely browser
+dependent, please provide information about the affected browsers as well.
 
 =head1 SEE ALSO
 

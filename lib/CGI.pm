@@ -3,22 +3,6 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-# See the bottom of this file for the POD documentation.  Search for the
-# string '=head'.
-
-# You can run this file through either pod2man or pod2html to produce pretty
-# documentation in manual or html file format (these utilities are part of the
-# Perl 5 distribution).
-
-# Copyright 1995-1998 Lincoln D. Stein.  All rights reserved.
-# It may be used and modified freely, but I do request that this copyright
-# notice remain attached to the file.  You may modify this module as you 
-# wish, but if you redistribute a modified version, please attach a note
-# listing the modifications you have made.
-
-# The most recent version and complete docs are available at:
-#   http://search.cpan.org/dist/CGI.pm
-
 $CGI::VERSION='4.01';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.

@@ -5,19 +5,6 @@ use warnings;
 
 use if $] >= 5.019, 'deprecate';
 
-# See the bottom of this file for the POD documentation.  Search for the
-# string '=head'.
-
-# You can run this file through either pod2man or pod2html to produce pretty
-# documentation in manual or html file format (these utilities are part of the
-# Perl 5 distribution).
-
-# Copyright 1995-1999, Lincoln D. Stein.  All rights reserved.
-# It may be used and modified freely, but I do request that this copyright
-# notice remain attached to the file.  You may modify this module as you
-# wish, but if you redistribute a modified version, please attach a note
-# listing the modifications you have made.
-
 our $VERSION='1.31';
 
 use CGI::Util qw(rearrange unescape escape);
@@ -521,12 +508,18 @@ Get or set the cookie's expiration time.
 
 =head1 AUTHOR INFORMATION
 
-Copyright 1997-1998, Lincoln D. Stein.  All rights reserved.  
+The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
+distributed under GPL and the Artistic License 2.0. It is currently
+maintained by Lee Johnson with help from many contributors.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Address bug reports and comments to: https://github.com/leejo/CGI.pm/issues
 
-Address bug reports and comments to: lstein@cshl.org
+The original bug tracker can be found at: https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm
+
+When sending bug reports, please provide the version of CGI.pm, the version of
+Perl, the name and version of your Web server, and the name and version of the
+operating system you are using.  If the problem is even remotely browser
+dependent, please provide information about the affected browsers as well.
 
 =head1 BUGS
 
