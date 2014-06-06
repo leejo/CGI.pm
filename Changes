@@ -1,8 +1,9 @@
 Next Version
 
     [NEW FEATURES]
-    - CGI::Carp learns noTimestamp /$CGI::Carp::NO_TIMESTAMP to prevent
+    - CGI::Carp learns noTimestamp / $CGI::Carp::NO_TIMESTAMP to prevent
       timestamp in messages (RT #82364, EDAVIS@cpan.org)
+    - multipart_init and multipart_start learn -charset option (RT #22737)
 
     [INTERNALS]
     - Support multiple cookies when passing an ARRAY ref with -set-cookie

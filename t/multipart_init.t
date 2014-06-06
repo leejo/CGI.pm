@@ -5,7 +5,10 @@ use CGI;
 my $q = CGI->new;
 
 my $sv = $q->multipart_init;
-like( $sv, qr|Content-Type: multipart/x-mixed-replace;boundary="------- =|, 'multipart_init(), basic');
+like( $sv, qr|Content-Type: multipart/x-mixed-replace;boundary="------- =.*?; charset=ISO-8859-1|, 'multipart_init(), basic');
+
+$sv = $q->multipart_init(-charset=>'utf-8');
+like( $sv, qr|Content-Type: multipart/x-mixed-replace;boundary="------- =.*?; charset=utf-8|, 'multipart_init(), -charset');
 
 like( $sv, qr/$CGI::CRLF$/, 'multipart_init(), ends in CRLF' );
 
