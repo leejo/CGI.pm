@@ -3,7 +3,7 @@
 
 use strict;
 
-use Test::More tests => 61;
+use Test::More tests => 63;
 use IO::Handle;
 
 use CGI::Carp;
@@ -92,6 +92,22 @@ my $warn_expect_l = $expect_l = __LINE__ + 1;
 like(CGI::Carp::warn("There is a problem"),
    "/] $id: There is a problem at $q_file line $expect_l.".'$/',
    "CGI::Carp::warn builds correct message");
+
+# Test $NO_TIMESTAMP
+{
+    local $CGI::Carp::NO_TIMESTAMP = 1;
+    $expect_l = __LINE__ + 1;
+    like(CGI::Carp::warn("There is a problem"),
+        qr/\A\Q$id: There is a problem at $file line $expect_l.\E\s*\z/,
+        "noTimestamp");
+
+    local $CGI::Carp::NO_TIMESTAMP = 0;
+    $expect_l = __LINE__ + 2;
+    import CGI::Carp 'noTimestamp';
+    like(CGI::Carp::warn("There is a problem"),
+        qr/\A\Q$id: There is a problem at $file line $expect_l.\E\s*\z/,
+        "noTimestamp");
+}
 
 #-----------------------------------------------------------------------------
 # Test ineval

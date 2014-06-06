@@ -1,8 +1,12 @@
 Next Version
 
+    [NEW FEATURES]
+    - CGI::Carp learns noTimestamp /$CGI::Carp::NO_TIMESTAMP to prevent
+      timestamp in messages (RT #82364, EDAVIS@cpan.org)
+
     [INTERNALS]
     - Support multiple cookies when passing an ARRAY ref with -set-cookie
-      (RT#15065, JWILLIAMS@cpan.org)
+      (RT #15065, JWILLIAMS@cpan.org)
 
     [DOCUMENTATION]
     - Made licencing information consistent and remove duplicate comments
