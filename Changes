@@ -1,31 +1,31 @@
-Next Version
+4.02 2014-06-09
 
-    [NEW FEATURES]
+    [ NEW FEATURES ]
     - CGI::Carp learns noTimestamp / $CGI::Carp::NO_TIMESTAMP to prevent
       timestamp in messages (RT #82364, EDAVIS@cpan.org)
     - multipart_init and multipart_start learn -charset option (RT #22737)
 
-    [INTERNALS]
+    [ SPEC / BUG FIXES ]
     - Support multiple cookies when passing an ARRAY ref with -set-cookie
       (RT #15065, JWILLIAMS@cpan.org)
 
-    [DOCUMENTATION]
+    [ DOCUMENTATION ]
     - Made licencing information consistent and remove duplicate comments
       about licence details, corrected location to report bugs (RT #38285)
 
-Version 4.01 May 27, 2014
+4.01 2014-05-27
 
-    [DOCUMENTATION]
+    [ DOCUMENTATION ]
     - CGI.pm hasn't been removed from core *just* yet, but will be soon:
       http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80 
 
-Version 4.00 May 22, 2014
+4.00 2014-05-22
 
-    [INTERNALS]
+    [ INTERNALS ]
     - CGI::Fast split out into its own distribution, related files and tests removed
     - developer test added for building with perlbrew
 
-    [DOCUMENTATION]
+    [ DOCUMENTATION ]
     - Update perldoc to explain that CGI.pm has been removed from perl core
     - Make =head2 perldoc less shouty (RT #91140)
     - Tickets migrated from RT to github issues (both CGI and CGI.pm distributions)
