@@ -1,3 +1,16 @@
+4.03 ????-??-??
+
+    [ REMOVED / DEPRECATIONS ]
+    - the -multiple option to popup_menu is now IGNORED as this did not
+      function correctly. If you require a menu with multiple selections
+      use the scrolling_list method. (RT #30057)
+
+    [ SPEC / BUG FIXES ]
+
+
+    [ DOCUMENTATION ]
+
+
 4.02 2014-06-09
 
     [ NEW FEATURES ]

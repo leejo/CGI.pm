@@ -2536,6 +2536,9 @@ sub popup_menu {
                                 : $default;
     }
     $name=$self->_maybe_escapeHTML($name);
+    # RT #30057 - ignore -multiple, if you need this
+    # then use scrolling_list
+    @other = grep { $_ !~ /^multiple=/i } @other;
     my($other) = @other ? " @other" : '';
 
     my(@values);
@@ -6379,7 +6382,9 @@ a small penalty of loading IO::Handle the first time you call it.
           -labels=>\%labels,
           -attributes=>\%attributes);
 
-popup_menu() creates a menu.
+popup_menu() creates a menu. Please note that the -multiple option will be
+ignored if passed - use scrolling_list() if you want to create a menu that
+supports multiple selections
 
 =over 4
 

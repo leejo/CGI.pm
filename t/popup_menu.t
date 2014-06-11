@@ -20,3 +20,14 @@ is(
 </optgroup>
 </select>'
     , "<optgroup> selections work when the default values contain regex characters (RT#49606)"); 
+
+unlike(
+	$q->popup_menu(
+		-name     =>"foo",
+		-values   =>[0,1],
+		-multiple => 'true',
+		-MULTIPLE => 'true',
+	),
+	qr/multiple/,
+	'popup_menu ignores -multiple option',
+);
