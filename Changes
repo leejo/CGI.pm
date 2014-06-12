@@ -9,6 +9,7 @@
 
 
     [ DOCUMENTATION ]
+    - clarify documentation regarding query_string method (RT #48370)
 
 
 4.02 2014-06-09

@@ -5569,7 +5569,8 @@ of the form(s).  Something like this will do the trick.
 If you want more control over what's returned, using the B<url()>
 method instead.
 
-You can also retrieve the unprocessed query string with query_string():
+You can also retrieve a query string representation of the current object
+state with query_string():
 
     $the_string = $q->query_string();
 
