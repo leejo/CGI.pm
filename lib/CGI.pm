@@ -580,12 +580,7 @@ sub init {
                       $self->add_parameter($param);
                       my($value) = $self->read_multipart_related($start,$boundary,$content_length,0);
                       push (@{$self->{param}{$param}},$value);
-                      if ($MOD_PERL) {
-                              $query_string = $self->r->args;
-                      } else {
-                              $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
-                              $query_string ||= $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
-                      }
+					  $query_string = $self->_get_query_string_from_env;
                       $is_xforms = 1;
               }
       }
@@ -630,13 +625,8 @@ sub init {
       # If method is GET, HEAD or DELETE, fetch the query from
       # the environment.
       if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
-	  if ($MOD_PERL) {
-	    $query_string = $self->r->args;
-	  } else {
-	      $query_string = $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
-	      $query_string ||= $ENV{'REDIRECT_QUERY_STRING'} if defined $ENV{'REDIRECT_QUERY_STRING'};
-	  }
-	  last METHOD;
+          $query_string = $self->_get_query_string_from_env;
+	      last METHOD;
       }
 
       if ($meth eq 'POST' || $meth eq 'PUT') {
@@ -706,6 +696,38 @@ sub init {
     $self->delete('.cgifields');
 
     $self->save_request unless defined $initializer;
+}
+
+sub _get_query_string_from_env {
+    my $self = shift;
+    my $query_string = '';
+
+    if ( $MOD_PERL ) {
+        $query_string = $self->r->args;
+        if ( ! $query_string && $MOD_PERL == 2 ) {
+            # possibly a redirect, inspect prev request
+            # (->prev only supported under mod_perl2)
+            if ( my $prev = $self->r->prev ) {
+                $query_string = $prev->args;
+            }
+        }
+    }
+
+    $query_string ||= $ENV{'QUERY_STRING'}
+        if defined $ENV{'QUERY_STRING'};
+
+    if ( ! $query_string ) {
+        # try to get from REDIRECT_ env variables, support
+        # 5 levels of redirect and no more (RT #36312)
+        REDIRECT: foreach my $r ( 1 .. 5 ) {
+            my $key = join( '',( 'REDIRECT_' x $r ) );
+            $query_string ||= $ENV{"${key}QUERY_STRING"}
+                if defined $ENV{"${key}QUERY_STRING"};
+            last REDIRECT if $query_string;
+        }
+    }
+
+    return $query_string;
 }
 
 # FUNCTIONS TO OVERRIDE:

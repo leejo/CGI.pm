@@ -6,6 +6,8 @@
       use the scrolling_list method. (RT #30057)
 
     [ SPEC / BUG FIXES ]
+    - support redirects in mod_perl2, or fall back to using env variable
+      for up to 5 redirects, when getting the query string (RT #36312)
 
 
     [ DOCUMENTATION ]

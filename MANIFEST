@@ -61,6 +61,7 @@ t/push.t
 t/query_string.t
 t/rt-52469.t
 t/request.t
+t/redirect_query_string.t
 t/save_read_roundtrip.t
 t/start_end_asterisk.t
 t/start_end_end.t
