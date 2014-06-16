@@ -13,6 +13,8 @@
     [ DOCUMENTATION ]
     - clarify documentation regarding query_string method (RT #48370)
 
+    [ TESTING ]
+    - add t/changes.t for testing this Changes file
 
 4.02 2014-06-09
 
