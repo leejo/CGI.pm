@@ -1,4 +1,4 @@
-4.03 ????-??-??
+4.03 2014-06-30
 
     [ REMOVED / DEPRECATIONS ]
     - the -multiple option to popup_menu is now IGNORED as this did not
@@ -8,7 +8,9 @@
     [ SPEC / BUG FIXES ]
     - support redirects in mod_perl2, or fall back to using env variable
       for up to 5 redirects, when getting the query string (RT #36312)
-
+    - CGI::Cookie now correctly supports the -max-age argument, previously
+      if this was passed the value of the -expires argument would be used
+      meaning there was no way to supply *only* this argument (RT #50576)
 
     [ DOCUMENTATION ]
     - clarify documentation regarding query_string method (RT #48370)

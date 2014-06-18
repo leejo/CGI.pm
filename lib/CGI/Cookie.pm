@@ -126,7 +126,7 @@ sub new {
   $self->domain( $domain )     if defined $domain;
   $self->secure( $secure )     if defined $secure;
   $self->expires( $expires )   if defined $expires;
-  $self->max_age($expires)     if defined $max_age;
+  $self->max_age( $max_age )   if defined $max_age;
   $self->httponly( $httponly ) if defined $httponly;
   return $self;
 }
@@ -337,6 +337,7 @@ See these URLs for more information:
 	my $c = CGI::Cookie->new(-name    =>  'foo',
                              -value   =>  'bar',
                              -expires =>  '+3M',
+                           '-max-age' =>  '+3M',
                              -domain  =>  '.capricorn.com',
                              -path    =>  '/cgi-bin/database',
                              -secure  =>  1
@@ -502,6 +503,10 @@ Get or set the cookie's path.
 =item B<expires()>
 
 Get or set the cookie's expiration time.
+
+=item B<max_age()>
+
+Get or set the cookie's max_age value.
 
 =back
 

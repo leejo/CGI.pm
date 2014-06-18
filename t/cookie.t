@@ -175,6 +175,7 @@ my @test_cookie = (
   is($c->name   , 'baz', 'name is correct');
   is($c->value  , 'qux', 'value is correct');
   ok(!defined $c->expires,       'expires is not set');
+  ok(!defined $c->max_age,       'max_age is not set');
   ok(!defined $c->domain ,       'domain attributeis not set');
   is($c->path, '/',      'path atribute is set to default');
   ok(!defined $c->secure ,       'secure attribute is set');
@@ -207,6 +208,7 @@ my @test_cookie = (
   my $c = CGI::Cookie->new(-name    => 'Jam',
                -value   => 'Hamster',
                -expires => '+3M',
+               '-max-age' => '+3M',
                -domain  => '.pie-shop.com',
                -path    => '/',
                -secure  => 1,
@@ -221,6 +223,9 @@ my @test_cookie = (
 
   my $expires = $c->expires;
   like($c->as_string, "/$expires/", "Stringified cookie contains expires");
+
+  my $max_age = $c->max_age;
+  like($c->as_string, "/$max_age/", "Stringified cookie contains max_age");
 
   my $domain = $c->domain;
   like($c->as_string, "/$domain/", "Stringified cookie contains domain");
@@ -244,6 +249,8 @@ my @test_cookie = (
   like($c->as_string, "/$value/", "Stringified cookie contains value");
 
   ok($c->as_string !~ /expires/, "Stringified cookie has no expires field");
+
+  ok($c->as_string !~ /max-age/, "Stringified cookie has no max-age field");
 
   ok($c->as_string !~ /domain/, "Stringified cookie has no domain field");
 
@@ -364,6 +371,14 @@ MAX_AGE: {
 
     $cookie->max_age( '113' );
     is $cookie->max_age => 13, 'max_age(num) as delta';
+
+    $cookie = CGI::Cookie->new( -name=>'a', value=>'b', '-max-age' => '+3d');
+	is( $cookie->max_age,3*24*60*60,'-max-age in constructor' );
+	ok( !$cookie->expires,' ... lack of expires' );
+
+    $cookie = CGI::Cookie->new( -name=>'a', value=>'b', '-expires' => 'now', '-max-age' => '+3d');
+	is( $cookie->max_age,3*24*60*60,'-max-age in constructor' );
+	ok( $cookie->expires,'-expires in constructor' );
 }
 
 
