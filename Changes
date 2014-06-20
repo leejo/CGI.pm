@@ -17,6 +17,7 @@
 
     [ TESTING ]
     - add t/changes.t for testing this Changes file
+    - test case for RT #31107 confirming multipart parsing is to spec
 
 4.02 2014-06-09
 
