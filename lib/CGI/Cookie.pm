@@ -257,17 +257,15 @@ CGI::Cookie - Interface to HTTP Cookies
 
 =head1 DESCRIPTION
 
-CGI::Cookie is an interface to HTTP/1.1 cookies, an
-innovation that allows Web servers to store persistent information on
+CGI::Cookie is an interface to HTTP/1.1 cookies, a mechanism
+that allows Web servers to store persistent information on
 the browser's side of the connection.  Although CGI::Cookie is
 intended to be used in conjunction with CGI.pm (and is in fact used by
 it internally), you can use this module independently.
 
 For full information on cookies see 
 
-	http://tools.ietf.org/html/rfc2109
-	http://tools.ietf.org/html/rfc2965
-	http://tools.ietf.org/html/draft-ietf-httpstate-cookie
+    https://tools.ietf.org/html/rfc6265
 
 =head1 USING CGI::Cookie
 
@@ -327,7 +325,7 @@ This feature is supported by nearly all modern browsers.
 
 See these URLs for more information:
 
-	http://msdn.microsoft.com/en-us/library/ms533046.aspx
+    http://msdn.microsoft.com/en-us/library/ms533046.aspx
     http://www.browserscope.org/?category=security&v=top
 
 =back
