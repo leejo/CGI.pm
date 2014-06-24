@@ -14,6 +14,7 @@
 
     [ DOCUMENTATION ]
     - clarify documentation regarding query_string method (RT #48370)
+    - links fixed in some perldoc (Thanks to Michiel Beijen)
 
     [ TESTING ]
     - add t/changes.t for testing this Changes file
