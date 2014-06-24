@@ -4345,7 +4345,7 @@ become a de-facto standard.
 
 =head1 CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-	http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
+  L<http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80>
 
 If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
@@ -4362,7 +4362,7 @@ in time. These will be documented with L<CGI::Alternatives>.
 
 For more discussion on the removal of CGI.pm from core please see:
 
-http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html
+  L<http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html>
 
 =head2 Programming style
 
@@ -4807,7 +4807,7 @@ The file format used for save/restore is identical to that used by the
 Whitehead Genome Center's data exchange format "Boulderio", and can be
 manipulated and even databased using Boulderio utilities.  See
 
-  http://stein.cshl.org/boulder/
+  L<Boulder>
 
 for further details.
 
