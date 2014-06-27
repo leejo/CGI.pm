@@ -7,8 +7,13 @@ use CGI;
 
 $ENV{REQUEST_METHOD} = 'PUT';
 
-my $cgi = CGI->new;
-
-pass 'new() returned';
-
-
+eval {
+	local $SIG{ALRM} = sub { die "timeout!" };
+	alarm 10;
+	my $cgi = CGI->new;
+	alarm 0;
+	pass( 'new() returned' );
+};
+$@ && do {
+	fail( "CGI->new did not return" );
+};

@@ -19,6 +19,7 @@
     [ TESTING ]
     - add t/changes.t for testing this Changes file
     - test case for RT #31107 confirming multipart parsing is to spec
+    - improve t/rt-52469.t by adding a timeout check
 
 4.02 2014-06-09
 
