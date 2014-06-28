@@ -11,6 +11,8 @@
     - CGI::Cookie now correctly supports the -max-age argument, previously
       if this was passed the value of the -expires argument would be used
       meaning there was no way to supply *only* this argument (RT #50576)
+    - make :all actually import all methods, except for :cgi-lib, and add
+      :ssl to the :standard import (RT #70337)
 
     [ DOCUMENTATION ]
     - clarify documentation regarding query_string method (RT #48370)
