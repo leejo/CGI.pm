@@ -4912,7 +4912,7 @@ Import "standard" features, 'html2', 'html3', 'html4', 'ssl', 'form' and 'cgi'.
 Import all the available methods.  For the full list, see the CGI.pm
 code, where the variable %EXPORT_TAGS is defined. (N.B. the :cgi-lib
 imports will B<not> be included in the :all import, you will have to
-iport :cgi-lib to get those)
+import :cgi-lib to get those)
 
 =back
 
