@@ -1,3 +1,8 @@
+4.04 2014-08-01
+
+    [ TESTING ]
+    - add .travis.yml (https://travis-ci.org)
+
 4.03 2014-07-02
 
     [ REMOVED / DEPRECATIONS ]
