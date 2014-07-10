@@ -226,7 +226,7 @@ if ($needs_binmode) {
 	':form'     => [ qw/
 		textfield textarea filefield password_field hidden checkbox checkbox_group
 		submit reset defaults radio_group popup_menu button autoEscape
-		scrolling_list image_button start_form end_form startform endform
+		scrolling_list image_button start_form end_form
 		start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART
 	/ ],
 	':cgi' => [ qw/
@@ -1896,35 +1896,6 @@ sub isindex {
 END_OF_FUNC
 
 
-#### Method: startform
-# This method is DEPRECATED
-# Start a form
-# Parameters:
-#   $method -> optional submission method to use (GET or POST)
-#   $action -> optional URL of script to run
-#   $enctype ->encoding to use (URL_ENCODED or MULTIPART)
-'startform' => <<'END_OF_FUNC',
-sub startform {
-    my($self,@p) = self_or_default(@_);
-
-    my($method,$action,$enctype,@other) = 
-	rearrange([METHOD,ACTION,ENCTYPE],@p);
-
-    $method  = $self->_maybe_escapeHTML(lc($method || 'post'));
-    $enctype = $self->_maybe_escapeHTML($enctype || &URL_ENCODED);
-    if (defined $action) {
-       $action = $self->_maybe_escapeHTML($action);
-    }
-    else {
-       $action = $self->_maybe_escapeHTML($self->request_uri || $self->self_url);
-    }
-    $action = qq(action="$action");
-    my($other) = @other ? " @other" : '';
-    $self->{'.parametersToAdd'}={};
-    return qq/<form method="$method" $action enctype="$enctype"$other>/;
-}
-END_OF_FUNC
-
 #### Method: start_form
 # Start a form
 # Parameters:
@@ -1994,21 +1965,6 @@ sub end_form {
 }
 END_OF_FUNC
 
-'endform' => <<'END_OF_FUNC',
-sub endform {
-    my($self,@p) = self_or_default(@_);
-    if ( $NOSTICKY ) {
-        return wantarray ? ("</form>") : "\n</form>";
-    } else {
-        if (my @fields = $self->get_fields) {
-            return wantarray ? ("<div>",@fields,"</div>","</form>")
-                             : "<div>".(join '',@fields)."</div>\n</form>";
-        } else {
-            return "</form>";
-        }
-    }
-}
-END_OF_FUNC
 
 #### Method: end_multipart_form
 # end a multipart form
@@ -6006,13 +5962,9 @@ action and form encoding that you specify.  The defaults are:
 
 end_form() returns the closing </form> tag.  
 
-Start_form()'s enctype argument tells the browser how to package the various
+start_form()'s enctype argument tells the browser how to package the various
 fields of the form before sending the form to the server.  Two
 values are possible:
-
-B<Note:> These methods were previously named startform() and endform().
-These methods are now DEPRECATED.
-Please use start_form() and end_form() instead.
 
 =over 4
 

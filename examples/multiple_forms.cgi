@@ -18,7 +18,7 @@ print "<P>What's your favorite color? ",
         $query->popup_menu('color',['red','green','blue','chartreuse']),
 	"<P>";
 print $query->submit('form_1','Send Form 1');
-print $query->endform;
+print $query->end_form;
 
 # Print the second form
 print "<HR>\n";
@@ -27,7 +27,7 @@ print "Some radio buttons: ",$query->radio_group('radio buttons',
 						 [qw{one two three four five}],'three'),"\n";
 print "<P>What's the password? ",$query->password_field('pass','secret');
 print $query->defaults,$query->submit('form_2','Send Form 2'),"\n";
-print $query->endform;
+print $query->end_form;
 
 print "<HR>\n";
 

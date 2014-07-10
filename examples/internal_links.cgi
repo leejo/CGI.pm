@@ -19,7 +19,7 @@ $query->param('amenu','FOO1') unless $query->param('amenu');
 
 print $query->start_form;
 print $query->popup_menu('amenu',[('FOO1'..'FOO9')]);
-print $query->submit,$query->endform;
+print $query->submit,$query->end_form;
 
 # We create a long boring list for the purposes of illustration.
 $myself = $query->self_url;

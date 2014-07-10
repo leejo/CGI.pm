@@ -65,7 +65,7 @@ sub print_query {
 		       -values=>['red','green','blue','chartreuse']),
     "<P>";
     print $query->submit;
-    print $query->endform;
+    print $query->end_form;
 }
 
 sub print_response {

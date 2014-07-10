@@ -24,7 +24,7 @@ print "File #2:",filefield(-name=>'file2',-size=>45),"<BR>\n";
 print "Diff type: ",radio_group(-name=>'type',
 					-value=>['context','normal']),"<br>\n";
 print reset,submit(-name=>'submit',-value=>'Do Diff');
-print endform;
+print end_form;
 
 # Process the form if there is a file name entered
 $file1 = param('file1');

@@ -57,7 +57,7 @@ sub print_prompt {
    print "<P>",$query->reset;
    print $query->submit('Action','Shout');
    print $query->submit('Action','Scream');
-   print $query->endform;
+   print $query->end_form;
    print "<HR>\n";
  	}
  

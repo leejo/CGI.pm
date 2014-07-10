@@ -29,7 +29,7 @@ print start_multipart_form(),
     checkbox_group('count',\@types,\@types),
     p,
     reset,submit('submit','Process File'),
-    endform;
+    end_form;
 
 # Process the form if there is a file name entered
 if (my $file = param('filename')) {

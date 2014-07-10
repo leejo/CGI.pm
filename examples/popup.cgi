@@ -20,7 +20,7 @@ if (!$query->param) {
 		       -values=>['red','green','blue','chartreuse']),
     "<P>";
     print $query->submit;
-    print $query->endform;
+    print $query->end_form;
 
 } else {
     print "<H1>And the Answer is...</H1>\n";

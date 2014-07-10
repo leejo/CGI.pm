@@ -22,17 +22,14 @@ examples/tryit.cgi
 examples/wilogo.gif
 examples/WORLD_WRITABLE/18.157.1.253.sav
 lib/CGI.pm
-lib/CGI/Apache.pm
 lib/CGI/Carp.pm
 lib/CGI/Cookie.pm
 lib/CGI/Pretty.pm
 lib/CGI/Push.pm
-lib/CGI/Switch.pm
 lib/CGI/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README
-t/apache.t
 t/autoescape.t
 t/can.t
 t/carp.t
@@ -66,7 +63,6 @@ t/save_read_roundtrip.t
 t/start_end_asterisk.t
 t/start_end_end.t
 t/start_end_start.t
-t/switch.t
 t/tmpdir.t
 t/unescapeHTML.t
 t/upload.t

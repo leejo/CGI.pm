@@ -21,7 +21,7 @@ print "Save/restore state from file: ",$query->textfield('savefile',$default_nam
 print "<P>";
 print $query->submit('action','SAVE'),$query->submit('action','RESTORE');
 print "<P>",$query->defaults;
-print $query->endform;
+print $query->end_form;
 
 # Here we print out a bit at the end
 print $query->end_html;

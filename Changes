@@ -1,5 +1,11 @@
 4.04 2014-08-01
 
+    [ REMOVED / DEPRECATIONS ]
+    - startform and endform methods removed (previously deprecated, you
+      should be using the start_form and end_form methods)
+    - both CGI::Apache and CGI::Switch have been removed as these modules
+      1) have been deprecated for *years*, and 2) do nothing whatsoever
+
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
     - test case for RT #53966 - disallow filenames with ~ char
