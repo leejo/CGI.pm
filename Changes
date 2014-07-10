@@ -2,6 +2,7 @@
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
+    - test case for RT #53966 - disallow filenames with ~ char
 
 4.03 2014-07-02
 

@@ -38,6 +38,14 @@ isnt($CGITempFile::TMPDIRECTORY, $testdir2,
 isnt($CGITempFile::TMPDIRECTORY, $testdir,
     "unwritable \$ENV{TMPDIR} not overridden with an unwritable \$CGITempFile::TMPDIRECTORY");
 
+# can't write to home dir (linux specific)
+$CGITempFile::TMPDIRECTORY = '~';
+if ( CGITempFile->new ) {
+	isnt($CGITempFile::TMPDIRECTORY,"~","can't write to ~" );
+} else {
+	pass( "can't write to ~" );
+}
+
 done_testing();
 
 END { for ($testdir, $testdir2) { chmod 0700, $_; rmdir; } }
