@@ -10,6 +10,10 @@
     - handle multiple values in X-Forwarded-Host header, we follow the
       logic in most other frameworks and take the last value from the list
       (RT #54487)
+    - reverse the order of TEMP dir placement for WINDOWS: TEMP > TMP > WINDIR
+      (RT #71799, thanks to jeff@math.tntech.edu), this returns the behaviour
+      to pre e24d04e9bc5fda7722444b02fec135d8cc2ff488 but with the undefined
+      fix still in place
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
