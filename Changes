@@ -14,6 +14,8 @@
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
     - test case for RT #53966 - disallow filenames with ~ char
+    - test case for RT #55166 - calling Vars to get the filename does not return
+      a filehandle, so this cannot be used in the call to uploadinfo
 
 4.03 2014-07-02
 

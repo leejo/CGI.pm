@@ -73,6 +73,16 @@ my $q;
     my $test = "uploadInfo: basic test";
     my $fh = $q->upload('300x300_gif');
     is( $q->uploadInfo($fh)->{'Content-Type'}, "image/gif", $test);
+
+	# access using param
+	my $param_value = $q->param( '300x300_gif' );
+	ok( ref( $param_value ),'param returns filehandle' );
+    is( $q->uploadInfo( $param_value )->{'Content-Type'}, "image/gif", $test . ' via param');
+
+	# access using Vars (is not possible)
+	my $vars = $q->Vars;
+	ok( ! ref( $vars->{'300x300_gif'} ),'Vars does not return filehandle' );
+    ok( ! $q->uploadInfo( $vars->{'300x300_gif'} ), $test . ' via Vars');
 }
 
 my $q2 = CGI->new;
