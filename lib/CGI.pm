@@ -6242,6 +6242,12 @@ a hash containing all the document headers.
         die "HTML FILES ONLY!";
        }
 
+Note that you must use ->param to get the filename to pass into uploadInfo
+as internally this is represented as a Fh object (which is what will be
+returned by ->param). When using ->Vars you will get the literal filename
+rather than the Fh object, which will not return anything when passed to
+uploadInfo. So don't use ->Vars.
+
 If you are using a machine that recognizes "text" and "binary" data
 modes, be sure to understand when and how to use them (see the Camel book).  
 Otherwise you may find that binary files are corrupted during file
