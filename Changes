@@ -6,6 +6,11 @@
     - both CGI::Apache and CGI::Switch have been removed as these modules
       1) have been deprecated for *years*, and 2) do nothing whatsoever
 
+    [ SPEC / BUG FIXES ]
+    - handle multiple values in X-Forwarded-Host header, we follow the
+      logic in most other frameworks and take the last value from the list
+      (RT #54487)
+
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
     - test case for RT #53966 - disallow filenames with ~ char

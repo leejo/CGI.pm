@@ -16,6 +16,10 @@ is server_port()  => 8080, 'server_port()';
 
 is url() => 'http://proxy:8484', 'url()';
 
+$ENV{HTTP_X_FORWARDED_HOST} = '192.169.1.1, proxy1:80, 127.0.0.1, proxy2:8484';
+
+is url() => 'http://proxy2:8484', 'url() with multiple proxies';
+
 # let's see if we do the defaults right
 
 $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:80';

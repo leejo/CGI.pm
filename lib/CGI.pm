@@ -2810,6 +2810,8 @@ sub url {
         my $protocol = $self->protocol();
         $url = "$protocol://";
         my $vh = http('x_forwarded_host') || http('host') || '';
+			$vh =~ s/^.*,\s*//; # x_forwarded_host may be a comma-separated list (e.g. when the request has
+                                # passed through multiple reverse proxies. Take the last one.
             $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
 
         $url .= $vh || server_name();
