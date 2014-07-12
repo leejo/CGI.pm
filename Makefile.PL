@@ -15,6 +15,7 @@ WriteMakefile(
      'PREREQ_PM' => {
        'if'          => 0, # core in 5.6.2 and later, for deprecate.pm
        'Test::More'  => 0.98, # Ideally, this could be just a "test_requires". Version requirement is for 'subtest' support.
+       'Test::Deep'  => 0.11,
        'File::Spec'  => .82,
     },
     test => { TESTS => 't/*.t t/headers/*.t' },

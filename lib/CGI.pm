@@ -1307,6 +1307,7 @@ sub url_param {
 	    my($param,$value);
 	    for (@pairs) {
 		($param,$value) = split('=',$_,2);
+		next if ! defined($param);
 		$param = unescape($param);
 		$value = unescape($value);
 		push(@{$self->{'.url_param'}->{$param}},$value);

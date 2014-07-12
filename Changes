@@ -14,6 +14,7 @@
       (RT #71799, thanks to jeff@math.tntech.edu), this returns the behaviour
       to pre e24d04e9bc5fda7722444b02fec135d8cc2ff488 but with the undefined
       fix still in place
+    - fix warnings when QUERY_STRING has empty key=value pairs (RT #54511)
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
