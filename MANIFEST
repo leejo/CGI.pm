@@ -53,6 +53,7 @@ t/multipart_start.t
 t/no_tabindex.t
 t/param_fetch.t
 t/popup_menu.t
+t/postdata.t
 t/pretty.t
 t/push.t
 t/query_string.t
