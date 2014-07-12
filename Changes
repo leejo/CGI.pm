@@ -14,6 +14,8 @@
       (RT #71799, thanks to jeff@math.tntech.edu), this returns the behaviour
       to pre e24d04e9bc5fda7722444b02fec135d8cc2ff488 but with the undefined
       fix still in place
+    - prevent corruption of POSTDATA/PUTDATA when -utf8 flag is used and use
+      tempfiles to handle this data (RT #79102, thanks anonymous)
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)
