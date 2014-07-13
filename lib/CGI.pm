@@ -5019,10 +5019,16 @@ pragma.
 
 =item -utf8
 
-This makes CGI.pm treat all parameters as UTF-8 strings. Use this with
-care, as it will interfere with the processing of binary uploads. It
-is better to manually select which fields are expected to return utf-8
-strings and convert them using code like this:
+This makes CGI.pm treat all parameters as text strings rather than binary
+strings (see L<perlunitut> for the distinction), assuming UTF-8 for the
+encoding.
+
+CGI.pm does the decoding from the UTF-8 encoded input data, restricting this
+decoding to input text as distinct from binary upload data which are left
+untouched. Therefore, a ':utf8' layer must B<not> be used on STDIN.
+
+If you do not use this option you can manually select which fields are
+expected to return utf-8 strings and convert them using code like this:
 
  use Encode;
  my $arg = decode utf8=>param('foo');
