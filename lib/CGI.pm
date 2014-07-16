@@ -4332,6 +4332,21 @@ For more discussion on the removal of CGI.pm from core please see:
 
   L<http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html>
 
+=head1 HTML Generation functions should no longer be used
+
+B<All> HTML generation functions within CGI.pm are no longer being
+maintained. Any issues, bugs, or patches will be rejected unless
+they relate to fundamentally broken page rendering.
+
+The rational for this is that the HTML generation functions of CGI.pm
+are an obfuscation at best and a maintenance nightmare at worst. You
+should be using a template engine for better separation of concerns.
+See L<CGI::Alternatives> for an example of using CGI.pm with the
+L<Template::Toolkit> module.
+
+These functions, and perldoc for them, will continue to exist in the
+v4 releases of CGI.pm but may be deprecated (soft) in v5 and beyond.
+
 =head2 Programming style
 
 There are two styles of programming with CGI.pm, an object-oriented

@@ -26,6 +26,8 @@
 
     [ DOCUMENTATION ]
     - tweak perldoc for -utf8 option (RT #54341, thanks to Helmut Richter)
+    - explain the HTML generation functions should no longer be used and that
+      they may be deprecated in a future release
 
 4.03 2014-07-02
 
