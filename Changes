@@ -23,6 +23,8 @@
       a filehandle, so this cannot be used in the call to uploadinfo, also
       update documentation for the uploadInfo to show that ->Vars should not be
       used to get the filename for this method
+    - fix t/url.t to pass on Win32 platforms that have the SCRIPT_NAME env
+      variable set (RT #89992)
 
     [ DOCUMENTATION ]
     - tweak perldoc for -utf8 option (RT #54341, thanks to Helmut Richter)
