@@ -8,7 +8,7 @@
 use strict;
 use Test::More 'no_plan';
 
-use CGI;
+use CGI qw/ :form /;
 
 #-----------------------------------------------------------------------------
 # %ENV setup.
@@ -72,6 +72,7 @@ my $q;
 {
     my $test = "uploadInfo: basic test";
     my $fh = $q->upload('300x300_gif');
+    is( uploadInfo($fh)->{'Content-Type'}, "image/gif", $test);
     is( $q->uploadInfo($fh)->{'Content-Type'}, "image/gif", $test);
 
 	# access using param
