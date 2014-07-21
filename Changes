@@ -25,6 +25,8 @@
       used to get the filename for this method
     - fix t/url.t to pass on Win32 platforms that have the SCRIPT_NAME env
       variable set (RT #89992)
+    - add procedural call tests for upload and uploadInfo to confirm these work
+      as should (RT #91136)
 
     [ DOCUMENTATION ]
     - tweak perldoc for -utf8 option (RT #54341, thanks to Helmut Richter)
