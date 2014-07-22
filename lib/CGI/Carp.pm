@@ -578,6 +578,10 @@ END
     else {
         print STDOUT "Status: 500\n";
         print STDOUT "Content-type: text/html\n\n";
+        # MSIE won't display a custom 500 response unless it is >512 bytes!
+        if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
+          $mess = "<!-- " . (' ' x 513) . " -->\n$mess";
+        }
         print STDOUT $mess;
     }
   }
