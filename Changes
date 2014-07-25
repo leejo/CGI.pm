@@ -16,6 +16,9 @@
       fix still in place
     - fix warnings when QUERY_STRING has empty key=value pairs (RT #54511)
     - pad custom 500 status response messages to > 512 for MSIE (RT #81946)
+    - support content in DELETE requests (DELETEDATA param like POSTDATA) whilst
+      keeping compatibility with QUERY_STRING parsing (RT #69958)
+    - set POSTDATA/PUTDATA/DELETEDATA when CONTENT_TYPE is not defined (RT #70284)
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)

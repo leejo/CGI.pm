@@ -635,6 +635,11 @@ sub init {
       # the environment.
       if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
           $query_string = $self->_get_query_string_from_env;
+          # a DELETE request may have content, if so stick it in
+          # $delete_data to distinguish between it and POST/PUT
+		  if ( $meth eq 'DELETE' and $content_length > 0 ) {
+			$self->read_from_client(\$delete_data,$content_length,0);
+		  }
 	      last METHOD;
       }
 
@@ -666,14 +671,27 @@ sub init {
   }
 
 # YL: Begin Change for XML handler 10/19/2001
-    if (!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
-        && defined($ENV{'CONTENT_TYPE'})
-        && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
-	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
+    if (
+		!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT' || $meth eq 'DELETE')
+        && (
+			(
+				defined($ENV{'CONTENT_TYPE'})
+				&& $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
+				&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data|
+			)
+			|| !defined($ENV{'CONTENT_TYPE'})
+		)
+	) {
 	    my($param) = $meth . 'DATA' ;
 	    $self->add_parameter($param) ;
-	    push (@{$self->{param}{$param}},$query_string);
-	    undef $query_string ;
+		if ( $meth eq 'DELETE' ) {
+		    push (@{$self->{param}{$param}},$delete_data);
+		} else {
+		    push (@{$self->{param}{$param}},$query_string);
+		}
+		# we undef query_string to prevent further parsing of the data
+		# (lest we try to parse binary content)
+		undef $query_string;
     }
 # YL: End Change for XML handler 10/19/2001
 
@@ -4693,6 +4711,11 @@ it, use code like this:
 Likewise if PUTed data can be retrieved with code like this:
 
    my $data = $query->param('PUTDATA');
+
+And also if DELETEed data can be retrieved with code like this:
+
+   my $data = $query->param('DELETEDATA');
+
 
 (If you don't know what the preceding means, don't worry about it.  It
 only affects people trying to use CGI for XML processing and other

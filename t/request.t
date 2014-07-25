@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 44;
 use Test::Deep;
 
 use CGI ();
@@ -85,6 +85,7 @@ $q->_reset_globals;
   ok $q=new CGI,"CGI::new() from POST";
   is $q->param('weather'), 'nice',"CGI::param() from POST";
   is $q->url_param('big_balls'), 'basketball',"CGI::url_param()";
+  is $q->param( 'POSTDATA' ), $test_string;
 }
 
 # test url_param 
