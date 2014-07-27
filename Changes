@@ -16,6 +16,8 @@
       fix still in place
     - fix warnings when QUERY_STRING has empty key=value pairs (RT #54511)
     - pad custom 500 status response messages to > 512 for MSIE (RT #81946)
+    - make Vars tied hash delete method return the value deleted from the hash
+      making it act like perl's delete (RT #51020)
 
     [ TESTING ]
     - add .travis.yml (https://travis-ci.org)

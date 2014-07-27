@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 44;
 use Test::Deep;
 
 use CGI ();
@@ -70,6 +70,7 @@ is $p->{bar}, 'froz',"tied interface fetch";
 $p->{bar} = join("\0",qw(foo bar baz));
 is join(' ',$q->param('bar')), 'foo bar baz','tied interface store';
 ok exists $p->{bar};
+is delete $p->{bar}, "foo\0bar\0baz",'tied interface delete';
 
 # test posting
 $q->_reset_globals;

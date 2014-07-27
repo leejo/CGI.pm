@@ -1217,7 +1217,10 @@ END_OF_FUNC
 
 'DELETE' => <<'END_OF_FUNC',
 sub DELETE {
-    $_[0]->delete($_[1]);
+    my ($self, $param) = @_;
+    my $value = $self->FETCH($param);
+    $self->delete($param);
+    return $value;
 }
 END_OF_FUNC
 
