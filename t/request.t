@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 use Test::Deep;
 
 use CGI ();
@@ -69,8 +69,16 @@ my $p = $q->Vars;
 is $p->{bar}, 'froz',"tied interface fetch";
 $p->{bar} = join("\0",qw(foo bar baz));
 is join(' ',$q->param('bar')), 'foo bar baz','tied interface store';
-ok exists $p->{bar};
+ok exists $p->{bar}, 'tied interface stored';
+is $p->{bar}, "foo\0bar\0baz",'tied interface get';
 is delete $p->{bar}, "foo\0bar\0baz",'tied interface delete';
+$p->{bar_array_ref} = [ qw/foo bar baz/ ];
+# FIXME: FETCH should return an array ref if the original STORE was
+# an array ref. *BUT* STORE always stores an array ref.
+# so we don't currently know if what we had was an array ref
+# because it was passed or because we stored it that way.
+isa_ok( $p->{bar_array_ref},'ARRAY' );
+is join(' ',$q->param('bar_array_ref')), 'foo bar baz','tied interface store (ARRAY)';
 
 # test posting
 $q->_reset_globals;

@@ -1180,11 +1180,13 @@ END_OF_FUNC
 
 'STORE' => <<'END_OF_FUNC',
 sub STORE {
-    my $self = shift;
-    my $tag  = shift;
-    my $vals = shift;
-    my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
-    $self->param(-name=>$tag,-value=>\@vals);
+    my ( $self,$tag,$vals ) = @_;
+    if (defined $vals and ref $vals eq 'ARRAY') {
+        return $self->param(-name => $tag, -value => $vals);
+    } else {
+        my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
+        return $self->param(-name=>$tag,-value=>\@vals);
+    }
 }
 END_OF_FUNC
 
