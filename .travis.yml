@@ -25,4 +25,4 @@ script:
     - prove -lrsv t
 
 notifications:
-	email: false
+    email: false
