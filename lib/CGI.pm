@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.03_01';
+$CGI::VERSION='4.03_02';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -4170,27 +4170,20 @@ sub find_tempdir {
     if( $CGI::OS eq 'WINDOWS' ){
          # PeterH: These evars may not exist if this is invoked within a service and untainting
          # is in effect - with 'use warnings' the undefined array entries causes Perl to die
-         unshift(@TEMP,$ENV{WINDIR} . $SL . 'TEMP') if defined $ENV{WINDIR};
-         unshift(@TEMP,$ENV{TMP}) if defined $ENV{TMP};
-         unshift(@TEMP,$ENV{TEMP}) if defined $ENV{TEMP};
+         unshift(@TEMP,$ENV{WINDIR} . $SL . 'TEMP') if $ENV{WINDIR};
+         unshift(@TEMP,$ENV{TMP}) if $ENV{TMP};
+         unshift(@TEMP,$ENV{TEMP}) if $ENV{TEMP};
     }
 
     unshift(@TEMP,$ENV{'TMPDIR'}) if defined $ENV{'TMPDIR'};
-
-    # this feature was supposed to provide per-user tmpfiles, but
-    # it is problematic.
-    #    unshift(@TEMP,(getpwuid($<))[7].'/tmp') if $CGI::OS eq 'UNIX';
-    # Rob: getpwuid() is unfortunately UNIX specific. On brain dead OS'es this
-    #    : can generate a 'getpwuid() not implemented' exception, even though
-    #    : it's never called.  Found under DOS/Win with the DJGPP perl port.
-    #    : Refer to getpwuid() only at run-time if we're fortunate and have  UNIX.
-    # unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
 
     for (@TEMP) {
       do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
     }
   }
-  $TMPDIRECTORY  = $MAC ? "" : "." unless $TMPDIRECTORY;
+  if (! $TMPDIRECTORY) {
+    $TMPDIRECTORY = $MAC ? "" : ".";
+  }
 }
 
 find_tempdir();
