@@ -4154,35 +4154,19 @@ END_OF_AUTOLOAD
 ####################################################################################
 ################################## TEMPORARY FILES #################################
 ####################################################################################
+
+# FIXME: kill this package and just use File::Temp
 package CGITempFile;
+
+use File::Spec;
 
 sub find_tempdir {
   $SL = $CGI::SL;
-  $MAC = $CGI::OS eq 'MACINTOSH';
-  my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
   unless (defined $TMPDIRECTORY) {
-    @TEMP=("${SL}usr${SL}tmp","${SL}var${SL}tmp",
-	   "C:${SL}temp","${SL}tmp","${SL}temp",
-	   "${vol}${SL}Temporary Items",
-           "${SL}WWW_ROOT", "${SL}SYS\$SCRATCH",
-	   "C:${SL}system${SL}temp");
-    
-    if( $CGI::OS eq 'WINDOWS' ){
-         # PeterH: These evars may not exist if this is invoked within a service and untainting
-         # is in effect - with 'use warnings' the undefined array entries causes Perl to die
-         unshift(@TEMP,$ENV{WINDIR} . $SL . 'TEMP') if $ENV{WINDIR};
-         unshift(@TEMP,$ENV{TMP}) if $ENV{TMP};
-         unshift(@TEMP,$ENV{TEMP}) if $ENV{TEMP};
-    }
-
-    unshift(@TEMP,$ENV{'TMPDIR'}) if defined $ENV{'TMPDIR'};
-
-    for (@TEMP) {
+    for ($ENV{'TMPDIR'},File::Spec->tmpdir) {
+      next if ! defined;
       do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
     }
-  }
-  if (! $TMPDIRECTORY) {
-    $TMPDIRECTORY = $MAC ? "" : ".";
   }
 }
 
@@ -5122,11 +5106,8 @@ The temporary directory is selected using the following algorithm:
     2. if the environment variable TMPDIR exists, use the location
     indicated.
 
-    3. Otherwise try the locations /usr/tmp, /var/tmp, C:\temp,
-    /tmp, /temp, ::Temporary Items, and \WWW_ROOT.
-
-Each of these locations is checked that it is a directory and is
-writable.  If not, the algorithm tries the next choice.
+    3. Otherwise use File::Spec->tmpdir to find a temp directory
+    (see File::Spec::Unix and File::Spec::Win32)
 
 =back
 
