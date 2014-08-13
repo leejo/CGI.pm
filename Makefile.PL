@@ -10,7 +10,7 @@ system("perl", "t/gen-tests/gen-start-end-tags.pl");
 WriteMakefile(
 'INSTALLDIRS' => ( $] >= 5.012 ? 'site' : 'perl' ),
     'NAME'	=> 'CGI',
-    'DISTNAME'  => 'CGI.pm',
+    'DISTNAME'  => 'CGI',
     'VERSION_FROM'   => 'lib/CGI.pm',
      'PREREQ_PM' => {
        'if'          => 0, # core in 5.6.2 and later, for deprecate.pm
