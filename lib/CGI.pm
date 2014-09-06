@@ -7967,7 +7967,7 @@ available for your use:
   * PrintEnv()
     This function is not available. You'll have to roll your own if you really need it.
 
-=head1 AUTHOR INFORMATION
+=head1 LICENSE
 
 The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
 distributed under GPL and the Artistic License 2.0. It is currently
