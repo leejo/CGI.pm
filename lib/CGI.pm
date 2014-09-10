@@ -499,15 +499,13 @@ sub self_or_CGI {
 # parameter list with the single parameter 'keywords'.
 
 sub init {
-  my ($self,$initializer,$config) = @_;
+  my $self = shift;
   my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
 
   my $is_xforms;
-  $config ||= {};
 
+  my $initializer = shift;  # for backward compatibility
   local($/) = "\n";
-
-  $self->{'.client_handle'} = $config->{client_handle} || \*STDIN;
 
     # set autoescaping on by default
     $self->{'escape'} = 1;
@@ -515,11 +513,7 @@ sub init {
     # if we get called more than once, we want to initialize
     # ourselves from the original query (which may be gone
     # if it was read from STDIN originally.)
-    if (
-        @QUERY_PARAM
-        && !defined($initializer)
-        && !exists($config->{client_handle})
-    ) {
+    if (@QUERY_PARAM && !defined($initializer)) {
         for my $name (@QUERY_PARAM) {
             my $val = $QUERY_PARAM{$name}; # always an arrayref;
             $self->param('-name'=>$name,'-value'=> $val);
@@ -533,7 +527,6 @@ sub init {
         $self->charset($QUERY_CHARSET);
         $self->{'.fieldnames'} = {%QUERY_FIELDNAMES};
         $self->{'.tmpfiles'}   = {%QUERY_TMPFILES};
-        $self->init_cleanup();
         return;
     }
 
@@ -712,13 +705,6 @@ sub init {
     $self->delete('.cgifields');
 
     $self->save_request unless defined $initializer;
-    $self->init_cleanup;
-}
-
-sub init_cleanup {
-    my $self = shift;
-    delete( $self->{'.client_handle'} );
-    return;
 }
 
 sub _get_query_string_from_env {
@@ -1036,7 +1022,7 @@ sub read_from_client {
     local $^W=0;                # prevent a warning
     return $MOD_PERL
         ? $self->r->read($$buff, $len, $offset)
-        : read($self->{'.client_handle'}, $$buff, $len, $offset);
+        : read(\*STDIN, $$buff, $len, $offset);
 }
 END_OF_FUNC
 
@@ -3954,8 +3940,7 @@ sub new {
     } else { # otherwise we find it ourselves
 	my($old);
 	($old,$/) = ($/,$CRLF); # read a CRLF-delimited line
-    my $client_handle = $interface->{'.client_handle'};
-    $boundary = <$client_handle>;   # BUG: This won't work correctly under mod_perl
+	$boundary = <STDIN>;      # BUG: This won't work correctly under mod_perl
 	$length -= length($boundary);
 	chomp($boundary);               # remove the CRLF
 	$/ = $old;                      # restore old line separator
