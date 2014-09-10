@@ -3,6 +3,11 @@
     [ DOCUMENTATION ]
     - change AUTHOR INFORMATION to LICENSE to please Kwalitee
 
+    [ TESTING ]
+    - t/arbitrary_handles.t to check need for patch in RT #54055, it
+      turns out there is no need - the first argument to CGI->new can
+      be an arbitrary handle
+
 4.04 2014-09-04
 
     [ RELEASE NOTES ]
