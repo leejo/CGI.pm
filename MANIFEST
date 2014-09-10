@@ -30,6 +30,7 @@ lib/CGI/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/arbitrary_handles.t
 t/autoescape.t
 t/can.t
 t/carp.t
