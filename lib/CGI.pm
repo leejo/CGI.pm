@@ -4182,7 +4182,13 @@ sub DESTROY {
     my($self) = @_;
     $$self =~ m!^([a-zA-Z0-9_ \'\":/.\$\\~-]+)$! || return;
     my $safe = $1;             # untaint operation
-    unlink $safe;              # get rid of the file
+	if ( -e $safe ) {
+		my $ret = unlink $safe;    # get rid of the file
+		if ( ! $ret ) {
+			warn "Couldn't unlink temp file ($safe): $!";
+		}
+		return $ret;
+	}
 }
 
 ###############################################################################

@@ -3,6 +3,10 @@
     [ DOCUMENTATION ]
     - change AUTHOR INFORMATION to LICENSE to please Kwalitee
 
+    [ ERROR HANDLING ]
+    - CGITempFile will now warn if it fails to remove temporary files
+      in the DESTROY method
+
     [ TESTING ]
     - t/arbitrary_handles.t to check need for patch in RT #54055, it
       turns out there is no need - the first argument to CGI->new can
