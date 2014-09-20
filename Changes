@@ -1,4 +1,32 @@
-4.04 2014-08-01
+4.05 2014-11-01
+
+    [ DOCUMENTATION ]
+    - change AUTHOR INFORMATION to LICENSE to please Kwalitee
+
+    [ ERROR HANDLING ]
+    - CGITempFile will now warn if it fails to remove temporary files
+      in the DESTROY method
+
+    [ TESTING ]
+    - t/arbitrary_handles.t to check need for patch in RT #54055, it
+      turns out there is no need - the first argument to CGI->new can
+      be an arbitrary handle
+    - add test case for incorrect unescaping of redirect headers
+      (RT #61120)
+
+    [ SPEC / BUG FIXES ]
+    - don't set binmode on STDOUT/STDERR/STDIN if a none standard layer
+      is already set on them on none UNIX platforms (RT #57524)
+
+
+4.04 2014-09-04
+
+    [ RELEASE NOTES ]
+    - this release removes some long deprecated modules/functions and
+      includes refactoring to the temporary file handling in CGI.pm. if
+      you are doing anything out of the ordinary with regards to temp
+      files you should test your code before deploying this update as
+      temp files may no longer be stored in previously used locations
 
     [ REMOVED / DEPRECATIONS ]
     - startform and endform methods removed (previously deprecated, you
@@ -10,10 +38,8 @@
     - handle multiple values in X-Forwarded-Host header, we follow the
       logic in most other frameworks and take the last value from the list
       (RT #54487)
-    - reverse the order of TEMP dir placement for WINDOWS: TEMP > TMP > WINDIR
-      (RT #71799, thanks to jeff@math.tntech.edu), this returns the behaviour
-      to pre e24d04e9bc5fda7722444b02fec135d8cc2ff488 but with the undefined
-      fix still in place
+    - refactor CGITempFile::find_tempdir to use File::Spec->tmpdir
+      (related: RT #71799)
     - fix warnings when QUERY_STRING has empty key=value pairs (RT #54511)
     - pad custom 500 status response messages to > 512 for MSIE (RT #81946)
     - make Vars tied hash delete method return the value deleted from the hash
