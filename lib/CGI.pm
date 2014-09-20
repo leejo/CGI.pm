@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.03';
+$CGI::VERSION='4.04';
 
 # HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
 # UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
@@ -95,6 +95,9 @@ sub initialize_globals {
 
     # return everything as utf-8
     $PARAM_UTF8      = 0;
+
+    # make param('PUTDATA') act like file upload
+    $PUTDATA_UPLOAD = 0;
 
     # Other globals that you shouldn't worry about.
     undef $Q;
@@ -201,10 +204,31 @@ if ($OS eq 'VMS') {
   $CRLF = "\015\012";
 }
 
-if ($needs_binmode) {
-    $CGI::DefaultClass->binmode(\*main::STDOUT);
-    $CGI::DefaultClass->binmode(\*main::STDIN);
-    $CGI::DefaultClass->binmode(\*main::STDERR);
+_set_binmode() if ($needs_binmode);
+
+sub _set_binmode {
+
+	# rt #57524 - don't set binmode on filehandles if there are
+	# already none default layers set on them
+	my %default_layers = (
+		unix   => 1,
+		perlio => 1,
+		stdio  => 1,
+		crlf   => 1,
+	);
+
+	foreach my $fh (
+		\*main::STDOUT,
+		\*main::STDIN,
+		\*main::STDERR,
+	) {
+		my @modes = grep { ! $default_layers{$_} }
+			PerlIO::get_layers( $fh );
+
+		if ( ! @modes ) {
+			$CGI::DefaultClass->binmode( $fh );
+		}
+	}
 }
 
 %EXPORT_TAGS = (
@@ -444,7 +468,7 @@ sub param {
 
     my @result = @{$self->{param}{$name}};
 
-    if ($PARAM_UTF8) {
+    if ($PARAM_UTF8 && $name ne 'PUTDATA' && $name ne 'POSTDATA') {
       eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
       @result = map {ref $_ ? $_ : $self->_decode_utf8($_) } @result;
     }
@@ -635,12 +659,24 @@ sub init {
       # the environment.
       if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
           $query_string = $self->_get_query_string_from_env;
+         $self->param($meth . 'DATA', $self->param('XForms:Model'))
+             if $is_xforms;
 	      last METHOD;
       }
 
       if ($meth eq 'POST' || $meth eq 'PUT') {
 	  if ( $content_length > 0 ) {
-	    $self->read_from_client(\$query_string,$content_length,0);
+        if ( ( $PUTDATA_UPLOAD || $self->{'.upload_hook'} ) && !$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
+            && defined($ENV{'CONTENT_TYPE'})
+            && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
+        && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ){
+            my $postOrPut = $meth . 'DATA' ; # POSTDATA/PUTDATA
+            $self->read_postdata_putdata( $postOrPut, $content_length, $ENV{'CONTENT_TYPE'}  );
+            $meth = ''; # to skip xform testing
+            undef $query_string ;
+        } else {
+            $self->read_from_client(\$query_string,$content_length,0);
+        }
 	  }
 	  # Some people want to have their cake and eat it too!
 	  # Uncomment this line to have the contents of the query string
@@ -935,6 +971,7 @@ sub _setup_symbols {
 	$DEBUG=0,                next if /^[:-]no_?[Dd]ebug$/;
 	$DEBUG=2,                next if /^[:-][Dd]ebug$/;
 	$USE_PARAM_SEMICOLONS++, next if /^[:-]newstyle_urls$/;
+	$PUTDATA_UPLOAD++,       next if /^[:-](?:putdata_upload|postdata_upload)$/;
 	$PARAM_UTF8++,           next if /^[:-]utf8$/;
 	$XHTML++,                next if /^[:-]xhtml$/;
 	$XHTML=0,                next if /^[:-]no_?xhtml$/;
@@ -985,6 +1022,128 @@ sub element_tab {
   my $tab = $self->{'.etab'}++;
   return '' unless $TABINDEX or defined $new_value;
   return qq(tabindex="$tab" );
+}
+
+#####
+# subroutine: read_postdata_putdata
+# 
+# Unless file uploads are disabled
+# Reads BODY of POST/PUT request and stuffs it into tempfile
+# accessible as param POSTDATA/PUTDATA
+# 
+# Also respects      upload_hook
+# 
+# based on subroutine read_multipart_related
+#####
+sub read_postdata_putdata {
+    my ( $self, $postOrPut, $content_length, $content_type ) = @_;
+    my %header = (
+        "Content-Type" =>  $content_type,
+    );
+    my $param = $postOrPut;
+    # add this parameter to our list
+    $self->add_parameter($param);
+    
+    
+    my ( $tmpfile, $tmp, $filehandle );
+  UPLOADS: {
+
+        # If we get here, then we are dealing with a potentially large
+        # uploaded form.  Save the data to a temporary file, then open
+        # the file for reading.
+
+        # skip the file if uploads disabled
+        if ($DISABLE_UPLOADS) {
+            
+            #	      while (defined($data = $buffer->read)) { }
+            my $buff;
+            my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
+            my $len  = $content_length;
+            while ( $len > 0 ) {
+                my $read = $self->read_from_client( \$buf, $unit, 0 );
+                $len -= $read;
+            }
+            last UPLOADS;
+        }
+
+        # SHOULD PROBABLY SKIP THIS IF NOT $self->{'use_tempfile'}
+        # BUT THE REST OF CGI.PM DOESN'T, SO WHATEVER
+        # choose a relatively unpredictable tmpfile sequence number
+        my $seqno =
+          unpack( "%16C*",
+            join( '', localtime, grep { defined $_ } values %ENV ) );
+        for ( my $cnt = 10 ; $cnt > 0 ; $cnt-- ) {
+            next unless $tmpfile = CGITempFile->new($seqno);
+            $tmp = $tmpfile->as_string;
+            last
+              if defined(
+                      $filehandle = Fh->new( $param, $tmp, $PRIVATE_TEMPFILES )
+              );
+            $seqno += int rand(100);
+        }
+        $CGI::DefaultClass->binmode($filehandle)
+          if $CGI::needs_binmode
+              && defined fileno($filehandle);
+
+
+        my ($data);
+        local ($\) = '';
+        my $totalbytes;
+        my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
+        my $len  = $content_length;
+        $unit = $len;
+        my $ZERO_LOOP_COUNTER =0;
+
+        while( $len > 0 )
+        {
+            
+            my $bytesRead = $self->read_from_client( \$data, $unit, 0 );
+            $len -= $bytesRead ;
+
+            # An apparent bug in the Apache server causes the read()
+            # to return zero bytes repeatedly without blocking if the
+            # remote user aborts during a file transfer.  I don't know how
+            # they manage this, but the workaround is to abort if we get
+            # more than SPIN_LOOP_MAX consecutive zero reads.
+            if ($bytesRead <= 0) {
+                die  "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $SPIN_LOOP_MAX;
+            } else {
+                $ZERO_LOOP_COUNTER = 0;
+            }
+            
+            if ( defined $self->{'.upload_hook'} ) {
+                $totalbytes += length($data);
+                &{ $self->{'.upload_hook'} }( $param, $data, $totalbytes,
+                    $self->{'.upload_data'} );
+            }
+            print $filehandle $data if ( $self->{'use_tempfile'} );
+            undef $data;
+        }
+
+        # back up to beginning of file
+        seek( $filehandle, 0, 0 );
+
+        ## Close the filehandle if requested this allows a multipart MIME
+        ## upload to contain many files, and we won't die due to too many
+        ## open file handles. The user can access the files using the hash
+        ## below.
+        close $filehandle if $CLOSE_UPLOAD_FILES;
+        $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode;
+
+        # Save some information about the uploaded file where we can get
+        # at it later.
+        # Use the typeglob as the key, as this is guaranteed to be
+        # unique for each filehandle.  Don't use the file descriptor as
+        # this will be re-used for each filehandle if the
+        # close_upload_files feature is used.
+        $self->{'.tmpfiles'}->{$$filehandle} = {
+            hndl => $filehandle,
+            name => $tmpfile,
+            info => {%header},
+        };
+        push( @{ $self->{param}{$param} }, $filehandle );
+    }
+    return;
 }
 
 ###############################################################################
@@ -2800,15 +2959,15 @@ sub url {
 
     my $path        =  $self->path_info;
     my $script_name =  $self->script_name;
-    my $request_uri =  unescape($self->request_uri) || '';
+    my $request_uri =  $self->request_uri || '';
     my $query_str   =  $self->query_string;
 
-    my $rewrite_in_use = $request_uri && $request_uri !~ /^\Q$script_name/;
+    $request_uri    =~ s/\?.*$//s; # remove query string
+    $request_uri    =  unescape($request_uri);
 
     my $uri         =  $rewrite && $request_uri ? $request_uri : $script_name;
-    $uri            =~ s/\?.*$//s;                                # remove query string
+    $uri            =~ s/\?.*$//s; # remove query string
     $uri            =~ s/\Q$ENV{PATH_INFO}\E$// if defined $ENV{PATH_INFO};
-#    $uri            =~ s/\Q$path\E$//      if defined $path;      # remove path
 
     if ($full) {
         my $protocol = $self->protocol();
@@ -4154,43 +4313,20 @@ END_OF_AUTOLOAD
 ####################################################################################
 ################################## TEMPORARY FILES #################################
 ####################################################################################
+
+# FIXME: kill this package and just use File::Temp
 package CGITempFile;
+
+use File::Spec;
 
 sub find_tempdir {
   $SL = $CGI::SL;
-  $MAC = $CGI::OS eq 'MACINTOSH';
-  my ($vol) = $MAC ? MacPerl::Volumes() =~ /:(.*)/ : "";
   unless (defined $TMPDIRECTORY) {
-    @TEMP=("${SL}usr${SL}tmp","${SL}var${SL}tmp",
-	   "C:${SL}temp","${SL}tmp","${SL}temp",
-	   "${vol}${SL}Temporary Items",
-           "${SL}WWW_ROOT", "${SL}SYS\$SCRATCH",
-	   "C:${SL}system${SL}temp");
-    
-    if( $CGI::OS eq 'WINDOWS' ){
-         # PeterH: These evars may not exist if this is invoked within a service and untainting
-         # is in effect - with 'use warnings' the undefined array entries causes Perl to die
-         unshift(@TEMP,$ENV{WINDIR} . $SL . 'TEMP') if defined $ENV{WINDIR};
-         unshift(@TEMP,$ENV{TMP}) if defined $ENV{TMP};
-         unshift(@TEMP,$ENV{TEMP}) if defined $ENV{TEMP};
-    }
-
-    unshift(@TEMP,$ENV{'TMPDIR'}) if defined $ENV{'TMPDIR'};
-
-    # this feature was supposed to provide per-user tmpfiles, but
-    # it is problematic.
-    #    unshift(@TEMP,(getpwuid($<))[7].'/tmp') if $CGI::OS eq 'UNIX';
-    # Rob: getpwuid() is unfortunately UNIX specific. On brain dead OS'es this
-    #    : can generate a 'getpwuid() not implemented' exception, even though
-    #    : it's never called.  Found under DOS/Win with the DJGPP perl port.
-    #    : Refer to getpwuid() only at run-time if we're fortunate and have  UNIX.
-    # unshift(@TEMP,(eval {(getpwuid($>))[7]}).'/tmp') if $CGI::OS eq 'UNIX' and $> != 0;
-
-    for (@TEMP) {
+    for ($ENV{'TMPDIR'},File::Spec->tmpdir) {
+      next if ! defined;
       do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
     }
   }
-  $TMPDIRECTORY  = $MAC ? "" : "." unless $TMPDIRECTORY;
 }
 
 find_tempdir();
@@ -4205,7 +4341,13 @@ sub DESTROY {
     my($self) = @_;
     $$self =~ m!^([a-zA-Z0-9_ \'\":/.\$\\~-]+)$! || return;
     my $safe = $1;             # untaint operation
-    unlink $safe;              # get rid of the file
+	if ( -e $safe ) {
+		my $ret = unlink $safe;    # get rid of the file
+		if ( ! $ret ) {
+			warn "Couldn't unlink temp file ($safe): $!";
+		}
+		return $ret;
+	}
 }
 
 ###############################################################################
@@ -4701,6 +4843,10 @@ Likewise if PUTed data can be retrieved with code like this:
 only affects people trying to use CGI for XML processing and other
 specialized tasks.)
 
+PUTDATA/POSTDATA are also available via
+L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
+and as L<file uploads|/PROCESSING A FILE UPLOAD FIELD> via L</-putdata_upload>
+option.
 
 =head2 Direct access to the parameter list:
 
@@ -5051,6 +5197,14 @@ expected to return utf-8 strings and convert them using code like this:
  use Encode;
  my $arg = decode utf8=>param('foo');
 
+=item -putdata_upload
+
+Makes C<<< $query->param('PUTDATA'); >>> and C<<< $query->param('POSTDATA'); >>>
+act like file uploads named PUTDATA and POSTDATA. See
+L</HANDLING NON-URLENCODED ARGUMENTS> and L</PROCESSING A FILE UPLOAD FIELD>
+PUTDATA/POSTDATA are also available via
+L<upload_hook|/Progress bars for file uploads and avoiding temp files>.
+
 =item -nph
 
 This makes CGI.pm produce a header appropriate for an NPH (no
@@ -5129,11 +5283,8 @@ The temporary directory is selected using the following algorithm:
     2. if the environment variable TMPDIR exists, use the location
     indicated.
 
-    3. Otherwise try the locations /usr/tmp, /var/tmp, C:\temp,
-    /tmp, /temp, ::Temporary Items, and \WWW_ROOT.
-
-Each of these locations is checked that it is a directory and is
-writable.  If not, the algorithm tries the next choice.
+    3. Otherwise use File::Spec->tmpdir to find a temp directory
+    (see File::Spec::Unix and File::Spec::Win32)
 
 =back
 
@@ -7993,7 +8144,7 @@ available for your use:
   * PrintEnv()
     This function is not available. You'll have to roll your own if you really need it.
 
-=head1 AUTHOR INFORMATION
+=head1 LICENSE
 
 The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
 distributed under GPL and the Artistic License 2.0. It is currently
