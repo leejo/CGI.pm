@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+	<env:Header>
+		<mm7:TransactionID env:mustUnderstand="1" xmlns:mm7="http://www.3gpp.org/ftp/Specs/archive/23_series/23.140/schema/REL-5-MM7-1-0">4401196412625869430</mm7:TransactionID>
+	</env:Header>
+	<env:Body>
+		<mm7:CapabilityASReplyReq xmlns:mm7="http://www.3gpp.org/ftp/Specs/archive/23_series/23.140/schema/REL-5-MM7-1-0">
+			<MM7Version>5.3.0</MM7Version>
+			<SenderAddress>XXXXX</SenderAddress>
+			<CapRequestId>4401196412625869430</CapRequestId>
+			<TimeStamp>2007-11-30 09:50:25</TimeStamp>
+			<StatusCode>1000</StatusCode>
+			<StatusText>Request Received</StatusText>
+			<Content href="cid:generic_content_id"/>
+		</mm7:CapabilityASReplyReq>
+	</env:Body>
+</env:Envelope>

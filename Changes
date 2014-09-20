@@ -17,7 +17,8 @@
     [ SPEC / BUG FIXES ]
     - don't set binmode on STDOUT/STDERR/STDIN if a none standard layer
       is already set on them on none UNIX platforms (RT #57524)
-
+    - make XForms:Model data accesible through POSTDATA/PUTDATA param
+      (RT #75628)
 
 4.04 2014-09-04
 

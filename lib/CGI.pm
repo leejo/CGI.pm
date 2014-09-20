@@ -656,6 +656,8 @@ sub init {
       # the environment.
       if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
           $query_string = $self->_get_query_string_from_env;
+         $self->param($meth . 'DATA', $self->param('XForms:Model'))
+             if $is_xforms;
 	      last METHOD;
       }
 
