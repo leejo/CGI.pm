@@ -201,10 +201,31 @@ if ($OS eq 'VMS') {
   $CRLF = "\015\012";
 }
 
-if ($needs_binmode) {
-    $CGI::DefaultClass->binmode(\*main::STDOUT);
-    $CGI::DefaultClass->binmode(\*main::STDIN);
-    $CGI::DefaultClass->binmode(\*main::STDERR);
+_set_binmode() if ($needs_binmode);
+
+sub _set_binmode {
+
+	# rt #57524 - don't set binmode on filehandles if there are
+	# already none default layers set on them
+	my %default_layers = (
+		unix   => 1,
+		perlio => 1,
+		stdio  => 1,
+		crlf   => 1,
+	);
+
+	foreach my $fh (
+		\*main::STDOUT,
+		\*main::STDIN,
+		\*main::STDERR,
+	) {
+		my @modes = grep { ! $default_layers{$_} }
+			PerlIO::get_layers( $fh );
+
+		if ( ! @modes ) {
+			$CGI::DefaultClass->binmode( $fh );
+		}
+	}
 }
 
 %EXPORT_TAGS = (
