@@ -524,7 +524,7 @@ END
         eval { 
             &$CUSTOM_MSG($msg); # nicer to perl 5.003 users
         };
-        if ($@) { print STDERR q(error while executing the error handler: $@); }
+        if ($@) { print STDERR qq(error while executing the error handler: $@); }
 
       return;
     } else {

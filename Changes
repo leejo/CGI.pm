@@ -24,6 +24,7 @@
     - unescape request URI *after* having removed the query string to prevent
       removal of ? chars that are part of the original URI (and were encoded)
       (RT #83265)
+    - fix q( to qq( in CGI::Carp so $@ is correct interpolated (RT #83360)
 
 4.04 2014-09-04
 
