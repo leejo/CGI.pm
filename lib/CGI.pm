@@ -2960,7 +2960,7 @@ sub url {
     my $path        =  $self->path_info;
     my $script_name =  $self->script_name;
     my $request_uri =  $self->request_uri || '';
-    my $query_str   =  $self->query_string;
+    my $query_str   =  $query ? $self->query_string : '';
 
     $request_uri    =~ s/\?.*$//s; # remove query string
     $request_uri    =  unescape($request_uri);

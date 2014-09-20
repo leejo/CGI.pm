@@ -26,6 +26,8 @@
       removal of ? chars that are part of the original URI (and were encoded)
       (RT #83265)
     - fix q( to qq( in CGI::Carp so $@ is correct interpolated (RT #83360)
+    - don't call ->query_string in url unless -query is passed (RT #87790)
+      (optimisation and fits the current documented behaviour)
 
 4.04 2014-09-04
 
