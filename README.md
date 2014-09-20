@@ -16,7 +16,7 @@ split into its own distribution, meaning you do not need acces to a compiler
 to install CGI.pm
 
 The rational for this decision is that CGI.pm is no longer considered good
-practice for developing web applications, B<including> quick prototyping and
+practice for developing web applications, *including* quick prototyping and
 small web scripts. There are far better, cleaner, quicker, easier, safer,
 more scalable, more extensible, more modern alternatives available at this point
 in time. These will be documented with a specific CPAN dist: CGI::Alternatives.
