@@ -12,6 +12,11 @@
       turns out there is no need - the first argument to CGI->new can
       be an arbitrary handle
 
+    [ SPEC / BUG FIXES ]
+    - don't set binmode on STDOUT/STDERR/STDIN if a none standard layer
+      is already set on them on none UNIX platforms (RT #57524)
+
+
 4.04 2014-09-04
 
     [ RELEASE NOTES ]
