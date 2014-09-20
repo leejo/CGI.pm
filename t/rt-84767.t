@@ -18,7 +18,7 @@ open( my $fh,"<","$Script" )
 while ( <$fh> ) {
     eval { die("error") if /error/; };
     $@ && do {
-        like( $@,qr/line 19, line 19/,'die with input line number' );
+        like( $@,qr!at t/$Script line 19!,'die with input line number' );
         last;
     }
 }
