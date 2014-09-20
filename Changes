@@ -13,6 +13,7 @@
       be an arbitrary handle
     - add test case for incorrect unescaping of redirect headers
       (RT #61120)
+    - add tests for the handle method (RT #85074, thanks to TONYC@cpan.org)
 
     [ SPEC / BUG FIXES ]
     - don't set binmode on STDOUT/STDERR/STDIN if a none standard layer

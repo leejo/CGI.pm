@@ -4039,8 +4039,8 @@ END_OF_FUNC
 'handle' => <<'END_OF_FUNC',
 sub handle {
   my $self = shift;
-  eval "require IO::Handle" unless IO::Handle->can('new_from_fd');
-  return IO::Handle->new_from_fd(fileno $self,"<");
+  eval "require IO::File" unless IO::Handle->can('new_from_fd');
+  return IO::File->new_from_fd(fileno $self,"<");
 }
 END_OF_FUNC
 
@@ -6375,14 +6375,14 @@ recognized.  See textfield() for details.
 
 =head3 Basics
 
-When the form is processed, you can retrieve an L<IO::Handle> compatible
+When the form is processed, you can retrieve an L<IO::File> compatible
 handle for a file upload field like this:
 
   $lightweight_fh  = $q->upload('field_name');
 
   # undef may be returned if it's not a valid file handle
   if (defined $lightweight_fh) {
-    # Upgrade the handle to one compatible with IO::Handle:
+    # Upgrade the handle to one compatible with IO::File:
     my $io_handle = $lightweight_fh->handle;
 
     open (OUTFILE,'>>','/usr/local/web/users/feedback');
@@ -6522,10 +6522,10 @@ param() is not a filehandle at all, but a string.
 To solve this problem the upload() method was added, which always returns a
 lightweight filehandle. This generally works well, but will have trouble
 interoperating with some other modules because the file handle is not derived
-from L<IO::Handle>. So that brings us to current recommendation given above,
+from L<IO::File>. So that brings us to current recommendation given above,
 which is to call the handle() method on the file handle returned by upload().
-That upgrades the handle to an IO::Handle. It's a big win for compatibility for
-a small penalty of loading IO::Handle the first time you call it.
+That upgrades the handle to an IO::File. It's a big win for compatibility for
+a small penalty of loading IO::File the first time you call it.
 
 
 =head2 Creating a popup menu

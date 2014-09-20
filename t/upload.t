@@ -122,6 +122,17 @@ ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
     is(tell($fh1), 1656, $test);
 }
 
+{ # test handle() method
+ my $fh1 = $q->upload("300x300_gif");
+ my $rawhandle = $fh1->handle;
+ ok($rawhandle, "check handle()");
+ isnt($rawhandle, "300x300_gif", "no string overload");
+ # check it acts like a handle
+ seek($rawhandle, 0, 2);
+ is(tell($rawhandle), 1656, "check it acts like a handle");
+ ok(eval { $rawhandle->seek(0, 2); 1 }, "can call seek() on handle result");
+}
+
 my $q2 = CGI->new;
 
 {
