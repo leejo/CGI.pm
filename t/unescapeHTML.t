@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 use CGI 'unescapeHTML';
 
 is( unescapeHTML( '&amp;'), '&', 'unescapeHTML: &');
@@ -10,3 +10,10 @@ is( unescapeHTML( 'This_string_contains_both_escaped_&_unescaped_&lt;entities&gt
     'This_string_contains_both_escaped_&_unescaped_<entities>', 'unescapeHTML: partially-escaped string.');
 is( unescapeHTML( 'This escaped string kind of looks like it has an escaped entity &x; it does not'), 
     'This escaped string kind of looks like it has an escaped entity &x; it does not', 'unescapeHTML: Another case where &...; should not be escaped.');
+
+# rt #61120
+is(
+	unescapeHTML( 'ies_detection:&any_non_whitespace;results_in' ),
+	'ies_detection:&any_non_whitespace;results_in',
+	"none white space doesn't cause unescape"
+);
