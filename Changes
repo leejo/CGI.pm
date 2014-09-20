@@ -21,6 +21,9 @@
       (RT #75628)
     - prevent corruption of POSTDATA/PUTDATA when -utf8 flag is used and use
       tempfiles to handle this data (RT #79102, thanks anonymous)
+    - unescape request URI *after* having removed the query string to prevent
+      removal of ? chars that are part of the original URI (and were encoded)
+      (RT #83265)
 
 4.04 2014-09-04
 

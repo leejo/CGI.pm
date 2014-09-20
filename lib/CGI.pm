@@ -2959,15 +2959,15 @@ sub url {
 
     my $path        =  $self->path_info;
     my $script_name =  $self->script_name;
-    my $request_uri =  unescape($self->request_uri) || '';
+    my $request_uri =  $self->request_uri || '';
     my $query_str   =  $self->query_string;
 
-    my $rewrite_in_use = $request_uri && $request_uri !~ /^\Q$script_name/;
+    $request_uri    =~ s/\?.*$//s; # remove query string
+    $request_uri    =  unescape($request_uri);
 
     my $uri         =  $rewrite && $request_uri ? $request_uri : $script_name;
-    $uri            =~ s/\?.*$//s;                                # remove query string
+    $uri            =~ s/\?.*$//s; # remove query string
     $uri            =~ s/\Q$ENV{PATH_INFO}\E$// if defined $ENV{PATH_INFO};
-#    $uri            =~ s/\Q$path\E$//      if defined $path;      # remove path
 
     if ($full) {
         my $protocol = $self->protocol();
