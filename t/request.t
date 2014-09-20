@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 41;
+use Test::More tests => 44;
+use Test::Deep;
 
 use CGI ();
 use Config;
@@ -69,6 +70,7 @@ is $p->{bar}, 'froz',"tied interface fetch";
 $p->{bar} = join("\0",qw(foo bar baz));
 is join(' ',$q->param('bar')), 'foo bar baz','tied interface store';
 ok exists $p->{bar};
+is delete $p->{bar}, "foo\0bar\0baz",'tied interface delete';
 
 # test posting
 $q->_reset_globals;
@@ -112,4 +114,16 @@ $q->_reset_globals;
 
     is_deeply [ sort $q->$_( 'keywords' ) ], [ qw/ dragon tiger / ],
         "$_ keywords" for qw/ param url_param /;
+
+	{
+		# RT #54511. TODO: use Test::Warn / Test::Warnings / Test::NoWarnings
+		$^W++;
+		local $SIG{__WARN__} = sub { fail( "Got a warning: " . $_[0] ); };
+
+		CGI::_reset_globals;
+		$q = CGI->new;
+		$ENV{QUERY_STRING} = 'p1=1&&&;;&;&&;;p2;p3;p4=4&=p5';
+		ok $q->url_param, 'url_param() is true if parameters';
+		cmp_deeply( [ $q->url_param ],bag( qw/p1 p2 p3 p4/,'' ),'url_param' );
+	}
 }

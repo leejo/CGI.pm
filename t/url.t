@@ -5,7 +5,7 @@ use Test::More;
 
 use CGI ':all';
 
-
+delete( $ENV{SCRIPT_NAME} ); # Win32 fix, see RT 89992
 $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:8484';
 $ENV{SERVER_PROTOCOL}       = 'HTTP/1.0';
 $ENV{SERVER_PORT}           = 8080;

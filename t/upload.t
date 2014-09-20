@@ -9,7 +9,7 @@ use strict;
 
 use Test::More 'no_plan';
 
-use CGI;
+use CGI qw/ :cgi /;
 
 #-----------------------------------------------------------------------------
 # %ENV setup.
@@ -88,6 +88,7 @@ is( $q->param('300x300_gif')       , '300x300.gif'       , 'filename_4' );
 # Now check that the upload method works.
 #-----------------------------------------------------------------------------
 
+isa_ok( upload('does_not_exist_gif'),'Fh','upload_basic_2 (no object)' );
 ok( defined $q->upload('does_not_exist_gif'), 'upload_basic_2' );
 ok( defined $q->upload('100;100_gif')       , 'upload_basic_3' );
 ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
