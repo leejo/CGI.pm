@@ -6,7 +6,7 @@ This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
 
 ## CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-	http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
+http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
 
 If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
