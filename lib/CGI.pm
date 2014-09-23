@@ -4458,7 +4458,7 @@ become a de-facto standard.
 
 =head1 CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-  L<http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80>
+L<http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80>
 
 If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
@@ -4475,7 +4475,7 @@ in time. These will be documented with L<CGI::Alternatives>.
 
 For more discussion on the removal of CGI.pm from core please see:
 
-  L<http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html>
+L<http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html>
 
 =head1 HTML Generation functions should no longer be used
 
@@ -8150,15 +8150,6 @@ The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
 distributed under GPL and the Artistic License 2.0. It is currently
 maintained by Lee Johnson with help from many contributors.
 
-Address bug reports and comments to: https://github.com/leejo/CGI.pm/issues
-
-The original bug tracker can be found at: https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm
-
-When sending bug reports, please provide the version of CGI.pm, the version of
-Perl, the name and version of your Web server, and the name and version of the
-operating system you are using.  If the problem is even remotely browser
-dependent, please provide information about the affected browsers as well.
-
 =head1 CREDITS
 
 Thanks very much to:
@@ -8295,7 +8286,14 @@ for suggestions and bug fixes.
 
 =head1 BUGS
 
-Please report them.
+Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
+
+The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
+
+When sending bug reports, please provide the version of CGI.pm, the version of
+Perl, the name and version of your Web server, and the name and version of the
+operating system you are using.  If the problem is even remotely browser
+dependent, please provide information about the affected browsers as well.
 
 =head1 SEE ALSO
 
