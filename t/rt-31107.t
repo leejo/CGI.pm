@@ -23,7 +23,17 @@ ok( $q->param( 'capabilities.zip' ),'capabilities.zip' );
 ok( $q->param( 'mm7-submit' ),'mm7-submit' );
 
 my $fh = $q->param( 'mm7-submit' );
-my @content = $fh->handle->getlines;
+
+my @content = $fh->getlines;
+like(
+	$content[9],
+	qr!<CapRequestId>4401196412625869430</CapRequestId>!,
+	'multipart data read'
+);
+
+# test back compatibility handle method
+seek( $fh,0,0 );
+@content = $fh->handle->getlines;
 like(
 	$content[9],
 	qr!<CapRequestId>4401196412625869430</CapRequestId>!,

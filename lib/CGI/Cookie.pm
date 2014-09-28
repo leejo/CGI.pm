@@ -5,7 +5,7 @@ use warnings;
 
 use if $] >= 5.019, 'deprecate';
 
-our $VERSION='4.04_01';
+our $VERSION='4.04_02';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;

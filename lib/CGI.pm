@@ -3,11 +3,8 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.04_01';
+$CGI::VERSION='4.04_02';
 
-# HARD-CODED LOCATION FOR FILE UPLOAD TEMPORARY FILES.
-# UNCOMMENT THIS ONLY IF YOU KNOW WHAT YOU'RE DOING.
-# $CGITempFile::TMPDIRECTORY = '/usr/tmp';
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
 #use constant XHTML_DTD => ['-//W3C//DTD XHTML Basic 1.0//EN',
@@ -26,9 +23,9 @@ $MOD_PERL            = 0; # no mod_perl by default
 #global settings
 $POST_MAX            = -1; # no limit to uploaded files
 $DISABLE_UPLOADS     = 0;
+$UNLINK_TMP_FILES    = 1;
 
 @SAVED_SYMBOLS = ();
-
 
 # >>>>> Here are some globals that you might want to adjust <<<<<<
 sub initialize_globals {
@@ -59,13 +56,6 @@ sub initialize_globals {
     # Set this to 1 to enable debugging from @ARGV
     # Set to 2 to enable debugging from STDIN
     $DEBUG = 1;
-
-    # Set this to 1 to make the temporary files created
-    # during file uploads safe from prying eyes
-    # or do...
-    #    1) use CGI qw(:private_tempfiles)
-    #    2) CGI::private_tempfiles(1);
-    $PRIVATE_TEMPFILES = 0;
 
     # Set this to 1 to generate automatic tab indexes
     $TABINDEX = 0;
@@ -387,23 +377,6 @@ sub new {
   $self->_reset_globals if $PERLEX;
   $self->init(@initializer);
   return $self;
-}
-
-# We provide a DESTROY method so that we can ensure that
-# temporary files are closed (via Fh->DESTROY) before they
-# are unlinked (via CGITempFile->DESTROY) because it is not
-# possible to unlink an open file on Win32. We explicitly
-# call DESTROY on each, rather than just undefing them and
-# letting Perl DESTROY them by garbage collection, in case the
-# user is still holding any reference to them as well.
-sub DESTROY {
-  my $self = shift;
-  if ($OS eq 'WINDOWS' || $OS eq 'VMS') {
-    for my $href (values %{$self->{'.tmpfiles'}}) {
-      $href->{hndl}->DESTROY if defined $href->{hndl};
-      $href->{name}->DESTROY if defined $href->{name};
-    }
-  }
 }
 
 sub r {
@@ -976,7 +949,6 @@ sub _setup_symbols {
 	$XHTML++,                next if /^[:-]xhtml$/;
 	$XHTML=0,                next if /^[:-]no_?xhtml$/;
 	$USE_PARAM_SEMICOLONS=0, next if /^[:-]oldstyle_urls$/;
-	$PRIVATE_TEMPFILES++,    next if /^[:-]private_tempfiles$/;
 	$TABINDEX++,             next if /^[:-]tabindex$/;
 	$CLOSE_UPLOAD_FILES++,   next if /^[:-]close_upload_files$/;
 	$EXPORT{$_}++,           next if /^[:-]any$/;
@@ -1045,7 +1017,6 @@ sub read_postdata_putdata {
     $self->add_parameter($param);
     
     
-    my ( $tmpfile, $tmp, $filehandle );
   UPLOADS: {
 
         # If we get here, then we are dealing with a potentially large
@@ -1068,23 +1039,13 @@ sub read_postdata_putdata {
 
         # SHOULD PROBABLY SKIP THIS IF NOT $self->{'use_tempfile'}
         # BUT THE REST OF CGI.PM DOESN'T, SO WHATEVER
-        # choose a relatively unpredictable tmpfile sequence number
-        my $seqno =
-          unpack( "%16C*",
-            join( '', localtime, grep { defined $_ } values %ENV ) );
-        for ( my $cnt = 10 ; $cnt > 0 ; $cnt-- ) {
-            next unless $tmpfile = CGITempFile->new($seqno);
-            $tmp = $tmpfile->as_string;
-            last
-              if defined(
-                      $filehandle = Fh->new( $param, $tmp, $PRIVATE_TEMPFILES )
-              );
-            $seqno += int rand(100);
-        }
+        my $filehandle = CGI::File::Temp->new(
+			UNLINK => $UNLINK_TMP_FILES,
+		);
+
         $CGI::DefaultClass->binmode($filehandle)
           if $CGI::needs_binmode
               && defined fileno($filehandle);
-
 
         my ($data);
         local ($\) = '';
@@ -1138,7 +1099,7 @@ sub read_postdata_putdata {
         # close_upload_files feature is used.
         $self->{'.tmpfiles'}->{$$filehandle} = {
             hndl => $filehandle,
-            name => $tmpfile,
+			name => $filehandle->filename,
             info => {%header},
         };
         push( @{ $self->{param}{$param} }, $filehandle );
@@ -3552,9 +3513,8 @@ END_OF_FUNC
 ####
 'private_tempfiles' => <<'END_OF_FUNC',
 sub private_tempfiles {
-    my ($self,$param) = self_or_CGI(@_);
-    $CGI::PRIVATE_TEMPFILES = $param if defined($param);
-    return $CGI::PRIVATE_TEMPFILES;
+	warn "private_tempfiles has been deprecated";
+    return 0;
 }
 END_OF_FUNC
 #### Method: close_upload_files
@@ -3718,7 +3678,6 @@ sub read_multipart {
 	    next;
 	}
 
-	my ($tmpfile,$tmp,$filehandle);
       UPLOADS: {
 	  # If we get here, then we are dealing with a potentially large
 	  # uploaded form.  Save the data to a temporary file, then open
@@ -3735,15 +3694,11 @@ sub read_multipart {
               $filename = "multipart/mixed";
           }
 
-	  # choose a relatively unpredictable tmpfile sequence number
-          my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
-          for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = CGITempFile->new($seqno);
-	    $tmp = $tmpfile->as_string;
-	    last if defined($filehandle = Fh->new($filename,$tmp,$PRIVATE_TEMPFILES));
-            $seqno += int rand(100);
-          }
-          die "CGI.pm open of tmpfile $tmp/$filename failed: $!\n" unless defined $filehandle;
+      my $filehandle = CGI::File::Temp->new(
+		UNLINK => $UNLINK_TMP_FILES,
+      );
+	  $filehandle->_mp_filename( $filename );
+
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
                      && defined fileno($filehandle);
 
@@ -3787,7 +3742,7 @@ sub read_multipart {
 	  # close_upload_files feature is used.
 	  $self->{'.tmpfiles'}->{$$filehandle}= {
               hndl => $filehandle,
-	      name => $tmpfile,
+		  name => $filehandle->filename,
 	      info => {%header},
 	  };
 	  push(@{$self->{param}{$param}},$filehandle);
@@ -3835,7 +3790,6 @@ sub read_multipart_related {
 	# add this parameter to our list
 	$self->add_parameter($param);
 
-	my ($tmpfile,$tmp,$filehandle);
       UPLOADS: {
 	  # If we get here, then we are dealing with a potentially large
 	  # uploaded form.  Save the data to a temporary file, then open
@@ -3847,15 +3801,10 @@ sub read_multipart_related {
 	      last UPLOADS;
 	  }
 
-	  # choose a relatively unpredictable tmpfile sequence number
-          my $seqno = unpack("%16C*",join('',localtime,grep {defined $_} values %ENV));
-          for (my $cnt=10;$cnt>0;$cnt--) {
-	    next unless $tmpfile = CGITempFile->new($seqno);
-	    $tmp = $tmpfile->as_string;
-	    last if defined($filehandle = Fh->new($param,$tmp,$PRIVATE_TEMPFILES));
-            $seqno += int rand(100);
-          }
-          die "CGI open of tmpfile: $!\n" unless defined $filehandle;
+      my $filehandle = CGI::File::Temp->new(
+		UNLINK => $UNLINK_TMP_FILES,
+	  );
+
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
                      && defined fileno($filehandle);
 
@@ -3889,7 +3838,7 @@ sub read_multipart_related {
 	  # close_upload_files feature is used.
 	  $self->{'.tmpfiles'}->{$$filehandle}= {
               hndl => $filehandle,
-	      name => $tmpfile,
+		  name => $filehandle->filename,
 	      info => {%header},
 	  };
 	  push(@{$self->{param}{$param}},$filehandle);
@@ -3912,9 +3861,7 @@ END_OF_FUNC
 'tmpFileName' => <<'END_OF_FUNC',
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{$$filename}->{name} ?
-	$self->{'.tmpfiles'}->{$$filename}->{name}->as_string
-	    : '';
+    return $self->{'.tmpfiles'}->{$$filename}->{name} || '';
 }
 END_OF_FUNC
 
@@ -3970,82 +3917,6 @@ END_OF_AUTOLOAD
 #########################################################
 # Globals and stubs for other packages that we use.
 #########################################################
-
-################### Fh -- lightweight filehandle ###############
-package Fh;
-
-use overload 
-    '""'  => \&asString,
-    'cmp' => \&compare,
-    'fallback'=>1;
-
-$FH='fh00000';
-
-*Fh::AUTOLOAD = \&CGI::AUTOLOAD;
-
-sub DESTROY {
-    my $self = shift;
-    close $self;
-}
-
-$AUTOLOADED_ROUTINES = '';      # prevent -w error
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
-%SUBS =  (
-'asString' => <<'END_OF_FUNC',
-sub asString {
-    my $self = shift;
-    # get rid of package name
-    (my $i = $$self) =~ s/^\*(\w+::fh\d{5})+//; 
-    $i =~ s/%(..)/ chr(hex($1)) /eg;
-    return $i.$CGI::TAINTED;
-# BEGIN DEAD CODE
-# This was an extremely clever patch that allowed "use strict refs".
-# Unfortunately it relied on another bug that caused leaky file descriptors.
-# The underlying bug has been fixed, so this no longer works.  However
-# "strict refs" still works for some reason.
-#    my $self = shift;
-#    return ${*{$self}{SCALAR}};
-# END DEAD CODE
-}
-END_OF_FUNC
-
-'compare' => <<'END_OF_FUNC',
-sub compare {
-    my $self = shift;
-    my $value = shift;
-    return "$self" cmp $value;
-}
-END_OF_FUNC
-
-'new'  => <<'END_OF_FUNC',
-sub new {
-    my($pack,$name,$file,$delete) = @_;
-    _setup_symbols(@SAVED_SYMBOLS) if @SAVED_SYMBOLS;
-    require Fcntl unless defined &Fcntl::O_RDWR;
-    (my $safename = $name) =~ s/([':%])/ sprintf '%%%02X', ord $1 /eg;
-    my $fv = ++$FH . $safename;
-    my $ref = \*{"Fh::$fv"};
-
-    # Note this same regex is also used elsewhere in the same file for CGITempFile::new
-    $file =~ m!^([a-zA-Z0-9_ \'\":/.\$\\\+-]+)$! || return;
-    my $safe = $1;
-    sysopen($ref,$safe,Fcntl::O_RDWR()|Fcntl::O_CREAT()|Fcntl::O_EXCL(),0600) || return;
-    unlink($safe) if $delete;
-    CORE::delete $Fh::{$fv};
-    return bless $ref,$pack;
-}
-END_OF_FUNC
-
-'handle' => <<'END_OF_FUNC',
-sub handle {
-  my $self = shift;
-  eval "require IO::File" unless IO::Handle->can('new_from_fd');
-  return IO::File->new_from_fd(fileno $self,"<");
-}
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
 
 ######################## MultipartBuffer ####################
 package MultipartBuffer;
@@ -4310,82 +4181,43 @@ END_OF_FUNC
 );
 END_OF_AUTOLOAD
 
-####################################################################################
-################################## TEMPORARY FILES #################################
-####################################################################################
+1;
 
-# FIXME: kill this package and just use File::Temp
-package CGITempFile;
+# this is a back compatibility wrapper around File::Temp. DO NOT
+# use this package outside of CGI, i won't provide any help if
+# you use it directly and your code breaks horribly
+package CGI::File::Temp;
 
-use File::Spec;
+use parent File::Temp;
 
-sub find_tempdir {
-  $SL = $CGI::SL;
-  unless (defined $TMPDIRECTORY) {
-    for ($ENV{'TMPDIR'},File::Spec->tmpdir) {
-      next if ! defined;
-      do {$TMPDIRECTORY = $_; last} if -d $_ && -w _;
-    }
-  }
+use overload
+    '""'  => \&asString,
+    'cmp' => \&compare,
+    'fallback'=>1;
+
+# back compatibility method since we now return a File::Temp object
+# as the filehandle (which isa IO::Handle) so calling ->handle on
+# it will fail. FIXME: deprecate this method in v5+
+sub handle { return shift; };
+
+sub compare {
+    my ( $self,$value ) = @_;
+    return "$self" cmp $value;
 }
 
-find_tempdir();
-
-$MAXTRIES = 5000;
-
-# cute feature, but overload implementation broke it
-# %OVERLOAD = ('""'=>'as_string');
-*CGITempFile::AUTOLOAD = \&CGI::AUTOLOAD;
-
-sub DESTROY {
-    my($self) = @_;
-    $$self =~ m!^([a-zA-Z0-9_ \'\":/.\$\\~-]+)$! || return;
-    my $safe = $1;             # untaint operation
-	if ( -e $safe ) {
-		my $ret = unlink $safe;    # get rid of the file
-		if ( ! $ret ) {
-			warn "Couldn't unlink temp file ($safe): $!";
-		}
-		return $ret;
-	}
+sub _mp_filename {
+	my ( $self,$filename ) = @_;
+	${*$self}->{ _mp_filename } = $filename
+		if $filename;
+	return ${*$self}->{_mp_filename};
 }
 
-###############################################################################
-################# THESE FUNCTIONS ARE AUTOLOADED ON DEMAND ####################
-###############################################################################
-$AUTOLOADED_ROUTINES = '';      # prevent -w error
-$AUTOLOADED_ROUTINES=<<'END_OF_AUTOLOAD';
-%SUBS = (
-
-'new' => <<'END_OF_FUNC',
-sub new {
-    my($package,$sequence) = @_;
-    my $filename;
-    unless (-w $TMPDIRECTORY) {
-        $TMPDIRECTORY = undef;
-        find_tempdir();
-    }
-    for (my $i = 0; $i < $MAXTRIES; $i++) {
-	last if ! -f ($filename = sprintf("\%s${SL}CGItemp%d", $TMPDIRECTORY, $sequence++));
-    }
-    # check that it is a more-or-less valid filename
-    # Note this same regex is also used elsewhere in the same file for Fh::new
-    return unless $filename =~ m!^([a-zA-Z0-9_ \'\":/.\$\\\+-]+)$!;
-    # this used to untaint, now it doesn't
-    # $filename = $1;
-    return bless \$filename;
+sub asString {
+    my ( $self ) = @_;
+	return $self->_mp_filename;
 }
-END_OF_FUNC
 
-'as_string' => <<'END_OF_FUNC'
-sub as_string {
-    my($self) = @_;
-    return $$self;
-}
-END_OF_FUNC
-
-);
-END_OF_AUTOLOAD
+1;
 
 package CGI;
 
@@ -5257,36 +5089,6 @@ arguments from STDIN, producing the message "(offline mode: enter
 name=value pairs on standard input)" features.
 
 See the section on debugging for more details.
-
-=item -private_tempfiles
-
-CGI.pm can process uploaded file. Ordinarily it spools the uploaded
-file to a temporary directory, then deletes the file when done.
-However, this opens the risk of eavesdropping as described in the file
-upload section.  Another CGI script author could peek at this data
-during the upload, even if it is confidential information. On Unix
-systems, the -private_tempfiles pragma will cause the temporary file
-to be unlinked as soon as it is opened and before any data is written
-into it, reducing, but not eliminating the risk of eavesdropping
-(there is still a potential race condition).  To make life harder for
-the attacker, the program chooses tempfile names by calculating a 32
-bit checksum of the incoming HTTP headers.
-
-To ensure that the temporary file cannot be read by other CGI scripts,
-use suEXEC or a CGI wrapper program to run your script.  The temporary
-file is created with mode 0600 (neither world nor group readable).
-
-The temporary directory is selected using the following algorithm:
-
-    1. if $CGITempFile::TMPDIRECTORY is already set, use that
-
-    2. if the environment variable TMPDIR exists, use the location
-    indicated.
-
-    3. Otherwise use File::Spec->tmpdir to find a temp directory
-    (see File::Spec::Unix and File::Spec::Win32)
-
-=back
 
 =head2 Special forms for importing HTML-tag functions
 
@@ -6378,13 +6180,8 @@ recognized.  See textfield() for details.
 When the form is processed, you can retrieve an L<IO::File> compatible
 handle for a file upload field like this:
 
-  $lightweight_fh  = $q->upload('field_name');
-
   # undef may be returned if it's not a valid file handle
-  if (defined $lightweight_fh) {
-    # Upgrade the handle to one compatible with IO::File:
-    my $io_handle = $lightweight_fh->handle;
-
+  if ( my $io_handle = $q->upload('field_name') ) {
     open (OUTFILE,'>>','/usr/local/web/users/feedback');
     while ($bytesread = $io_handle->read($buffer,1024)) {
       print OUTFILE $buffer;
@@ -6419,9 +6216,9 @@ a hash containing all the document headers.
        }
 
 Note that you must use ->param to get the filename to pass into uploadInfo
-as internally this is represented as a Fh object (which is what will be
+as internally this is represented as a File::Temp object (which is what will be
 returned by ->param). When using ->Vars you will get the literal filename
-rather than the Fh object, which will not return anything when passed to
+rather than the File::Temp object, which will not return anything when passed to
 uploadInfo. So don't use ->Vars.
 
 If you are using a machine that recognizes "text" and "binary" data
@@ -6441,9 +6238,28 @@ upload by passing the file name to the tmpFileName() method:
        $tmpfilename = $query->tmpFileName($filename);
 
 The temporary file will be deleted automatically when your program exits unless
-you manually rename it. On some operating systems (such as Windows NT), you
-will need to close the temporary file's filehandle before your program exits.
-Otherwise the attempt to delete the temporary file will fail.
+you manually rename it or set $CGI::UNLINK_TMP_FILES to 0. On some operating
+systems (such as Windows NT), you will need to close the temporary file's
+filehandle before your program exits. Otherwise the attempt to delete the
+temporary file will fail.
+
+=head3 Changes in temporary file handling (v4.05+)
+
+CGI.pm had its temporary file handling significantly refactored. this logic is
+now all deferred to File::Temp (which is wrapped in a compatibilty object,
+CGI::File::Temp - B<DO NOT USE THIS PACKAGE DIRECTLY>). As a consequence the
+PRIVATE_TEMPFILES variable has been removed along with deprecation of the
+private_tempfiles routine and B<complete> removal of the CGITempFile and Fh
+packages. The $CGITempFile::TMPDIRECTORY is no longer used to set the temp
+directory, refer to the perldoc for File::Temp is you want to override the
+default settings in that package (the TMPDIR env variable is still availble
+on some platforms).
+
+When you get the internal file handle you will receive a File::Temp object,
+this should be transparent as File::Temp isa IO::Handle and isa IO::Seekable
+meaning it behaves as previously. if you are doing anything out of the ordinary
+with regards to temp files you should test your code before deploying this update
+and refer to the File::Temp documentation for more information.
 
 =head3 Handling interrupted file uploads
 

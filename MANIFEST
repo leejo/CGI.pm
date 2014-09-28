@@ -65,7 +65,6 @@ t/save_read_roundtrip.t
 t/start_end_asterisk.t
 t/start_end_end.t
 t/start_end_start.t
-t/tmpdir.t
 t/unescapeHTML.t
 t/upload.t
 t/upload_post_text.txt

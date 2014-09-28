@@ -1,11 +1,11 @@
 4.05 2014-11-01
 
+    [ RELEASE NOTES ]
+    - this release includes *significant* refactoring of temporary file
+      handling in CGI.pm. See "Changes in temporary file handling" in perldoc
+
     [ DOCUMENTATION ]
     - change AUTHOR INFORMATION to LICENSE to please Kwalitee
-
-    [ ERROR HANDLING ]
-    - CGITempFile will now warn if it fails to remove temporary files
-      in the DESTROY method
 
     [ TESTING ]
     - t/arbitrary_handles.t to check need for patch in RT #54055, it

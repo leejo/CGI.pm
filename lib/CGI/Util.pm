@@ -6,7 +6,7 @@ use if $] >= 5.019, 'deprecate';
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
-our $VERSION = '4.04_01';
+our $VERSION = '4.04_02';
 
 use constant EBCDIC => "\t" ne "\011";
 
