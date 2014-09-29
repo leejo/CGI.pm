@@ -2,8 +2,9 @@ package CGI;
 require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
+use CGI::File::Temp;
 
-$CGI::VERSION='4.04_02';
+$CGI::VERSION='4.04_03';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -4183,42 +4184,6 @@ END_OF_AUTOLOAD
 
 1;
 
-# this is a back compatibility wrapper around File::Temp. DO NOT
-# use this package outside of CGI, i won't provide any help if
-# you use it directly and your code breaks horribly
-package CGI::File::Temp;
-
-use parent File::Temp;
-
-use overload
-    '""'  => \&asString,
-    'cmp' => \&compare,
-    'fallback'=>1;
-
-# back compatibility method since we now return a File::Temp object
-# as the filehandle (which isa IO::Handle) so calling ->handle on
-# it will fail. FIXME: deprecate this method in v5+
-sub handle { return shift; };
-
-sub compare {
-    my ( $self,$value ) = @_;
-    return "$self" cmp $value;
-}
-
-sub _mp_filename {
-	my ( $self,$filename ) = @_;
-	${*$self}->{ _mp_filename } = $filename
-		if $filename;
-	return ${*$self}->{_mp_filename};
-}
-
-sub asString {
-    my ( $self ) = @_;
-	return $self->_mp_filename;
-}
-
-1;
-
 package CGI;
 
 # We get a whole bunch of warnings about "possibly uninitialized variables"
@@ -6249,11 +6214,15 @@ CGI.pm had its temporary file handling significantly refactored. this logic is
 now all deferred to File::Temp (which is wrapped in a compatibilty object,
 CGI::File::Temp - B<DO NOT USE THIS PACKAGE DIRECTLY>). As a consequence the
 PRIVATE_TEMPFILES variable has been removed along with deprecation of the
-private_tempfiles routine and B<complete> removal of the CGITempFile and Fh
-packages. The $CGITempFile::TMPDIRECTORY is no longer used to set the temp
-directory, refer to the perldoc for File::Temp is you want to override the
-default settings in that package (the TMPDIR env variable is still availble
-on some platforms).
+private_tempfiles routine and B<complete> removal of the CGITempFile package.
+The $CGITempFile::TMPDIRECTORY is no longer used to set the temp directory,
+refer to the perldoc for File::Temp is you want to override the default
+settings in that package (the TMPDIR env variable is still availble on some
+platforms).
+
+The Fh package still exists but does nothing, the CGI::File::Temp class is
+a subclass of both File::Temp and the empty Fh package, so if you have any
+code that checks that the filehandle isa Fh this should still work.
 
 When you get the internal file handle you will receive a File::Temp object,
 this should be transparent as File::Temp isa IO::Handle and isa IO::Seekable

@@ -89,6 +89,7 @@ is( $q->param('300x300_gif')       , '300x300.gif'       , 'filename_4' );
 #-----------------------------------------------------------------------------
 
 isa_ok( upload('does_not_exist_gif'),'File::Temp','upload_basic_2 (no object)' );
+isa_ok( upload('does_not_exist_gif'),'Fh','upload_basic_2 (no object)' );
 ok( defined $q->upload('does_not_exist_gif'), 'upload_basic_2' );
 ok( defined $q->upload('100;100_gif')       , 'upload_basic_3' );
 ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
