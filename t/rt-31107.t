@@ -19,8 +19,10 @@ my $q;
     $q = CGI->new;
 }
 
-ok( $q->param( 'capabilities.zip' ),'capabilities.zip' );
-ok( $q->param( 'mm7-submit' ),'mm7-submit' );
+foreach my $class ( 'File::Temp','CGI::File::Temp','Fh' ) {
+	isa_ok( $q->param( 'capabilities.zip' ),$class,'capabilities.zip' );
+	isa_ok( $q->param( 'mm7-submit' ),$class,'mm7-submit' );
+}
 
 my $fh = $q->param( 'mm7-submit' );
 

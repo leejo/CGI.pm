@@ -7,7 +7,7 @@
 #################################################################
 
 use strict;
-use Test::More tests => 22;
+use Test::More tests => 28;
 
 use CGI;
 $CGI::DEBUG=1;
@@ -88,11 +88,11 @@ for my $pdata ( qw' POST PUT ' ){
     ok( !!$CGI::PUTDATA_UPLOAD, "-\L$pdata\E_upload default is on");
     
     my $q = CGI->new;
-    ok( scalar $q->param( $pdata  ), "we have $pdata param" );
+	foreach my $class ( 'File::Temp','CGI::File::Temp','Fh' ) {
+    	isa_ok( $q->param( $pdata  ),$class,"$pdata param" );
+	}
     
     my $filename = $q->param($pdata);
-    ok( $filename , "and it is a filename/lightweight Fh object");
-    
     my $tmpfilename = $q->tmpFileName( $filename );
     ok( $tmpfilename , "and tmpFileName returns the filename" );
 }
@@ -114,6 +114,8 @@ for my $pdata ( qw' POST PUT ' ){
     };
     my $q = CGI->new( $callback ); 
     ok( ref $q, "got query");
-    ok( scalar $q->param( $pdata  ), "we have $pdata param" );
+	foreach my $class ( 'File::Temp','CGI::File::Temp','Fh' ) {
+    	isa_ok( $q->param( $pdata ),$class,"$pdata param" );
+	}
     ok( $yourang, "and callback invoked");
 }
