@@ -23,6 +23,7 @@ WriteMakefile(
         'File::Spec' => 0.82,
         'if'         => 0,     # core in 5.6.2 and later, for deprecate.pm
 		'parent'     => 0.225, # parent was first released with perl v5.10.1
+		'File::Temp' => 0,     # was first released with perl v5.6.1'
     },
     BUILD_REQUIRES   => {
 		'Config'     => 0,    # Config was first released with perl 5.00307

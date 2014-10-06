@@ -4,7 +4,7 @@ use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
 
-$CGI::VERSION='4.04_03';
+$CGI::VERSION='4.04_04';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1040,8 +1040,13 @@ sub read_postdata_putdata {
 
         # SHOULD PROBABLY SKIP THIS IF NOT $self->{'use_tempfile'}
         # BUT THE REST OF CGI.PM DOESN'T, SO WHATEVER
+		my $tmp_dir    = $CGI::OS eq 'WINDOWS'
+			? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
+			: undef; # File::Temp defaults to TMPDIR
+
         my $filehandle = CGI::File::Temp->new(
 			UNLINK => $UNLINK_TMP_FILES,
+			DIR    => $tmp_dir,
 		);
 
         $CGI::DefaultClass->binmode($filehandle)
@@ -3695,8 +3700,13 @@ sub read_multipart {
               $filename = "multipart/mixed";
           }
 
+	my $tmp_dir    = $CGI::OS eq 'WINDOWS'
+		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
+		: undef; # File::Temp defaults to TMPDIR
+
       my $filehandle = CGI::File::Temp->new(
 		UNLINK => $UNLINK_TMP_FILES,
+		DIR    => $tmp_dir,
       );
 	  $filehandle->_mp_filename( $filename );
 
@@ -3802,8 +3812,13 @@ sub read_multipart_related {
 	      last UPLOADS;
 	  }
 
+	my $tmp_dir    = $CGI::OS eq 'WINDOWS'
+		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
+		: undef; # File::Temp defaults to TMPDIR
+
       my $filehandle = CGI::File::Temp->new(
 		UNLINK => $UNLINK_TMP_FILES,
+		DIR    => $tmp_dir,
 	  );
 
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
@@ -6218,7 +6233,9 @@ private_tempfiles routine and B<complete> removal of the CGITempFile package.
 The $CGITempFile::TMPDIRECTORY is no longer used to set the temp directory,
 refer to the perldoc for File::Temp is you want to override the default
 settings in that package (the TMPDIR env variable is still availble on some
-platforms).
+platforms). For Windows platforms the temporary directory order remains
+as before: TEMP > TMP > WINDIR ( > TMPDIR ) so if you have any of these in
+use in existing scripts they should still work.
 
 The Fh package still exists but does nothing, the CGI::File::Temp class is
 a subclass of both File::Temp and the empty Fh package, so if you have any
