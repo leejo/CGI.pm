@@ -4,6 +4,11 @@
     - this release includes *significant* refactoring of temporary file
       handling in CGI.pm. See "Changes in temporary file handling" in perldoc
 
+    - this release adds a warning for when the param method is called
+      in list context, see the Warning in the perldoc for the section
+      "Fetching the value or values of a single named parameter" for why
+      this has been added and how to disable this warning
+
     [ DOCUMENTATION ]
     - change AUTHOR INFORMATION to LICENSE to please Kwalitee
 
