@@ -33,6 +33,8 @@ WriteMakefile(
         'IO::Handle' => 0,    # IO::Handle was first released with perl 5.00307
         'Test::Deep' => 0.11,
         'Test::More' => 0.98,
+		'Test::Warn' => 0.30,
+		'Test::NoWarnings' => 1.04,
     },
     test    => { TESTS    => 't/*.t t/headers/*.t' },
     linkext => { LINKTYPE => '' }, # no link needed

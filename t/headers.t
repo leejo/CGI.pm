@@ -46,6 +46,7 @@ like($@,qr/contains a newline/,'redirect with leading newlines blows up');
 {
     my $cgi = CGI->new('t=bogus%0A%0A<html>');
     my $out;
+	$CGI::LIST_CONTEXT_WARN = 0;
     eval { $out = $cgi->redirect( $cgi->param('t') ) };
     like($@,qr/contains a newline/, "redirect does not allow double-newline injection");
 }

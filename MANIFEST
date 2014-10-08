@@ -55,6 +55,7 @@ t/multipart_init.t
 t/multipart_start.t
 t/no_tabindex.t
 t/param_fetch.t
+t/param_list_context.t
 t/popup_menu.t
 t/postdata.t
 t/pretty.t

@@ -414,6 +414,17 @@ sub upload_hook {
 ####
 sub param {
     my($self,@p) = self_or_default(@_);
+
+	# list context can be dangerous so warn:
+	# http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications
+	if ( wantarray && $LIST_CONTEXT_WARN ) {
+		my ( $package, $filename, $line ) = caller;
+		if ( $package ne 'CGI' ) {
+			warn "CGI::param called in list context from package $package line $line, this can lead to vulnerabilities. "
+				. 'See the warning in "Fetching the value or values of a single named parameter"';
+		}
+	}
+
     return $self->all_parameters unless @p;
     my($name,$value,@other);
 
@@ -447,11 +458,6 @@ sub param {
       eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
       @result = map {ref $_ ? $_ : $self->_decode_utf8($_) } @result;
     }
-
-	if ( wantarray && $LIST_CONTEXT_WARN ) {
-		warn "CGI::param called in list context, this can lead to vulnerabilities. "
-			. 'See the warning in "Fetching the value or values of a single named parameter"';
-	}
 
     return wantarray ?  @result : $result[0];
 }
@@ -3890,6 +3896,7 @@ END_OF_FUNC
 'uploadInfo' => <<'END_OF_FUNC',
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
+    return if ! defined $$filename;
     return $self->{'.tmpfiles'}->{$$filename}->{info};
 }
 END_OF_FUNC

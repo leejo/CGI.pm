@@ -10,6 +10,7 @@ use strict;
 use Test::More 'no_plan';
 
 use CGI qw/ :cgi /;
+$CGI::LIST_CONTEXT_WARN = 0;
 
 #-----------------------------------------------------------------------------
 # %ENV setup.
