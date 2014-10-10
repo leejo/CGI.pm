@@ -1,3 +1,7 @@
+4.06 2014-10-10
+    - make warning on list context call of ->param more lenient and don't
+      warn if called with no arguments
+
 4.05 2014-10-08
 
     [ RELEASE NOTES ]

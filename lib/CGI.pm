@@ -4,7 +4,7 @@ use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
 
-$CGI::VERSION='4.05';
+$CGI::VERSION='4.06';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -415,6 +415,8 @@ sub upload_hook {
 sub param {
     my($self,@p) = self_or_default(@_);
 
+    return $self->all_parameters unless @p;
+
 	# list context can be dangerous so warn:
 	# http://blog.gerv.net/2014/10/new-class-of-vulnerability-in-perl-web-applications
 	if ( wantarray && $LIST_CONTEXT_WARN ) {
@@ -425,7 +427,6 @@ sub param {
 		}
 	}
 
-    return $self->all_parameters unless @p;
     my($name,$value,@other);
 
     # For compatibility between old calling style and use_named_parameters() style, 
@@ -6253,7 +6254,7 @@ systems (such as Windows NT), you will need to close the temporary file's
 filehandle before your program exits. Otherwise the attempt to delete the
 temporary file will fail.
 
-=head3 Changes in temporary file handling (v4.05+)
+=head3 Changes in temporary file handling (v4.06+)
 
 CGI.pm had its temporary file handling significantly refactored. this logic is
 now all deferred to File::Temp (which is wrapped in a compatibilty object,
