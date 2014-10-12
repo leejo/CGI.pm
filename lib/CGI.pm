@@ -4,7 +4,7 @@ use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
 
-$CGI::VERSION='4.06';
+$CGI::VERSION='4.07';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -4688,7 +4688,7 @@ specialized tasks.)
 
 PUTDATA/POSTDATA are also available via
 L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
-and as L<file uploads|/PROCESSING A FILE UPLOAD FIELD> via L</-putdata_upload>
+and as L<file uploads|/Processing a file upload field> via L</-putdata_upload>
 option.
 
 =head2 Direct access to the parameter list:
@@ -5044,7 +5044,7 @@ expected to return utf-8 strings and convert them using code like this:
 
 Makes C<<< $query->param('PUTDATA'); >>> and C<<< $query->param('POSTDATA'); >>>
 act like file uploads named PUTDATA and POSTDATA. See
-L</HANDLING NON-URLENCODED ARGUMENTS> and L</PROCESSING A FILE UPLOAD FIELD>
+L</Handling non-urlencoded arguments> and L</Processing a file upload field>
 PUTDATA/POSTDATA are also available via
 L<upload_hook|/Progress bars for file uploads and avoiding temp files>.
 
@@ -5100,6 +5100,8 @@ arguments from STDIN, producing the message "(offline mode: enter
 name=value pairs on standard input)" features.
 
 See the section on debugging for more details.
+
+=back
 
 =head2 Special forms for importing HTML-tag functions
 
@@ -6254,7 +6256,7 @@ systems (such as Windows NT), you will need to close the temporary file's
 filehandle before your program exits. Otherwise the attempt to delete the
 temporary file will fail.
 
-=head3 Changes in temporary file handling (v4.06+)
+=head3 Changes in temporary file handling (v4.07+)
 
 CGI.pm had its temporary file handling significantly refactored. this logic is
 now all deferred to File::Temp (which is wrapped in a compatibility object,

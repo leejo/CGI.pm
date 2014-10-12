@@ -1,4 +1,17 @@
+4.07 2014-10-12
+
+    [ RELEASE NOTES ]
+    - please see changes for v4.05
+
+    [ TESTING ]
+    - typo and POD fixes, add test to check POD and compiles
+
 4.06 2014-10-10
+
+    [ RELEASE NOTES ]
+    - please see changes for v4.05
+
+    [ DOCUMENTATION ]
     - make warning on list context call of ->param more lenient and don't
       warn if called with no arguments
 
