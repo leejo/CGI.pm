@@ -6256,7 +6256,7 @@ systems (such as Windows NT), you will need to close the temporary file's
 filehandle before your program exits. Otherwise the attempt to delete the
 temporary file will fail.
 
-=head3 Changes in temporary file handling (v4.07+)
+=head3 Changes in temporary file handling (v4.05+)
 
 CGI.pm had its temporary file handling significantly refactored. this logic is
 now all deferred to File::Temp (which is wrapped in a compatibility object,
