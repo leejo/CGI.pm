@@ -6257,13 +6257,13 @@ temporary file will fail.
 =head3 Changes in temporary file handling (v4.06+)
 
 CGI.pm had its temporary file handling significantly refactored. this logic is
-now all deferred to File::Temp (which is wrapped in a compatibilty object,
+now all deferred to File::Temp (which is wrapped in a compatibility object,
 CGI::File::Temp - B<DO NOT USE THIS PACKAGE DIRECTLY>). As a consequence the
 PRIVATE_TEMPFILES variable has been removed along with deprecation of the
 private_tempfiles routine and B<complete> removal of the CGITempFile package.
 The $CGITempFile::TMPDIRECTORY is no longer used to set the temp directory,
 refer to the perldoc for File::Temp is you want to override the default
-settings in that package (the TMPDIR env variable is still availble on some
+settings in that package (the TMPDIR env variable is still available on some
 platforms). For Windows platforms the temporary directory order remains
 as before: TEMP > TMP > WINDIR ( > TMPDIR ) so if you have any of these in
 use in existing scripts they should still work.

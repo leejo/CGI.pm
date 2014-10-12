@@ -178,7 +178,7 @@ Version 3.63 Nov 12, 2012
 Version 3.62, Nov 9th, 2012
 
     [INTERNALS]
-    - Changed how the  deprecated endform function was defined for compatibilty
+    - Changed how the deprecated endform function was defined for compatibility
       with the development version of Perl. 
     - Fix failures in t/tmpdir.t when run as root
       https://github.com/markstos/CGI.pm/issues/22, RT#80659)
