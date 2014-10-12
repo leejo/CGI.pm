@@ -7983,7 +7983,7 @@ available for your use:
 
 The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
 distributed under GPL and the Artistic License 2.0. It is currently
-maintained by Lee Johnson with help from many contributors.
+maintained by Lee Johnson (LEEJO) with help from many contributors.
 
 =head1 CREDITS
 

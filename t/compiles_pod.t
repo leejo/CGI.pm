@@ -35,7 +35,7 @@ for my $file (@files) {
   TODO: {
 	# not enough POD coverage yet by a long way, also the nature
 	# of CGI.pm at present (most subs eval'd as strings) means
-	# this test isn't that much use - 
+	# this test isn't that much use - so mark as TODO for now
 	local $TODO = 'POD coverage';
 	Test::Pod::Coverage::pod_coverage_ok($module);
   }
