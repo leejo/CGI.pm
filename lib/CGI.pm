@@ -4239,7 +4239,6 @@ __END__
 CGI - Handle Common Gateway Interface requests and responses
 
 =for html
-
 <a href='https://travis-ci.org/leejo/CGI.pm?branch=master'><img src='https://travis-ci.org/leejo/CGI.pm?branch=master' alt='Build Status' /></a>
 <a href='https://coveralls.io/r/leejo/CGI.pm'><img src='https://coveralls.io/repos/leejo/CGI.pm/badge.png?branch=master' alt='Coverage Status' /></a>
 
