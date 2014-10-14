@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/leejo/CGI.pm.svg?branch=master)](https://travis-ci.org/leejo/CGI.pm)
+[![Coverage Status](https://coveralls.io/repos/leejo/CGI.pm/badge.png)](https://coveralls.io/r/leejo/CGI.pm)
 
 ## WHAT IS THIS?
 
