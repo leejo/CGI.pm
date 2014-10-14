@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Deep;
 use Test::Warn;
 
@@ -18,15 +18,21 @@ ok $q,"CGI::new()";
 
 my @params;
 
-warning_like
+warnings_are
 	{ @params = $q->param }
-	qr/CGI::param called in list context from package main line 22, this can lead to vulnerabilities/,
-    "calling ->param in list context warns"
+	[],
+	"no warnings when calling ->param with no args"
+;
+
+warning_like
+	{ @params = $q->param('game') }
+	qr/CGI::param called in list context from package main line 28, this can lead to vulnerabilities/,
+    "calling ->param with args in list context warns"
 ;
 
 cmp_deeply(
-	\@params,
-	[ qw/ game weather / ],
+	[ sort @params ],
+	[ qw/ checkers chess / ],
 	'CGI::param()',
 );
 
@@ -36,3 +42,4 @@ warnings_are
 	{ @params = $q->param }
 	[],
 	"no warnings when LIST_CONTEXT_WARN set to 0"
+;
