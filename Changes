@@ -8,6 +8,10 @@
       charset force numeric encoding of all characters, because that does not
       happen
 
+    [ SPEC / BUG FIXES ]
+    - don't sub out PATH_INFO in url if PATH_INFO is the same as SCRIPT_NAME
+      (RT #89827)
+
 4.07 2014-10-12
 
     [ RELEASE NOTES ]
