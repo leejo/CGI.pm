@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 use Test::Deep;
+use Test::NoWarnings;
 
 use CGI ();
 use Config;
@@ -12,6 +13,8 @@ use Config;
 my $loaded = 1;
 
 $| = 1;
+
+$CGI::LIST_CONTEXT_WARN = 0;
 
 ######################### End of black magic.
 
@@ -70,6 +73,7 @@ is $p->{bar}, 'froz',"tied interface fetch";
 $p->{bar} = join("\0",qw(foo bar baz));
 is join(' ',$q->param('bar')), 'foo bar baz','tied interface store';
 ok exists $p->{bar};
+is delete $p->{bar}, "foo\0bar\0baz",'tied interface delete';
 
 # test posting
 $q->_reset_globals;
@@ -116,9 +120,7 @@ $q->_reset_globals;
         "$_ keywords" for qw/ param url_param /;
 
 	{
-		# RT #54511. TODO: use Test::Warn / Test::Warnings / Test::NoWarnings
 		$^W++;
-		local $SIG{__WARN__} = sub { fail( "Got a warning: " . $_[0] ); };
 
 		CGI::_reset_globals;
 		$q = CGI->new;

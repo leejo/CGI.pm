@@ -12,6 +12,8 @@ my $loaded = 1;
 
 $| = 1;
 
+$CGI::LIST_CONTEXT_WARN = 0;
+
 ######################### End of black magic.
 
 my $xml_string = 'xml';

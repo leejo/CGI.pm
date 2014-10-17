@@ -10,6 +10,8 @@ use Test::More tests => 3;
 use IO::File;
 use CGI;
 
+$CGI::LIST_CONTEXT_WARN = 0;
+
 my $cgi = CGI->new('a=1;=;b=2;=3');
 ok eq_set (['a', '', 'b'], [$cgi->param]);
 

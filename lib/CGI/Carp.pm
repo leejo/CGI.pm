@@ -318,7 +318,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION     = '3.64';
+$CGI::Carp::VERSION     = '4.07';
 $CGI::Carp::CUSTOM_MSG  = undef;
 $CGI::Carp::DIE_HANDLER = undef;
 $CGI::Carp::TO_BROWSER  = 1;
@@ -524,7 +524,7 @@ END
         eval { 
             &$CUSTOM_MSG($msg); # nicer to perl 5.003 users
         };
-        if ($@) { print STDERR q(error while executing the error handler: $@); }
+        if ($@) { print STDERR qq(error while executing the error handler: $@); }
 
       return;
     } else {

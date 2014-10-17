@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/leejo/CGI.pm.svg?branch=master)](https://travis-ci.org/leejo/CGI.pm)
+[![Coverage Status](https://coveralls.io/repos/leejo/CGI.pm/badge.png?branch=master)](https://coveralls.io/r/leejo/CGI.pm)
 
 ## WHAT IS THIS?
 
@@ -6,7 +7,7 @@ This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
 
 ## CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
-	http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
+http://perl5.git.perl.org/perl.git/commitdiff/e9fa5a80
 
 If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
@@ -16,7 +17,7 @@ split into its own distribution, meaning you do not need acces to a compiler
 to install CGI.pm
 
 The rational for this decision is that CGI.pm is no longer considered good
-practice for developing web applications, B<including> quick prototyping and
+practice for developing web applications, *including* quick prototyping and
 small web scripts. There are far better, cleaner, quicker, easier, safer,
 more scalable, more extensible, more modern alternatives available at this point
 in time. These will be documented with a specific CPAN dist: CGI::Alternatives.
@@ -30,10 +31,12 @@ http://www.nntp.perl.org/group/perl.perl5.porters/2013/05/msg202130.html
 To install this module, cd to the directory that contains this README
 file and type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+```bash
+perl Makefile.PL
+make
+make test
+make install
+```
 
 ## WHAT SYSTEMS DOES IT WORK WITH?
 
@@ -73,7 +76,16 @@ These tickets are still considered active, they will be closed when
 the issues on github are closed.
 
 If you would like to contribute then please comment on issues, raise
-issues, pull requests, etc.
+issues, pull requests, etc. If you do raise an issue please provide
+the following information: Your version of perl (```perl -V```), the
+version of CGI.pm you are using (i will almost certainly ask you to
+upgrade to the latest version so please try that first), the version
+of your operating system.
+
+Failing tests cases are appreciated with issues, and if you submit a
+patch then it will *not* be accepted unless you provide a reasonable
+automated test case with it (please see the existing tests in t/ for
+examples)
 
 ## WHERE CAN I LEARN MORE?
 
