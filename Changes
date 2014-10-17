@@ -1,3 +1,10 @@
+4.08 2014-11-01
+
+    [ DOCUMENTATION ]
+    - note that calling headers without a -charset may lead to a nonsensical
+      charset being added to certain content types due to the default and the
+      workaround
+
 4.07 2014-10-12
 
     [ RELEASE NOTES ]

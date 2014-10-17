@@ -68,4 +68,34 @@ use Test::More;
     is $got, $expected, 'type and charset, type defines charset';
 }
 
+{
+    my $cgi = CGI->new;
+    my $got = $cgi->header( -type => 'image/gif' );
+    my $expected = 'Content-Type: image/gif; charset=ISO-8859-1'
+                 . $CGI::CRLF x 2;
+    is $got, $expected, 'image type, no charset';
+}
+
+{
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
+		-type    => 'image/gif',
+		-charset => '',
+	);
+    my $expected = 'Content-Type: image/gif'
+                 . $CGI::CRLF x 2;
+    is $got, $expected, 'image type, no charset';
+}
+
+{
+    my $cgi = CGI->new;
+    my $got = $cgi->header(
+        -type    => 'image/gif',
+        -charset => 'utf-8',
+    );
+    my $expected = 'Content-Type: image/gif; charset=utf-8'
+                 . $CGI::CRLF x 2;
+    is $got, $expected, 'image type, forced charset';
+}
+
 done_testing;

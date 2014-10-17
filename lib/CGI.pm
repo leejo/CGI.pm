@@ -5238,7 +5238,13 @@ to use with certain servers that expect all their scripts to be NPH.
 
 The B<-charset> parameter can be used to control the character set
 sent to the browser.  If not provided, defaults to ISO-8859-1.  As a
-side effect, this sets the charset() method as well.
+side effect, this sets the charset() method as well. B<Note> that the
+default being ISO-8859-1 may not make sense for all content types, e.g.:
+
+    Content-Type: image/gif; charset=ISO-8859-1
+
+In the above case you need to pass -charset => '' to prevent the default
+being used.
 
 The B<-attachment> parameter can be used to turn the page into an
 attachment.  Instead of displaying the page, some browsers will prompt
