@@ -10,6 +10,7 @@ use strict;
 use Test::More 'no_plan';
 
 use CGI qw/ :cgi /;
+$CGI::LIST_CONTEXT_WARN = 0;
 
 #-----------------------------------------------------------------------------
 # %ENV setup.
@@ -88,6 +89,7 @@ is( $q->param('300x300_gif')       , '300x300.gif'       , 'filename_4' );
 # Now check that the upload method works.
 #-----------------------------------------------------------------------------
 
+isa_ok( upload('does_not_exist_gif'),'File::Temp','upload_basic_2 (no object)' );
 isa_ok( upload('does_not_exist_gif'),'Fh','upload_basic_2 (no object)' );
 ok( defined $q->upload('does_not_exist_gif'), 'upload_basic_2' );
 ok( defined $q->upload('100;100_gif')       , 'upload_basic_3' );
@@ -120,6 +122,17 @@ ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
     seek($fh1,0,2);
     # How long is the file?
     is(tell($fh1), 1656, $test);
+}
+
+{ # test handle() method
+ my $fh1 = $q->upload("300x300_gif");
+ my $rawhandle = $fh1->handle;
+ ok($rawhandle, "check handle()");
+ isnt($rawhandle, "300x300_gif", "no string overload");
+ # check it acts like a handle
+ seek($rawhandle, 0, 2);
+ is(tell($rawhandle), 1656, "check it acts like a handle");
+ ok(eval { $rawhandle->seek(0, 2); 1 }, "can call seek() on handle result");
 }
 
 my $q2 = CGI->new;

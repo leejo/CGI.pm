@@ -18,11 +18,16 @@ before_install:
     - cd $BUILD_DIR
 
 install:
-    - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
+    - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j1:c HARNESS_TIMER=1
+    - cpanm --quiet --notest Devel::Cover::Report::Coveralls
     - cpanm --quiet --notest --installdeps .
 
 script:
-    - prove -lrsv t
+    - PERL5OPT=-MDevel::Cover=-ignore,"t/",+ignore,"prove",-coverage,statement,branch,condition,path,subroutine prove -lrs t
+    - cover
+
+after_success:
+    - cover -report coveralls
 
 notifications:
     email: false

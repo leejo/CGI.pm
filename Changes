@@ -1,11 +1,40 @@
-4.05 2014-11-01
+4.08 2014-11-01
+
+    [ DOCUMENTATION ]
+    - note that calling headers without a -charset may lead to a nonsensical
+      charset being added to certain content types due to the default and the
+      workaround
+
+4.07 2014-10-12
+
+    [ RELEASE NOTES ]
+    - please see changes for v4.05
+
+    [ TESTING ]
+    - typo and POD fixes, add test to check POD and compiles
+
+4.06 2014-10-10
+
+    [ RELEASE NOTES ]
+    - please see changes for v4.05
+
+    [ DOCUMENTATION ]
+    - make warning on list context call of ->param more lenient and don't
+      warn if called with no arguments
+
+4.05 2014-10-08
+
+    [ RELEASE NOTES ]
+    - this release includes *significant* refactoring of temporary file
+      handling in CGI.pm. See "Changes in temporary file handling" in perldoc
+
+    - this release adds a warning for when the param method is called
+      in list context, see the Warning in the perldoc for the section
+      "Fetching the value or values of a single named parameter" for why
+      this has been added and how to disable this warning
 
     [ DOCUMENTATION ]
     - change AUTHOR INFORMATION to LICENSE to please Kwalitee
-
-    [ ERROR HANDLING ]
-    - CGITempFile will now warn if it fails to remove temporary files
-      in the DESTROY method
 
     [ TESTING ]
     - t/arbitrary_handles.t to check need for patch in RT #54055, it
@@ -13,11 +42,21 @@
       be an arbitrary handle
     - add test case for incorrect unescaping of redirect headers
       (RT #61120)
+    - add tests for the handle method (RT #85074, thanks to TONYC@cpan.org)
 
     [ SPEC / BUG FIXES ]
     - don't set binmode on STDOUT/STDERR/STDIN if a none standard layer
       is already set on them on none UNIX platforms (RT #57524)
-
+    - make XForms:Model data accesible through POSTDATA/PUTDATA param
+      (RT #75628)
+    - prevent corruption of POSTDATA/PUTDATA when -utf8 flag is used and use
+      tempfiles to handle this data (RT #79102, thanks anonymous)
+    - unescape request URI *after* having removed the query string to prevent
+      removal of ? chars that are part of the original URI (and were encoded)
+      (RT #83265)
+    - fix q( to qq( in CGI::Carp so $@ is correct interpolated (RT #83360)
+    - don't call ->query_string in url unless -query is passed (RT #87790)
+      (optimisation and fits the current documented behaviour)
 
 4.04 2014-09-04
 
@@ -38,6 +77,10 @@
     - handle multiple values in X-Forwarded-Host header, we follow the
       logic in most other frameworks and take the last value from the list
       (RT #54487)
+    - reverse the order of TEMP dir placement for WINDOWS: TEMP > TMP > WINDIR
+      (RT #71799, thanks to jeff@math.tntech.edu), this returns the behaviour
+      to pre e24d04e9bc5fda7722444b02fec135d8cc2ff488 but with the undefined
+      fix still in place
     - refactor CGITempFile::find_tempdir to use File::Spec->tmpdir
       (related: RT #71799)
     - fix warnings when QUERY_STRING has empty key=value pairs (RT #54511)
@@ -155,7 +198,7 @@ Version 3.63 Nov 12, 2012
 Version 3.62, Nov 9th, 2012
 
     [INTERNALS]
-    - Changed how the  deprecated endform function was defined for compatibilty
+    - Changed how the deprecated endform function was defined for compatibility
       with the development version of Perl. 
     - Fix failures in t/tmpdir.t when run as root
       https://github.com/markstos/CGI.pm/issues/22, RT#80659)
