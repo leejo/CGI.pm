@@ -5834,11 +5834,7 @@ character becomes "&lt;", ">" becomes "&gt;", "&" becomes "&amp;", and
 the quote character becomes "&quot;".  In addition, the hexadecimal
 0x8b and 0x9b characters, which some browsers incorrectly interpret
 as the left and right angle-bracket characters, are replaced by their
-numeric character entities ("&#8249" and "&#8250;").  If you manually change
-the charset, either by calling the charset() method explicitly or by
-passing a -charset argument to header(), then B<all> characters will
-be replaced by their numeric entities, since CGI.pm has no lookup
-table for all the possible encodings.
+numeric character entities ("&#8249" and "&#8250;").
 
 C<escapeHTML()> expects the supplied string to be a character string. This means you
 should Encode::decode data received from "outside" and Encode::encode your

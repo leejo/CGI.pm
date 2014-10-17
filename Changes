@@ -4,6 +4,9 @@
     - note that calling headers without a -charset may lead to a nonsensical
       charset being added to certain content types due to the default and the
       workaround
+    - remove documentation stating that calls to escapeHTML with a changed
+      charset force numeric encoding of all characters, because that does not
+      happen
 
 4.07 2014-10-12
 
