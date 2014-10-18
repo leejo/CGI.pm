@@ -4,7 +4,7 @@ use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
 
-$CGI::VERSION='4.07';
+$CGI::VERSION='4.08';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -401,7 +401,7 @@ sub upload_hook {
   $self->{'use_tempfile'} = $use_tempfile if defined $use_tempfile;
 }
 
-#### Method: param
+#### Method: param / multi_param
 # Returns the value(s)of a named parameter.
 # If invoked in a list context, returns the
 # entire list.  Otherwise returns the first
@@ -411,7 +411,18 @@ sub upload_hook {
 # If more than one argument is provided, the
 # second and subsequent arguments are used to
 # set the value of the parameter.
+#
+# note that calling param() in list context
+# will raise a warning about potential bad
+# things, hence the multi_param method
 ####
+sub multi_param {
+	# we don't need to set $LIST_CONTEXT_WARN to 0 here
+	# because param() will check the caller before warning
+	my @list_of_params = param( @_ );
+	return @list_of_params;
+}
+
 sub param {
     my($self,@p) = self_or_default(@_);
 
@@ -4255,7 +4266,8 @@ CGI - Handle Common Gateway Interface requests and responses
     my $q = CGI->new;
 
     # Process an HTTP request
-     @values  = $q->param('form_field');
+     @values  = $q->multi_param('form_field');
+     $value   = $q->param('param_name');
 
      $fh      = $q->upload('file_field');
 
@@ -4558,11 +4570,13 @@ parsed keywords can be obtained as an array using the keywords() method.
 
 =head2 Fetching the names of all the parameters passed to your script:
 
+     @names = $query->multi_param
+
      @names = $query->param
 
 If the script was invoked with a parameter list
-(e.g. "name1=value1&name2=value2&name3=value3"), the param() method
-will return the parameter names as a list.  If the script was invoked
+(e.g. "name1=value1&name2=value2&name3=value3"), the param() / multi_param()
+methods will return the parameter names as a list.  If the script was invoked
 as an <ISINDEX> script and contains a string without ampersands
 (e.g. "value1+value2+value3") , there will be a single parameter named
 "keywords" containing the "+"-delimited keywords.
@@ -4575,22 +4589,26 @@ of the spec, and so isn't guaranteed).
 
 =head2 Fetching the value or values of a single named parameter:
 
-    @values = $query->param('foo');
+    @values = $query->multi_param('foo');
 
 	      -or-
 
     $value = $query->param('foo');
 
-Pass the param() method a single argument to fetch the value of the
-named parameter. If the parameter is multivalued (e.g. from multiple
+Pass the param() / multi_param() method a single argument to fetch the value
+of the named parameter. If the parameter is multivalued (e.g. from multiple
 selections in a scrolling list), you can ask to receive an array.  Otherwise
 the method will return a single value.
 
-B<Warning> - calling param in list context can lead to vulnerabilities if
+B<Warning> - calling param() in list context can lead to vulnerabilities if
 you do not sanitise user input as it is possible to inject other param
-keys and values into your code. The following code is an example of a
-vulnerability as the call to param will be evaluated in list context and
-thus possibly inject extra keys and values into the hash:
+keys and values into your code. This is why the multi_param() method exists,
+to make it clear that a list is being returned, note that param() can stil
+be called in list context and will return a list for back compatibility.
+
+The following code is an example of a vulnerability as the call to param will
+be evaluated in list context and thus possibly inject extra keys and values
+into the hash:
 
 	my %user_info = (
 		id   => 1,
@@ -4602,8 +4620,9 @@ prefixing it with "scalar"
 
 	name => scalar $query->param('name'),
 
-If you call param in list context a warning will be raised by CGI.pm, you can
-disable this warning by setting $CGI::LIST_CONTEXT_WARN to 0.
+If you call param() in list context with an argument a warning will be raised
+by CGI.pm, you can disable this warning by setting $CGI::LIST_CONTEXT_WARN to 0
+or by using the multi_param() method instead
 
 If a value is not given in the query string, as in the queries
 "name1=&name2=", it will be returned as an empty string.

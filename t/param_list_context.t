@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::Deep;
 use Test::Warn;
 
@@ -21,7 +21,7 @@ my @params;
 warnings_are
 	{ @params = $q->param }
 	[],
-	"no warnings when calling ->param with no args"
+    "calling ->param with no args in list does not warn"
 ;
 
 warning_like
@@ -34,6 +34,18 @@ cmp_deeply(
 	[ sort @params ],
 	[ qw/ checkers chess / ],
 	'CGI::param()',
+);
+
+warnings_are
+	{ @params = $q->multi_param('game') }
+	[],
+	"no warnings calling multi_param"
+;
+
+cmp_deeply(
+	[ sort @params ],
+	[ qw/ checkers chess / ],
+	'CGI::multi_param'
 );
 
 $CGI::LIST_CONTEXT_WARN = 0;
