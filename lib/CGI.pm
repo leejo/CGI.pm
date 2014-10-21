@@ -345,8 +345,7 @@ sub new {
     $self->{'use_tempfile'} = 1;
 
     if (ref($initializer[0])
-            && (UNIVERSAL::isa($initializer[0],'Apache')
-            || UNIVERSAL::isa($initializer[0],'Apache2::RequestRec') )) {
+            && (UNIVERSAL::isa($initializer[0],'Apache') || UNIVERSAL::isa($initializer[0],'Apache2::RequestRec') )) {
         $self->r(shift @initializer);
     }
     if (ref($initializer[0]) && (UNIVERSAL::isa($initializer[0],'CODE'))) {
@@ -481,7 +480,7 @@ sub _decode_utf8 {
 }
 
 sub self_or_default {
-    return @_ if defined($_[0]) && (!ref($_[0])) &&($_[0] eq 'CGI');
+    return @_ if (defined($_[0]) && (!ref($_[0])) && ($_[0] eq 'CGI'));
     unless (defined($_[0])
             && (ref($_[0]) eq 'CGI' || UNIVERSAL::isa($_[0],'CGI')) ) { # slightly optimized for common case
         $Q = $CGI::DefaultClass->new unless defined($Q);
@@ -491,10 +490,9 @@ sub self_or_default {
 }
 
 sub self_or_CGI {
-    local $^W=0;                # prevent a warning
+    local $^W=0; # prevent a warning
     if (defined($_[0])
-            && (substr(ref($_[0]),0,3) eq 'CGI'
-            || UNIVERSAL::isa($_[0],'CGI'))) {
+            && (substr(ref($_[0]),0,3) eq 'CGI' || UNIVERSAL::isa($_[0],'CGI'))) {
         return @_;
     } else {
         return ($DefaultClass,@_);
@@ -545,7 +543,7 @@ sub init {
         return;
     }
 
-    $meth=$ENV{'REQUEST_METHOD'} if defined($ENV{'REQUEST_METHOD'});
+    $meth = $ENV{'REQUEST_METHOD'} if defined($ENV{'REQUEST_METHOD'});
     $content_length = defined($ENV{'CONTENT_LENGTH'}) ? $ENV{'CONTENT_LENGTH'} : 0;
 
     $fh = to_filehandle($initializer) if $initializer;
@@ -656,12 +654,12 @@ sub init {
 
         if ($meth eq 'POST' || $meth eq 'PUT') {
             if ( $content_length > 0 ) {
-                if ( ( $PUTDATA_UPLOAD || $self->{'.upload_hook'} )
+                if ( ($PUTDATA_UPLOAD || $self->{'.upload_hook'})
                         && !$is_xforms
                         && ($meth eq 'POST' || $meth eq 'PUT')
                         && defined($ENV{'CONTENT_TYPE'})
                         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
-                        && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ){
+                        && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
                     my $postOrPut = $meth . 'DATA' ; # POSTDATA/PUTDATA
                     $self->read_postdata_putdata( $postOrPut, $content_length, $ENV{'CONTENT_TYPE'}  );
                     $meth = ''; # to skip xform testing
@@ -692,7 +690,8 @@ sub init {
     }
 
     # YL: Begin Change for XML handler 10/19/2001
-    if (!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
+    if (!$is_xforms
+            && ($meth eq 'POST' || $meth eq 'PUT')
             && defined($ENV{'CONTENT_TYPE'})
             && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
             && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
@@ -873,8 +872,9 @@ sub $tagname {
         $func .= qq#
     return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest;
     my(\$tag,\$untag) = ("\L<$tagname\E\$attr>","\L</$tagname>\E");
-    my \@result = map { "\$tag\$_\$untag" } 
-                      (ref(\$rest[0]) eq 'ARRAY') ? \@{\$rest[0]} : "\@rest";
+    my \@result
+        = map { "\$tag\$_\$untag" }
+            (ref(\$rest[0]) eq 'ARRAY') ? \@{\$rest[0]} : "\@rest";
     return "\@result";
 }#;
     }
@@ -1056,7 +1056,7 @@ sub read_postdata_putdata {
 
         # SHOULD PROBABLY SKIP THIS IF NOT $self->{'use_tempfile'}
         # BUT THE REST OF CGI.PM DOESN'T, SO WHATEVER
-        my $tmp_dir    = $CGI::OS eq 'WINDOWS'
+        my $tmp_dir = $CGI::OS eq 'WINDOWS'
             ? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
             : undef; # File::Temp defaults to TMPDIR
 
@@ -1076,8 +1076,7 @@ sub read_postdata_putdata {
         $unit = $len;
         my $ZERO_LOOP_COUNTER =0;
 
-        while( $len > 0 )
-        {
+        while( $len > 0 ) {
             my $bytesRead = $self->read_from_client( \$data, $unit, 0 );
             $len -= $bytesRead ;
 
@@ -1159,7 +1158,7 @@ END_OF_FUNC
 # Read data from a file handle
 sub read_from_client {
     my($self, $buff, $len, $offset) = @_;
-    local $^W=0;                # prevent a warning
+    local $^W=0; # prevent a warning
     return $MOD_PERL
         ? $self->r->read($$buff, $len, $offset)
         : read(\*STDIN, $$buff, $len, $offset);
@@ -1175,8 +1174,7 @@ sub delete {
     my(@names) = rearrange([NAME],@p);
     my @to_delete = ref($names[0]) eq 'ARRAY' ? @$names[0] : @names;
     my %to_delete;
-    for my $name (@to_delete)
-    {
+    for my $name (@to_delete) {
         CORE::delete $self->{param}{$name};
         CORE::delete $self->{'.fieldnames'}->{$name};
         $to_delete{$name}++;
