@@ -4,7 +4,7 @@ use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
 
-$CGI::VERSION='4.08';
+$CGI::VERSION='4.09';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1072,6 +1072,7 @@ sub read_postdata_putdata {
 			UNLINK => $UNLINK_TMP_FILES,
 			DIR    => $tmp_dir,
 		);
+		$filehandle->_mp_filename( $postOrPut );
 
         $CGI::DefaultClass->binmode($filehandle)
           if $CGI::needs_binmode
@@ -1123,11 +1124,11 @@ sub read_postdata_putdata {
 
         # Save some information about the uploaded file where we can get
         # at it later.
-        # Use the typeglob as the key, as this is guaranteed to be
+        # Use the typeglob + filename as the key, as this is guaranteed to be
         # unique for each filehandle.  Don't use the file descriptor as
         # this will be re-used for each filehandle if the
         # close_upload_files feature is used.
-        $self->{'.tmpfiles'}->{$$filehandle} = {
+        $self->{'.tmpfiles'}->{$$filehandle . $filehandle} = {
             hndl => $filehandle,
 			name => $filehandle->filename,
             info => {%header},
@@ -3783,11 +3784,11 @@ sub read_multipart {
 
 	  # Save some information about the uploaded file where we can get
 	  # at it later.
-	  # Use the typeglob as the key, as this is guaranteed to be
+	  # Use the typeglob + filename as the key, as this is guaranteed to be
 	  # unique for each filehandle.  Don't use the file descriptor as
 	  # this will be re-used for each filehandle if the
 	  # close_upload_files feature is used.
-	  $self->{'.tmpfiles'}->{$$filehandle}= {
+      $self->{'.tmpfiles'}->{$$filehandle . $filehandle} = {
               hndl => $filehandle,
 		  name => $filehandle->filename,
 	      info => {%header},
@@ -3856,6 +3857,7 @@ sub read_multipart_related {
 		UNLINK => $UNLINK_TMP_FILES,
 		DIR    => $tmp_dir,
 	  );
+	  $filehandle->_mp_filename( $filehandle->filename );
 
 	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
                      && defined fileno($filehandle);
@@ -3884,11 +3886,11 @@ sub read_multipart_related {
 
 	  # Save some information about the uploaded file where we can get
 	  # at it later.
-	  # Use the typeglob as the key, as this is guaranteed to be
+	  # Use the typeglob + filename as the key, as this is guaranteed to be
 	  # unique for each filehandle.  Don't use the file descriptor as
 	  # this will be re-used for each filehandle if the
 	  # close_upload_files feature is used.
-	  $self->{'.tmpfiles'}->{$$filehandle}= {
+	  $self->{'.tmpfiles'}->{$$filehandle . $filehandle} = {
               hndl => $filehandle,
 		  name => $filehandle->filename,
 	      info => {%header},
@@ -3913,7 +3915,7 @@ END_OF_FUNC
 'tmpFileName' => <<'END_OF_FUNC',
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{$$filename}->{name} || '';
+    return $self->{'.tmpfiles'}->{$$filename . $filename}->{name} || '';
 }
 END_OF_FUNC
 
@@ -3921,7 +3923,7 @@ END_OF_FUNC
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
     return if ! defined $$filename;
-    return $self->{'.tmpfiles'}->{$$filename}->{info};
+    return $self->{'.tmpfiles'}->{$$filename . $filename}->{info};
 }
 END_OF_FUNC
 
