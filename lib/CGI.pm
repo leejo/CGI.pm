@@ -3134,7 +3134,13 @@ sub _name_and_path_from_env {
     $uri =~ s/\?.*//s;
     $uri = unescape($uri);
 
-    if ($uri ne "$script_name$path_info") {
+    if ( $IIS ) {
+      # IIS doesn't set $ENV{PATH_INFO} correctly. It sets it to
+      # $ENV{SCRIPT_NAME}path_info 
+      # IIS also doesn't set $ENV{REQUEST_URI} so we don't want to do
+      # the test below, hence this comes first
+      $path_info =~ s/^\Q$script_name\E(.*)/$1/;
+    } elsif ($uri ne "$script_name$path_info") {
         my $script_name_pattern = quotemeta($script_name);
         my $path_info_pattern = quotemeta($path_info);
         $script_name_pattern =~ s{(?:\\/)+}{/+}g;
@@ -7606,7 +7612,8 @@ execute the additional path information as a Perl script.
 If you use the ordinary file associations mapping, the
 path information will be present in the environment, 
 but incorrect.  The best thing to do is to avoid using additional
-path information in CGI scripts destined for use with IIS.
+path information in CGI scripts destined for use with IIS. A
+best attempt has been made to make CGI.pm do the right thing.
 
 =item B<path_translated()>
 

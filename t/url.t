@@ -85,6 +85,7 @@ subtest 'RT#58377: + in PATH_INFO' => sub {
 };
 
 subtest 'IIS PATH_INFO eq SCRIPT_NAME' => sub {
+	$CGI::IIS++;
     local $ENV{PATH_INFO}           = '/hello+world';
     local $ENV{HTTP_X_FORWARDED_HOST} = undef;
     local $ENV{HTTP_HOST}           = 'example.com';

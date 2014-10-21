@@ -1,4 +1,4 @@
-4.08 2014-10-18
+4.09 2014-10-21
 
     [ RELEASE NOTES ]
     - with this release the large backlog of issues against CGI.pm has been
@@ -12,6 +12,11 @@
       recent changes and file an issue on github if there has been a regression.
     - please do *NOT* file issues regarding HTML generating functions, these
       are no longer being maintained (see perldoc for rational)
+
+    [ SPEC / BUG FIXES ]
+    - tweak url to DTRT when the web server is IIS (RT #89827 / GH #152)
+
+4.08 2014-10-18
 
     [ DOCUMENTATION ]
     - note that calling headers without a -charset may lead to a nonsensical
