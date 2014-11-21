@@ -4323,7 +4323,7 @@ package/manually. To make this a little easier the L<CGI::Fast> module has been
 split into its own distribution, meaning you do not need acces to a compiler
 to install CGI.pm
 
-The rational for this decision is that CGI.pm is no longer considered good
+The rationale for this decision is that CGI.pm is no longer considered good
 practice for developing web applications, B<including> quick prototyping and
 small web scripts. There are far better, cleaner, quicker, easier, safer,
 more scalable, more extensible, more modern alternatives available at this point
@@ -4339,7 +4339,7 @@ B<All> HTML generation functions within CGI.pm are no longer being
 maintained. Any issues, bugs, or patches will be rejected unless
 they relate to fundamentally broken page rendering.
 
-The rational for this is that the HTML generation functions of CGI.pm
+The rationale for this is that the HTML generation functions of CGI.pm
 are an obfuscation at best and a maintenance nightmare at worst. You
 should be using a template engine for better separation of concerns.
 See L<CGI::Alternatives> for an example of using CGI.pm with the
