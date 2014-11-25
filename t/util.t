@@ -5,9 +5,10 @@
 
 $| = 1;
 
-use Test::More tests => 57;
+use Test::More tests => 77;
+use Test::Deep;
 use Config;
-use_ok ( 'CGI::Util', qw(escape unescape) );
+use_ok ( 'CGI::Util', qw(escape unescape rearrange) );
 
 # ASCII order, ASCII codepoints, ASCII repertoire
 
@@ -35,5 +36,46 @@ foreach(sort(keys(%punct))) {
     my $unescape = "AbC$_" . "dEF";
     my $cgi_unescape = unescape("AbC\%$punct{$_}dEF");
     is($unescape, $cgi_unescape , "# $unescape ne $cgi_unescape");
+}
+
+# rearrange should return things in a consistent order, so when we pass through
+# a hash reference it should sort the keys
+for ( 1 .. 20 ) {
+	my %args = (
+		'-charset'      => 'UTF-8',
+		'-type'         => 'text/html',
+		'-content-type' => 'text/html; charset=iso-8859-1',
+	);
+
+	my @ordered = rearrange(
+		[
+			[ 'TYPE','CONTENT_TYPE','CONTENT-TYPE' ],
+			'STATUS',
+			[ 'COOKIE','COOKIES','SET-COOKIE' ],
+			'TARGET',
+			'EXPIRES',
+			'NPH',
+			'CHARSET',
+			'ATTACHMENT',
+			'P3P'
+		],
+		%args,
+	);
+
+	cmp_deeply(
+		[ @ordered ],
+		[
+			'text/html; charset=iso-8859-1',
+			undef,
+			undef,
+			undef,
+			undef,
+			undef,
+			'UTF-8',
+			undef,
+			undef
+		],
+		'rearrange not sensitive to hash key ordering'
+	);
 }
 

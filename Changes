@@ -1,3 +1,16 @@
+4.09_01 2014-11-25
+
+    [ SPEC / BUG FIXES ]
+    - favour -content-type arg in header if -type and -charset options are also
+      passed in (GH #155, thanks to kaoru for the test case). this change also
+      sorts the hash keys in the rearrange method in CGI::Util meaning the order
+      of the arrangement will always be the same for params that have multiple
+      aliases. really you shouldn't be passing in multiple aliases, but this will
+      make it consistent should you do that
+
+    [ DOCUMENTATION ]
+    - fix some typos
+
 4.09 2014-10-21
 
     [ RELEASE NOTES ]

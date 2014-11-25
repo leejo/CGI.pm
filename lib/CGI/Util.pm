@@ -6,7 +6,7 @@ use if $] >= 5.019, 'deprecate';
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
-our $VERSION = '4.09';
+our $VERSION = '4.09_01';
 
 use constant EBCDIC => "\t" ne "\011";
 
@@ -114,15 +114,28 @@ sub _rearrange_params {
     $i++;
     }
 
+    my %params_as_hash = ( @param );
+
     my (@result,%leftover);
     $#result = $#$order;  # preextend
-    while (@param) {
-    my $key = lc(shift(@param));
+
+    foreach my $k (
+        # sort keys alphabetically but favour certain keys before others
+        # specifically for the case where there could be several options
+        # for a param key, but one should be preferred (see GH #155)
+        sort {
+            if    ( $a =~ /content/i ) { return 1 }
+            elsif ( $b =~ /content/i ) { return -1 }
+            else  { $a cmp $b }
+        }
+        keys( %params_as_hash )
+    ) {
+    my $key = lc($k);
     $key =~ s/^\-//;
     if (exists $pos{$key}) {
-        $result[$pos{$key}] = shift(@param);
+        $result[$pos{$key}] = $params_as_hash{$k};
     } else {
-        $leftover{$key} = shift(@param);
+        $leftover{$key} = $params_as_hash{$k};
     }
     }
 
