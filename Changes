@@ -24,7 +24,7 @@
     - please refer to the RELEASE NOTES for version 4.00 and above for all
       recent changes and file an issue on github if there has been a regression.
     - please do *NOT* file issues regarding HTML generating functions, these
-      are no longer being maintained (see perldoc for rational)
+      are no longer being maintained (see perldoc for rationale)
 
     [ SPEC / BUG FIXES ]
     - tweak url to DTRT when the web server is IIS (RT #89827 / GH #152)
