@@ -1,3 +1,9 @@
+4.10_01 2014-11-30
+
+    [ SPEC / BUG FIXES ]
+    - more hash key ordering bugs fixed in HTML attribute output (thanks to
+      Marcus Meissner for the patch and test case)
+
 4.10 2014-11-27
 
     [ SPEC / BUG FIXES ]
