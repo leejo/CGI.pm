@@ -1878,7 +1878,7 @@ sub start_html {
     }
 
     if ($meta && ref($meta) && (ref($meta) eq 'HASH')) {
-	for (keys %$meta) { push(@result,$XHTML ? qq(<meta name="$_" content="$meta->{$_}" />) 
+	for (sort keys %$meta) { push(@result,$XHTML ? qq(<meta name="$_" content="$meta->{$_}" />) 
 			: qq(<meta name="$_" content="$meta->{$_}">)); }
     }
 

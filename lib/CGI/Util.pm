@@ -167,7 +167,7 @@ sub make_attributes {
     my $value = $escape ? simple_escape($attr->{$_}) : $attr->{$_};
     push(@att,defined($attr->{$_}) ? qq/$key=$quote$value$quote/ : qq/$key/);
     }
-    return @att;
+    return sort @att;
 }
 
 sub simple_escape {
