@@ -4,6 +4,14 @@
     - more hash key ordering bugs fixed in HTML attribute output (thanks to
       Marcus Meissner for the patch and test case)
 
+    [ REFACTORING ]
+    - escapeHTML (and unescapeHTML) have been refactored to use the functions
+      exported by the HTML::Entities module
+
+    [ DOCUMENTATION ]
+    - replace any remaining uses of indirect object notation (new Object) with
+      the safer Object->new syntax
+
 4.10 2014-11-27
 
     [ SPEC / BUG FIXES ]

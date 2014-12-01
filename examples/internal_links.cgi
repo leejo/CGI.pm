@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use CGI;
-$query = new CGI;
+$query = CGI->new;
 
 # We generate a regular HTML file containing a very long list
 # and a popup menu that does nothing except to show that we

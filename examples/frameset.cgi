@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use CGI;
-$query = new CGI;
+$query = CGI->new;
 print $query->header;
 $TITLE="Frameset Example";
 

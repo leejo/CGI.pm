@@ -13,7 +13,7 @@ use CGI ();
 $ENV{REQUEST_METHOD}  = 'GET';
 $ENV{QUERY_STRING}    = 'game=chess&game=checkers&weather=dull';
 
-my $q = new CGI;
+my $q = CGI->new;
 ok $q,"CGI::new()";
 
 my @params;

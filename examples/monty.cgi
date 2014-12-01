@@ -3,7 +3,7 @@
 use CGI;
 use CGI::Carp qw/fatalsToBrowser/;
  
-$query = new CGI;
+$query = CGI->new;
 
 print $query->header;
 print $query->start_html("Example CGI.pm Form");
