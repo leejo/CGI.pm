@@ -3,6 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 use CGI::File::Temp;
+use HTML::Entities;
 
 $CGI::VERSION='4.10_01';
 
@@ -2417,32 +2418,7 @@ sub escapeHTML {
      push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
      my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
      return undef unless defined($toencode);
-     $toencode =~ s{&}{&amp;}gso;
-     $toencode =~ s{<}{&lt;}gso;
-     $toencode =~ s{>}{&gt;}gso;
-     if ($DTD_PUBLIC_IDENTIFIER =~ /[^X]HTML 3\.2/i) {
-     # $quot; was accidentally omitted from the HTML 3.2 DTD -- see
-     # <http://validator.w3.org/docs/errors.html#bad-entity> /
-     # <http://lists.w3.org/Archives/Public/www-html/1997Mar/0003.html>.
-        $toencode =~ s{"}{&#34;}gso;
-     }
-     else {
-        $toencode =~ s{"}{&quot;}gso;
-     }
-
-    # Handle bug in some browsers with Latin charsets
-    if ($self->{'.charset'} 
-            && (uc($self->{'.charset'}) eq 'ISO-8859-1' 
-            || uc($self->{'.charset'}) eq 'WINDOWS-1252')) {
-                $toencode =~ s{'}{&#39;}gso;
-                $toencode =~ s{\x8b}{&#8249;}gso;
-                $toencode =~ s{\x9b}{&#8250;}gso;
-        if (defined $newlinestoo && $newlinestoo) {
-            $toencode =~ s{\012}{&#10;}gso;
-            $toencode =~ s{\015}{&#13;}gso;
-        }
-    }
-    return $toencode;
+	 return encode_entities($toencode);
 }
 END_OF_FUNC
 
@@ -2453,20 +2429,7 @@ sub unescapeHTML {
     push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
     my ($self,$string) = CGI::self_or_default(@_);
     return undef unless defined($string);
-    my $latin = defined $self->{'.charset'} ? $self->{'.charset'} =~ /^(ISO-8859-1|WINDOWS-1252)$/i
-                                            : 1;
-    # thanks to Randal Schwartz for the correct solution to this one
-    $string=~ s[&([^\s&]*?);]{
-	local $_ = $1;
-	/^amp$/i	? "&" :
-	/^quot$/i	? '"' :
-        /^gt$/i		? ">" :
-	/^lt$/i		? "<" :
-	/^#(\d+)$/ && $latin	     ? chr($1) :
-	/^#x([0-9a-f]+)$/i && $latin ? chr(hex($1)) :
-	"&$_;"
-	}gex;
-    return $string;
+	return decode_entities($string);
 }
 END_OF_FUNC
 
@@ -5857,24 +5820,10 @@ is passed through a function called escapeHTML():
 
 =item $escaped_string = escapeHTML("unescaped string");
 
-Escape HTML formatting characters in a string.
+Escape HTML formatting characters in a string. Internally this calls
+L<HTML::Entities> (encode_entities) so really you should just use that instead
 
 =back
-
-Provided that you have specified a character set of ISO-8859-1 (the
-default), the standard HTML escaping rules will be used.  The "<"
-character becomes "&lt;", ">" becomes "&gt;", "&" becomes "&amp;", and
-the quote character becomes "&quot;".  In addition, the hexadecimal
-0x8b and 0x9b characters, which some browsers incorrectly interpret
-as the left and right angle-bracket characters, are replaced by their
-numeric character entities ("&#8249" and "&#8250;").
-
-C<escapeHTML()> expects the supplied string to be a character string. This means you
-should Encode::decode data received from "outside" and Encode::encode your
-strings before sending them back outside. If your source code UTF-8 encoded and
-you want to upgrade string literals in your source to character strings, you
-can use "use utf8". See L<perlunitut>, L<perlunifaq> and L<perlunicode> for more
-information on how Perl handles the difference between bytes and characters.
 
 The automatic escaping does not apply to other shortcuts, such as
 h1().  You should call escapeHTML() yourself on untrusted data in

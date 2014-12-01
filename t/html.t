@@ -182,14 +182,12 @@ is end_h3, '</h3>';
 
 is start_table( { -border => undef } ), '<table border>';
 is h1( escapeHTML("this is <not> \x8bright\x9b") ),
-  '<h1>this is &lt;not&gt; &#8249;right&#8250;</h1>';
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
 
 charset('utf-8');
 
 is h1( escapeHTML("this is <not> \x8bright\x9b") ),
-  ord("\t") == 9
-  ? '<h1>this is &lt;not&gt; ‹right›</h1>'
-  : '<h1>this is &lt;not&gt; »rightº</h1>';
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
 
 is i( p('hello there') ), '<i><p>hello there</p></i>';
 
