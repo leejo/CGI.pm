@@ -430,7 +430,7 @@ sub param {
     return $self->all_parameters unless @p;
 
 	# list context can be dangerous so warn:
-	# http://blog.gerv.net/2014.11/new-class-of-vulnerability-in-perl-web-applications
+	# http://blog.gerv.net/2014.10/new-class-of-vulnerability-in-perl-web-applications
 	if ( wantarray && $LIST_CONTEXT_WARN ) {
 		my ( $package, $filename, $line ) = caller;
 		if ( $package ne 'CGI' ) {
