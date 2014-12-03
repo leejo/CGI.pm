@@ -1,16 +1,18 @@
-4.10_01 2014-11-30
+4.11 2014-12-02
 
     [ SPEC / BUG FIXES ]
-    - more hash key ordering bugs fixed in HTML attribute output (thanks to
-      Marcus Meissner for the patch and test case)
+    - more hash key ordering bugs fixed in HTML attribute output (GH #158,
+      thanks to Marcus Meissner for the patch and test case)
 
     [ REFACTORING ]
     - escapeHTML (and unescapeHTML) have been refactored to use the functions
-      exported by the HTML::Entities module
+      exported by the HTML::Entities module (GH #157)
+    - change BUILD_REQUIRES to TEST_REQUIRES in Makefile.PL as these are test
+      dependencies not build dependencies (GH #159)
 
     [ DOCUMENTATION ]
     - replace any remaining uses of indirect object notation (new Object) with
-      the safer Object->new syntax
+      the safer Object->new syntax (GH #156)
 
 4.10 2014-11-27
 

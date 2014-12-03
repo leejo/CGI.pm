@@ -5,7 +5,7 @@ use Carp 'croak';
 use CGI::File::Temp;
 use HTML::Entities;
 
-$CGI::VERSION='4.10_01';
+$CGI::VERSION='4.11';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -430,7 +430,7 @@ sub param {
     return $self->all_parameters unless @p;
 
 	# list context can be dangerous so warn:
-	# http://blog.gerv.net/2014.10_01/new-class-of-vulnerability-in-perl-web-applications
+	# http://blog.gerv.net/2014.11/new-class-of-vulnerability-in-perl-web-applications
 	if ( wantarray && $LIST_CONTEXT_WARN ) {
 		my ( $package, $filename, $line ) = caller;
 		if ( $package ne 'CGI' ) {
