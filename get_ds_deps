@@ -1,0 +1,15 @@
+curl -XPOST api.metacpan.org/v0/release/_search -d '{
+  "query": {
+    "match_all": {}
+  },
+  "size": 5000,
+  "fields": [ "distribution" ],
+  "filter": {
+    "and": [
+      { "term": { "release.dependency.module": "CGI" } },
+      { "term": {"release.maturity": "released"} },
+      { "term": {"release.status": "latest"} }
+    ]
+  }
+}';
+echo see also http://grep.cpan.me/?q=CGI%3A%3APretty
