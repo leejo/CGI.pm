@@ -1,4 +1,4 @@
-4.12 2014-12-18
+4.13 2014-12-18
 
     [ RELEASE NOTES ]
     - CGI::Pretty is now DEPRECATED and will be removed in a future release.

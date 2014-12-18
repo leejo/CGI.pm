@@ -5,7 +5,7 @@ use Carp 'croak';
 use CGI::File::Temp;
 use HTML::Entities;
 
-$CGI::VERSION='4.12';
+$CGI::VERSION='4.13';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
