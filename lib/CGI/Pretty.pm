@@ -4,7 +4,7 @@ use strict;
 use if $] >= 5.019, 'deprecate';
 use CGI ();
 
-$CGI::Pretty::VERSION = '4.11';
+$CGI::Pretty::VERSION = '4.12';
 $CGI::DefaultClass = __PACKAGE__;
 $CGI::Pretty::AutoloadClass = 'CGI';
 @CGI::Pretty::ISA = qw( CGI );
@@ -175,6 +175,9 @@ sub _reset_globals { initialize_globals(); }
 
 # ugly, but quick fix
 sub import {
+
+	warn "CGI::Pretty is DEPRECATED and will be removed in a future release. Please see https://github.com/leejo/CGI.pm/issues/162 for more information";
+
     my $self = shift;
     no strict 'refs';
     ${ "$self\::AutoloadClass" } = 'CGI';
