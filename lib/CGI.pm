@@ -2,8 +2,6 @@ package CGI;
 require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
-use CGI::File::Temp;
-use HTML::Entities;
 
 $CGI::VERSION='4.11';
 
@@ -858,8 +856,7 @@ foreach my $tag (
 	( map { uc( $_ ) } _all_html_tags() )
 ) {
 	eval "sub $tag {
-		my \$function = _make_tag_func(undef,\$tag);
-		return \$function->(\@_);
+		return _tag_func(\$tag,\@_);
 	}";
 
 	foreach my $start_end ( qw/ start end / ) {
@@ -867,37 +864,35 @@ foreach my $tag (
 		my $start_end_function = "${start_end}_${tag}";
 
 		eval "sub $start_end_function {
-			my \$function = _make_tag_func(undef,\$start_end_function);
-			return \$function->(\@_);
+			return _tag_func(\$start_end_function,\@_);
 		}";
 	}
 }
 
-sub _make_tag_func {
-    my ($self,$tagname) = @_;
-    my $func = qq(
-         my (\$q,\$a,\@rest) = self_or_default(\@_);
-         my(\$attr) = '';
-	 if (ref(\$a) && ref(\$a) eq 'HASH') {
-	    my(\@attr) = make_attributes(\$a,\$q->{'escape'});
-	    \$attr = " \@attr" if \@attr;
-	  } else {
-	    unshift \@rest,\$a if defined \$a;
-	  }
-	);
+sub _tag_func {
+    my $tagname = shift;
+	my ($q,$a,@rest) = self_or_default(@_);
+
+	my($attr) = '';
+
+	if (ref($a) && ref($a) eq 'HASH') {
+		my(@attr) = make_attributes($a,$q->{'escape'});
+		$attr = " @attr" if @attr;
+	} else {
+		unshift @rest,$a if defined $a;
+	}
+
     if ($tagname=~/start_(\w+)/i) {
-	$func .= qq! return "<\L$1\E\$attr>"; !;
+		return "<$1$attr>";
     } elsif ($tagname=~/end_(\w+)/i) {
-	$func .= qq! return "<\L/$1\E>"; !;
+		return "</$1>";
     } else {
-	$func .= qq#
-	    return \$XHTML ? "\L<$tagname\E\$attr />" : "\L<$tagname\E\$attr>" unless \@rest;
-	    my(\$tag,\$untag) = ("\L<$tagname\E\$attr>","\L</$tagname>\E");
-	    my \@result = map { "\$tag\$_\$untag" } 
-                              (ref(\$rest[0]) eq 'ARRAY') ? \@{\$rest[0]} : "\@rest";
-	    return "\@result";#;
+	    return $XHTML ? "<$tagname$attr />" : "<$tagname$attr>" unless @rest;
+	    my($tag,$untag) = ("<$tagname$attr>","</$tagname>");
+	    my @result = map { "$tag$_$untag" } 
+                              (ref($rest[0]) eq 'ARRAY') ? @{$rest[0]} : "@rest";
+	    return "@result";
     }
-	return sub { eval $func };
 }
 
 sub _selected {
@@ -1015,6 +1010,7 @@ sub read_postdata_putdata {
 			? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
 			: undef; # File::Temp defaults to TMPDIR
 
+		require CGI::File::Temp;
         my $filehandle = CGI::File::Temp->new(
 			UNLINK => $UNLINK_TMP_FILES,
 			DIR    => $tmp_dir,
@@ -2200,20 +2196,22 @@ sub checkbox {
 
 # Escape HTML
 sub escapeHTML {
+     require HTML::Entities;
      # hack to work around  earlier hacks
      push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
      my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
      return undef unless defined($toencode);
-	 return encode_entities($toencode);
+	 return HTML::Entities::encode_entities($toencode);
 }
 
 # unescape HTML -- used internally
 sub unescapeHTML {
+    require HTML::Entities;
     # hack to work around  earlier hacks
     push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
     my ($self,$string) = CGI::self_or_default(@_);
     return undef unless defined($string);
-	return decode_entities($string);
+	return HTML::Entities::decode_entities($string);
 }
 
 # Internal procedure - don't use
@@ -3358,6 +3356,7 @@ sub read_multipart {
 		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
 		: undef; # File::Temp defaults to TMPDIR
 
+      require CGI::File::Temp;
       my $filehandle = CGI::File::Temp->new(
 		UNLINK => $UNLINK_TMP_FILES,
 		DIR    => $tmp_dir,
@@ -3468,6 +3467,7 @@ sub read_multipart_related {
 		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
 		: undef; # File::Temp defaults to TMPDIR
 
+      require CGI::File::Temp;
       my $filehandle = CGI::File::Temp->new(
 		UNLINK => $UNLINK_TMP_FILES,
 		DIR    => $tmp_dir,
