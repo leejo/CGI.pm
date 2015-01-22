@@ -1,3 +1,14 @@
+4.13 2014-12-18
+
+    [ RELEASE NOTES ]
+    - CGI::Pretty is now DEPRECATED and will be removed in a future release.
+      Please see GH #162 (https://github.com/leejo/CGI.pm/issues/162) for more
+      information and discussion (also GH #140 for HTML function deprecation
+      discussion: https://github.com/leejo/CGI.pm/issues/140)
+
+    [ TESTING ]
+    - fix t\rt-84767.t for failures on Win32 platforms related to file paths
+
 4.11 2014-12-02
 
     [ SPEC / BUG FIXES ]

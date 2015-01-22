@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.11';
+$CGI::VERSION='4.13';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -3816,5 +3816,3 @@ EOF
 }
 
 1;
-
-__END__
