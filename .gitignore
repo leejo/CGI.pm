@@ -9,3 +9,4 @@ MYMETA.*
 CGI.pm*tar*
 .DS_Store
 *.tar.gz
+nytprof*
