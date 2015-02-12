@@ -828,23 +828,24 @@ sub compile {
 
 sub _all_html_tags {
 	return qw/
-		a abbr acronym address applet
+		a abbr acronym address applet Area
 		b base basefont bdo big blink blockquote body br
 		caption center cite code col colgroup
 		dd del dfn div dl dt
 		em embed
-		fieldset font frame frameset
-		h1 h2 h3 h4 h5 h6 head hr
-		i iframe img input ins
+		fieldset font fontsize frame frameset
+		h1 h2 h3 h4 h5 h6 head hr html
+		i iframe ilayer img input ins
 		kbd
-		label legend li
-		menu meta
-		nobr noframes noscript
+		label layer legend li Link
+		Map menu meta
+		nextid nobr noframes noscript
 		object ol option
-		p pre
-		samp script small span
-		strike strong style sup
-		table tbody td tfoot th thead title tt
+		p Param pre
+		Q
+		samp script Select small span
+		strike strong style Sub sup
+		table tbody td tfoot th thead title Tr TR tt
 		u ul
 		var
 	/
@@ -854,6 +855,9 @@ foreach my $tag ( _all_html_tags() ) {
 	eval "sub $tag {
 		return _tag_func(\$tag,\@_);
 	}";
+
+	# start_html and end_html already exist as custom functions
+	next if ($tag eq 'html');
 
 	foreach my $start_end ( qw/ start end / ) {
 		my $start_end_function = "${start_end}_${tag}";
