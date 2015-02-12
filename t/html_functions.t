@@ -17,6 +17,8 @@ foreach my $tag ( $q->_all_html_tags ) {
 
 	is( $q->$tag( { bar => 'boz' } ),"<$tag bar=\"boz\" />","$tag function" );
 
+	next if ($tag eq 'html');
+
 	my $start = "start_$tag";
 	is( $q->$start( 'foo' ),"<$tag>","$start function" );
 
