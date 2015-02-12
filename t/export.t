@@ -8,5 +8,5 @@ my @tags = CGI::expand_tags(':all');
 
 foreach my $tag ( @tags ) {
     eval " &$tag ";
-    ok( !$@, "$tag function defined" );
+    ok( $@ !~ /Undefined subroutine/, "$tag function defined" );
 }
