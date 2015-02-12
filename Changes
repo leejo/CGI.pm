@@ -2,7 +2,7 @@
 
     [ RELEASE NOTES ]
     - This release removes the AUTOLOAD and compile optimisations from CGI.pm
-      that were introduced into CGI.pm many years ago (15+?) as a response to
+      that were introduced into CGI.pm twenty (20) years ago as a response to
       its large size, which meant there was a significant compile time penalty.
       This essentially deprecates the -compile pragma and ->compile method (the
       -compile pragma will no longer do anything, whereas the ->compile method
