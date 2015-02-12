@@ -61,6 +61,7 @@ t/headers/target.t
 t/headers/type.t
 t/hidden.t
 t/html.t
+t/html_functions.t
 t/http.t
 t/init.t
 t/init_test.txt

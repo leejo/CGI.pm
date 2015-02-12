@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.13';
+$CGI::VERSION='4.13_01';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -822,47 +822,41 @@ sub binmode {
 }
 
 # back compatibility html tag generation functions
+sub compile {
+	warn "->compile / -compile is DEPRECATED";
+}
+
 sub _all_html_tags {
-	# https://developer.mozilla.org/en-US/docs/Web/HTML/Element
 	return qw/
-		a abbr acronym address applet area article aside audio
-		b base basefont bdi bdo bgsound big blink blockquote body br
-		canvas caption center cite code col colgroup content
-		data datalist dd decorator del details dfn dialog dir div dl dt
-		element em embed
-		fieldset figcaption figure font footer frame frameset
-		h1 h2 h3 h4 h5 h6 head hgroup hr
+		a abbr acronym address applet
+		b base basefont bdo big blink blockquote body br
+		caption center cite code col colgroup
+		dd del dfn div dl dt
+		em embed
+		fieldset font frame frameset
+		h1 h2 h3 h4 h5 h6 head hr
 		i iframe img input ins
-		kbd keygen
-		label legend li link listing
-		main map mark marquee menu menuitem meta meter
-		nav nobr noframes noscript
-		object ol option output
-		p picture plaintext pre progress
-		q
-		rp rt ruby
-		s samp script section select shadow small source spacer span
-		strike strong style sub summary sup
-		table tbody td template tfoot th thead time title tr track tt
+		kbd
+		label legend li
+		menu meta
+		nobr noframes noscript
+		object ol option
+		p pre
+		samp script small span
+		strike strong style sup
+		table tbody td tfoot th thead title tt
 		u ul
-		var video
-		wbr
-		xmp
+		var
 	/
 }
 
-foreach my $tag (
-	_all_html_tags(),
-	( map { uc( $_ ) } _all_html_tags() )
-) {
+foreach my $tag ( _all_html_tags() ) {
 	eval "sub $tag {
 		return _tag_func(\$tag,\@_);
 	}";
 
 	foreach my $start_end ( qw/ start end / ) {
-
 		my $start_end_function = "${start_end}_${tag}";
-
 		eval "sub $start_end_function {
 			return _tag_func(\$start_end_function,\@_);
 		}";
