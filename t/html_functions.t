@@ -15,7 +15,31 @@ my $q = CGI->new;
 
 foreach my $tag ( $q->_all_html_tags ) {
 
-	is( $q->$tag( { bar => 'boz' } ),"<$tag bar=\"boz\" />","$tag function" );
+	is(
+		$q->$tag(),
+		"<$tag />",
+		"$tag function (no args)"
+	);
+
+	is(
+		$q->$tag( 'some','contents' ),
+		"<$tag>some contents</$tag>",
+		"$tag function (content)"
+	);
+
+	is(
+		$q->$tag( { bar => 'boz', biz => 'baz' } ),
+		"<$tag bar=\"boz\" biz=\"baz\" />",
+		"$tag function (attributes)"
+	);
+
+	is(
+		$q->$tag( { bar => 'boz' },'some','contents' ),
+		"<$tag bar=\"boz\">some contents</$tag>",
+		"$tag function (attributes and content)"
+	);
+
+	next if ($tag eq 'html');
 
 	my $start = "start_$tag";
 	is( $q->$start( 'foo' ),"<$tag>","$start function" );
