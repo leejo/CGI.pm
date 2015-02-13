@@ -33,7 +33,6 @@ lib/CGI/File/Temp.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
-README.pod
 t/Dump.t
 t/arbitrary_handles.t
 t/autoescape.t
