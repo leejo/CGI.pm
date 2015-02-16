@@ -829,8 +829,6 @@ and end_I<tag_name>, as in:
 
   print start_h1,'Level 1 Header',end_h1;
 
-=back
-
 =head1 GENERATING DYNAMIC DOCUMENTS
 
 Most of CGI.pm's functions deal with creating documents on the fly.
