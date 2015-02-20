@@ -62,9 +62,6 @@ the "pretty" functions will no longer output "pretty" HTML.
 
 =head1 Alternatives
 
-L<Marpa::HTML> (see the html_fmt script for examples)
-
-
 L<HTML::HTML5::Parser> + L<HTML::HTML5::Writer> + L<XML::LibXML::PrettyPrint>:
 
     use HTML::HTML5::Parser qw();
@@ -80,5 +77,11 @@ L<HTML::HTML5::Parser> + L<HTML::HTML5::Writer> + L<XML::LibXML::PrettyPrint>:
             HTML::HTML5::Parser->new->parse_string( $html_string )
         )
     );
+
+L<Marpa::R2::HTML> (see the html_fmt script for examples)
+
+L<HTML::Tidy>
+
+L<HTML::Parser>
 
 =cut
