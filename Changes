@@ -1,9 +1,121 @@
-4.08 2014-11-01
+4.14 2015-04-01
+
+    [ RELEASE NOTES ]
+    - This release removes the AUTOLOAD and compile optimisations from CGI.pm
+      that were introduced into CGI.pm twenty (20) years ago as a response to
+      its large size, which meant there was a significant compile time penalty.
+
+    - This optimisation is no longer relevant and makes the code difficult to
+      deal with as well as making test coverage metrics incorrect. Benchmarks
+      show that advantages of AUTOLOAD / lazy loading / deferred compile are
+      less than 0.05s, which will be dwarfed by just about any meaningful code
+      in a cgi script. If this is an issue for you then you should look at
+      running CGI.pm in a persistent environment (FCGI, etc)
+
+    - To offset some of the time added by removing the AUTOLOAD functionality
+      the dependencies have been made runtime rather than compile time. The
+      POD has also been split into its own file. CGI.pm now contains around
+      4000 lines of code, which compared to some modules on CPAN isn't really
+      that much
+
+    - This essentially deprecates the -compile pragma and ->compile method. The
+      -compile pragma will no longer do anything, whereas the ->compile method
+      will raise a deprecation warning. More importantly this also REMOVES the
+      -any pragma because as per the documentation this pragma needed to be
+      "used with care or not at all" and allowing arbitrary HTML tags is almost
+      certainly a bad idea. If you are using the -any pragma and using arbitrary
+      tags (or have typo's in your code) your code will *BREAK*
+
+    - Although this release should be back compatible (with the exception of any
+      code using the -any pragma) you are encouraged to test it throughly as if
+      you are doing anything out of the ordinary with CGI.pm (i.e. have bugs
+      that may have been masked by the AUTOLOAD feature) you may see some issues.
+
+    - References: GH #162, GH #137, GH #164
+
+	[ SPEC / BUG FIXES ]
+    - Add the multi_param method to :cgi export (thanks to xblitz for the patch
+      and tests. GH #167)
+
+4.13 2014-12-18
+
+    [ RELEASE NOTES ]
+    - CGI::Pretty is now DEPRECATED and will be removed in a future release.
+      Please see GH #162 (https://github.com/leejo/CGI.pm/issues/162) for more
+      information and discussion (also GH #140 for HTML function deprecation
+      discussion: https://github.com/leejo/CGI.pm/issues/140)
+
+    [ TESTING ]
+    - fix t\rt-84767.t for failures on Win32 platforms related to file paths
+
+4.11 2014-12-02
+
+    [ SPEC / BUG FIXES ]
+    - more hash key ordering bugs fixed in HTML attribute output (GH #158,
+      thanks to Marcus Meissner for the patch and test case)
+
+    [ REFACTORING ]
+    - escapeHTML (and unescapeHTML) have been refactored to use the functions
+      exported by the HTML::Entities module (GH #157)
+    - change BUILD_REQUIRES to TEST_REQUIRES in Makefile.PL as these are test
+      dependencies not build dependencies (GH #159)
+
+    [ DOCUMENTATION ]
+    - replace any remaining uses of indirect object notation (new Object) with
+      the safer Object->new syntax (GH #156)
+
+4.10 2014-11-27
+
+    [ SPEC / BUG FIXES ]
+    - favour -content-type arg in header if -type and -charset options are also
+      passed in (GH #155, thanks to kaoru for the test case). this change also
+      sorts the hash keys in the rearrange method in CGI::Util meaning the order
+      of the arrangement will always be the same for params that have multiple
+      aliases. really you shouldn't be passing in multiple aliases, but this will
+      make it consistent should you do that
+
+    [ DOCUMENTATION ]
+    - fix some typos
+
+4.09 2014-10-21
+
+    [ RELEASE NOTES ]
+    - with this release the large backlog of issues against CGI.pm has been
+      cleared. All fixes have been made in the versions 4.00 and above so if
+      you are upgrading from 3.* you should thoroughly test your code against
+      recent versions of CGI.pm
+    - an effort has been made to retain back compatibility against previous
+      versions of CGI.pm for any fixes made, however some changes related to
+      the handling of temporary files may have consequences for your code
+    - please refer to the RELEASE NOTES for version 4.00 and above for all
+      recent changes and file an issue on github if there has been a regression.
+    - please do *NOT* file issues regarding HTML generating functions, these
+      are no longer being maintained (see perldoc for rationale)
+
+    [ SPEC / BUG FIXES ]
+    - tweak url to DTRT when the web server is IIS (RT #89827 / GH #152)
+    - fix temporary file handling when dealing with multiple files in MIME uploads
+      (GH #154, thanks to GeJ for the test case)
+
+4.08 2014-10-18
 
     [ DOCUMENTATION ]
     - note that calling headers without a -charset may lead to a nonsensical
       charset being added to certain content types due to the default and the
       workaround
+    - remove documentation stating that calls to escapeHTML with a changed
+      charset force numeric encoding of all characters, because that does not
+      happen
+    - documentation tweaks for calling param() in list context and the addition
+      of multi_param()
+
+    [ SPEC / BUG FIXES ]
+    - don't sub out PATH_INFO in url if PATH_INFO is the same as SCRIPT_NAME
+      (RT #89827)
+    - add multi_param() method to allow calling of param() in list context
+      without having to disable the $LIST_CONTEXT_WARN flag (see RELEASE NOTES
+      for version 4.05 on why calling param() in list context could be a bad
+      thing)
 
     [ SPEC / BUG FIXES ]
     - set POSTDATA/PUTDATA/DELETEDATA when CONTENT_TYPE is not defined (RT #70284)

@@ -34,7 +34,7 @@ $ENV{CONTENT_LENGTH}  = length( $xml_string );
 local *STDIN;
 open STDIN, '<', \$xml_string;
 
-my $q = new CGI;
+my $q = CGI->new;
 ok $q,"CGI::new()";
 is $q->request_method => 'DELETE',"CGI::request_method()";
 is $q->query_string => 'DELETEDATA=xml;game=chess;game=checkers;weather=dull',"CGI::query_string()";

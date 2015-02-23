@@ -30,7 +30,7 @@ $ENV{SERVER_NAME}     = 'the.good.ship.lollypop.com';
 $ENV{REQUEST_URI}     = "$ENV{SCRIPT_NAME}$ENV{PATH_INFO}?$ENV{QUERY_STRING}";
 $ENV{HTTP_LOVE}       = 'true';
 
-my $q = new CGI;
+my $q = CGI->new;
 ok $q,"CGI::new()";
 is $q->request_method => 'GET',"CGI::request_method()";
 is $q->query_string => 'game=chess;game=checkers;weather=dull',"CGI::query_string()";
@@ -59,12 +59,12 @@ ok !$q->param('foo'),'CGI::delete()';
 
 $q->_reset_globals;
 $ENV{QUERY_STRING}='mary+had+a+little+lamb';
-ok $q=new CGI,"CGI::new() redux";
+ok $q=CGI->new,"CGI::new() redux";
 is join(' ',$q->keywords), 'mary had a little lamb','CGI::keywords';
 is join(' ',$q->param('keywords')), 'mary had a little lamb','CGI::keywords';
-ok $q=new CGI('foo=bar&foo=baz'),"CGI::new() redux";
+ok $q=CGI->new('foo=bar&foo=baz'),"CGI::new() redux";
 is $q->param('foo'), 'bar','CGI::param() redux';
-ok $q=new CGI({'foo'=>'bar','bar'=>'froz'}),"CGI::new() redux 2";
+ok $q=CGI->new({'foo'=>'bar','bar'=>'froz'}),"CGI::new() redux 2";
 is $q->param('bar'), 'froz',"CGI::param() redux 2";
 
 # test tied interface
@@ -86,7 +86,7 @@ $q->_reset_globals;
   local *STDIN;
   open STDIN, '<', \$test_string;
 
-  ok $q=new CGI,"CGI::new() from POST";
+  ok $q=CGI->new,"CGI::new() from POST";
   is $q->param('weather'), 'nice',"CGI::param() from POST";
   is $q->url_param('big_balls'), 'basketball',"CGI::url_param()";
   is $q->param( 'POSTDATA' ), $test_string;
