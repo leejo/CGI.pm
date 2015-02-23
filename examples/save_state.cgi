@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use CGI;
-$query = new CGI;
+$query = CGI->new;
 
 print $query->header;
 print $query->start_html("Save and Restore Example");
@@ -43,7 +43,7 @@ sub restore_parameters {
     local($query) = @_;
     local($filename) = &clean_name($query->param('savefile'));
     if (open(FILE,$filename)) {
-	$query = new CGI(FILE);  # Throw out the old query, replace it with a new one
+	$query = CGI->new(FILE);  # Throw out the old query, replace it with a new one
 	close FILE;
 	print "<STRONG>State has been restored from file $filename</STRONG>\n";
     } else {

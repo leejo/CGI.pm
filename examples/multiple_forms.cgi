@@ -2,7 +2,7 @@
 
 use CGI;
 
-$query = new CGI;
+$query = CGI->new;
 print $query->header;
 print $query->start_html('Multiple Forms');
 print "<H1>Multiple Forms</H1>\n";

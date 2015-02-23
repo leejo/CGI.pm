@@ -1,7 +1,7 @@
 package CGI::Push;
 use if $] >= 5.019, 'deprecate';
 
-$CGI::Push::VERSION='4.07';
+$CGI::Push::VERSION='4.13_02';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');
@@ -152,7 +152,7 @@ You may call do_push() in the object oriented manner or not, as you
 prefer:
 
     use CGI::Push;
-    $q = new CGI::Push;
+    $q = CGI::Push->new;
     $q->do_push(-next_page=>\&draw_a_page);
 
         -or-

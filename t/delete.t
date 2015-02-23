@@ -28,7 +28,7 @@ $ENV{SERVER_NAME}     = 'the.good.ship.lollypop.com';
 $ENV{REQUEST_URI}     = "$ENV{SCRIPT_NAME}$ENV{PATH_INFO}?$ENV{QUERY_STRING}";
 $ENV{HTTP_LOVE}       = 'true';
 
-my $q = new CGI;
+my $q = CGI->new;
 ok $q,"CGI::new()";
 is $q->request_method => 'DELETE',"CGI::request_method()";
 is $q->query_string => 'game=chess;game=checkers;weather=dull',"CGI::query_string()";

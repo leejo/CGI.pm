@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use CGI;
-$query = new CGI;
+$query = CGI->new;
 print $query->header;
 print $query->start_html("A Clickable Image");
 print <<END;

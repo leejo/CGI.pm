@@ -84,6 +84,16 @@ subtest 'RT#58377: + in PATH_INFO' => sub {
     is($q->path_info(), '/hello+world', 'a plus sign in a script name is preserved when calling path_info()');
 };
 
+subtest 'IIS PATH_INFO eq SCRIPT_NAME' => sub {
+	$CGI::IIS++;
+    local $ENV{PATH_INFO}           = '/hello+world';
+    local $ENV{HTTP_X_FORWARDED_HOST} = undef;
+    local $ENV{HTTP_HOST}           = 'example.com';
+    local $ENV{SCRIPT_NAME}         = '/hello+world';
+
+    my $q = CGI->new;
+    is( $q->url,'http://example.com/hello+world','PATH_INFO being the same as SCRIPT_NAME');
+};
 
 done_testing();
 
