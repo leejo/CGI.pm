@@ -239,7 +239,7 @@ sub _set_binmode {
 		start_multipart_form end_multipart_form isindex tmpFileName uploadInfo URL_ENCODED MULTIPART
 	/ ],
 	':cgi' => [ qw/
-		param upload path_info path_translated request_uri url self_url script_name
+		param multi_param upload path_info path_translated request_uri url self_url script_name
 		cookie Dump raw_cookie request_method query_string Accept user_agent remote_host content_type
 		remote_addr referer server_name server_software server_port server_protocol virtual_port
 		virtual_host remote_ident auth_type http append save_parameters restore_parameters param_fetch
