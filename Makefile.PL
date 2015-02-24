@@ -7,6 +7,8 @@ system( "perl", "t/gen-tests/gen-start-end-tags.pl" );
 # the contents of the Makefile that is written.
 WriteMakefile(
     INSTALLDIRS      => ( $] >= 5.012 ? 'site' : 'perl' ),
+    ABSTRACT_FROM    => 'lib/CGI.pod',
+    VERSION_FROM     => 'lib/CGI.pm',
     NAME             => 'CGI',
     DISTNAME         => 'CGI',
     VERSION_FROM     => 'lib/CGI.pm',

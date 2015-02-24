@@ -164,10 +164,7 @@ single or a multi-valued value.  The two cases are shown below:
    $q->param(-name=>'veggie',-value=>'tomato');
    $q->param(-name=>'veggie',-value=>['tomato','tomahto','potato','potahto']);
 
-A large number of routines in CGI.pm actually aren't specifically
-defined in the module, but are generated automatically as needed.
-These are the "HTML shortcuts," routines that generate HTML tags for
-use in dynamically-generated pages.  HTML tags have both attributes
+HTML tags have both attributes
 (the attribute="value" pairs within the tag itself) and contents (the
 part between the opening and closing pairs.)  To distinguish between
 attributes and contents, CGI.pm uses the convention of passing HTML
@@ -177,7 +174,7 @@ this:
 
    Code                           Generated HTML
    ----                           --------------
-   h1()                           <h1>
+   h1()                           <h1 />
    h1('some','contents');         <h1>some contents</h1>
    h1({-align=>left});            <h1 align="LEFT">
    h1({-align=>left},'contents'); <h1 align="LEFT">contents</h1>
@@ -658,18 +655,6 @@ import :cgi-lib to get those)
 
 =back
 
-If you import a function name that is not part of CGI.pm, the module
-will treat it as a new HTML tag and generate the appropriate
-subroutine.  You can then use it like any other HTML tag.  This is to
-provide for the rapidly-evolving HTML "standard."  For example, say
-Microsoft comes out with a new tag called <gradient> (which causes the
-user's desktop to be flooded with a rotating gradient fill until his
-machine reboots).  You don't need to wait for a new version of CGI.pm
-to start using it immediately:
-
-   use CGI qw/:standard :html3 gradient/;
-   print gradient({-start=>'red',-end=>'blue'});
-
 Note that in the interests of execution speed CGI.pm does B<not> use
 the standard L<Exporter> syntax for specifying load symbols.  This may
 change in the future.
@@ -723,47 +708,6 @@ standard set of functions and enables debugging mode (pragma
 The current list of pragmas is as follows:
 
 =over 4
-
-=item -any
-
-When you I<use CGI -any>, then any method that the query object
-doesn't recognize will be interpreted as a new HTML tag.  This allows
-you to support the next I<ad hoc> HTML
-extension.  This lets you go wild with new and unsupported tags:
-
-   use CGI qw(-any);
-   $q=CGI->new;
-   print $q->gradient({speed=>'fast',start=>'red',end=>'blue'});
-
-Since using <cite>any</cite> causes any mistyped method name
-to be interpreted as an HTML tag, use it with care or not at
-all.
-
-=item -compile
-
-This causes the indicated autoloaded methods to be compiled up front,
-rather than deferred to later.  This is useful for scripts that run
-for an extended period of time under FastCGI or mod_perl, and for
-those destined to be crunched by Malcolm Beattie's Perl compiler.  Use
-it in conjunction with the methods or method families you plan to use.
-
-   use CGI qw(-compile :standard :html3);
-
-or even
-
-   use CGI qw(-compile :all);
-
-Note that using the -compile pragma in this way will always have
-the effect of importing the compiled functions into the current
-namespace.  If you want to compile without importing use the
-compile() method instead:
-
-   use CGI();
-   CGI->compile();
-
-This is particularly useful in a mod_perl environment, in which you
-might want to precompile all CGI routines in a startup script, and
-then import the functions individually in each mod_perl script.
 
 =item -nosticky
 
@@ -847,18 +791,6 @@ self_url() and query_string(). newstyle_urls became the default in version
 Separate the name=value pairs in CGI parameter query strings with
 ampersands rather than semicolons.  This is no longer the default.
 
-=item -autoload
-
-This overrides the autoloader so that any function in your program
-that is not recognized is referred to CGI.pm for possible evaluation.
-This allows you to use all the CGI.pm functions without adding them to
-your symbol table, which is of concern for mod_perl users who are
-worried about memory consumption.  I<Warning:> when
-I<-autoload> is in effect, you cannot use "poetry mode"
-(functions without the parenthesis).  Use I<hr()> rather
-than I<hr>, or add something like I<use subs qw/hr p header/> 
-to the top of your script.
-
 =item -no_debug
 
 This turns off the command-line processing features.  If you want to
@@ -896,32 +828,6 @@ tags yourself.  In this case, you can use the form start_I<tag_name>
 and end_I<tag_name>, as in:
 
   print start_h1,'Level 1 Header',end_h1;
-
-With a few exceptions (described below), start_I<tag_name> and
-end_I<tag_name> functions are not generated automatically when you
-I<use CGI>.  However, you can specify the tags you want to generate
-I<start/end> functions for by putting an asterisk in front of their
-name, or, alternatively, requesting either "start_I<tag_name>" or
-"end_I<tag_name>" in the import list.
-
-Example:
-
-  use CGI qw/:standard *table start_ul/;
-
-In this example, the following functions are generated in addition to
-the standard ones:
-
-=over 4
-
-=item 1. start_table() (generates a <table> tag)
-
-=item 2. end_table() (generates a </table> tag)
-
-=item 3. start_ul() (generates a <ul> tag)
-
-=item 4. end_ul() (generates a </ul> tag)
-
-=back
 
 =head1 GENERATING DYNAMIC DOCUMENTS
 
@@ -1618,14 +1524,6 @@ Get or set the current character set.
 Get or set the value of the autoescape flag.
 
 =back
-
-=head2 Pretty-printing HTML
-
-By default, all the HTML produced by these functions comes out as one
-long line without carriage returns or indentation. This is yuck, but
-it does reduce the size of the documents by 10-20%.  To get
-pretty-printed output, please use L<CGI::Pretty>, a subclass
-contributed by Brian Paulsen.
 
 =head1 CREATING FILL-OUT FORMS:
 
@@ -3901,7 +3799,4 @@ L<CGI::Carp> - provides a L<Carp> implementation tailored to the CGI environment
 
 L<CGI::Fast> - supports running CGI applications under FastCGI
 
-L<CGI::Pretty> - pretty prints HTML generated by CGI.pm (with a performance penalty)
-
 =cut
-

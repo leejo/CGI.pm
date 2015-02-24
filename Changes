@@ -1,3 +1,38 @@
+4.13_02 2015-02-13
+
+    [ RELEASE NOTES ]
+    - This release removes the AUTOLOAD and compile optimisations from CGI.pm
+      that were introduced into CGI.pm twenty (20) years ago as a response to
+      its large size, which meant there was a significant compile time penalty.
+
+    - This optimisation is no longer relevant and makes the code difficult to
+      deal with as well as making test coverage metrics incorrect. Benchmarks
+      show that advantages of AUTOLOAD / lazy loading / deferred compile are
+      less than 0.05s, which will be dwarfed by just about any meaningful code
+      in a cgi script. If this is an issue for you then you should look at
+      running CGI.pm in a persistent environment (FCGI, etc)
+
+    - To offset some of the time added by removing the AUTOLOAD functionality
+      the dependencies have been made runtime rather than compile time. The
+      POD has also been split into its own file. CGI.pm now contains around
+      4000 lines of code, which compared to some modules on CPAN isn't really
+      that much
+
+    - This essentially deprecates the -compile pragma and ->compile method. The
+      -compile pragma will no longer do anything, whereas the ->compile method
+      will raise a deprecation warning. More importantly this also REMOVES the
+      -any pragma because as per the documentation this pragma needed to be
+      "used with care or not at all" and allowing arbitrary HTML tags is almost
+      certainly a bad idea. If you are using the -any pragma and using arbitrary
+      tags (or have typo's in your code) your code will *BREAK*
+
+    - Although this release should be back compatible (with the exception of any
+      code using the -any pragma) you are encouraged to test it throughly as if
+      you are doing anything out of the ordinary with CGI.pm (i.e. have bugs
+      that may have been masked by the AUTOLOAD feature) you may see some issues.
+
+    - References: GH #162, GH #137, GH #164
+
 4.13 2014-12-18
 
     [ RELEASE NOTES ]
