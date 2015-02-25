@@ -33,9 +33,13 @@
 
     - References: GH #162, GH #137, GH #164
 
-	[ SPEC / BUG FIXES ]
+    [ SPEC / BUG FIXES ]
     - Add the multi_param method to :cgi export (thanks to xblitz for the patch
       and tests. GH #167)
+
+    [ INTERNALS ]
+    - Remove dependency on constant - internal DEBUG, XHTML_DTD and EBCDIC
+      constants changes to $_DEBUG, $_XHTML_DTD, and $_EBCDIC
 
 4.13 2014-12-18
 

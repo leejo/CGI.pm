@@ -7,10 +7,7 @@ $CGI::VERSION='4.13_02';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
-#use constant XHTML_DTD => ['-//W3C//DTD XHTML Basic 1.0//EN',
-#                           'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'];
-
-use constant XHTML_DTD => ['-//W3C//DTD XHTML 1.0 Transitional//EN',
+$_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
 
 {
@@ -1672,7 +1669,7 @@ sub start_html {
             $dtd = $DEFAULT_DTD unless $dtd =~ m|^-//|;
         }
     } else {
-        $dtd = $XHTML ? XHTML_DTD : $DEFAULT_DTD;
+        $dtd = $XHTML ? $_XHTML_DTD : $DEFAULT_DTD;
     }
 
     $xml_dtd++ if ref($dtd) eq 'ARRAY' && $dtd->[0] =~ /\bXHTML\b/i;
@@ -3570,7 +3567,7 @@ sub _set_attributes {
 
 package MultipartBuffer;
 
-use constant DEBUG => 0;
+$_DEBUG = 0;
 
 # how many bytes to read at a time.  We use
 # a 4K buffer by default.
@@ -3658,9 +3655,9 @@ sub readHeader {
     my %return;
 
     if ($CGI::EBCDIC) {
-      warn "untranslated header=$header\n" if DEBUG;
+      warn "untranslated header=$header\n" if $_DEBUG;
       $header = CGI::Util::ascii2ebcdic($header);
-      warn "translated header=$header\n" if DEBUG;
+      warn "translated header=$header\n" if $_DEBUG;
     }
 
     # See RFC 2045 Appendix A and RFC 822 sections 3.4.8
@@ -3691,9 +3688,9 @@ sub readBody {
     }
 
     if ($CGI::EBCDIC) {
-      warn "untranslated body=$returnval\n" if DEBUG;
+      warn "untranslated body=$returnval\n" if $_DEBUG;
       $returnval = CGI::Util::ascii2ebcdic($returnval);
-      warn "translated body=$returnval\n"   if DEBUG;
+      warn "translated body=$returnval\n"   if $_DEBUG;
     }
     return $returnval;
 }
@@ -3717,7 +3714,7 @@ sub read {
     # Find the boundary in the buffer (it may not be there).
     my $start = index($self->{BUFFER},$boundary_start);
 
-    warn "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n" if DEBUG;
+    warn "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n" if $_DEBUG;
 
     # protect against malformed multipart POST operations
     die "Malformed multipart POST\n" unless $self->{CHUNKED} || ($start >= 0 || $self->{LENGTH} > 0);
@@ -3774,7 +3771,7 @@ sub fillBuffer {
     my $bytesRead = $self->{INTERFACE}->read_from_client(\$self->{BUFFER},
 							 $bytesToRead,
 							 $bufferLength);
-    warn "bytesToRead=$bytesToRead, bufferLength=$bufferLength, buffer=$self->{BUFFER}\n" if DEBUG;
+    warn "bytesToRead=$bytesToRead, bufferLength=$bufferLength, buffer=$self->{BUFFER}\n" if $_DEBUG;
     $self->{BUFFER} = '' unless defined $self->{BUFFER};
 
     # An apparent bug in the Apache server causes the read()
