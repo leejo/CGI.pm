@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 177;
+use Test::More tests => 178;
 
 BEGIN{ use_ok('CGI', ':all'); }
 
