@@ -33,6 +33,10 @@
 
     - References: GH #162, GH #137, GH #164
 
+    [ FEATURES ]
+    - CGI::Carp now has $CGI::Carp::FULL_PATH for displaying the full path to the
+      offending script in error messages
+
     [ SPEC / BUG FIXES ]
     - Add the multi_param method to :cgi export (thanks to xblitz for the patch
       and tests. GH #167)

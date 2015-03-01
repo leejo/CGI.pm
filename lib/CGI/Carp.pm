@@ -280,6 +280,10 @@ Alternatively you can set C<$CGI::Carp::NO_TIMESTAMP> to 1.
 Note that the name of the program is still automatically included in
 the message.
 
+=head1 GETTING THE FULL PATH OF THE SCRIPT IN MESSAGES
+
+Set C<$CGI::Carp::FULL_PATH> to 1.
+
 =head1 AUTHOR INFORMATION
 
 The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
@@ -323,7 +327,7 @@ $CGI::Carp::CUSTOM_MSG  = undef;
 $CGI::Carp::DIE_HANDLER = undef;
 $CGI::Carp::TO_BROWSER  = 1;
 $CGI::Carp::NO_TIMESTAMP= 0;
-
+$CGI::Carp::FULL_PATH   = 0;
 
 # fancy import routine detects and handles 'errorWrap' specially.
 sub import {
@@ -370,7 +374,9 @@ sub stamp {
 	  ($pack,$file) = caller($frame++);
         } until !$file;
     }
-    ($dev,$dirs,$id) = File::Spec->splitpath($id);
+	if (! $CGI::Carp::FULL_PATH) {
+	    ($dev,$dirs,$id) = File::Spec->splitpath($id);
+	}
     return "$id: " if $CGI::Carp::NO_TIMESTAMP;
     my $time = scalar(localtime);
     return "[$time] $id: ";

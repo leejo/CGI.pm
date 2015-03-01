@@ -3,10 +3,11 @@
 
 use strict;
 
-use Test::More tests => 63;
+use Test::More tests => 64;
 use IO::Handle;
 
 use CGI::Carp;
+use Cwd;
 
 #-----------------------------------------------------------------------------
 # Test id
@@ -55,6 +56,18 @@ sub stamp1 {return CGI::Carp::stamp()};
 sub stamp2 {return stamp1()};
 
 like(stamp2(), $stamp, "Time in correct format");
+
+$CGI::Carp::FULL_PATH = 1;
+# really should test the full path here, but platform differnces
+# will make the regexp hideous. this may well fail if anything
+# using it chdirs into t/ so using Cwd to dry to catch this
+my $cwd = getcwd;
+if ( $cwd !~ /t$/ ) {
+	unlike(stamp2(), $stamp, "Time in correct format (FULL_PATH)");
+} else {
+	pass( "Can't run FULL_PATH test when cwd is t/" );
+}
+$CGI::Carp::FULL_PATH = 0;
 
 #-----------------------------------------------------------------------------
 # Test warn and _warn
