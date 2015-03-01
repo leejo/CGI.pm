@@ -47,6 +47,9 @@
     - Remove dependency on constant - internal DEBUG, XHTML_DTD and EBCDIC
       constants changes to $_DEBUG, $_XHTML_DTD, and $_EBCDIC
 
+    [ DOCUMENTATION ]
+    - Add missing documentation for env variable fetching routines (GH #163)
+
 4.13 2014-12-18
 
     [ RELEASE NOTES ]
