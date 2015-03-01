@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.13_02';
+$CGI::VERSION='4.13_03';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -818,10 +818,9 @@ sub binmode {
     CORE::binmode($_[1]);
 }
 
-# back compatibility html tag generation functions
-sub compile {
-	warn "CGI ->compile / -compile is DEPRECATED";
-}
+# back compatibility html tag generation functions - noop
+# since this is now the default having removed AUTOLOAD
+sub compile { 1; }
 
 sub _all_html_tags {
 	return qw/
@@ -849,18 +848,14 @@ sub _all_html_tags {
 }
 
 foreach my $tag ( _all_html_tags() ) {
-	eval "sub $tag {
-		return _tag_func(\$tag,\@_);
-	}";
+	*$tag = sub { return _tag_func($tag,@_); };
 
 	# start_html and end_html already exist as custom functions
 	next if ($tag eq 'html');
 
 	foreach my $start_end ( qw/ start end / ) {
 		my $start_end_function = "${start_end}_${tag}";
-		eval "sub $start_end_function {
-			return _tag_func(\$start_end_function,\@_);
-		}";
+		*$start_end_function = sub { return _tag_func($start_end_function,@_); };
 	}
 }
 
@@ -876,6 +871,8 @@ sub _tag_func {
 	} else {
 		unshift @rest,$a if defined $a;
 	}
+
+	$tagname = lc( $tagname );
 
     if ($tagname=~/start_(\w+)/i) {
 		return "<$1$attr>";
