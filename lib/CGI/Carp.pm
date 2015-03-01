@@ -565,7 +565,7 @@ END
       $mod_perl == 2 ? ModPerl::Util::exit(0) : $r->exit;
     } else {
       # MSIE won't display a custom 500 response unless it is >512 bytes!
-      if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
+      if (defined($ENV{HTTP_USER_AGENT}) && $ENV{HTTP_USER_AGENT} =~ /MSIE/) {
         $mess = "<!-- " . (' ' x 513) . " -->\n$mess";
       }
       $r->custom_response(500,$mess);
@@ -579,7 +579,7 @@ END
         print STDOUT "Status: 500\n";
         print STDOUT "Content-type: text/html\n\n";
         # MSIE won't display a custom 500 response unless it is >512 bytes!
-        if ($ENV{HTTP_USER_AGENT} =~ /MSIE/) {
+        if (defined($ENV{HTTP_USER_AGENT}) && $ENV{HTTP_USER_AGENT} =~ /MSIE/) {
           $mess = "<!-- " . (' ' x 513) . " -->\n$mess";
         }
         print STDOUT $mess;

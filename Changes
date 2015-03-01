@@ -37,6 +37,8 @@
     - Add the multi_param method to :cgi export (thanks to xblitz for the patch
       and tests. GH #167)
 
+    - Fix warning for lack of HTTP_USER_AGENT in CGI::Carp (GH #168)
+
     [ INTERNALS ]
     - Remove dependency on constant - internal DEBUG, XHTML_DTD and EBCDIC
       constants changes to $_DEBUG, $_XHTML_DTD, and $_EBCDIC
