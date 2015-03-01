@@ -1247,6 +1247,9 @@ state with query_string():
 The behavior of calling query_string is currently undefined when the HTTP method is
 something other than GET.
 
+If you want to retreived the query string as set in the webserver, namely the
+environment variable, you can call env_query_string()
+
 =head2 Obtaining the script's url
 
     $full_url      = url();

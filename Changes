@@ -37,6 +37,10 @@
     - CGI::Carp now has $CGI::Carp::FULL_PATH for displaying the full path to the
       offending script in error messages
 
+    - CGI now has env_query_string() for getting the value of QUERY_STRING from the
+      environment and not that fiddled with by CGI.pm (which is what query_string()
+      does) (GH #161)
+
     [ SPEC / BUG FIXES ]
     - Add the multi_param method to :cgi export (thanks to xblitz for the patch
       and tests. GH #167)

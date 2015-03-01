@@ -240,7 +240,7 @@ sub _set_binmode {
 		cookie Dump raw_cookie request_method query_string Accept user_agent remote_host content_type
 		remote_addr referer server_name server_software server_port server_protocol virtual_port
 		virtual_host remote_ident auth_type http append save_parameters restore_parameters param_fetch
-		remote_user user_name header redirect import_names put Delete Delete_all url_param cgi_error
+		remote_user user_name header redirect import_names put Delete Delete_all url_param cgi_error env_query_string
 	/ ],
 	':netscape' => [qw/blink fontsize center/],
 	':ssl'      => [qw/https/],
@@ -2904,6 +2904,10 @@ sub query_string {
       push(@pairs,".cgifields=".escape("$_"));
     }
     return join($USE_PARAM_SEMICOLONS ? ';' : '&',@pairs);
+}
+
+sub env_query_string {
+    return (defined $ENV{'QUERY_STRING'}) ? $ENV{'QUERY_STRING'} : undef;
 }
 
 #### Method: accept
