@@ -3220,6 +3220,13 @@ retrieves the B<unescaped> form of the cookie.  You can use the
 regular cookie() method to get the names, or use the raw_fetch()
 method from the CGI::Cookie module.
 
+=item B<env_query_string()>
+
+Returns the QUERY_STRING variable, note that this is the original
+value as set in the environment by the webserver and (possibly)
+not the same value as returned by query_string(), which represents
+the object state
+
 =item B<user_agent()>
 
 Returns the HTTP_USER_AGENT variable.  If you give
