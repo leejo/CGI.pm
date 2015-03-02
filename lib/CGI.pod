@@ -1247,6 +1247,9 @@ state with query_string():
 The behavior of calling query_string is currently undefined when the HTTP method is
 something other than GET.
 
+If you want to retreived the query string as set in the webserver, namely the
+environment variable, you can call env_query_string()
+
 =head2 Obtaining the script's url
 
     $full_url      = url();
@@ -3217,6 +3220,13 @@ retrieves the B<unescaped> form of the cookie.  You can use the
 regular cookie() method to get the names, or use the raw_fetch()
 method from the CGI::Cookie module.
 
+=item B<env_query_string()>
+
+Returns the QUERY_STRING variable, note that this is the original
+value as set in the environment by the webserver and (possibly)
+not the same value as returned by query_string(), which represents
+the object state
+
 =item B<user_agent()>
 
 Returns the HTTP_USER_AGENT variable.  If you give
@@ -3254,14 +3264,24 @@ path as well.
 Returns either the remote host name or IP address.
 if the former is unavailable.
 
+=item B<remote_ident()>
+
+Returns the name of the remote user (as returned by identd) or undef
+if not set
+
 =item B<remote_addr()>
 
 Returns the remote host IP address, or 
 127.0.0.1 if the address is unavailable.
 
+=item B<request_uri()>
+
+Returns the interpreted pathname of the requested document or CGI
+(relative to the document root). Or undef if not set.
+
 =item B<script_name()>
-Return the script name as a partial URL, for self-referring
-scripts.
+
+Return the script name as a partial URL, for self-referring scripts.
 
 =item B<referer()>
 
@@ -3269,40 +3289,45 @@ Return the URL of the page the browser was viewing
 prior to fetching your script.  Not available for all
 browsers.
 
-=item B<auth_type ()>
+=item B<auth_type()>
 
 Return the authorization/verification method in use for this
 script, if any.
 
-=item B<server_name ()>
+=item B<server_name()>
 
 Returns the name of the server, usually the machine's host
 name.
 
-=item B<virtual_host ()>
+=item B<virtual_host()>
 
 When using virtual hosts, returns the name of the host that
 the browser attempted to contact
 
-=item B<server_port ()>
+=item B<server_port()>
 
 Return the port that the server is listening on.
 
-=item B<virtual_port ()>
+=item B<server_protocol()>
+
+Returns the protocol and revision of the incoming request, or defaults
+to HTTP/1.0 if this is not set
+
+=item B<virtual_port()>
 
 Like server_port() except that it takes virtual hosts into account.
 Use this when running with virtual hosts.
 
-=item B<server_software ()>
+=item B<server_software()>
 
 Returns the server software and version number.
 
-=item B<remote_user ()>
+=item B<remote_user()>
 
 Return the authorization/verification name used for user
 verification, if this script is protected.
 
-=item B<user_name ()>
+=item B<user_name()>
 
 Attempt to obtain the remote user's name, using a variety of different
 techniques.  This only works with older browsers such as Mosaic.

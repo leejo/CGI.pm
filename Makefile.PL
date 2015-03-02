@@ -14,7 +14,8 @@ WriteMakefile(
     VERSION_FROM     => 'lib/CGI.pm',
     MIN_PERL_VERSION => '5.8.1',
     PREREQ_PM        => {
-        'Carp'           => 0,     # Carp was first released with perl 6
+        'Cwd'            => 0,     # Cwd was first released with perl 5
+        'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
         'base'           => 0,     # base was first released with perl 5.00405
         'overload'       => 0,     # overload was first released with perl 5.002

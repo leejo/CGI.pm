@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-BEGIN {$| = 1; print "1..32\n"; }
+BEGIN {$| = 1; print "1..33\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Config;
 use CGI (':standard','keywords');
@@ -105,4 +105,6 @@ test(30, !charset("") && header() eq "Content-Type: text/html${CRLF}${CRLF}", "E
 
 test(31, header(-foo=>'bar') eq "Foo: bar${CRLF}Content-Type: text/html${CRLF}${CRLF}", "Custom header");
 
-test(32, start_form(-action=>'one',name=>'two',onsubmit=>'three') eq qq(<form method="post" action="one" enctype="multipart/form-data" name="two" onsubmit="three">), "initial dash followed by undashed arguments")
+test(32, start_form(-action=>'one',name=>'two',onsubmit=>'three') eq qq(<form method="post" action="one" enctype="multipart/form-data" name="two" onsubmit="three">), "initial dash followed by undashed arguments");
+$ENV{QUERY_STRING}  ='game=chess&game=checkers&weather=dull';
+test(33,env_query_string() eq $ENV{QUERY_STRING},"CGI::env_query_string()");
