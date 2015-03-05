@@ -8,6 +8,7 @@ use CGI;
 use FindBin qw/ $Bin /;
 
 # skip if necessary modules for running this test are not installed
+# or if the env variable to run this test is not set
 
 if( ! eval 'use Template; 1' ) {
   plan skip_all => "Template is required";
@@ -22,8 +23,13 @@ my %examples = (
 		'magnification=2 letter=C picture.x=50 picture.y=45' => [
 			qr/value="2" checked="checked"/,
 			qr/Selected Position <strong>\(50,45\)/,
-		]
+		],
 	},
+	"cookie.cgi" => {
+		'' => [
+			qr/Animal Crackers/,
+		],
+	}
 );
 
 foreach my $example ( sort keys( %examples ) ) {
