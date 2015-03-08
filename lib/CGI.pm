@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.13_03';
+$CGI::VERSION='4.13_04';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -263,6 +263,15 @@ sub import {
 
     $self->_setup_symbols(@_);
     my ($callpack, $callfile, $callline) = caller;
+
+	if ( $callpack eq 'CGI::Fast' ) {
+		# fixes GH #11 (and GH #12 in CGI::Fast since
+		# sub import was added to CGI::Fast in 9537f90
+		# so we need to move up a level to export the
+		# routines to the namespace of whatever is using
+		# CGI::Fast
+		($callpack, $callfile, $callline) = caller(1);
+	}
 
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.

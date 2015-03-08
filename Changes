@@ -1,4 +1,4 @@
-4.13_03 2015-03-01
+4.13_04 2015-03-08
 
     [ RELEASE NOTES ]
     - This release removes the AUTOLOAD and compile optimisations from CGI.pm
@@ -46,6 +46,10 @@
       and tests. GH #167)
 
     - Fix warning for lack of HTTP_USER_AGENT in CGI::Carp (GH #168)
+
+    - Fix imports when called from CGI::Fast, restores the import of CGI functions
+      into the callers namespace for users of CGI::Fast (GH leejo/cgi-fast#11 and
+      GH leejo/cgi-fast#12)
 
     [ INTERNALS ]
     - Remove dependency on constant - internal DEBUG, XHTML_DTD and EBCDIC
