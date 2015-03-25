@@ -1506,7 +1506,21 @@ is passed through a function called escapeHTML():
 =item $escaped_string = escapeHTML("unescaped string");
 
 Escape HTML formatting characters in a string. Internally this calls
-L<HTML::Entities> (encode_entities) so really you should just use that instead
+L<HTML::Entities> (encode_entities) so really you should just use that
+instead - the default list of chars that will be encoded (passed to the
+HTML::Entities encode_entities method) is:
+
+    & < > " \x8b \x9b '
+
+you can control this list by setting the value of $CGI::ENCODE_ENTITIES:
+
+    # only encode < >
+    $CGI::ENCODE_ENTITIES = q{<>}
+
+if you want to encode B<all> entities then undef $CGI::ENCODE_ENTITIES:
+
+    # encode all entities
+    $CGI::ENCODE_ENTITIES = undef;
 
 =back
 

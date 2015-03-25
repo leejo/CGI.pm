@@ -22,6 +22,7 @@ $POST_MAX            = -1; # no limit to uploaded files
 $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
+$ENCODE_ENTITIES     = q{&<>"\x8b\x9b'};
 
 @SAVED_SYMBOLS = ();
 
@@ -2208,7 +2209,9 @@ sub escapeHTML {
      push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
      my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
      return undef unless defined($toencode);
-	 return HTML::Entities::encode_entities($toencode);
+	 my $encode_entities = $ENCODE_ENTITIES;
+	 $encode_entities .= "\012\015" if ( $encode_entities && $newlinestoo );
+	 return HTML::Entities::encode_entities($toencode,$encode_entities);
 }
 
 # unescape HTML -- used internally
