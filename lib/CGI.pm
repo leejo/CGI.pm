@@ -22,6 +22,10 @@ $POST_MAX            = -1; # no limit to uploaded files
 $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
+
+# the hexadecimal 0x8b and 0x9b characters, which many windows-based browsers
+# interpret as the left and right angle-bracket characters, are replaced by
+# their numeric HTML entities ("&#139" and "&#155;")
 $ENCODE_ENTITIES     = q{&<>"\x8b\x9b'};
 
 @SAVED_SYMBOLS = ();
