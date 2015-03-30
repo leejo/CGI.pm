@@ -1,6 +1,9 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
-use CGI::Carp qw(fatalsToBrowser);
+use strict;
+use warnings;
+
+use CGI::Carp qw/ fatalsToBrowser /;
 
 # This line invokes a fatal error message at compile time.
 foo bar baz;

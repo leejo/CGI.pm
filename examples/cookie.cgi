@@ -58,9 +58,6 @@ print $cgi->header(
 
 $tt->process( \*DATA,$template_vars ) or warn $tt->error;
 
-use Data::Dumper;
-warn Dumper $template_vars;
-
 __DATA__
 <!DOCTYPE html>
 <html>

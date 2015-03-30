@@ -29,7 +29,12 @@ my %examples = (
 		'' => [
 			qr/Animal Crackers/,
 		],
-	}
+	},
+	"crash.cgi" => {
+		'' => [
+			qr/\QBareword &quot;baz&quot; not allowed\E/,
+		],
+	},
 );
 
 foreach my $example ( sort keys( %examples ) ) {
