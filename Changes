@@ -1,4 +1,4 @@
-4.13_05 2015-03-25
+4.14 2015-04-01
 
     [ RELEASE NOTES ]
     - This release removes the AUTOLOAD and compile optimisations from CGI.pm
