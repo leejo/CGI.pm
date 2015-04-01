@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.13_03';
+$CGI::VERSION='4.14';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -22,6 +22,11 @@ $POST_MAX            = -1; # no limit to uploaded files
 $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
+
+# the hexadecimal 0x8b and 0x9b characters, which many windows-based browsers
+# interpret as the left and right angle-bracket characters, are replaced by
+# their numeric HTML entities ("&#139" and "&#155;")
+$ENCODE_ENTITIES     = q{&<>"\x8b\x9b'};
 
 @SAVED_SYMBOLS = ();
 
@@ -263,6 +268,15 @@ sub import {
 
     $self->_setup_symbols(@_);
     my ($callpack, $callfile, $callline) = caller;
+
+	if ( $callpack eq 'CGI::Fast' ) {
+		# fixes GH #11 (and GH #12 in CGI::Fast since
+		# sub import was added to CGI::Fast in 9537f90
+		# so we need to move up a level to export the
+		# routines to the namespace of whatever is using
+		# CGI::Fast
+		($callpack, $callfile, $callline) = caller(1);
+	}
 
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
@@ -2199,7 +2213,9 @@ sub escapeHTML {
      push @_,$_[0] if @_==1 && $_[0] eq 'CGI';
      my ($self,$toencode,$newlinestoo) = CGI::self_or_default(@_);
      return undef unless defined($toencode);
-	 return HTML::Entities::encode_entities($toencode);
+	 my $encode_entities = $ENCODE_ENTITIES;
+	 $encode_entities .= "\012\015" if ( $encode_entities && $newlinestoo );
+	 return HTML::Entities::encode_entities($toencode,$encode_entities);
 }
 
 # unescape HTML -- used internally

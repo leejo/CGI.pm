@@ -1,7 +1,7 @@
 package CGI::Push;
 use if $] >= 5.019, 'deprecate';
 
-$CGI::Push::VERSION='4.13_03';
+$CGI::Push::VERSION='4.14';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');

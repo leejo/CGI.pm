@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-use Test::More tests => 40;
+use Test::More tests => 42;
 
 END { ok $loaded; }
 use CGI ( ':standard', '-no_debug', '*h3', 'start_table' );
@@ -188,6 +188,20 @@ charset('utf-8');
 
 is h1( escapeHTML("this is <not> \x8bright\x9b") ),
   '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
+
+my $old_encode = $CGI::ENCODE_ENTITIES;
+$CGI::ENCODE_ENTITIES = '<';
+
+isnt h1( escapeHTML("this is <not> \x8bright\x9b") ),
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
+
+undef( $CGI::ENCODE_ENTITIES );
+
+is h1( escapeHTML("this is <not> \x8bright\x9b") ),
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
+
+
+$CGI::ENCODE_ENTITIES = $old_encode;
 
 is i( p('hello there') ), '<i><p>hello there</p></i>';
 
