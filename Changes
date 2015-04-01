@@ -1,3 +1,8 @@
+4.15 2015-07-01
+
+    [ INTERNALS ]
+    - Cwd made a TEST_REQUIRES rather than a BUILD_REQUIRES in Makefile.PL
+
 4.14 2015-04-01
 
     [ RELEASE NOTES ]
