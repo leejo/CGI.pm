@@ -6,7 +6,6 @@ use CGI ();
 
 $CGI::Pretty::VERSION = '4.14';
 $CGI::DefaultClass = __PACKAGE__;
-$CGI::Pretty::AutoloadClass = 'CGI';
 @CGI::Pretty::ISA = qw( CGI );
 
 sub new {
@@ -21,7 +20,6 @@ sub import {
 
     my $self = shift;
     no strict 'refs';
-    ${ "$self\::AutoloadClass" } = 'CGI';
 
     # This causes modules to clash.
     undef %CGI::EXPORT;
@@ -35,7 +33,7 @@ sub import {
     my @packages = ($self,@{"$self\:\:ISA"});
     foreach my $sym (keys %CGI::EXPORT) {
 	my $pck;
-	my $def = ${"$self\:\:AutoloadClass"} || $CGI::DefaultClass;
+	my $def = $CGI::DefaultClass;
 	foreach $pck (@packages) {
 	    if (defined(&{"$pck\:\:$sym"})) {
 		$def = $pck;

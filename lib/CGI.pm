@@ -283,7 +283,7 @@ sub import {
     my @packages = ($self,@{"$self\:\:ISA"});
     for $sym (keys %EXPORT) {
 	my $pck;
-	my $def = ${"$self\:\:AutoloadClass"} || $DefaultClass;
+	my $def = $DefaultClass;
 	for $pck (@packages) {
 	    if (defined(&{"$pck\:\:$sym"})) {
 		$def = $pck;
