@@ -35,6 +35,12 @@ my %examples = (
 			qr/\QBareword &quot;baz&quot; not allowed\E/,
 		],
 	},
+	"wikipedia_example.cgi" => {
+		'name=Lee' => [
+			qr/\QA Simple CGI Page\E/,
+			qr/\QYour name is Lee\E/,
+		],
+	},
 );
 
 foreach my $example ( sort keys( %examples ) ) {

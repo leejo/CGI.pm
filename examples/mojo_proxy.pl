@@ -7,5 +7,6 @@ plugin CGI => [ '/clickable_image' => "clickable_image.cgi" ];
 plugin CGI => [ '/cookie'          => "cookie.cgi" ];
 plugin CGI => [ '/crash'           => "crash.cgi" ];
 plugin CGI => [ '/file_upload'     => "file_upload.cgi" ];
+plugin CGI => [ '/wikipedia_ex'    => "wikipedia_example.cgi" ];
 
 app->start;
