@@ -283,7 +283,7 @@ sub import {
     my @packages = ($self,@{"$self\:\:ISA"});
     for $sym (keys %EXPORT) {
 	my $pck;
-	my $def = ${"$self\:\:AutoloadClass"} || $DefaultClass;
+	my $def = $DefaultClass;
 	for $pck (@packages) {
 	    if (defined(&{"$pck\:\:$sym"})) {
 		$def = $pck;
@@ -405,7 +405,7 @@ sub param {
 	if ( wantarray && $LIST_CONTEXT_WARN ) {
 		my ( $package, $filename, $line ) = caller;
 		if ( $package ne 'CGI' ) {
-			warn "CGI::param called in list context from package $package line $line, this can lead to vulnerabilities. "
+			warn "CGI::param called in list context from $filename line $line, this can lead to vulnerabilities. "
 				. 'See the warning in "Fetching the value or values of a single named parameter"';
 		}
 	}

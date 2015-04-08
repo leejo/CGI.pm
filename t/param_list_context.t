@@ -26,7 +26,7 @@ warnings_are
 
 warning_like
 	{ @params = $q->param('game') }
-	qr/CGI::param called in list context from package main line 28, this can lead to vulnerabilities/,
+	qr/CGI::param called in list context from .+param_list_context\.t line 28, this can lead to vulnerabilities/,
     "calling ->param with args in list context warns"
 ;
 

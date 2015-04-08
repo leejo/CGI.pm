@@ -1,3 +1,19 @@
+4.15 2015-07-01
+
+    [ SPEC / BUG FIXES ]
+    - make the list context warning in param show the filename rather than
+      the package so we have more information on exactly where the warning
+      has been raised from (GH #171)
+
+    [ DOCUMENTATION ]
+    - Fix some typos (GH #173, GH #174)
+
+    [ INTERNALS ]
+    - Cwd made a TEST_REQUIRES rather than a BUILD_REQUIRES in Makefile.PL
+      (GH #170)
+    - AutoloadClass variables have been removed as AUTOLOAD was removed in
+      v4.14 so these are no longer necessary (GH #172 thanks to alexmv)
+
 4.14 2015-04-01
 
     [ RELEASE NOTES ]

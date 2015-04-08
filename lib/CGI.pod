@@ -59,7 +59,7 @@ If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
 update, then you will have to install CGI.pm yourself with cpan/cpanm/a vendor
 package/manually. To make this a little easier the L<CGI::Fast> module has been
-split into its own distribution, meaning you do not need acces to a compiler
+split into its own distribution, meaning you do not need access to a compiler
 to install CGI.pm
 
 The rationale for this decision is that CGI.pm is no longer considered good

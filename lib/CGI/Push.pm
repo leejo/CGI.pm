@@ -7,7 +7,6 @@ use CGI::Util 'rearrange';
 @ISA = ('CGI');
 
 $CGI::DefaultClass = 'CGI::Push';
-$CGI::Push::AutoloadClass = 'CGI';
 
 # add do_push() and push_delay() to exported tags
 push(@{$CGI::EXPORT_TAGS{':standard'}},'do_push','push_delay');
