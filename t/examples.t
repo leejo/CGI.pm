@@ -41,6 +41,11 @@ my %examples = (
 			qr/\QYour name is Lee\E/,
 		],
 	},
+	"file_upload.cgi" => {
+		'' => [
+			qr/\QFile Upload Example\E/,
+		],
+	},
 );
 
 foreach my $example ( sort keys( %examples ) ) {
