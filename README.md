@@ -3,7 +3,7 @@
 
 ## WHAT IS THIS?
 
-This is CGI.pm, an easy-to-use Perl5 library for writing CGI scripts.
+This is CGI.pm, an easy-to-use perl5 library for writing CGI scripts.
 
 ## CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
@@ -51,7 +51,7 @@ on Unix systems, type "man CGI" or "perldoc CGI").
 ## WHERE ARE THE EXAMPLES?
 
 A collection of examples demonstrating various CGI features and techniques are
-in the directory "examples". These are now rather old examples of Perl code and
+in the directory "examples". These are now rather old examples of perl code and
 should not be considered as best practices.
 
 ## WHERE IS THE ONLINE DOCUMENTATION?
@@ -63,7 +63,7 @@ can be found at:
 
 ## WHERE CAN I VIEW OR SUBMIT BUGS / ISSUES / REQUESTS / CONTRIBUTE?
 
-The new bug tracker can be found on github:
+The bug tracker can be found on github:
 
    https://github.com/leejo/CGI.pm/issues
 

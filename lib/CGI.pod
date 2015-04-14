@@ -8,48 +8,58 @@ CGI - Handle Common Gateway Interface requests and responses
 
 =head1 SYNOPSIS
 
+    use strict;
+    use warnings;
+
     use CGI;
 
     my $q = CGI->new;
 
     # Process an HTTP request
-     @values  = $q->multi_param('form_field');
-     $value   = $q->param('param_name');
+    my @values  = $q->multi_param('form_field');
+    my $value   = $q->param('param_name');
 
-     $fh      = $q->upload('file_field');
+    my $fh      = $q->upload('file_field');
 
-     $riddle  = $query->cookie('riddle_name');
-     %answers = $query->cookie('answers');
+    my $riddle  = $query->cookie('riddle_name');
+    my %answers = $query->cookie('answers');
 
     # Prepare various HTTP responses
     print $q->header();
     print $q->header('application/json');
 
-	$cookie1 = $q->cookie(-name=>'riddle_name', -value=>"The Sphynx's Question");
-	$cookie2 = $q->cookie(-name=>'answers', -value=>\%answers);
+    my $cookie1 = $q->cookie(
+        -name  => 'riddle_name',
+        -value => "The Sphynx's Question"
+    );
+
+    my $cookie2 = $q->cookie(
+        -name  => 'answers',
+        -value => \%answers
+    );
+
     print $q->header(
         -type    => 'image/gif',
         -expires => '+3d',
-        -cookie  => [$cookie1,$cookie2]
-        );
+        -cookie  => [ $cookie1,$cookie2 ]
+    );
 
-   print  $q->redirect('http://somewhere.else/in/movie/land');
+    print $q->redirect('http://somewhere.else/in/movie/land');
 
 =head1 DESCRIPTION
 
 CGI.pm is a stable, complete and mature solution for processing and preparing
 HTTP requests and responses.  Major features including processing form
 submissions, file uploads, reading and writing cookies, query string generation
-and manipulation, and processing and preparing HTTP headers. Some HTML
-generation utilities are included as well.
+and manipulation, and processing and preparing HTTP headers.
 
 CGI.pm performs very well in a vanilla CGI.pm environment and also comes
 with built-in support for mod_perl and mod_perl2 as well as FastCGI.
 
-It has the benefit of having developed and refined over 10 years with input
+It has the benefit of having developed and refined over 20 years with input
 from dozens of contributors and being deployed on thousands of websites.
-CGI.pm has been included in the Perl distribution since Perl 5.4, and has
-become a de-facto standard.
+CGI.pm was included in the perl distribution from perl v5.4 to v5.20, however
+is has now been removed from the perl core...
 
 =head1 CGI.pm HAS BEEN REMOVED FROM THE PERL CORE
 
@@ -86,262 +96,222 @@ L<Template::Toolkit> module.
 
 These functions, and perldoc for them, will continue to exist in the
 v4 releases of CGI.pm but may be deprecated (soft) in v5 and beyond.
+All documentation for these functions has been moved to L<CGI::HTML::Functions>.
 
-=head2 Programming style
+=head1 Programming style
 
-There are two styles of programming with CGI.pm, an object-oriented
-style and a function-oriented style.  In the object-oriented style you
-create one or more CGI objects and then use object methods to create
-the various elements of the page.  Each CGI object starts out with the
-list of named parameters that were passed to your CGI script by the
-server.  You can modify the objects, save them to a file or database
-and recreate them.  Because each object corresponds to the "state" of
-the CGI script, and because each object's parameter list is
+There are two styles of programming with CGI.pm, an object-oriented (OO)
+style and a function-oriented style. You are recommended to use the OO
+style as CGI.pm will create an internal default object when the functions
+are called procedurally and you will not have to worry about method names
+clashing with perl builtins.
+
+In the object-oriented style you create one or more CGI objects and then
+use object methods to create the various elements of the page. Each CGI
+object starts out with the list of named parameters that were passed to
+your CGI script by the server. You can modify the objects, save them to a
+file or database and recreate them. Because each object corresponds to the
+"state" of the CGI script, and because each object's parameter list is
 independent of the others, this allows you to save the state of the
 script and restore it later.
 
 For example, using the object oriented style, here is how you create
 a simple "Hello World" HTML page:
 
-   #!/usr/local/bin/perl -w
-   use CGI;                             # load CGI routines
-   $q = CGI->new;                        # create new CGI object
-   print $q->header,                    # create the HTTP header
-         $q->start_html('hello world'), # start the HTML
-         $q->h1('hello world'),         # level 1 header
-         $q->end_html;                  # end the HTML
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+
+    use CGI;                             # load CGI routines
+
+    my $q = CGI->new;                    # create new CGI object
+    print $q->header;                    # create the HTTP header
+
+    ...
 
 In the function-oriented style, there is one default CGI object that
-you rarely deal with directly.  Instead you just call functions to
-retrieve CGI parameters, create HTML tags, manage cookies, and so
-on.  This provides you with a cleaner programming interface, but
-limits you to using one CGI object at a time.  The following example
-prints the same page, but uses the function-oriented interface.
-The main differences are that we now need to import a set of functions
-into our name space (usually the "standard" functions), and we don't
+you rarely deal with directly. Instead you just call functions to
+retrieve CGI parameters, manage cookies, and so on. The following example
+is identical to above, in terms of output, but uses the function-oriented
+interface. The main differences are that we now need to import a set of
+functions into our name space (usually the "standard" functions), and we don't
 need to create the CGI object.
 
-   #!/usr/local/bin/perl
-   use CGI qw/:standard/;           # load standard CGI routines
-   print header,                    # create the HTTP header
-         start_html('hello world'), # start the HTML
-         h1('hello world'),         # level 1 header
-         end_html;                  # end the HTML
+    #!/usr/bin/env perl
 
-The examples in this document mainly use the object-oriented style.
-See HOW TO IMPORT FUNCTIONS for important information on
-function-oriented programming in CGI.pm
+    use strict;
+    use warnings;
+
+    use CGI qw/:standard/;           # load standard CGI routines
+    print header();                  # create the HTTP header
+
+    ...
+
+The examples in this document mainly use the object-oriented style. See HOW
+TO IMPORT FUNCTIONS for important information on function-oriented programming
+in CGI.pm
 
 =head2 Calling CGI.pm routines
 
 Most CGI.pm routines accept several arguments, sometimes as many as 20
-optional ones!  To simplify this interface, all routines use a named
+optional ones! To simplify this interface, all routines use a named
 argument calling style that looks like this:
 
-   print $q->header(-type=>'image/gif',-expires=>'+3d');
+    print $q->header(
+        -type    => 'image/gif',
+        -expires => '+3d',
+    );
 
-Each argument name is preceded by a dash.  Neither case nor order
-matters in the argument list.  -type, -Type, and -TYPE are all
-acceptable.  In fact, only the first argument needs to begin with a
-dash.  If a dash is present in the first argument, CGI.pm assumes
-dashes for the subsequent ones.
+Each argument name is preceded by a dash. Neither case nor order matters in
+the argument list: -type, -Type, and -TYPE are all acceptable. In fact, only
+the first argument needs to begin with a dash. If a dash is present in the
+first argument CGI.pm assumes dashes for the subsequent ones.
 
-Several routines are commonly called with just one argument.  In the
-case of these routines you can provide the single argument without an
-argument name.  header() happens to be one of these routines.  In this
-case, the single argument is the document type.
+Several routines are commonly called with just one argument. In the case
+of these routines you can provide the single argument without an argument
+name. header() happens to be one of these routines. In this case, the single
+argument is the document type.
 
-   print $q->header('text/html');
+    print $q->header('text/html');
 
 Other such routines are documented below.
 
-Sometimes named arguments expect a scalar, sometimes a reference to an
-array, and sometimes a reference to a hash.  Often, you can pass any
-type of argument and the routine will do whatever is most appropriate.
-For example, the param() routine is used to set a CGI parameter to a
-single or a multi-valued value.  The two cases are shown below:
+Sometimes named arguments expect a scalar, sometimes a reference to an array,
+and sometimes a reference to a hash. Often, you can pass any type of argument
+and the routine will do whatever is most appropriate. For example, the param()
+routine is used to set a CGI parameter to a single or a multi-valued value.
+The two cases are shown below:
 
-   $q->param(-name=>'veggie',-value=>'tomato');
-   $q->param(-name=>'veggie',-value=>['tomato','tomahto','potato','potahto']);
+    $q->param(
+        -name  => 'veggie',
+        -value => 'tomato',
+    );
 
-HTML tags have both attributes
-(the attribute="value" pairs within the tag itself) and contents (the
-part between the opening and closing pairs.)  To distinguish between
-attributes and contents, CGI.pm uses the convention of passing HTML
-attributes as a hash reference as the first argument, and the
-contents, if any, as any subsequent arguments.  It works out like
-this:
+    $q->param(
+        -name  => 'veggie',
+        -value => [ qw/tomato tomahto potato potahto/ ],
+    );
 
-   Code                           Generated HTML
-   ----                           --------------
-   h1()                           <h1 />
-   h1('some','contents');         <h1>some contents</h1>
-   h1({-align=>left});            <h1 align="LEFT">
-   h1({-align=>left},'contents'); <h1 align="LEFT">contents</h1>
 
-HTML tags are described in more detail later.
+Many routines will do something useful with a named argument that it doesn't
+recognize. For example, you can produce non-standard HTTP header fields by
+providing them as named arguments:
 
-Many newcomers to CGI.pm are puzzled by the difference between the
-calling conventions for the HTML shortcuts, which require curly braces
-around the HTML tag attributes, and the calling conventions for other
-routines, which manage to generate attributes without the curly
-brackets.  Don't be confused.  As a convenience the curly braces are
-optional in all but the HTML shortcuts.  If you like, you can use
-curly braces when calling any routine that takes named arguments.  For
-example:
-
-   print $q->header( {-type=>'image/gif',-expires=>'+3d'} );
-
-If you use the B<-w> switch, you will be warned that some CGI.pm argument
-names conflict with built-in Perl functions.  The most frequent of
-these is the -values argument, used to create multi-valued menus,
-radio button clusters and the like.  To get around this warning, you
-have several choices:
-
-=over 4
-
-=item 1.
-
-Use another name for the argument, if one is available. 
-For example, -value is an alias for -values.
-
-=item 2.
-
-Change the capitalization, e.g. -Values
-
-=item 3.
-
-Put quotes around the argument name, e.g. '-values'
-
-=back
-
-Many routines will do something useful with a named argument that it
-doesn't recognize.  For example, you can produce non-standard HTTP
-header fields by providing them as named arguments:
-
-  print $q->header(-type  =>  'text/html',
-                   -cost  =>  'Three smackers',
-                   -annoyance_level => 'high',
-                   -complaints_to   => 'bit bucket');
+    print $q->header(
+        -type            => 'text/html',
+        -cost            => 'Three smackers',
+        -annoyance_level => 'high',
+        -complaints_to   => 'bit bucket',
+    );
 
 This will produce the following nonstandard HTTP header:
 
-   HTTP/1.0 200 OK
-   Cost: Three smackers
-   Annoyance-level: high
-   Complaints-to: bit bucket
-   Content-type: text/html
+    HTTP/1.0 200 OK
+    Cost: Three smackers
+    Annoyance-level: high
+    Complaints-to: bit bucket
+    Content-type: text/html
 
-Notice the way that underscores are translated automatically into
-hyphens.  HTML-generating routines perform a different type of
-translation. 
-
-This feature allows you to keep up with the rapidly changing HTTP and
-HTML "standards".
+Notice the way that underscores are translated automatically into hyphens.
 
 =head2 Creating a new query object (object-oriented style):
 
-     $query = CGI->new;
+    my $query = CGI->new;
 
 This will parse the input (from POST, GET and DELETE methods) and store
-it into a perl5 object called $query. 
+it into a perl5 object called $query. Note that because the input parsing
+happens at object instantiation you have to set any CGI package variables
+that control parsing B<before> you call CGI->new.
 
-Any filehandles from file uploads will have their position reset to 
-the beginning of the file. 
+Any filehandles from file uploads will have their position reset to the
+beginning of the file.
 
 =head2 Creating a new query object from an input file
 
-     $query = CGI->new(INPUTFILE);
+    my $query = CGI->new( $input_filehandle );
 
-If you provide a file handle to the new() method, it will read
-parameters from the file (or STDIN, or whatever).  The file can be in
-any of the forms describing below under debugging (i.e. a series of
-newline delimited TAG=VALUE pairs will work).  Conveniently, this type
-of file is created by the save() method (see below).  Multiple records
-can be saved and restored.
+If you provide a file handle to the new() method, it will read parameters
+from the file (or STDIN, or whatever). The file can be in any of the forms
+describing below under debugging (i.e. a series of newline delimited
+TAG=VALUE pairs will work). Conveniently, this type of file is created by
+the save() method (see below). Multiple records can be saved and restored.
 
-Perl purists will be pleased to know that this syntax accepts
-references to file handles, or even references to filehandle globs,
-which is the "official" way to pass a filehandle:
+Perl purists will be pleased to know that this syntax accepts references to
+file handles, or even references to filehandle globs, which is the "official"
+way to pass a filehandle. You can also initialize the CGI object with a
+FileHandle or IO::File object.
 
-    $query = CGI->new(\*STDIN);
+If you are using the function-oriented interface and want to initialize CGI
+state from a file handle, the way to do this is with B<restore_parameters()>.
+This will (re)initialize the default CGI object from the indicated file handle.
 
-You can also initialize the CGI object with a FileHandle or IO::File
-object.
+    open( my $in_fh,'<',"test.in") || die "Couldn't open test.in for read: $!";
+    restore_parameters( $in_fh );
+    close( $in_fh );
 
-If you are using the function-oriented interface and want to
-initialize CGI state from a file handle, the way to do this is with
-B<restore_parameters()>.  This will (re)initialize the
-default CGI object from the indicated file handle.
+You can also initialize the query object from a hash reference:
 
-    open (IN,"test.in") || die;
-    restore_parameters(IN);
-    close IN;
-
-You can also initialize the query object from a hash
-reference:
-
-    $query = CGI->new( {'dinosaur'=>'barney',
-		       'song'=>'I love you',
-		       'friends'=>[qw/Jessica George Nancy/]}
-		    );
+    my $query = CGI->new( {
+        'dinosaur' => 'barney',
+        'song'     => 'I love you',
+        'friends'  => [ qw/ Jessica George Nancy / ]
+    } );
 
 or from a properly formatted, URL-escaped query string:
 
-    $query = CGI->new('dinosaur=barney&color=purple');
+    my $query = CGI->new('dinosaur=barney&color=purple');
 
-or from a previously existing CGI object (currently this clones the
-parameter list, but none of the other object-specific fields, such as
-autoescaping):
+or from a previously existing CGI object (currently this clones the parameter
+list, but none of the other object-specific fields, such as autoescaping):
 
-    $old_query = CGI->new;
-    $new_query = CGI->new($old_query);
+    my $old_query = CGI->new;
+    my $new_query = CGI->new($old_query);
 
 To create an empty query, initialize it from an empty string or hash:
 
-   $empty_query = CGI->new("");
+    my $empty_query = CGI->new("");
 
        -or-
 
-   $empty_query = CGI->new({});
+    my $empty_query = CGI->new({});
 
 =head2 Fetching a list of keywords from the query:
 
-     @keywords = $query->keywords
+    my @keywords = $query->keywords
 
-If the script was invoked as the result of an <ISINDEX> search, the
-parsed keywords can be obtained as an array using the keywords() method.
+If the script was invoked as the result of an <ISINDEX> search, the parsed
+keywords can be obtained as an array using the keywords() method.
 
 =head2 Fetching the names of all the parameters passed to your script:
 
-     @names = $query->multi_param
+    my @names = $query->multi_param
 
-     @names = $query->param
+    my @names = $query->param
 
 If the script was invoked with a parameter list
 (e.g. "name1=value1&name2=value2&name3=value3"), the param() / multi_param()
 methods will return the parameter names as a list.  If the script was invoked
 as an <ISINDEX> script and contains a string without ampersands
-(e.g. "value1+value2+value3") , there will be a single parameter named
+(e.g. "value1+value2+value3"), there will be a single parameter named
 "keywords" containing the "+"-delimited keywords.
 
-NOTE: As of version 1.5, the array of parameter names returned will
-be in the same order as they were submitted by the browser.
-Usually this order is the same as the order in which the 
-parameters are defined in the form (however, this isn't part
-of the spec, and so isn't guaranteed).
+The array of parameter names returned will be in the same order as they were
+submitted by the browser. Usually this order is the same as the order in which
+the parameters are defined in the form (however, this isn't part of the spec,
+and so isn't guaranteed).
 
 =head2 Fetching the value or values of a single named parameter:
 
-    @values = $query->multi_param('foo');
+    my @values = $query->multi_param('foo');
 
-	      -or-
+        -or-
 
-    $value = $query->param('foo');
+    my $value = $query->param('foo');
 
 Pass the param() / multi_param() method a single argument to fetch the value
 of the named parameter. If the parameter is multivalued (e.g. from multiple
-selections in a scrolling list), you can ask to receive an array.  Otherwise
+selections in a scrolling list), you can ask to receive an array. Otherwise
 the method will return a single value.
 
 B<Warning> - calling param() in list context can lead to vulnerabilities if
@@ -354,110 +324,112 @@ The following code is an example of a vulnerability as the call to param will
 be evaluated in list context and thus possibly inject extra keys and values
 into the hash:
 
-	my %user_info = (
-		id   => 1,
-		name => $query->param('name'),
-	);
+    my %user_info = (
+        id   => 1,
+        name => $query->param('name'),
+    );
 
 The fix for the above is to force scalar context on the call to ->param by
 prefixing it with "scalar"
 
-	name => scalar $query->param('name'),
+    name => scalar $query->param('name'),
 
 If you call param() in list context with an argument a warning will be raised
 by CGI.pm, you can disable this warning by setting $CGI::LIST_CONTEXT_WARN to 0
 or by using the multi_param() method instead
 
-If a value is not given in the query string, as in the queries
-"name1=&name2=", it will be returned as an empty string.
+If a value is not given in the query string, as in the queries "name1=&name2=",
+it will be returned as an empty string.
 
-If the parameter does not exist at all, then param() will return undef
-in a scalar context, and the empty list in a list context.
+If the parameter does not exist at all, then param() will return undef in scalar
+context, and the empty list in a list context.
 
 =head2 Setting the value(s) of a named parameter:
 
     $query->param('foo','an','array','of','values');
 
-This sets the value for the named parameter 'foo' to an array of
-values.  This is one way to change the value of a field AFTER
-the script has been invoked once before.  (Another way is with
-the -override parameter accepted by all methods that generate
-form elements.)
+This sets the value for the named parameter 'foo' to an array of values. This
+is one way to change the value of a field AFTER the script has been invoked
+once before.
 
-param() also recognizes a named parameter style of calling described
-in more detail later:
+param() also recognizes a named parameter style of calling described in more
+detail later:
 
-    $query->param(-name=>'foo',-values=>['an','array','of','values']);
+    $query->param(
+        -name   => 'foo',
+        -values => ['an','array','of','values'],
+    );
 
-			      -or-
+                -or-
 
-    $query->param(-name=>'foo',-value=>'the value');
+    $query->param(
+        -name  => 'foo',
+        -value => 'the value',
+    );
 
 =head2 Appending additional values to a named parameter:
 
-   $query->append(-name=>'foo',-values=>['yet','more','values']);
+    $query->append(
+        -name   =>'foo',
+        -values =>['yet','more','values'],
+    );
 
-This adds a value or list of values to the named parameter.  The
-values are appended to the end of the parameter if it already exists.
-Otherwise the parameter is created.  Note that this method only
-recognizes the named argument calling syntax.
+This adds a value or list of values to the named parameter. The values are
+appended to the end of the parameter if it already exists. Otherwise the
+parameter is created. Note that this method only recognizes the named argument
+calling syntax.
 
 =head2 Importing all parameters into a namespace:
 
-   $query->import_names('R');
+    $query->import_names('R');
 
-This creates a series of variables in the 'R' namespace.  For example,
-$R::foo, @R:foo.  For keyword lists, a variable @R::keywords will appear.
-If no namespace is given, this method will assume 'Q'.
-WARNING:  don't import anything into 'main'; this is a major security
-risk!!!!
+This creates a series of variables in the 'R' namespace. For example, $R::foo,
+@R:foo. For keyword lists, a variable @R::keywords will appear. If no namespace
+is given, this method will assume 'Q'. B<WARNING>: don't import anything into
+'main'; this is a major security risk!
 
-NOTE 1: Variable names are transformed as necessary into legal Perl
-variable names.  All non-legal characters are transformed into
-underscores.  If you need to keep the original names, you should use
-the param() method instead to access CGI variables by name.
+NOTE 1: Variable names are transformed as necessary into legal perl variable
+names. All non-legal characters are transformed into underscores. If you need
+to keep the original names, you should use the param() method instead to access
+CGI variables by name.
 
-NOTE 2: In older versions, this method was called B<import()>.  As of version 2.20, 
-this name has been removed completely to avoid conflict with the built-in
-Perl module B<import> operator.
+In fact, you should probably not use this method at all given the above caveats
+and security risks.
 
 =head2 Deleting a parameter completely:
 
     $query->delete('foo','bar','baz');
 
-This completely clears a list of parameters.  It sometimes useful for
-resetting parameters that you don't want passed down between script
-invocations.
+This completely clears a list of parameters. It sometimes useful for resetting
+parameters that you don't want passed down between script invocations.
 
-If you are using the function call interface, use "Delete()" instead
-to avoid conflicts with Perl's built-in delete operator.
+If you are using the function call interface, use "Delete()" instead to avoid
+conflicts with perl's built-in delete operator.
 
 =head2 Deleting all parameters:
 
-   $query->delete_all();
+    $query->delete_all();
 
-This clears the CGI object completely.  It might be useful to ensure
-that all the defaults are taken when you create a fill-out form.
+This clears the CGI object completely. It might be useful to ensure that all
+the defaults are taken when you create a fill-out form.
 
 Use Delete_all() instead if you are using the function call interface.
 
 =head2 Handling non-urlencoded arguments
 
-
 If POSTed data is not of type application/x-www-form-urlencoded or
-multipart/form-data, then the POSTed data will not be processed, but
-instead be returned as-is in a parameter named POSTDATA.  To retrieve
-it, use code like this:
+multipart/form-data, then the POSTed data will not be processed, but instead
+be returned as-is in a parameter named POSTDATA. To retrieve it, use code like
+this:
 
-   my $data = $query->param('POSTDATA');
+    my $data = $query->param('POSTDATA');
 
 Likewise if PUTed data can be retrieved with code like this:
 
-   my $data = $query->param('PUTDATA');
+    my $data = $query->param('PUTDATA');
 
-(If you don't know what the preceding means, don't worry about it.  It
-only affects people trying to use CGI for XML processing and other
-specialized tasks.)
+(If you don't know what the preceding means, worry not. It only affects people
+trying to use CGI for XML processing and other specialized tasks)
 
 PUTDATA/POSTDATA are also available via
 L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
@@ -466,124 +438,113 @@ option.
 
 =head2 Direct access to the parameter list:
 
-   $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
-   unshift @{$q->param_fetch(-name=>'address')},'George Munster';
+    $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
+    unshift @{$q->param_fetch(-name=>'address')},'George Munster';
 
-If you need access to the parameter list in a way that isn't covered
-by the methods given in the previous sections, you can obtain a direct 
-reference to it by
-calling the B<param_fetch()> method with the name of the parameter.  This
-will return an array reference to the named parameter, which you then
-can manipulate in any way you like.
+If you need access to the parameter list in a way that isn't covered by the
+methods given in the previous sections, you can obtain a direct reference to
+it by calling the B<param_fetch()> method with the name of the parameter. This
+will return an array reference to the named parameter, which you then can
+manipulate in any way you like.
 
 You can also use a named argument style using the B<-name> argument.
 
 =head2 Fetching the parameter list as a hash:
 
-    $params = $q->Vars;
+    my $params = $q->Vars;
     print $params->{'address'};
-    @foo = split("\0",$params->{'foo'});
-    %params = $q->Vars;
+    my @foo = split("\0",$params->{'foo'});
+    my %params = $q->Vars;
 
     use CGI ':cgi-lib';
-    $params = Vars;
+    my $params = Vars;
 
-Many people want to fetch the entire parameter list as a hash in which
-the keys are the names of the CGI parameters, and the values are the
-parameters' values.  The Vars() method does this.  Called in a scalar
-context, it returns the parameter list as a tied hash reference.
-Changing a key changes the value of the parameter in the underlying
-CGI parameter list.  Called in a list context, it returns the
-parameter list as an ordinary hash.  This allows you to read the
+Many people want to fetch the entire parameter list as a hash in which the keys
+are the names of the CGI parameters, and the values are the parameters' values.
+The Vars() method does this. Called in a scalar context, it returns the
+parameter list as a tied hash reference. Changing a key changes the value of
+the parameter in the underlying CGI parameter list. Called in a list context,
+it returns the parameter list as an ordinary hash. This allows you to read the
 contents of the parameter list, but not to change it.
 
 When using this, the thing you must watch out for are multivalued CGI
-parameters.  Because a hash cannot distinguish between scalar and
-list context, multivalued parameters will be returned as a packed
-string, separated by the "\0" (null) character.  You must split this
-packed string in order to get at the individual values.  This is the
-convention introduced long ago by Steve Brenner in his cgi-lib.pl
-module for Perl version 4.
+parameters. Because a hash cannot distinguish between scalar and list context,
+multivalued parameters will be returned as a packed string, separated by the
+"\0" (null) character. You must split this packed string in order to get at the
+individual values. This is the convention introduced long ago by Steve Brenner
+in his cgi-lib.pl module for perl version 4, and may be replaced in future
+versions with array references.
 
-If you wish to use Vars() as a function, import the I<:cgi-lib> set of
-function calls (also see the section on CGI-LIB compatibility).
+If you wish to use Vars() as a function, import the I<:cgi-lib> set of function
+calls (also see the section on CGI-LIB compatibility).
 
 =head2 Saving the state of the script to a file:
 
     $query->save(\*FILEHANDLE)
 
-This will write the current state of the form to the provided
-filehandle.  You can read it back in by providing a filehandle
-to the new() method.  Note that the filehandle can be a file, a pipe,
-or whatever!
+This will write the current state of the form to the provided filehandle. You
+can read it back in by providing a filehandle to the new() method. Note that
+the filehandle can be a file, a pipe, or whatever.
 
 The format of the saved file is:
 
-	NAME1=VALUE1
-	NAME1=VALUE1'
-	NAME2=VALUE2
-	NAME3=VALUE3
-	=
+    NAME1=VALUE1
+    NAME1=VALUE1'
+    NAME2=VALUE2
+    NAME3=VALUE3
+    =
 
-Both name and value are URL escaped.  Multi-valued CGI parameters are
-represented as repeated names.  A session record is delimited by a
-single = symbol.  You can write out multiple records and read them
-back in with several calls to B<new>.  You can do this across several
-sessions by opening the file in append mode, allowing you to create
-primitive guest books, or to keep a history of users' queries.  Here's
-a short example of creating multiple session records:
+Both name and value are URL escaped. Multi-valued CGI parameters are represented
+as repeated names. A session record is delimited by a single = symbol. You can
+write out multiple records and read them back in with several calls to B<new>.
+You can do this across several sessions by opening the file in append mode,
+allowing you to create primitive guest books, or to keep a history of users'
+queries. Here's a short example of creating multiple session records:
 
-   use CGI;
+    use strict;
+    use warnings;
+    use CGI;
 
-   open (OUT,'>>','test.out') || die;
-   $records = 5;
-   for (0..$records) {
-       my $q = CGI->new;
-       $q->param(-name=>'counter',-value=>$_);
-       $q->save(\*OUT);
-   }
-   close OUT;
+    open (my $out_fh,'>>','test.out') || die "Can't open test.out: $!";
+    my $records = 5;
+    for ( 0 .. $records ) {
+        my $q = CGI->new;
+        $q->param( -name => 'counter',-value => $_ );
+        $q->save( $out_fh );
+    }
+    close( $out_fh );
 
-   # reopen for reading
-   open (IN,'<','test.out') || die;
-   while (!eof(IN)) {
-       my $q = CGI->new(\*IN);
-       print $q->param('counter'),"\n";
-   }
+    # reopen for reading
+    open (my $in_fh,'<','test.out') || die "Can't open test.out: $!";
+    while (!eof($in_fh)) {
+        my $q = CGI->new($in_fh);
+        print $q->param('counter'),"\n";
+    }
 
-The file format used for save/restore is identical to that used by the
-Whitehead Genome Center's data exchange format "Boulderio", and can be
-manipulated and even databased using Boulderio utilities.  See
+The file format used for save/restore is identical to that used by the Whitehead
+Genome Center's data exchange format "Boulderio", and can be manipulated and
+even databased using Boulderio utilities.  See L<Boulder> for further details.
 
-  L<Boulder>
-
-for further details.
-
-If you wish to use this method from the function-oriented (non-OO)
-interface, the exported name for this method is B<save_parameters()>.
+If you wish to use this method from the function-oriented (non-OO) interface,
+the exported name for this method is B<save_parameters()>.
 
 =head2 Retrieving cgi errors
 
-Errors can occur while processing user input, particularly when
-processing uploaded files.  When these errors occur, CGI will stop
-processing and return an empty parameter list.  You can test for
-the existence and nature of errors using the I<cgi_error()> function.
-The error messages are formatted as HTTP status codes. You can either
-incorporate the error text into an HTML page, or use it as the value
-of the HTTP status:
+Errors can occur while processing user input, particularly when processing
+uploaded files. When these errors occur, CGI will stop processing and return
+an empty parameter list. You can test for the existence and nature of errors
+using the I<cgi_error()> function. The error messages are formatted as HTTP
+status codes. You can either incorporate the error text into an HTML page, or
+use it as the value of the HTTP status:
 
-    my $error = $q->cgi_error;
-    if ($error) {
-	print $q->header(-status=>$error),
-	      $q->start_html('Problems'),
-              $q->h2('Request not processed'),
-	      $q->strong($error);
+    if ( my $error = $q->cgi_error ) {
+        print $q->header( -status => $error );
+        print "Error: $error";
         exit 0;
     }
 
-When using the function-oriented interface (see the next section),
-errors may only occur the first time you call I<param()>. Be ready
-for this!
+When using the function-oriented interface (see the next section), errors may
+only occur the first time you call I<param()>. Be ready for this!
 
 =head2 Using the function-oriented interface
 
@@ -1482,7 +1443,7 @@ like
 
     print comment('here is my comment');
 
-Because of conflicts with built-in Perl functions, the following functions
+Because of conflicts with built-in perl functions, the following functions
 begin with initial caps:
 
     Select
@@ -2028,7 +1989,7 @@ to write the uploaded file to disk.
 The original way to process file uploads with CGI.pm was to use param(). The
 value it returns has a dual nature as both a file name and a lightweight
 filehandle. This dual nature is problematic if you following the recommended
-practice of having C<use strict> in your code. Perl will complain when you try
+practice of having C<use strict> in your code. perl will complain when you try
 to use a string as a filehandle.  More seriously, it is possible for the remote
 user to type garbage into the upload field, in which case what you get from
 param() is not a filehandle at all, but a string.
@@ -2574,7 +2535,7 @@ reset() creates the "reset" button.  Note that it restores the
 form to its value from the last time the script was called, 
 NOT necessarily to the defaults.
 
-Note that this conflicts with the Perl reset() built-in.  Use
+Note that this conflicts with the perl reset() built-in.  Use
 CORE::reset() to get the original reset function.
 
 =head2 Creating a default button
@@ -3219,7 +3180,7 @@ corresponding to the browser's preference for this type from 0.0
 list are handled correctly.
 
 Note that the capitalization changed between version 2.43 and 2.44 in
-order to avoid conflict with Perl's accept() function.
+order to avoid conflict with perl's accept() function.
 
 =item B<raw_cookie()>
 
@@ -3256,8 +3217,8 @@ path_info() returning "/additional/stuff".
 
 NOTE: The Microsoft Internet Information Server
 is broken with respect to additional path information.  If
-you use the Perl DLL library, the IIS server will attempt to
-execute the additional path information as a Perl script.
+you use the perl DLL library, the IIS server will attempt to
+execute the additional path information as a perl script.
 If you use the ordinary file associations mapping, the
 path information will be present in the environment, 
 but incorrect.  The best thing to do is to avoid using additional
@@ -3828,7 +3789,7 @@ Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
 
 When sending bug reports, please provide the version of CGI.pm, the version of
-Perl, the name and version of your Web server, and the name and version of the
+perl, the name and version of your Web server, and the name and version of the
 operating system you are using.  If the problem is even remotely browser
 dependent, please provide information about the affected browsers as well.
 

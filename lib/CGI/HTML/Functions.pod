@@ -1,0 +1,88 @@
+=head1 NAME
+
+CGI::HTML::Functions - Documentation for CGI.pm's Legacy HTML Functions
+
+=head1 SYNOPIS
+
+Nothing here - please do not use these functions, they are considered to
+be legacy and essentially deprecated. This documentation exists solely to
+aid in maintenance and migration of legacy code using these functions.
+
+These functions are likely to be removed in future versions of CGI.pm so
+you are strongly encouraged to migrate away from them. If you are working
+on new code you should be using a template engine. For more information see
+L<CGI::Alternatives>.
+
+=head1 DESCRIPTION
+
+The documentation here should be considered an addendum to the sections in the
+L<CGI> documentation - the sections here are named the same as those within the
+CGI perldoc.
+
+=head1 Calling CGI.pm routines
+
+HTML tag functions have both attributes (the attribute="value" pairs within the
+tag itself) and contents (the part between the opening and closing pairs). To
+distinguish between attributes and contents, CGI.pm uses the convention of
+passing HTML attributes as a hash reference as the first argument, and the
+contents, if any, as any subsequent arguments.  It works out like
+this:
+
+    Code                           Generated HTML
+    ----                           --------------
+    h1()                           <h1 />
+    h1('some','contents');         <h1>some contents</h1>
+    h1({-align=>left});            <h1 align="LEFT">
+    h1({-align=>left},'contents'); <h1 align="LEFT">contents</h1>
+
+Many newcomers to CGI.pm are puzzled by the difference between the calling
+conventions for the HTML shortcuts, which require curly braces around the HTML
+tag attributes, and the calling conventions for other routines, which manage
+to generate attributes without the curly brackets. Don't be confused. As a
+convenience the curly braces are optional in all but the HTML shortcuts. If you
+like, you can use curly braces when calling any routine that takes named
+arguments. For example:
+
+    print $q->header( { -type => 'image/gif', -expires => '+3d' } );
+
+If you use warnings, you will be warned that some CGI.pm argument names
+conflict with built-in perl functions. The most frequent of these is the
+-values argument, used to create multi-valued menus, radio button clusters
+and the like. To get around this warning, you have several choices:
+
+=over 4
+
+=item 1.
+
+Use another name for the argument, if one is available. 
+For example, -value is an alias for -values.
+
+=item 2.
+
+Change the capitalization, e.g. -Values
+
+=item 3.
+
+Put quotes around the argument name, e.g. '-values'
+
+=back
+
+
+
+=head1 BUGS
+
+Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
+
+The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
+
+However as stated these functions are no longer being maintained and are
+considered deprecated. Any feature requests, bug reports, issues, pull
+requests, etc, for these functions will almost certainly be closed without
+any action being taken place - this includes fixes to utterly broken page
+rendering, invalid HTML, nonsensical output, and annoyances.
+
+=head1 SEE ALSO
+
+L<CGI> - The original source of these functions
+
+=cut
