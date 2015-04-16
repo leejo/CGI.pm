@@ -2689,8 +2689,16 @@ sub url {
 	if ( defined( $ENV{PATH_INFO} ) ) {
 		# IIS sometimes sets PATH_INFO to the same value as SCRIPT_NAME so only sub it out
 		# if SCRIPT_NAME isn't defined or isn't the same value as PATH_INFO
-    	$uri =~ s/\Q$ENV{PATH_INFO}\E$//
+		$uri =~ s/\Q$ENV{PATH_INFO}\E$//
 			if ( ! defined( $ENV{SCRIPT_NAME} ) or $ENV{PATH_INFO} ne $ENV{SCRIPT_NAME} );
+
+		# if we're not IIS then keep to spec, the relevant info is here:
+		# https://tools.ietf.org/html/rfc3875#section-4.1.13, namely
+		# "No PATH_INFO segment (see section 4.1.5) is included in the
+		# SCRIPT_NAME value." (see GH #126, GH #152, GH #176)
+		if ( ! $IIS ) {
+			$uri =~ s/\Q$ENV{PATH_INFO}\E$//;
+		}
 	}
 
     if ($full) {
