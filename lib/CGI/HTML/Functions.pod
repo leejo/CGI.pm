@@ -1,15 +1,15 @@
 =head1 NAME
 
-CGI::HTML::Functions - Documentation for CGI.pm's Legacy HTML Functions
+CGI::HTML::Functions - Documentation for CGI.pm Legacy HTML Functionality
 
 =head1 SYNOPIS
 
-Nothing here - please do not use these functions, they are considered to
+Nothing here - please do not use this functionality, it is considered to
 be legacy and essentially deprecated. This documentation exists solely to
-aid in maintenance and migration of legacy code using these functions.
+aid in maintenance and migration of legacy code using this functionality.
 
-These functions are likely to be removed in future versions of CGI.pm so
-you are strongly encouraged to migrate away from them. If you are working
+This functionality is likely to be removed in future versions of CGI.pm so
+you are strongly encouraged to migrate away from it. If you are working
 on new code you should be using a template engine. For more information see
 L<CGI::Alternatives>.
 
@@ -67,6 +67,102 @@ Put quotes around the argument name, e.g. '-values'
 
 =back
 
+=head2 Function-oriented interface HTML exports
+
+Here is a list of the HTML related function sets you can import:
+
+=over 4
+
+=item B<:form>
+
+Import all fill-out form generating methods, such as B<textfield()>.
+
+=item B<:html2>
+
+Import all methods that generate HTML 2.0 standard elements.
+
+=item B<:html3>
+
+Import all methods that generate HTML 3.0 elements (such as
+<table>, <super> and <sub>).
+
+=item B<:html4>
+
+Import all methods that generate HTML 4 elements (such as
+<abbrev>, <acronym> and <thead>).
+
+=item B<:netscape>
+
+Import the <blink>, <fontsize> and <center> tags. 
+
+=item B<:html>
+
+Import all HTML-generating shortcuts (i.e. 'html2', 'html3', 'html4' and 'netscape')
+
+=item B<:standard>
+
+Import "standard" features, 'html2', 'html3', 'html4', 'ssl', 'form' and 'cgi'.
+
+=back
+
+If you import any of the state-maintaining CGI or form-generating methods,
+a default CGI object will be created and initialized automatically the first
+time you use any of the methods that require one to be present. This includes
+B<param()>, B<textfield()>, B<submit()> and the like. (If you need direct access
+to the CGI object, you can find it in the global variable B<$CGI::Q>).
+
+=head2 Pragmas
+
+Additional HTML generation related pragms:
+
+=over 4
+
+=item -nosticky
+
+By default the CGI module implements a state-preserving behavior called
+"sticky" fields. The way this works is that if you are regenerating a form,
+the methods that generate the form field values will interrogate param()
+to see if similarly-named parameters are present in the query string. If
+they find a like-named parameter, they will use it to set their default values.
+
+Sometimes this isn't what you want. The B<-nosticky> pragma prevents this
+behavior. You can also selectively change the sticky behavior in each element
+that you generate.
+
+=item -tabindex
+
+Automatically add tab index attributes to each form field. With this option
+turned off, you can still add tab indexes manually by passing a -tabindex
+option to each field-generating method.
+
+=item -no_xhtml
+
+By default, CGI.pm versions 2.69 and higher emit XHTML
+(http://www.w3.org/TR/xhtml1/). The -no_xhtml pragma disables this feature.
+Thanks to Michalis Kabrianis <kabrianis@hellug.gr> for this feature.
+
+If start_html()'s -dtd parameter specifies an HTML 2.0, 3.2, 4.0 or 4.01 DTD,
+XHTML will automatically be disabled without needing to use this pragma.
+
+=back
+
+=head2 Special forms for importing HTML-tag functions
+
+Many of the methods generate HTML tags. As described below, tag functions
+automatically generate both the opening and closing tags. For example:
+
+    print h1('Level 1 Header');
+
+produces
+
+    <h1>Level 1 Header</h1>
+
+There will be some times when you want to produce the start and end tags
+yourself. In this case, you can use the form start_I<tag_name> and
+end_I<tag_name>, as in:
+
+    print start_h1,'Level 1 Header',end_h1;
+
 
 
 =head1 BUGS
@@ -75,14 +171,14 @@ Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 
 The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
 
-However as stated these functions are no longer being maintained and are
+However as stated this functionality is no longer being maintained and is
 considered deprecated. Any feature requests, bug reports, issues, pull
-requests, etc, for these functions will almost certainly be closed without
+requests, etc, for this functionality will almost certainly be closed without
 any action being taken place - this includes fixes to utterly broken page
 rendering, invalid HTML, nonsensical output, and annoyances.
 
 =head1 SEE ALSO
 
-L<CGI> - The original source of these functions
+L<CGI> - The original source of this functionality
 
 =cut
