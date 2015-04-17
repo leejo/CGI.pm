@@ -288,7 +288,7 @@ To create an empty query, initialize it from an empty string or hash:
 
     my @keywords = $query->keywords
 
-If the script was invoked as the result of an <ISINDEX> search, the parsed
+If the script was invoked as the result of an ISINDEX search, the parsed
 keywords can be obtained as an array using the keywords() method.
 
 ## Fetching the names of all the parameters passed to your script:
@@ -300,7 +300,7 @@ keywords can be obtained as an array using the keywords() method.
 If the script was invoked with a parameter list
 (e.g. "name1=value1&name2=value2&name3=value3"), the param() / multi\_param()
 methods will return the parameter names as a list. If the script was invoked
-as an <ISINDEX> script and contains a string without ampersands
+as an ISINDEX script and contains a string without ampersands
 (e.g. "value1+value2+value3"), there will be a single parameter named
 "keywords" containing the "+"-delimited keywords.
 
