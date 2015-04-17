@@ -5,10 +5,16 @@
 
 $| = 1;
 
-use Test::More tests => 77;
+use Test::More tests => 80;
 use Test::Deep;
 use Config;
-use_ok ( 'CGI::Util', qw(escape unescape rearrange) );
+use_ok ( 'CGI::Util', qw(
+	escape
+	unescape
+	rearrange
+	ebcdic2ascii
+	ascii2ebcdic
+) );
 
 # ASCII order, ASCII codepoints, ASCII repertoire
 
@@ -79,3 +85,6 @@ for ( 1 .. 20 ) {
 	);
 }
 
+ok( CGI::Util::utf8_chr( "1",1 ),'utf8_chr' );
+ok( my $ebcdic = ascii2ebcdic( "A" ),'ascii2ebcdic' );
+is( ebcdic2ascii( $ebcdic ),'A','ebcdic2ascii' );

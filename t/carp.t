@@ -3,7 +3,7 @@
 
 use strict;
 
-use Test::More tests => 64;
+use Test::More tests => 71;
 use IO::Handle;
 
 use CGI::Carp;
@@ -425,3 +425,16 @@ untie *STDOUT;
  like $result[0] => qr/Message ToBrowser/, 'die message for ToBrowser = 0 is OK';
  ok !$result[1], 'No output for ToBrowser = 0';
 
+*CGI::Carp::die = sub { &$CGI::Carp::DIE_HANDLER; return 1 };
+*CGI::Carp::warn = sub { return 1 };
+
+CGI::Carp::set_die_handler( sub { pass( "die handler" ); return 1 } );
+ok( CGI::Carp::confess(),'confess' );
+ok( CGI::Carp::croak(),'croak' );
+ok( CGI::Carp::carp(),'carp' );
+ok( CGI::Carp::cluck(),'cluck' );
+
+use File::Temp;
+my $fh = File::Temp->new;
+
+ok( CGI::Carp::carpout( $fh ),'carpout' );

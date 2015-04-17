@@ -82,6 +82,7 @@ sub do_sleep {
         sleep($delay);
     } else {
         select(undef,undef,undef,$delay);
+		return $delay;
     }
 }
 

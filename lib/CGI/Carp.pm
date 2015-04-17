@@ -494,7 +494,7 @@ sub carpout {
     
     open(SAVEERR, ">&STDERR");
     open(STDERR, ">&$no") or 
-	( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
+	( print SAVEERR "Unable to redirect >&$no: $!\n" and exit(1) );
 }
 
 sub warningsToBrowser {

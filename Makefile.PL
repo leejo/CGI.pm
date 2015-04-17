@@ -1,8 +1,6 @@
 use ExtUtils::MakeMaker;
 my $mm = $ExtUtils::MakeMaker::VERSION;
 
-system( "perl", "t/gen-tests/gen-start-end-tags.pl" );
-
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(

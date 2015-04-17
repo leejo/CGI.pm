@@ -12,6 +12,10 @@
     - All *documentation* for HTML functionality in CGI has been moved into
       its own namespace: CGI::HTML::Functions - although the functionality
       continues to exist within CGI.pm so there are no code changes required
+      (GH #142)
+
+    [ TESTING ]
+    - Increase test coverage (GH #3)
 
     [ INTERNALS ]
     - Cwd made a TEST_REQUIRES rather than a BUILD_REQUIRES in Makefile.PL

@@ -9,18 +9,7 @@ ok( my $q = CGI::Push->new(), 'create a new CGI::Push object' );
 # test the simple_counter() method
 like( join('', $q->simple_counter(10)) , '/updated.+?10.+?times./', 'counter' );
 
-# test do_sleep, except we don't want to bog down the tests
-# there's also a potential timing-related failure lurking here
-# change this variable at your own risk
-my $sleep_in_tests = 0;
-
-SKIP: {
-	skip( 'do_sleep() test may take a while', 1 ) unless $sleep_in_tests;
-
-	my $time = time;
-	CGI::Push::do_sleep(2);
-	is(time - $time, 2, 'slept for a while' );
-}
+ok( CGI::Push::do_sleep(0.01),'do_sleep' );
 
 # test push_delay()
 ok( ! defined $q->push_delay(), 'no initial delay' );

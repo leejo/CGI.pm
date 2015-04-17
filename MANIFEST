@@ -34,7 +34,6 @@ t/delete.t
 t/end_form.t
 t/form.t
 t/function.t
-t/gen-tests/gen-start-end-tags.pl
 t/gh-155.t
 t/headers.t
 t/headers/attachment.t
