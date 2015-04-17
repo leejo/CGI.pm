@@ -122,8 +122,7 @@ file or database and recreate them. Because each object corresponds to the
 independent of the others, this allows you to save the state of the
 script and restore it later.
 
-For example, using the object oriented style, here is how you create
-a simple "Hello World" HTML page:
+For example, using the object oriented style:
 
     #!/usr/bin/env perl
 
@@ -541,8 +540,8 @@ Errors can occur while processing user input, particularly when processing
 uploaded files. When these errors occur, CGI will stop processing and return
 an empty parameter list. You can test for the existence and nature of errors
 using the I<cgi_error()> function. The error messages are formatted as HTTP
-status codes. You can either incorporate the error text into an HTML page, or
-use it as the value of the HTTP status:
+status codes. You can either incorporate the error text into a page, or use
+it as the value of the HTTP status:
 
     if ( my $error = $q->cgi_error ) {
         print $q->header( -status => $error );
@@ -1700,8 +1699,8 @@ be returned to the browser as the CGI script's status code. For example:
    }
 
 However it isn't clear that any browser currently knows what to do with this
-status code. It might be better just to create an HTML page that warns the user
-of the problem.
+status code. It might be better just to create a page that warns the user of
+the problem.
 
 =head1 COMPATIBILITY WITH CGI-LIB.PL
 
