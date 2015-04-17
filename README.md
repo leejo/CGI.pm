@@ -124,8 +124,7 @@ file or database and recreate them. Because each object corresponds to the
 independent of the others, this allows you to save the state of the
 script and restore it later.
 
-For example, using the object oriented style, here is how you create
-a simple "Hello World" HTML page:
+For example, using the object oriented style:
 
     #!/usr/bin/env perl
 
@@ -223,7 +222,7 @@ This will produce the following nonstandard HTTP header:
 
 Notice the way that underscores are translated automatically into hyphens.
 
-## Creating a new query object (object-oriented style):
+## Creating a new query object (object-oriented style)
 
     my $query = CGI->new;
 
@@ -284,14 +283,14 @@ To create an empty query, initialize it from an empty string or hash:
 
     my $empty_query = CGI->new({});
 
-## Fetching a list of keywords from the query:
+## Fetching a list of keywords from the query
 
     my @keywords = $query->keywords
 
 If the script was invoked as the result of an ISINDEX search, the parsed
 keywords can be obtained as an array using the keywords() method.
 
-## Fetching the names of all the parameters passed to your script:
+## Fetching the names of all the parameters passed to your script
 
     my @names = $query->multi_param
 
@@ -309,7 +308,7 @@ submitted by the browser. Usually this order is the same as the order in which
 the parameters are defined in the form (however, this isn't part of the spec,
 and so isn't guaranteed).
 
-## Fetching the value or values of a single named parameter:
+## Fetching the value or values of a single named parameter
 
     my @values = $query->multi_param('foo');
 
@@ -352,7 +351,7 @@ it will be returned as an empty string.
 If the parameter does not exist at all, then param() will return undef in scalar
 context, and the empty list in a list context.
 
-## Setting the value(s) of a named parameter:
+## Setting the value(s) of a named parameter
 
     $query->param('foo','an','array','of','values');
 
@@ -375,7 +374,7 @@ detail later:
         -value => 'the value',
     );
 
-## Appending additional values to a named parameter:
+## Appending additional values to a named parameter
 
     $query->append(
         -name   =>'foo',
@@ -387,7 +386,7 @@ appended to the end of the parameter if it already exists. Otherwise the
 parameter is created. Note that this method only recognizes the named argument
 calling syntax.
 
-## Importing all parameters into a namespace:
+## Importing all parameters into a namespace
 
     $query->import_names('R');
 
@@ -404,7 +403,7 @@ CGI variables by name.
 In fact, you should probably not use this method at all given the above caveats
 and security risks.
 
-## Deleting a parameter completely:
+## Deleting a parameter completely
 
     $query->delete('foo','bar','baz');
 
@@ -414,7 +413,7 @@ parameters that you don't want passed down between script invocations.
 If you are using the function call interface, use "Delete()" instead to avoid
 conflicts with perl's built-in delete operator.
 
-## Deleting all parameters:
+## Deleting all parameters
 
     $query->delete_all();
 
@@ -444,7 +443,7 @@ PUTDATA/POSTDATA are also available via
 and as [file uploads](#processing-a-file-upload-field) via ["-putdata\_upload"](#putdata_upload)
 option.
 
-## Direct access to the parameter list:
+## Direct access to the parameter list
 
     $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
     unshift @{$q->param_fetch(-name=>'address')},'George Munster';
@@ -457,7 +456,7 @@ manipulate in any way you like.
 
 You can also use a named argument style using the **-name** argument.
 
-## Fetching the parameter list as a hash:
+## Fetching the parameter list as a hash
 
     my $params = $q->Vars;
     print $params->{'address'};
@@ -486,7 +485,7 @@ versions with array references.
 If you wish to use Vars() as a function, import the _:cgi-lib_ set of function
 calls (also see the section on CGI-LIB compatibility).
 
-## Saving the state of the script to a file:
+## Saving the state of the script to a file
 
     $query->save(\*FILEHANDLE)
 
@@ -542,8 +541,8 @@ Errors can occur while processing user input, particularly when processing
 uploaded files. When these errors occur, CGI will stop processing and return
 an empty parameter list. You can test for the existence and nature of errors
 using the _cgi\_error()_ function. The error messages are formatted as HTTP
-status codes. You can either incorporate the error text into an HTML page, or
-use it as the value of the HTTP status:
+status codes. You can either incorporate the error text into a page, or use
+it as the value of the HTTP status:
 
     if ( my $error = $q->cgi_error ) {
         print $q->header( -status => $error );
@@ -699,7 +698,7 @@ Each of these functions produces a fragment of HTTP which you can print out
 directly so that it is processed by the browser, appended to a string, or saved
 to a file for later use.
 
-## Creating a standard http header:
+## Creating a standard http header
 
 Normally the first thing you will do in any CGI script is print out an HTTP
 header. This tells the browser what type of document to expect, and gives other
@@ -853,7 +852,7 @@ to another status code if you wish.
 Note that the human-readable phrase is also expected to be present to conform
 with RFC 2616, section 6.1.
 
-## Creating a self-referencing url that preserves state information:
+## Creating a self-referencing url that preserves state information
 
     my $myself = $q->self_url;
     print qq(<a href="$myself">I'm talking to myself.</a>);
@@ -1665,8 +1664,8 @@ be returned to the browser as the CGI script's status code. For example:
     }
 
 However it isn't clear that any browser currently knows what to do with this
-status code. It might be better just to create an HTML page that warns the user
-of the problem.
+status code. It might be better just to create a page that warns the user of
+the problem.
 
 # COMPATIBILITY WITH CGI-LIB.PL
 
