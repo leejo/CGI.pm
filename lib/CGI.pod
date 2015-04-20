@@ -463,7 +463,7 @@ You can also use a named argument style using the B<-name> argument.
     my %params = $q->Vars;
 
     use CGI ':cgi-lib';
-    my $params = Vars;
+    my $params = Vars();
 
 Many people want to fetch the entire parameter list as a hash in which the keys
 are the names of the CGI parameters, and the values are the parameters' values.
@@ -1045,7 +1045,7 @@ CGI::File::Temp - B<DO NOT USE THIS PACKAGE DIRECTLY>). As a consequence the
 PRIVATE_TEMPFILES variable has been removed along with deprecation of the
 private_tempfiles routine and B<complete> removal of the CGITempFile package.
 The $CGITempFile::TMPDIRECTORY is no longer used to set the temp directory,
-refer to the perldoc for File::Temp is you want to override the default
+refer to the perldoc for File::Temp if you want to override the default
 settings in that package (the TMPDIR env variable is still available on some
 platforms). For Windows platforms the temporary directory order remains
 as before: TEMP > TMP > WINDIR ( > TMPDIR ) so if you have any of these in
