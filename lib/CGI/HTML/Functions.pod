@@ -2,7 +2,7 @@
 
 CGI::HTML::Functions - Documentation for CGI.pm Legacy HTML Functionality
 
-=head1 SYNOPIS
+=head1 SYNOPSIS
 
 Nothing here - please do not use this functionality, it is considered to
 be legacy and essentially deprecated. This documentation exists solely to
