@@ -1824,7 +1824,11 @@ dependent, please provide information about the affected browsers as well.
 
 Failing tests cases are appreciated with issues, and if you submit a patch then
 it will *not* be accepted unless you provide a reasonable automated test case
-with it (please see the existing tests in t/ for examples)
+with it (please see the existing tests in t/ for examples).
+
+Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
+Features requests and none critical issues will be outright rejected. The module
+is now in maintenance mode for critical issues only.
 
 =head1 SEE ALSO
 

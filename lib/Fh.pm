@@ -2,6 +2,6 @@
 # that the filehandle object is a Fh
 package Fh;
 
-$Fh::VERSION = '4.15';
+$Fh::VERSION = '4.20';
 
 1;

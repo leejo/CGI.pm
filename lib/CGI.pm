@@ -3,7 +3,7 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.15';
+$CGI::VERSION='4.20';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -22,11 +22,7 @@ $POST_MAX            = -1; # no limit to uploaded files
 $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
-
-# the hexadecimal 0x8b and 0x9b characters, which many windows-based browsers
-# interpret as the left and right angle-bracket characters, are replaced by
-# their numeric HTML entities ("&#139" and "&#155;")
-$ENCODE_ENTITIES     = q{&<>"\x8b\x9b'};
+$ENCODE_ENTITIES     = q{&<>"'};
 
 @SAVED_SYMBOLS = ();
 

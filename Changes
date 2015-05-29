@@ -1,6 +1,10 @@
-4.15 2015-04-20
+4.20 2015-05-29
 
     [ RELEASE NOTES ]
+    - CGI.pm is now considered "done". See also "mature" and "legacy"
+      Features requests and none critical issues will be outright rejected.
+      The module is now in maintenance mode for critical issues only.
+
     - This release removes the AUTOLOAD and compile optimisations from CGI.pm
       that were introduced into CGI.pm twenty (20) years ago as a response to
       its large size, which meant there was a significant compile time penalty.
@@ -49,11 +53,13 @@
     [ FEATURES ]
     - CGI::Carp now has $CGI::Carp::FULL_PATH for displaying the full path to the
       offending script in error messages
-    - CGI now has env_query_string() for getting the value of QUERY_STRING from the
-      environment and not that fiddled with by CGI.pm (which is what query_string()
-      does) (GH #161)
-    - CGI::ENCODE_ENTITIES var added to control which chracters are encoded by the
-      call to the HTML::Entities module - defaults to &<>"\x8b\x9b' (GH #157)
+    - CGI now has env_query_string() for getting the value of QUERY_STRING from
+      the environment and not that fiddled with by CGI.pm (which is what
+      query_string() does) (GH #161)
+    - CGI::ENCODE_ENTITIES var added to control which chracters are encoded by
+      the call to the HTML::Entities module - defaults to &<>"' (GH #157 - the
+      \x8b and \x9b chars have been removed from this list as we are concerned
+      more about unicode compat these days than old browser support.)
 
     [ DOCUMENTATION ]
     - Fix some typos (GH #173, GH #174)

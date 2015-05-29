@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-use Test::More tests => 42;
+use Test::More tests => 40;
 
 END { ok $loaded; }
 use CGI ( ':standard', '-no_debug', '*h3', 'start_table' );
@@ -181,13 +181,8 @@ is start_h3, '<h3>';
 is end_h3, '</h3>';
 
 is start_table( { -border => undef } ), '<table border>';
-is h1( escapeHTML("this is <not> \x8bright\x9b") ),
-  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
 
 charset('utf-8');
-
-is h1( escapeHTML("this is <not> \x8bright\x9b") ),
-  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
 
 my $old_encode = $CGI::ENCODE_ENTITIES;
 $CGI::ENCODE_ENTITIES = '<';

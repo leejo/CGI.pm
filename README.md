@@ -464,7 +464,7 @@ You can also use a named argument style using the **-name** argument.
     my %params = $q->Vars;
 
     use CGI ':cgi-lib';
-    my $params = Vars;
+    my $params = Vars();
 
 Many people want to fetch the entire parameter list as a hash in which the keys
 are the names of the CGI parameters, and the values are the parameters' values.
@@ -1034,7 +1034,7 @@ CGI::File::Temp - **DO NOT USE THIS PACKAGE DIRECTLY**). As a consequence the
 PRIVATE\_TEMPFILES variable has been removed along with deprecation of the
 private\_tempfiles routine and **complete** removal of the CGITempFile package.
 The $CGITempFile::TMPDIRECTORY is no longer used to set the temp directory,
-refer to the perldoc for File::Temp is you want to override the default
+refer to the perldoc for File::Temp if you want to override the default
 settings in that package (the TMPDIR env variable is still available on some
 platforms). For Windows platforms the temporary directory order remains
 as before: TEMP > TMP > WINDIR ( > TMPDIR ) so if you have any of these in
@@ -1764,7 +1764,11 @@ dependent, please provide information about the affected browsers as well.
 
 Failing tests cases are appreciated with issues, and if you submit a patch then
 it will \*not\* be accepted unless you provide a reasonable automated test case
-with it (please see the existing tests in t/ for examples)
+with it (please see the existing tests in t/ for examples).
+
+Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
+Features requests and none critical issues will be outright rejected. The module
+is now in maintenance mode for critical issues only.
 
 # SEE ALSO
 
