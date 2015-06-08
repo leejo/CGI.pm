@@ -135,6 +135,21 @@ ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
  ok(eval { $rawhandle->seek(0, 2); 1 }, "can call seek() on handle result");
 }
 
+# tmpFileName with a filename (this is documented, and worked in 3.x)
+TODO: {
+    local $TODO = 'https://github.com/leejo/CGI.pm/issues/178';
+    ok($q->tmpFileName("300x300.gif"), 'tmpFileName(param(field)) works');
+    my $fn = $q->tmpFileName("300x300.gif");
+    ok(-s $fn == 1656, 'tmpFileName result has desired size');
+}
+
+# tmpFileName with a file-handle (this works in 4.09)
+{
+    ok($q->tmpFileName($q->upload("300x300_gif")), 'tmpFileName(upload(field)) works');
+    my $fn = $q->tmpFileName($q->upload("300x300_gif"));
+    ok(-s $fn == 1656, 'tmpFileName result has desired size');
+}
+
 my $q2 = CGI->new;
 
 {
