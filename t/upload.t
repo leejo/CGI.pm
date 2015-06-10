@@ -149,8 +149,7 @@ ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
 }
 # the API and documentation make it look as though this ought to work, and
 # it did in some versions, but is non-optimal; using the ref is better
-TODO: {
-    local $TODO = 'https://github.com/leejo/CGI.pm/issues/178';
+{
     ok($q->tmpFileName($q->param("300x300_gif").""), 'tmpFileName(stringified param) works');
     my $fn = $q->tmpFileName($q->param("300x300_gif")."");
     ok(-s $fn == 1656, 'tmpFileName(stringified param) result has desired size');

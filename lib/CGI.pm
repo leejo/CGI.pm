@@ -3547,7 +3547,23 @@ sub upload {
 
 sub tmpFileName {
     my($self,$filename) = self_or_default(@_);
-    return $self->{'.tmpfiles'}->{$$filename . $filename}->{name} || '';
+
+    # preferred calling convention: $filename came directly from param or upload
+    if (ref $filename) {
+        return $self->{'.tmpfiles'}->{$$filename . $filename}->{name} || '';
+    }
+
+    # backwards compatible with older versions: $filename is merely equal to
+    # one of our filenames when compared as strings
+    foreach my $param_name ($self->param) {
+        foreach my $filehandle ($self->multi_param($param_name)) {
+            if ($filehandle eq $filename) {
+                return $self->{'.tmpfiles'}->{$$filehandle . $filehandle}->{name} || '';
+            }
+        }
+    }
+
+    return '';
 }
 
 sub uploadInfo {
