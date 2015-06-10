@@ -135,6 +135,31 @@ ok( defined $q->upload('300x300_gif')       , 'upload_basic_4' );
  ok(eval { $rawhandle->seek(0, 2); 1 }, "can call seek() on handle result");
 }
 
+# param returns a blessed reference, so this always worked
+{
+    ok($q->tmpFileName($q->param("300x300_gif")), 'tmpFileName(param(field)) works');
+    my $fn = $q->tmpFileName($q->param("300x300_gif"));
+    ok(-s $fn == 1656, 'tmpFileName(param(field)) result has desired size');
+}
+# upload returns a blessed reference, so this always worked
+{
+    ok($q->tmpFileName($q->upload("300x300_gif")), 'tmpFileName(upload(field)) works');
+    my $fn = $q->tmpFileName($q->upload("300x300_gif"));
+    ok(-s $fn == 1656, 'tmpFileName result has desired size');
+}
+# the API and documentation make it look as though this ought to work, and
+# it did in some versions, but is non-optimal; using the ref is better
+TODO: {
+    local $TODO = 'https://github.com/leejo/CGI.pm/issues/178';
+    ok($q->tmpFileName($q->param("300x300_gif").""), 'tmpFileName(stringified param) works');
+    my $fn = $q->tmpFileName($q->param("300x300_gif")."");
+    ok(-s $fn == 1656, 'tmpFileName(stringified param) result has desired size');
+    # equivalent to the above
+    ok($q->tmpFileName("300x300.gif"), 'tmpFileName(string) works');
+    $fn = $q->tmpFileName("300x300.gif");
+    ok(-s $fn == 1656, 'tmpFileName(string) result has desired size');
+}
+
 my $q2 = CGI->new;
 
 {
