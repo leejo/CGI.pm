@@ -993,17 +993,17 @@ with it in the format of headers. The information usually includes the MIME
 content type. To retrieve this information, call uploadInfo(). It returns a
 reference to a hash containing all the document headers.
 
-    my $filename = $q->param( 'uploaded_file' );
-    my $type     = $q->uploadInfo( $filename )->{'Content-Type'};
+    my $filehandle = $q->upload( 'uploaded_file' );
+    my $type       = $q->uploadInfo( $filehandle )->{'Content-Type'};
     if ( $type ne 'text/html' ) {
         die "HTML FILES ONLY!";
     }
 
-Note that you must use ->param to get the filename to pass into uploadInfo as
-internally this is represented as a File::Temp object (which is what will be
-returned by ->param). When using ->Vars you will get the literal filename
-rather than the File::Temp object, which will not return anything when passed to
-uploadInfo. So don't use ->Vars.
+Note that you must use ->upload or ->param to get the file-handle to pass into
+uploadInfo as internally this is represented as a File::Temp object (which is
+what will be returned by ->upload or ->param). When using ->Vars you will get
+the literal filename rather than the File::Temp object, which will not return
+anything when passed to uploadInfo. So don't use ->Vars.
 
 If you are using a machine that recognizes "text" and "binary" data modes, be
 sure to understand when and how to use them (see the Camel book). Otherwise
@@ -1017,8 +1017,12 @@ file handle, CGI.pm unlinks (deletes) the temporary file. If you need to you
 can access the temporary file directly. You can access the temp file for a file
 upload by passing the file name to the tmpFileName() method:
 
-    my $filename    = $query->param( 'uploaded_file' );
-    my $tmpfilename = $query->tmpFileName( $filename );
+    my $filehandle  = $query->upload( 'uploaded_file' );
+    my $tmpfilename = $query->tmpFileName( $filehandle );
+
+As with ->uploadInfo, using the reference returned by ->upload
+or ->param is preferred, although unlike ->uploadInfo, plain filenames
+also work if possible for backwards compatibility.
 
 The temporary file will be deleted automatically when your program exits unless
 you manually rename it or set $CGI::UNLINK\_TMP\_FILES to 0. On some operating
