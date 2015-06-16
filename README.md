@@ -1020,9 +1020,9 @@ upload by passing the file name to the tmpFileName() method:
     my $filehandle  = $query->upload( 'uploaded_file' );
     my $tmpfilename = $query->tmpFileName( $filehandle );
 
-As with ->uploadInfo, using the reference returned by ->upload
-or ->param is preferred, although unlike ->uploadInfo, plain filenames
-also work if possible for backwards compatibility.
+As with ->uploadInfo, using the reference returned by ->upload or ->param is
+preferred, although unlike ->uploadInfo, plain filenames also work if possible
+for backwards compatibility.
 
 The temporary file will be deleted automatically when your program exits unless
 you manually rename it or set $CGI::UNLINK\_TMP\_FILES to 0. On some operating
@@ -1771,7 +1771,7 @@ it will \*not\* be accepted unless you provide a reasonable automated test case
 with it (please see the existing tests in t/ for examples).
 
 Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
-Features requests and none critical issues will be outright rejected. The module
+Feature requests and none critical issues will be outright rejected. The module
 is now in maintenance mode for critical issues only.
 
 # SEE ALSO

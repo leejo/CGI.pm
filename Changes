@@ -1,4 +1,4 @@
-4.20 2015-05-29
+4.21 2015-06-16
 
     [ RELEASE NOTES ]
     - CGI.pm is now considered "done". See also "mature" and "legacy"
@@ -49,6 +49,8 @@
     - Fix imports when called from CGI::Fast, restores the import of CGI functions
       into the callers namespace for users of CGI::Fast (GH leejo/cgi-fast#11 and
       GH leejo/cgi-fast#12)
+    - Fix regression of tmpFileName when calling with a plain string (GH #178,
+      thanks to Simon McVittie for the report and fix)
 
     [ FEATURES ]
     - CGI::Carp now has $CGI::Carp::FULL_PATH for displaying the full path to the
