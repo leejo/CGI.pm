@@ -1,5 +1,6 @@
 package CGI;
 require 5.008001;
+use warnings;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
@@ -1665,7 +1666,7 @@ sub start_html {
     $self->element_id(0);
     $self->element_tab(0);
 
-    $encoding = lc($self->charset) unless defined $encoding;
+    $encoding = lc(defined( $self->charset ) ? $self->charset : '') unless defined $encoding;
 
     # Need to sort out the DTD before it's okay to call escapeHTML().
     my(@result,$xml_dtd);
@@ -1808,7 +1809,7 @@ sub _style {
        }
 
       } else {
-           my $src = $s;
+           my $src = defined( $s ) ? $s : '';
            push(@result,$XHTML ? qq(<link rel="$rel" type="$type" href="$src" $other/>)
                                : qq(<link rel="$rel" type="$type" href="$src"$other>));
       }
@@ -1881,6 +1882,7 @@ sub end_html {
 sub isindex {
     my($self,@p) = self_or_default(@_);
     my($action,@other) = rearrange([ACTION],@p);
+	$action = defined( $action ) ? $action : '';
     $action = qq/ action="$action"/ if $action;
     my($other) = @other ? " @other" : '';
     return $XHTML ? "<isindex$action$other />" : "<isindex$action$other>";
@@ -2182,6 +2184,7 @@ sub checkbox {
        rearrange([NAME,[CHECKED,SELECTED,ON],VALUE,LABEL,LABELATTRIBUTES,
                    [OVERRIDE,FORCE],TABINDEX],@p);
 
+	$name  = defined $name  ? $name : '';
     $value = defined $value ? $value : 'on';
 
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
@@ -2321,12 +2324,14 @@ sub _box_group {
                   ],@_);
 
 
+	$name = defined( $name ) ? $name : '';
     my($result,$checked,@elements,@values);
 
     @values = $self->_set_values_and_labels($values,\$labels,$name);
     my %checked = $self->previous_or_default($name,$defaults,$override);
 
     # If no check array is specified, check the first by default
+	$values[0] = defined( $values[0] ) ? $values[0] : '';
     $checked{$values[0]}++ if $box_type eq 'radio' && !%checked;
 
     $name=$self->_maybe_escapeHTML($name);
@@ -2539,6 +2544,7 @@ sub scrolling_list {
 	= rearrange([NAME,[VALUES,VALUE],[DEFAULTS,DEFAULT],
           SIZE,MULTIPLE,LABELS,ATTRIBUTES,[OVERRIDE,FORCE],TABINDEX],@p);
 
+	$name = defined( $name ) ? $name : '';
     my($result,@values);
     @values = $self->_set_values_and_labels($values,\$labels,$name);
 
@@ -2598,7 +2604,7 @@ sub hidden {
 	rearrange([NAME,[DEFAULT,VALUE,VALUES],[OVERRIDE,FORCE]],@p);
 
     my $do_override = 0;
-    if ( ref($p[0]) || substr($p[0],0,1) eq '-') {
+    if ( defined($p[0]) && (ref($p[0]) || substr($p[0],0,1) eq '-')) {
 	@value = ref($default) ? @{$default} : $default;
 	$do_override = $override;
     } else {
@@ -2634,6 +2640,8 @@ sub image_button {
 
     my($name,$src,$alignment,@other) =
 	rearrange([NAME,SRC,ALIGN],@p);
+	$name = defined( $name ) ? $name : '';
+	$src = defined( $src ) ? $src : '';
 
     my($align) = $alignment ? " align=\L\"$alignment\"" : '';
     my($other) = @other ? " @other" : '';
@@ -3149,7 +3157,7 @@ sub https {
 sub protocol {
     local($^W)=0;
     my $self = shift;
-    return 'https' if uc($self->https()) eq 'ON'; 
+    return 'https' if $self->https && uc($self->https) eq 'ON'; 
     return 'https' if $self->server_port == 443;
     my $prot = $self->server_protocol;
     my($protocol,$version) = split('/',$prot);
@@ -3249,6 +3257,8 @@ sub previous_or_default {
     my($self,$name,$defaults,$override) = @_;
     my(%selected);
 
+	$name = defined( $name ) ? $name : '';
+
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined($self->param($name)) ) ) {
 	$selected{$_}++ for $self->param($name);
@@ -3264,6 +3274,7 @@ sub previous_or_default {
 
 sub register_parameter {
     my($self,$param) = @_;
+	$param = defined( $param ) ? $param : '';
     $self->{'.parametersToAdd'}->{$param}++;
 }
 

@@ -10,6 +10,7 @@ WriteMakefile(
     NAME             => 'CGI',
     DISTNAME         => 'CGI',
     VERSION_FROM     => 'lib/CGI.pm',
+    LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.8.1',
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
