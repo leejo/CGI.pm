@@ -436,7 +436,6 @@ sub param {
     my @result = @{$self->{param}{$name}};
 
     if ($PARAM_UTF8 && $name ne 'PUTDATA' && $name ne 'POSTDATA') {
-      eval "require Encode; 1;" unless Encode->can('decode'); # bring in these functions
       @result = map {ref $_ ? $_ : $self->_decode_utf8($_) } @result;
     }
 
@@ -445,6 +444,8 @@ sub param {
 
 sub _decode_utf8 {
     my ($self, $val) = @_;
+
+	require Encode;
 
     if (Encode::is_utf8($val)) {
         return $val;
