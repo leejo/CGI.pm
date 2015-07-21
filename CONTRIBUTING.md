@@ -15,6 +15,6 @@ perl, the name and version of your Web server, and the name and version of the
 operating system you are using. If the problem is even remotely browser
 dependent, please provide information about the affected browsers as well.
 
-You are strongly advised to the latest version of the module and testing your
-issue with it before submitting an issue. Failing tests cases are appreciated
-with issues, please see the existing tests in t/ for examples.
+You are strongly advised to update to the latest version of the module and
+test your issue with it before submitting a report. Failing tests cases are
+appreciated with issues, please see the existing tests in t/ for examples.
