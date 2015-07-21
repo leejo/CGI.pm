@@ -1912,13 +1912,11 @@ and it will be replaced with the a nice HTML dump shown above:
 
 Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 
-The original bug tracker can be found at: L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
+See the L<https://github.com/leejo/CGI.pm/CONTRIBUTING.md> file for information
+on raising issues and contributing
 
-However as stated this functionality is no longer being maintained and is
-considered deprecated. Any feature requests, bug reports, issues, pull
-requests, etc, for this functionality will almost certainly be rejected without
-any action being taken place - this includes fixes to utterly broken page
-rendering, invalid HTML, nonsensical output, and annoyances.
+The original bug tracker can be found at:
+L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
 
 =head1 SEE ALSO
 

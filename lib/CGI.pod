@@ -1818,21 +1818,11 @@ for suggestions and bug fixes.
 
 Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 
+See the L<https://github.com/leejo/CGI.pm/CONTRIBUTING.md> file for information
+on raising issues and contributing
+
 The original bug tracker can be found at:
 L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
-
-When sending bug reports, please provide the version of CGI.pm, the version of
-perl, the name and version of your Web server, and the name and version of the
-operating system you are using. If the problem is even remotely browser
-dependent, please provide information about the affected browsers as well.
-
-Failing tests cases are appreciated with issues, and if you submit a patch then
-it will *not* be accepted unless you provide a reasonable automated test case
-with it (please see the existing tests in t/ for examples).
-
-Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
-Feature requests and none critical issues will be outright rejected. The module
-is now in maintenance mode for critical issues only.
 
 =head1 SEE ALSO
 
