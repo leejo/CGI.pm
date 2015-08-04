@@ -30,5 +30,7 @@ script:
 after_success:
     - cover -report coveralls
 
+sudo: false
+
 notifications:
     email: false
