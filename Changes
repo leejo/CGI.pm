@@ -2,7 +2,7 @@
 
     [ RELEASE NOTES ]
     - CGI.pm is now considered "done". See also "mature" and "legacy"
-      Features requests and none critical issues will be outright rejected.
+      Features requests and non-critical issues will be outright rejected.
       The module is now in maintenance mode for critical issues only.
 
     - This release removes the AUTOLOAD and compile optimisations from CGI.pm

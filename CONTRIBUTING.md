@@ -1,7 +1,7 @@
 I'm happy to accept pull requests and issue reports
 
 Please note that CGI.pm is now considered done. See also "mature" and "legacy".
-Feature requests and none critical issues will probably be rejected, although
+Feature requests and non-critical issues will probably be rejected, although
 pull requests will be accepted if they are small in scope and included tests
 and perldoc. So if you want a shiny new feature you're going to have to add it
 yourself and submit a pull request.
