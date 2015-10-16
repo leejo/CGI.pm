@@ -1532,7 +1532,7 @@ hurt anything if you do.
 
 CGI.pm provides four simple functions for producing multipart documents of the
 type needed to implement server push. These functions were graciously provided
-by Ed Jordan <ed@fidalgo.net>. To import these into your namespace, you must
+by Ed Jordan &lt;ed@fidalgo.net>. To import these into your namespace, you must
 import the ":push" set. You are also advised to put the script into NPH mode
 and to set $| to 1 to avoid buffering problems.
 
@@ -1656,7 +1656,7 @@ the "use" statement:
 An attempt to send a POST larger than $POST\_MAX bytes will cause _param()_ to
 return an empty CGI parameter list. You can test for this event by checking
 _cgi\_error()_, either after you create the CGI object or, if you are using the
-function-oriented interface, call <param()> for the first time. If the POST was
+function-oriented interface, call &lt;param()> for the first time. If the POST was
 intercepted, then cgi\_error() will return the message "413 POST too large".
 
 This error message is actually defined by the HTTP protocol, and is designed to
@@ -1733,7 +1733,7 @@ Thanks very much to:
 - Mark Stosberg (mark@stosberg.com)
 - Matt Heffron (heffron@falstaff.css.beckman.com)
 - James Taylor (james.taylor@srs.gov)
-- Scott Anguish <sanguish@digifix.com>
+- Scott Anguish &lt;sanguish@digifix.com>
 - Mike Jewell (mlj3u@virginia.edu)
 - Timothy Shimmin (tes@kbs.citri.edu.au)
 - Joergen Haegg (jh@axis.se)

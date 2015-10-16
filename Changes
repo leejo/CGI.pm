@@ -1,3 +1,16 @@
+4.22 2015-10-16
+
+    [ RELEASE NOTES ]
+    - Documentation fixes only - please see v4.21 Changes for any potentially
+      impacting changes
+
+    [ DOCUMENTATION ]
+    - fix typos in CONTRIBUTING file
+    - links to docs, stackoverflow and perlmonks
+    - clarify deprecation policy on HTML functions (GH #188)
+    - mention HTML::Tiny in CGI::HTML::Functions (thanks to osfameron for
+      the suggestion)
+
 4.21 2015-06-16
 
     [ RELEASE NOTES ]
