@@ -1819,7 +1819,7 @@ for suggestions and bug fixes.
 
 Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 
-See the L<https://github.com/leejo/CGI.pm/CONTRIBUTING.md> file for information
+See the L<https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md> file for information
 on raising issues and contributing
 
 The original bug tracker can be found at:
