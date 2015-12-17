@@ -9,6 +9,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/CGI.pm',
     NAME             => 'CGI',
     DISTNAME         => 'CGI',
+    LICENSE          => 'perl_5',
     VERSION_FROM     => 'lib/CGI.pm',
     MIN_PERL_VERSION => '5.8.1',
     PREREQ_PM        => {

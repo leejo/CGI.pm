@@ -1,3 +1,12 @@
+4.23 2015-12-17
+
+    [ RELEASE NOTES ]
+    - Documentation fixes only - please see v4.21 Changes for any potentially
+      impacting changes
+
+    [ DOCUMENTATION ]
+    - add LICENSE file and LICENSE info to Makefile.PL
+
 4.22 2015-10-16
 
     [ RELEASE NOTES ]
