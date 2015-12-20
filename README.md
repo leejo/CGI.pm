@@ -105,8 +105,10 @@ See [CGI::Alternatives](https://metacpan.org/pod/CGI::Alternatives) for an examp
 
 These functions, and perldoc for them, are considered deprecated, they
 are no longer being maintained and no fixes or features for them will be
-accepted. They will, however, continue to exist in CGI.pm. All documentation
-for these functions has been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI::HTML::Functions).
+accepted. They will, however, continue to exist in CGI.pm without any
+deprecation warnings ("soft" deprecation) so you can continue to use
+them if you really want to. All documentation for these functions has
+been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI::HTML::Functions).
 
 # Programming style
 
@@ -1759,7 +1761,7 @@ Thanks very much to:
 
 Address bug reports and comments to: [https://github.com/leejo/CGI.pm/issues](https://github.com/leejo/CGI.pm/issues)
 
-See the [https://github.com/leejo/CGI.pm/CONTRIBUTING.md](https://github.com/leejo/CGI.pm/CONTRIBUTING.md) file for information
+See the [https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md](https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md) file for information
 on raising issues and contributing
 
 The original bug tracker can be found at:

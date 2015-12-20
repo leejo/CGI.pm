@@ -103,8 +103,10 @@ L<Template::Toolkit> module.
 
 These functions, and perldoc for them, are considered deprecated, they
 are no longer being maintained and no fixes or features for them will be
-accepted. They will, however, continue to exist in CGI.pm. All documentation
-for these functions has been moved to L<CGI::HTML::Functions>.
+accepted. They will, however, continue to exist in CGI.pm without any
+deprecation warnings ("soft" deprecation) so you can continue to use
+them if you really want to. All documentation for these functions has
+been moved to L<CGI::HTML::Functions>.
 
 =head1 Programming style
 
