@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Deep;
 use Test::Warn;
 
@@ -28,6 +28,12 @@ warning_like
 	{ @params = $q->param('game') }
 	qr/CGI::param called in list context from .+param_list_context\.t line 28, this can lead to vulnerabilities/,
     "calling ->param with args in list context warns"
+;
+
+warnings_are
+	{ @params = $q->param('game') }
+	[],
+    " ... but we only warn once",
 ;
 
 cmp_deeply(
