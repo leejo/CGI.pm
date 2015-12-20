@@ -1,6 +1,21 @@
 4.23 2015-12-17
 
     [ RELEASE NOTES ]
+    - please see v4.21 Changes for any potentially impacting changes
+
+    [ DOCUMENTATION ]
+    - fix link to CONTRIBUTING file (thanks to Manwar for the fix)
+    - clarify that "soft" deprecation means that the HTML functions
+      are deprecated but will not raise any deprecation warnings
+
+    [ SPEC / BUG FIXES ]
+    - make the list context warning only happen once per process (or
+      thread) to prevent excessive log noise in long running or in
+      persistent processes (thanks to @dadamail for the suggestion)
+
+4.23 2015-12-17
+
+    [ RELEASE NOTES ]
     - Documentation fixes only - please see v4.21 Changes for any potentially
       impacting changes
 
