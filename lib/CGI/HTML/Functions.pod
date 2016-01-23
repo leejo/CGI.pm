@@ -6,10 +6,8 @@ CGI::HTML::Functions - Documentation for CGI.pm Legacy HTML Functionality
 
 Nothing here - please do not use this functionality, it is considered to
 be legacy and essentially deprecated. This documentation exists solely to
-aid in maintenance and migration of legacy code using this functionality.
-
-This functionality is likely to be removed in future versions of CGI.pm so
-you are strongly encouraged to migrate away from it. If you are working
+aid in maintenance and migration of legacy code using this functionality
+and you are strongly encouraged to migrate away from it. If you are working
 on new code you should be using a template engine. For more information see
 L<CGI::Alternatives>.
 

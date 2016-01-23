@@ -137,8 +137,6 @@ For example, using the object oriented style:
     my $q = CGI->new;                    # create new CGI object
     print $q->header;                    # create the HTTP header
 
-    ...
-
 In the function-oriented style, there is one default CGI object that
 you rarely deal with directly. Instead you just call functions to
 retrieve CGI parameters, manage cookies, and so on. The following example
@@ -154,8 +152,6 @@ need to create the CGI object.
 
     use CGI qw/:standard/;           # load standard CGI routines
     print header();                  # create the HTTP header
-
-    ...
 
 The examples in this document mainly use the object-oriented style. See HOW
 TO IMPORT FUNCTIONS for important information on function-oriented programming
