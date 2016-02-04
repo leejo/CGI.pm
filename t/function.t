@@ -5,7 +5,6 @@ END {print "not ok 1\n" unless $loaded;}
 use Config;
 use CGI (':standard','keywords');
 $loaded = 1;
-$CGI::Util::SORT_ATTRIBUTES = 1;
 $CGI::LIST_CONTEXT_WARN = 0;
 print "ok 1\n";
 

@@ -1,3 +1,14 @@
+4.26 2016-02-04
+
+    [ RELEASE NOTES ]
+    - please see v4.21 Changes for any potentially impacting changes
+
+    [ SPEC / BUG FIXES ]
+    - sort HTML attributes by default (GH #106, GH #196)
+
+    [ DOCUMENTATION ]
+    - clarifications about HTML function non removal
+
 4.25 2015-12-17
 
     [ RELEASE NOTES ]

@@ -3,7 +3,7 @@
 # you use it directly and your code breaks horribly.
 package CGI::File::Temp;
 
-$CGI::File::Temp::VERSION = '4.25';
+$CGI::File::Temp::VERSION = '4.26';
 
 use parent File::Temp;
 use parent Fh;

@@ -4,7 +4,7 @@ use strict;
 use if $] >= 5.019, 'deprecate';
 use CGI ();
 
-$CGI::Pretty::VERSION = '4.25';
+$CGI::Pretty::VERSION = '4.26';
 $CGI::DefaultClass = __PACKAGE__;
 @CGI::Pretty::ISA = qw( CGI );
 

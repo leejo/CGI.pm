@@ -5,7 +5,6 @@ use Test::More tests => 40;
 END { ok $loaded; }
 use CGI ( ':standard', '-no_debug', '*h3', 'start_table' );
 $loaded = 1;
-$CGI::Util::SORT_ATTRIBUTES= 1;
 ok 1;
 
 BEGIN {
