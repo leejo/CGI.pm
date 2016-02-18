@@ -1241,7 +1241,7 @@ sub STORE {
     my $self = shift;
     my $tag  = shift;
     my $vals = shift;
-    my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
+    my @vals = defined($vals) && index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
     $self->param(-name=>$tag,-value=>\@vals);
 }
 
