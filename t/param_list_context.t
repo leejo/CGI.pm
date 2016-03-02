@@ -3,11 +3,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More;
 use Test::Deep;
 use Test::Warn;
 
 use CGI ();
+
+if ( ! eval 'use Test::Warn; 1' ) {
+  plan skip_all => 'Test::Warn required for this test';
+} else {
+  plan tests => 8;
+}
+
 
 # Set up a CGI environment
 $ENV{REQUEST_METHOD}  = 'GET';
@@ -26,7 +33,7 @@ warnings_are
 
 warning_like
 	{ @params = $q->param('game') }
-	qr/CGI::param called in list context from .+param_list_context\.t line 28, this can lead to vulnerabilities/,
+	qr/CGI::param called in list context from .+param_list_context\.t line 35, this can lead to vulnerabilities/,
     "calling ->param with args in list context warns"
 ;
 

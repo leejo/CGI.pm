@@ -1,3 +1,13 @@
+4.27 2016-03-02
+
+    [ RELEASE NOTES ]
+    - please see v4.21 Changes for any potentially impacting changes
+
+    [ INTERNALS ]
+    - fix a couple of warnings in test harness
+    - add taint flag to example file_upload
+    - fix a warnings in STORE subroutine
+
 4.26 2016-02-04
 
     [ RELEASE NOTES ]

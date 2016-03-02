@@ -26,10 +26,11 @@ find(
   -e 'blib' ? 'blib' : 'lib',
 );
 
-plan tests => @files * 3;
+plan tests => ( @files - 1 ) * 3;
 
 for my $file (@files) {
   my $module = $file; $module =~ s,\.pm$,,; $module =~ s,.*/?lib/,,; $module =~ s,/,::,g;
+  next if $module =~ /CGI::Pretty/;
   ok eval "use $module; 1", "use $module" or diag $@;
   Test::Pod::pod_file_ok($file);
   TODO: {

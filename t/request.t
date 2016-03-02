@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 45;
+use Test::More tests => 44;
 use Test::Deep;
-use Test::NoWarnings;
 
 use CGI ();
 use Config;
