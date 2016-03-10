@@ -55,5 +55,20 @@ is $q->url(-relative=>1,-path=>1,-query=>1),
 $q->delete('foo');
 ok !$q->param('foo'),'CGI::delete()';
 
+# test parameters in request body
+$q->_reset_globals;
+{
+  my $test_string = 'game=soccer&game=baseball&weather=nice';
+  local $ENV{REQUEST_METHOD}='DELETE';
+  local $ENV{CONTENT_LENGTH}=length($test_string);
+  local $ENV{QUERY_STRING}='big_balls=basketball&small_balls=golf';
+
+  local *STDIN;
+  open STDIN, '<', \$test_string;
+
+  ok $q=CGI->new,"CGI::new() from DELETE";
+  is $q->param('weather'), 'nice',"CGI::param() from DELETE";
+  is $q->url_param('big_balls'), 'basketball',"CGI::url_param()";
+}
 
 done_testing();
