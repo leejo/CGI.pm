@@ -622,16 +622,16 @@ sub init {
 	  last METHOD;
       }
 
-      # If method is GET, HEAD or DELETE, fetch the query from
-      # the environment.
-      if ($is_xforms || $meth=~/^(GET|HEAD|DELETE)$/) {
+      # First let's try to get data from request parameters
+      if ($is_xforms || $meth=~/^(GET|HEAD|DELETE|POST|PUT)$/) {
           $query_string = $self->_get_query_string_from_env;
          $self->param($meth . 'DATA', $self->param('XForms:Model'))
              if $is_xforms;
-	      last METHOD;
+	      last METHOD if($is_xforms || (defined $query_string && length $query_string));
       }
 
-      if ($meth eq 'POST' || $meth eq 'PUT') {
+      # If nothing found, let's try to get data from request body
+      if ($meth=~/^(GET|HEAD|DELETE|POST|PUT)$/) {
 	  if ( $content_length > 0 ) {
         if ( ( $PUTDATA_UPLOAD || $self->{'.upload_hook'} ) && !$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
             && defined($ENV{'CONTENT_TYPE'})
