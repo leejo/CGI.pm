@@ -85,3 +85,10 @@ t/user_agent.t
 t/utf8.t
 t/util-58.t
 t/util.t
+t/APR/Pool.pm
+t/Apache.pm
+t/Apache2/RequestIO.pm
+t/Apache2/RequestRec.pm
+t/Apache2/RequestUtil.pm
+t/Apache2/Response.pm
+t/ModPerl/Util.pm

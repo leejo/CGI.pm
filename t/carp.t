@@ -3,7 +3,7 @@
 
 use strict;
 
-use Test::More tests => 71;
+use Test::More tests => 76;
 use IO::Handle;
 
 use CGI::Carp;
@@ -82,6 +82,7 @@ my $q_file = quotemeta($file);
 # Test that realwarn is called
 {
   local $^W = 0;
+  ok( CGI::Carp::realwarn( "foo" ),'realwarn' );
   eval "sub CGI::Carp::realwarn {return 'Called realwarn'};";
 }
 
@@ -254,6 +255,11 @@ CGI::Carp::set_message('Override the message passed in'),
 
 CGI::Carp::fatalsToBrowser('Message to the world');
 $result[3] .= $_ while (<STDOUT>);
+
+CGI::Carp::set_message(sub {print 'Override message with callback'}),
+CGI::Carp::fatalsToBrowser('Message to the world');
+$result[4] .= $_ while (<STDOUT>);
+
 CGI::Carp::set_message(''),
 delete $ENV{SERVER_ADMIN};
 
@@ -283,6 +289,10 @@ like($result[3],
 
 like($result[3],
      '/Override the message passed in/',
+     "Correct message in string");
+
+like($result[4],
+     '/Override message with callback/',
      "Correct message in string");
 
 #-----------------------------------------------------------------------------
@@ -438,3 +448,30 @@ use File::Temp;
 my $fh = File::Temp->new;
 
 ok( CGI::Carp::carpout( $fh ),'carpout' );
+
+# mod_perl nonsense
+$ENV{MOD_PERL} = 2;
+$ENV{MOD_PERL_API_VERSION} = 2;
+$ENV{HTTP_USER_AGENT} = "MSIE";
+
+use FindBin qw/ $Bin /;
+use lib $Bin;
+
+CGI::Carp::fatalsToBrowser();
+like($ENV{MOD_PERL_PRINTED},
+     qr/Software error/,
+     "fatalsToBrowser with mod_perl 2");
+
+$ENV{MOD_PERL} = 1;
+$ENV{MOD_PERL_API_VERSION} = 1;
+$ENV{MOD_PERL_PRINTED} = undef;
+
+use FindBin qw/ $Bin /;
+use lib $Bin;
+
+require Apache;
+CGI::Carp::fatalsToBrowser();
+ok( length( $ENV{MOD_PERL_PRINTED} ) > 512,'MSIE error length hack' );
+like($ENV{MOD_PERL_PRINTED},
+     qr/Software error/,
+     "fatalsToBrowser with mod_perl 1");
