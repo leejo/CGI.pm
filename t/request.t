@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 62;
 use Test::Deep;
 
 use CGI ();
@@ -125,5 +125,42 @@ $q->_reset_globals;
 		$ENV{QUERY_STRING} = 'p1=1&&&;;&;&&;;p2;p3;p4=4&=p5';
 		ok $q->url_param, 'url_param() is true if parameters';
 		cmp_deeply( [ $q->url_param ],bag( qw/p1 p2 p3 p4/,'' ),'url_param' );
+	}
+}
+
+# regression matrix for request types
+foreach my $test (
+	{ desc => "OPTIONS", param => undef, url_param => 'basketball' },
+	{ desc => "GET", param => undef, url_param => 'basketball' },
+	{ desc => "HEAD", param => undef, url_param => 'basketball' },
+	{ desc => "POST", param => 'nice', url_param => 'basketball' },
+	{ desc => "PUT", param => 'nice', url_param => 'basketball' },
+	{ desc => "TRACE", param => undef, url_param => 'basketball' },
+	{ desc => "CONNECT", param => undef, url_param => 'basketball' },
+	{ desc => "DELETE", param => undef, url_param => 'basketball' },
+	# first pass over DELETE will enable $CGI::ALLOW_DELETE_CONTENT
+	{ desc => "DELETE", param => 'nice', url_param => 'basketball' },
+) {
+    CGI::_reset_globals;
+
+	my $req_method = $test->{desc};
+	my $test_string = 'game=soccer&game=baseball&weather=nice';
+	local $ENV{REQUEST_METHOD} = $req_method;
+	local $ENV{CONTENT_LENGTH} = length( $test_string );
+	local $ENV{QUERY_STRING}   = 'big_balls=basketball&small_balls=golf';
+
+	local *STDIN;
+	open STDIN, '<', \$test_string;
+
+    my $q = CGI->new;
+
+	{
+		is( $q->url_param('big_balls'),$test->{url_param},"CGI::url_param() from $req_method" );
+		local $TODO = $CGI::ALLOW_DELETE_CONTENT ? "content with DELETE" : undef;
+		is( $q->param('weather'),$test->{param},"CGI::param() from $req_method" );
+	}
+
+	if ( $req_method eq 'DELETE' ) {
+		$CGI::ALLOW_DELETE_CONTENT++;
 	}
 }
