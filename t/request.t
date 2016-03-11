@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 62;
+use Test::More tests => 71;
 use Test::Deep;
 
 use CGI ();
@@ -130,16 +130,16 @@ $q->_reset_globals;
 
 # regression matrix for request types
 foreach my $test (
-	{ desc => "OPTIONS", param => undef, url_param => 'basketball' },
-	{ desc => "GET", param => undef, url_param => 'basketball' },
-	{ desc => "HEAD", param => undef, url_param => 'basketball' },
-	{ desc => "POST", param => 'nice', url_param => 'basketball' },
-	{ desc => "PUT", param => 'nice', url_param => 'basketball' },
-	{ desc => "TRACE", param => undef, url_param => 'basketball' },
-	{ desc => "CONNECT", param => undef, url_param => 'basketball' },
-	{ desc => "DELETE", param => undef, url_param => 'basketball' },
+	{ desc => "OPTIONS", param => [ undef,undef   ], url_param => 'basketball' },
+	{ desc => "GET",     param => [ undef,'golf'  ], url_param => 'basketball' },
+	{ desc => "HEAD",    param => [ undef,'golf'  ], url_param => 'basketball' },
+	{ desc => "POST",    param => [ 'nice',undef  ], url_param => 'basketball' },
+	{ desc => "PUT",     param => [ 'nice',undef  ], url_param => 'basketball' },
+	{ desc => "TRACE",   param => [ undef,undef   ], url_param => 'basketball' },
+	{ desc => "CONNECT", param => [ undef,undef   ], url_param => 'basketball' },
+	{ desc => "DELETE",  param => [ undef,'golf'  ], url_param => 'basketball' },
 	# first pass over DELETE will enable $CGI::ALLOW_DELETE_CONTENT
-	{ desc => "DELETE", param => 'nice', url_param => 'basketball' },
+	{ desc => "DELETE",  param => [ 'nice','golf' ], url_param => 'basketball' },
 ) {
     CGI::_reset_globals;
 
@@ -156,8 +156,10 @@ foreach my $test (
 
 	{
 		is( $q->url_param('big_balls'),$test->{url_param},"CGI::url_param() from $req_method" );
+		is( $q->param('small_balls'),$test->{param}[1],"CGI::param() from $req_method (query string)" );
+
 		local $TODO = $CGI::ALLOW_DELETE_CONTENT ? "content with DELETE" : undef;
-		is( $q->param('weather'),$test->{param},"CGI::param() from $req_method" );
+		is( $q->param('weather'),$test->{param}[0],"CGI::param() from $req_method (body)" );
 	}
 
 	if ( $req_method eq 'DELETE' ) {
