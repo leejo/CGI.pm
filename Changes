@@ -1,3 +1,15 @@
+4.28 2016-03-14
+
+    [ RELEASE NOTES ]
+    - please see v4.21 Changes for any potentially impacting changes
+
+    [ SPEC / BUG FIXES ]
+    - undef %QUERY_PARAM in initialize_globals to clean mod_perl env
+
+    [ TESTING ]
+    - improve test coverage on request types (GH #199, GH #200)
+    - improve test coverage on CGI::Carp
+
 4.27 2016-03-02
 
     [ RELEASE NOTES ]
