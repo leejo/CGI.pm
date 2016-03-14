@@ -103,9 +103,12 @@ should be using a template engine for better separation of concerns.
 See [CGI::Alternatives](https://metacpan.org/pod/CGI::Alternatives) for an example of using CGI.pm with the
 [Template::Toolkit](https://metacpan.org/pod/Template::Toolkit) module.
 
-These functions, and perldoc for them, will continue to exist in the
-v4 releases of CGI.pm but may be deprecated (soft) in v5 and beyond.
-All documentation for these functions has been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI::HTML::Functions).
+These functions, and perldoc for them, are considered deprecated, they
+are no longer being maintained and no fixes or features for them will be
+accepted. They will, however, continue to exist in CGI.pm without any
+deprecation warnings ("soft" deprecation) so you can continue to use
+them if you really want to. All documentation for these functions has
+been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI::HTML::Functions).
 
 # Programming style
 
@@ -1531,7 +1534,7 @@ hurt anything if you do.
 
 CGI.pm provides four simple functions for producing multipart documents of the
 type needed to implement server push. These functions were graciously provided
-by Ed Jordan <ed@fidalgo.net>. To import these into your namespace, you must
+by Ed Jordan &lt;ed@fidalgo.net>. To import these into your namespace, you must
 import the ":push" set. You are also advised to put the script into NPH mode
 and to set $| to 1 to avoid buffering problems.
 
@@ -1655,7 +1658,7 @@ the "use" statement:
 An attempt to send a POST larger than $POST\_MAX bytes will cause _param()_ to
 return an empty CGI parameter list. You can test for this event by checking
 _cgi\_error()_, either after you create the CGI object or, if you are using the
-function-oriented interface, call <param()> for the first time. If the POST was
+function-oriented interface, call &lt;param()> for the first time. If the POST was
 intercepted, then cgi\_error() will return the message "413 POST too large".
 
 This error message is actually defined by the HTTP protocol, and is designed to
@@ -1732,7 +1735,7 @@ Thanks very much to:
 - Mark Stosberg (mark@stosberg.com)
 - Matt Heffron (heffron@falstaff.css.beckman.com)
 - James Taylor (james.taylor@srs.gov)
-- Scott Anguish <sanguish@digifix.com>
+- Scott Anguish &lt;sanguish@digifix.com>
 - Mike Jewell (mlj3u@virginia.edu)
 - Timothy Shimmin (tes@kbs.citri.edu.au)
 - Joergen Haegg (jh@axis.se)
@@ -1758,21 +1761,11 @@ Thanks very much to:
 
 Address bug reports and comments to: [https://github.com/leejo/CGI.pm/issues](https://github.com/leejo/CGI.pm/issues)
 
+See the [https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md](https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md) file for information
+on raising issues and contributing
+
 The original bug tracker can be found at:
 [https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm](https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm)
-
-When sending bug reports, please provide the version of CGI.pm, the version of
-perl, the name and version of your Web server, and the name and version of the
-operating system you are using. If the problem is even remotely browser
-dependent, please provide information about the affected browsers as well.
-
-Failing tests cases are appreciated with issues, and if you submit a patch then
-it will \*not\* be accepted unless you provide a reasonable automated test case
-with it (please see the existing tests in t/ for examples).
-
-Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
-Feature requests and none critical issues will be outright rejected. The module
-is now in maintenance mode for critical issues only.
 
 # SEE ALSO
 

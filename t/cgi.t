@@ -7,7 +7,6 @@ use warnings;
 
 use Test::More tests => 25;
 use Test::Deep;
-use Test::Warn;
 
 use CGI ();
 

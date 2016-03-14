@@ -101,9 +101,12 @@ should be using a template engine for better separation of concerns.
 See L<CGI::Alternatives> for an example of using CGI.pm with the
 L<Template::Toolkit> module.
 
-These functions, and perldoc for them, will continue to exist in the
-v4 releases of CGI.pm but may be deprecated (soft) in v5 and beyond.
-All documentation for these functions has been moved to L<CGI::HTML::Functions>.
+These functions, and perldoc for them, are considered deprecated, they
+are no longer being maintained and no fixes or features for them will be
+accepted. They will, however, continue to exist in CGI.pm without any
+deprecation warnings ("soft" deprecation) so you can continue to use
+them if you really want to. All documentation for these functions has
+been moved to L<CGI::HTML::Functions>.
 
 =head1 Programming style
 
@@ -134,8 +137,6 @@ For example, using the object oriented style:
     my $q = CGI->new;                    # create new CGI object
     print $q->header;                    # create the HTTP header
 
-    ...
-
 In the function-oriented style, there is one default CGI object that
 you rarely deal with directly. Instead you just call functions to
 retrieve CGI parameters, manage cookies, and so on. The following example
@@ -151,8 +152,6 @@ need to create the CGI object.
 
     use CGI qw/:standard/;           # load standard CGI routines
     print header();                  # create the HTTP header
-
-    ...
 
 The examples in this document mainly use the object-oriented style. See HOW
 TO IMPORT FUNCTIONS for important information on function-oriented programming
@@ -1818,21 +1817,11 @@ for suggestions and bug fixes.
 
 Address bug reports and comments to: L<https://github.com/leejo/CGI.pm/issues>
 
+See the L<https://github.com/leejo/CGI.pm/blob/master/CONTRIBUTING.md> file for information
+on raising issues and contributing
+
 The original bug tracker can be found at:
 L<https://rt.cpan.org/Public/Dist/Display.html?Queue=CGI.pm>
-
-When sending bug reports, please provide the version of CGI.pm, the version of
-perl, the name and version of your Web server, and the name and version of the
-operating system you are using. If the problem is even remotely browser
-dependent, please provide information about the affected browsers as well.
-
-Failing tests cases are appreciated with issues, and if you submit a patch then
-it will *not* be accepted unless you provide a reasonable automated test case
-with it (please see the existing tests in t/ for examples).
-
-Please note the CGI.pm is now considered "done". See also "mature" and "legacy".
-Feature requests and none critical issues will be outright rejected. The module
-is now in maintenance mode for critical issues only.
 
 =head1 SEE ALSO
 

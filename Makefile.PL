@@ -9,6 +9,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/CGI.pm',
     NAME             => 'CGI',
     DISTNAME         => 'CGI',
+    LICENSE          => 'perl_5',
     VERSION_FROM     => 'lib/CGI.pm',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.8.1',
@@ -37,7 +38,6 @@ WriteMakefile(
         'Test::Deep'       => 0.11,
         'Test::More'       => 0.98,
         'Test::Warn'       => 0.30,
-        'Test::NoWarnings' => 1.04,
     },
     test    => { TESTS    => 't/*.t t/headers/*.t' },
     linkext => { LINKTYPE => '' }, # no link needed

@@ -4,7 +4,7 @@ use warnings;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.21';
+$CGI::VERSION='4.28';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -24,6 +24,7 @@ $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
 $ENCODE_ENTITIES     = q{&<>"'};
+$ALLOW_DELETE_CONTENT = 0;
 
 @SAVED_SYMBOLS = ();
 
@@ -91,6 +92,7 @@ sub initialize_globals {
     $BEEN_THERE = 0;
     $DTD_PUBLIC_IDENTIFIER = "";
     undef @QUERY_PARAM;
+    undef %QUERY_PARAM;
     undef %EXPORT;
     undef $QUERY_CHARSET;
     undef %QUERY_FIELDNAMES;
@@ -399,9 +401,10 @@ sub param {
 
 	# list context can be dangerous so warn:
 	# http://blog.gerv.net/2014.10/new-class-of-vulnerability-in-perl-web-applications
-	if ( wantarray && $LIST_CONTEXT_WARN ) {
+	if ( wantarray && $LIST_CONTEXT_WARN == 1 ) {
 		my ( $package, $filename, $line ) = caller;
 		if ( $package ne 'CGI' ) {
+			$LIST_CONTEXT_WARN++; # only warn once
 			warn "CGI::param called in list context from $filename line $line, this can lead to vulnerabilities. "
 				. 'See the warning in "Fetching the value or values of a single named parameter"';
 		}
@@ -1242,7 +1245,7 @@ sub STORE {
     my $self = shift;
     my $tag  = shift;
     my $vals = shift;
-    my @vals = index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
+    my @vals = defined($vals) && index($vals,"\0")!=-1 ? split("\0",$vals) : $vals;
     $self->param(-name=>$tag,-value=>\@vals);
 }
 
