@@ -27,16 +27,14 @@ WriteMakefile(
         'HTML::Entities' => 3.69,
         'Encode'         => 0,    # Encode was first released with perl v5.7.3
         'Config'         => 0,    # Config was first released with perl 5.00307
-    },
-    TEST_REQUIRES   => {
-        'Cwd'              => 0,     # Cwd was first released with perl 5
-        'POSIX'            => 0,    # POSIX was first released with perl 5
-        'IO::File'         => 0,    # IO::File was first released with perl 5.00307
-        'IO::Handle'       => 0,    # IO::Handle was first released with perl 5.00307
-        'File::Find'       => 0,    # File::Find was first released with perl 5
-        'Test::Deep'       => 0.11,
-        'Test::More'       => 0.98,
-        'Test::Warn'       => 0.30,
+        'Test::Deep'     => 0.11,
+        'Cwd'            => 0,     # Cwd was first released with perl 5
+        'POSIX'          => 0,    # POSIX was first released with perl 5
+        'IO::File'       => 0,    # IO::File was first released with perl 5.00307
+        'IO::Handle'     => 0,    # IO::Handle was first released with perl 5.00307
+        'File::Find'     => 0,    # File::Find was first released with perl 5
+        'Test::More'     => 0.98,
+        'Test::Warn'     => 0.30,
     },
     test    => { TESTS    => 't/*.t t/headers/*.t' },
     linkext => { LINKTYPE => '' }, # no link needed
