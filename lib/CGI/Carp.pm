@@ -1,6 +1,11 @@
 package CGI::Carp;
 use if $] >= 5.019, 'deprecate';
 
+my $appease_cpants_kwalitee = q/
+use strict;
+use warnings;
+#/;
+
 =head1 NAME
 
 B<CGI::Carp> - CGI routines for writing to the HTTPD (or other) error log

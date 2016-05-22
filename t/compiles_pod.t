@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More qw/ no_plan /;
 use File::Find;
 
 if(($ENV{HARNESS_PERL_SWITCHES} || '') =~ /Devel::Cover/) {
@@ -26,8 +26,6 @@ find(
   -e 'blib' ? 'blib' : 'lib',
 );
 
-plan tests => ( @files - 1 ) * 3;
-
 for my $file (@files) {
   my $module = $file; $module =~ s,\.pm$,,; $module =~ s,.*/?lib/,,; $module =~ s,/,::,g;
   next if $module =~ /CGI::Pretty/;
@@ -38,6 +36,7 @@ for my $file (@files) {
 	# of CGI.pm at present (most subs eval'd as strings) means
 	# this test isn't that much use - so mark as TODO for now
 	local $TODO = 'POD coverage';
+	next if $module =~ /CGI::/;
 	Test::Pod::Coverage::pod_coverage_ok($module);
   }
 }

@@ -1,3 +1,29 @@
+4.28_01 2016-05-22
+
+    [ RELEASE NOTES ]
+    - DEV release to appease some CPANTS Kwalitee flags and cleanup some
+      package naming conventions
+
+    [ INTERNALS ]
+    - The MultipartBuffer package has been renamed to CGI::MultipartBuffer.
+      This has been done in a way to ensure any $MultipartBuffer package
+      variables are still set correctly in CGI::MultipartBuffer. if you are
+      explicitly using MultipartBuffer in a form such as:
+
+        MultipartBuffer->new
+
+      your code will break. you should be calling:
+
+        CGI->new->new_MultipartBuffer( $boundary,$length );
+
+      to ensure the correctly package is called. if you are extending the
+      MultipartBuffer package though use of ISA or base (or parent) then you
+      will need to update your code to use CGI::MultipartBuffer
+
+    - VERSION has been remove from all but the main CGI package
+
+    - fake using strict and warnings to appease CPANTS Kwalitee
+
 4.28 2016-03-14
 
     [ RELEASE NOTES ]

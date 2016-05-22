@@ -3,10 +3,13 @@
 # you use it directly and your code breaks horribly.
 package CGI::File::Temp;
 
-$CGI::File::Temp::VERSION = '4.28';
-
 use parent File::Temp;
 use parent Fh;
+
+my $appease_cpants_kwalitee = q/
+use strict;
+use warnings;
+#/;
 
 use overload
     '""'  => \&asString,

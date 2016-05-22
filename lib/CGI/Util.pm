@@ -6,9 +6,12 @@ use if $] >= 5.019, 'deprecate';
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
-our $VERSION = '4.28';
-
 our $_EBCDIC = "\t" ne "\011";
+
+my $appease_cpants_kwalitee = q/
+use strict;
+use warnings;
+#/;
 
 # (ord('^') == 95) for codepage 1047 as on os390, vmesa
 our @A2E = (

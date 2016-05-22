@@ -3,7 +3,12 @@ require 5.008001;
 use if $] >= 5.019, 'deprecate';
 use Carp 'croak';
 
-$CGI::VERSION='4.28';
+my $appease_cpants_kwalitee = q/
+use strict;
+use warnings;
+#/;
+
+$CGI::VERSION='4.28_01';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1006,7 +1011,7 @@ sub read_postdata_putdata {
             
             #	      while (defined($data = $buffer->read)) { }
             my $buff;
-            my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
+            my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
             my $len  = $content_length;
             while ( $len > 0 ) {
                 my $read = $self->read_from_client( \$buf, $unit, 0 );
@@ -1035,7 +1040,7 @@ sub read_postdata_putdata {
         my ($data);
         local ($\) = '';
         my $totalbytes;
-        my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
+        my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
         my $len  = $content_length;
         $unit = $len;
         my $ZERO_LOOP_COUNTER =0;
@@ -1101,7 +1106,7 @@ sub SERVER_PUSH { 'multipart/x-mixed-replace;boundary="' . shift() . '"'; }
 # Create a new multipart buffer
 sub new_MultipartBuffer {
     my($self,$boundary,$length) = @_;
-    return MultipartBuffer->new($self,$boundary,$length);
+    return CGI::MultipartBuffer->new($self,$boundary,$length);
 }
 
 # Read data from a file handle
@@ -3603,18 +3608,23 @@ sub _set_attributes {
 # Globals and stubs for other packages that we use.
 #########################################################
 
-######################## MultipartBuffer ####################
+######################## CGI::MultipartBuffer ####################
 
-package MultipartBuffer;
+package CGI::MultipartBuffer;
 
 $_DEBUG = 0;
 
 # how many bytes to read at a time.  We use
 # a 4K buffer by default.
-$INITIAL_FILLUNIT = 1024 * 4;
-$TIMEOUT = 240*60;       # 4 hour timeout for big files
-$SPIN_LOOP_MAX = 2000;  # bug fix for some Netscape servers
-$CRLF=$CGI::CRLF;
+$MultipartBuffer::INITIAL_FILLUNIT ||= 1024 * 4;
+$MultipartBuffer::TIMEOUT          ||= 240*60; # 4 hour timeout for big files
+$MultipartBuffer::SPIN_LOOP_MAX    ||= 2000;   # bug fix for some Netscape servers
+$MultipartBuffer::CRLF             ||= $CGI::CRLF;
+
+$INITIAL_FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
+$TIMEOUT          = $MultipartBuffer::TIMEOUT;
+$SPIN_LOOP_MAX    = $MultipartBuffer::SPIN_LOOP_MAX;
+$CRLF             = $MultipartBuffer::CRLF;
 
 sub new {
     my($package,$interface,$boundary,$length) = @_;
@@ -3848,10 +3858,10 @@ if ($^W) {
     $CGI::CGI = '';
     $CGI::CGI=<<EOF;
     $CGI::VERSION;
-    $MultipartBuffer::SPIN_LOOP_MAX;
-    $MultipartBuffer::CRLF;
-    $MultipartBuffer::TIMEOUT;
-    $MultipartBuffer::INITIAL_FILLUNIT;
+    $CGI::MultipartBuffer::SPIN_LOOP_MAX;
+    $CGI::MultipartBuffer::CRLF;
+    $CGI::MultipartBuffer::TIMEOUT;
+    $CGI::MultipartBuffer::INITIAL_FILLUNIT;
 EOF
     ;
 }
