@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.28_02';
+$CGI::VERSION='4.28_03';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1011,7 +1011,7 @@ sub read_postdata_putdata {
             
             #	      while (defined($data = $buffer->read)) { }
             my $buff;
-            my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
+            my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
             my $len  = $content_length;
             while ( $len > 0 ) {
                 my $read = $self->read_from_client( \$buf, $unit, 0 );
@@ -1040,7 +1040,7 @@ sub read_postdata_putdata {
         my ($data);
         local ($\) = '';
         my $totalbytes;
-        my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
+        my $unit = $MultipartBuffer::INITIAL_FILLUNIT;
         my $len  = $content_length;
         $unit = $len;
         my $ZERO_LOOP_COUNTER =0;
@@ -1057,7 +1057,7 @@ sub read_postdata_putdata {
             # they manage this, but the workaround is to abort if we get
             # more than SPIN_LOOP_MAX consecutive zero reads.
             if ($bytesRead <= 0) {
-                die  "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $SPIN_LOOP_MAX;
+                die  "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $MultipartBuffer::SPIN_LOOP_MAX;
             } else {
                 $ZERO_LOOP_COUNTER = 0;
             }
@@ -3617,18 +3617,12 @@ $_DEBUG = 0;
 # how many bytes to read at a time.  We use
 # a 4K buffer by default.
 $MultipartBuffer::INITIAL_FILLUNIT ||= 1024 * 4;
-$MultipartBuffer::TIMEOUT          ||= 240*60; # 4 hour timeout for big files
 $MultipartBuffer::SPIN_LOOP_MAX    ||= 2000;   # bug fix for some Netscape servers
 $MultipartBuffer::CRLF             ||= $CGI::CRLF;
 
-$INITIAL_FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
-$TIMEOUT          = $MultipartBuffer::TIMEOUT;
-$SPIN_LOOP_MAX    = $MultipartBuffer::SPIN_LOOP_MAX;
-$CRLF             = $MultipartBuffer::CRLF;
-
 sub new {
     my($package,$interface,$boundary,$length) = @_;
-    $FILLUNIT = $INITIAL_FILLUNIT;
+    $FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
     $CGI::DefaultClass->binmode($IN); # if $CGI::needs_binmode;  # just do it always
 
     # If the user types garbage into the file upload field,
@@ -3651,7 +3645,7 @@ sub new {
 
     } else { # otherwise we find it ourselves
 	my($old);
-	($old,$/) = ($/,$CRLF); # read a CRLF-delimited line
+	($old,$/) = ($/,$MultipartBuffer::CRLF); # read a CRLF-delimited line
 	$boundary = <STDIN>;      # BUG: This won't work correctly under mod_perl
 	$length -= length($boundary);
 	chomp($boundary);               # remove the CRLF
@@ -3686,11 +3680,12 @@ sub readHeader {
     my($ok) = 0;
     my($bad) = 0;
 
-    local($CRLF) = "\015\012" if $CGI::OS eq 'VMS' || $CGI::EBCDIC;
+	my $MBCRLF = $MultipartBuffer::CRLF;
+    $MBCRLF = "\015\012" if $CGI::OS eq 'VMS' || $CGI::EBCDIC;
 
     do {
 	$self->fillBuffer($FILLUNIT);
-	$ok++ if ($end = index($self->{BUFFER},"${CRLF}${CRLF}")) >= 0;
+	$ok++ if ($end = index($self->{BUFFER},"${MBCRLF}${MBCRLF}")) >= 0;
 	$ok++ if $self->{BUFFER} eq '';
 	$bad++ if !$ok && $self->{LENGTH} <= 0;
 	# this was a bad idea
@@ -3715,9 +3710,9 @@ sub readHeader {
     #   and 3.4.5 (Quoted-Strings).
 
     my $token = '[-\w!\#$%&\'*+.^_\`|{}~]';
-    $header=~s/$CRLF\s+/ /og;		# merge continuation lines
+    $header=~s/$MBCRLF\s+/ /og;		# merge continuation lines
 
-    while ($header=~/($token+):\s+([^$CRLF]*)/mgox) {
+    while ($header=~/($token+):\s+([^$MBCRLF]*)/mgox) {
         my ($field_name,$field_value) = ($1,$2);
 	$field_name =~ s/\b(\w)/uc($1)/eg; #canonicalize
 	$return{$field_name}=$field_value;
@@ -3831,7 +3826,7 @@ sub fillBuffer {
     # more than SPIN_LOOP_MAX consecutive zero reads.
     if ($bytesRead <= 0) {
 	die  "CGI.pm: Server closed socket during multipart read (client aborted?).\n"
-	    if ($self->{ZERO_LOOP_COUNTER}++ >= $SPIN_LOOP_MAX);
+	    if ($self->{ZERO_LOOP_COUNTER}++ >= $MultipartBuffer::SPIN_LOOP_MAX);
     } else {
 	$self->{ZERO_LOOP_COUNTER}=0;
     }
@@ -3858,10 +3853,9 @@ if ($^W) {
     $CGI::CGI = '';
     $CGI::CGI=<<EOF;
     $CGI::VERSION;
-    $CGI::MultipartBuffer::SPIN_LOOP_MAX;
-    $CGI::MultipartBuffer::CRLF;
-    $CGI::MultipartBuffer::TIMEOUT;
-    $CGI::MultipartBuffer::INITIAL_FILLUNIT;
+    $MultipartBuffer::SPIN_LOOP_MAX;
+    $MultipartBuffer::CRLF;
+    $MultipartBuffer::INITIAL_FILLUNIT;
 EOF
     ;
 }
