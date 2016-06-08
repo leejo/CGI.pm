@@ -1,8 +1,7 @@
-4.28_02 2016-05-22
+4.29 2016-06-08
 
-    [ RELEASE NOTES ]
-    - DEV release to appease some CPANTS Kwalitee flags and cleanup some
-      package naming conventions
+    [ FEATURES ]
+    - Add SameSite support to Cookie handling (thanks to pangyre)
 
     [ INTERNALS ]
     - The MultipartBuffer package has been renamed to CGI::MultipartBuffer.
