@@ -156,7 +156,8 @@ my @test_cookie = (
                -domain  => '.capricorn.com',
                -path    => '/cgi-bin/database',
                -secure  => 1,
-               -httponly=> 1
+               -httponly=> 1,
+               -samesite=> 'Lax'
               );
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'foo',               'name is correct');
@@ -166,6 +167,7 @@ my @test_cookie = (
   is($c->path   , '/cgi-bin/database', 'path is correct');
   ok($c->secure , 'secure attribute is set');
   ok( $c->httponly, 'httponly attribute is set' );
+  is( $c->samesite, 'Lax', 'samesite attribute is correct' );
 
   # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Cookie->new(-name    =>  'baz',
@@ -179,6 +181,7 @@ my @test_cookie = (
   is($c->path, '/',      'path atribute is set to default');
   ok(!defined $c->secure ,       'secure attribute is set');
   ok( !defined $c->httponly, 'httponly attribute is not set' );
+  ok( !$c->samesite, 'samesite attribute is not set' );
 
 # I'm really not happy about the restults of this section.  You pass
 # the new method invalid arguments and it just merilly creates a
@@ -210,7 +213,8 @@ my @test_cookie = (
                -domain  => '.pie-shop.com',
                -path    => '/',
                -secure  => 1,
-               -httponly=> 1
+               -httponly=> 1,
+               -samesite=> 'strict'
               );
 
   my $name = $c->name;
@@ -233,6 +237,9 @@ my @test_cookie = (
   like( $c->as_string, '/HttpOnly/',
     "Stringified cookie contains HttpOnly" );
 
+  like( $c->as_string, '/SameSite=Strict/',
+    "Stringified cookie contains normalized SameSite" );
+
   $c = CGI::Cookie->new(-name    =>  'Hamster-Jam',
             -value   =>  'Tulip',
                );
@@ -254,6 +261,9 @@ my @test_cookie = (
 
   ok( $c->as_string !~ /HttpOnly/,
     "Stringified cookie does not contain HttpOnly" );
+
+  ok( $c->as_string !~ /SameSite/,
+    "Stringified cookie does not contain SameSite" );
 }
 
 #-----------------------------------------------------------------------------
@@ -314,7 +324,8 @@ my @test_cookie = (
                -expires => '+3M',
                -domain  => '.pie-shop.com',
                -path    => '/',
-               -secure  => 1
+               -secure  => 1,
+               -samesite=> "strict"
                );
 
   is($c->name,          'Jam',   'name is correct');
@@ -345,6 +356,10 @@ my @test_cookie = (
   ok($c->secure,     'secure attribute is set');
   ok(!$c->secure(0), 'secure attribute is cleared');
   ok(!$c->secure,    'secure attribute is cleared');
+
+  is($c->samesite,        'Strict',   'SameSite is correct');
+  is($c->samesite('Lax'), 'Lax', 'SameSite is set correctly');
+  is($c->samesite,        'Lax', 'SameSite now returns updated value');
 }
 
 #----------------------------------------------------------------------------
@@ -353,7 +368,7 @@ my @test_cookie = (
 
 MAX_AGE: {
     my $cookie = CGI::Cookie->new( -name=>'a', value=>'b', '-expires' => 'now',);
-    is $cookie->expires, 'Thu, 01-Jan-1970 00:01:40 GMT';
+    is $cookie->expires, 'Thu, 01-Jan-1970 00:01:40 GMT', 'expires is correct';
     is $cookie->max_age => undef, 'max-age is undefined when setting expires';
 
     $cookie = CGI::Cookie->new( -name=>'a', 'value'=>'b' );
