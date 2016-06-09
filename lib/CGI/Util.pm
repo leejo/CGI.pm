@@ -6,6 +6,8 @@ use if $] >= 5.019, 'deprecate';
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
 
+our $VERSION = '4.30';
+
 our $_EBCDIC = "\t" ne "\011";
 
 my $appease_cpants_kwalitee = q/

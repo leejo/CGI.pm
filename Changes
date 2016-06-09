@@ -1,4 +1,4 @@
-4.29 2016-06-08
+4.30 2016-06-08
 
     [ FEATURES ]
     - Add SameSite support to Cookie handling (thanks to pangyre)
@@ -18,8 +18,6 @@
       to ensure the correctly package is called. if you are extending the
       MultipartBuffer package though use of ISA or base (or parent) then you
       will need to update your code to use CGI::MultipartBuffer
-
-    - VERSION has been remove from all but the main CGI package
 
     - fake using strict and warnings to appease CPANTS Kwalitee
 
