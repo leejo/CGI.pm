@@ -1,4 +1,4 @@
-4.30 2016-06-08
+4.31 2016-06-14
 
     [ FEATURES ]
     - Add SameSite support to Cookie handling (thanks to pangyre)
@@ -20,6 +20,8 @@
       will need to update your code to use CGI::MultipartBuffer
 
     - fake using strict and warnings to appease CPANTS Kwalitee
+
+    - require File::Temp v0.17+ to get seekable file handles (GH #204)
 
 4.28 2016-03-14
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::Push::VERSION='4.30';
+$CGI::Push::VERSION='4.31';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');
