@@ -304,7 +304,7 @@ The B<-onLoad> and B<-onUnload> parameters point to fragments of JavaScript code
 to execute when the page is respectively opened and closed by the browser.
 Usually these parameters are calls to functions defined in the B<-script> field:
 
-    $query = CGI->new;
+    $q = CGI->new;
     print header;
     $JSCRIPT = <<END;
         // Ask a silly question
@@ -658,8 +658,8 @@ your ability to incorporate special HTML character sequences, such as &Aacute;,
 into your fields.  If you wish to turn off automatic escaping, call the
 autoEscape() method with a false value immediately after creating the CGI object:
 
-   $query = CGI->new;
-   $query->autoEscape(0);
+   $q = CGI->new;
+   $q->autoEscape(0);
 
 Note that autoEscape() is exclusively used to effect the behavior of how some
 CGI.pm HTML generation functions handle escaping. Calling escapeHTML()
@@ -1908,8 +1908,8 @@ Produces something that looks like:
 As a shortcut, you can interpolate the entire CGI object into a string
 and it will be replaced with the a nice HTML dump shown above:
 
-    $query=CGI->new;
-    print "<h2>Current Values</h2> $query\n";
+    $q=CGI->new;
+    print "<h2>Current Values</h2> $q\n";
 
 
 =head1 BUGS
