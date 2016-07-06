@@ -831,8 +831,10 @@ identity of the user.
 The redirect() method redirects the browser to a different URL. If you use
 redirection like this, you should B<not> print out a header as well.
 
-You should always use full URLs (including the http: or ftp: part) in
-redirection requests. Relative URLs will not work correctly.
+You are advised to use full URLs (absolute with respect to current URL or even
+including the http: or ftp: part) in redirection requests as relative URLs
+are resolved by the user agent of the client so may not do what you want or
+expect them to do.
 
 You can also use named arguments:
 

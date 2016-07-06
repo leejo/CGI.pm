@@ -15,6 +15,7 @@ CGI - Handle Common Gateway Interface requests and responses
 
     use CGI;
 
+        # create a CGI object (query) for use
     my $q = CGI->new;
 
     # Process an HTTP request
@@ -23,8 +24,8 @@ CGI - Handle Common Gateway Interface requests and responses
 
     my $fh      = $q->upload('file_field');
 
-    my $riddle  = $query->cookie('riddle_name');
-    my %answers = $query->cookie('answers');
+    my $riddle  = $q->cookie('riddle_name');
+    my %answers = $q->cookie('answers');
 
     # Prepare various HTTP responses
     print $q->header();
@@ -139,8 +140,6 @@ For example, using the object oriented style:
     my $q = CGI->new;                    # create new CGI object
     print $q->header;                    # create the HTTP header
 
-    ...
-
 In the function-oriented style, there is one default CGI object that
 you rarely deal with directly. Instead you just call functions to
 retrieve CGI parameters, manage cookies, and so on. The following example
@@ -156,8 +155,6 @@ need to create the CGI object.
 
     use CGI qw/:standard/;           # load standard CGI routines
     print header();                  # create the HTTP header
-
-    ...
 
 The examples in this document mainly use the object-oriented style. See HOW
 TO IMPORT FUNCTIONS for important information on function-oriented programming
@@ -227,10 +224,10 @@ Notice the way that underscores are translated automatically into hyphens.
 
 ## Creating a new query object (object-oriented style)
 
-    my $query = CGI->new;
+    my $q = CGI->new;
 
 This will parse the input (from POST, GET and DELETE methods) and store
-it into a perl5 object called $query. Note that because the input parsing
+it into a perl5 object called $q. Note that because the input parsing
 happens at object instantiation you have to set any CGI package variables
 that control parsing **before** you call CGI->new.
 
@@ -239,7 +236,7 @@ beginning of the file.
 
 ## Creating a new query object from an input file
 
-    my $query = CGI->new( $input_filehandle );
+    my $q = CGI->new( $input_filehandle );
 
 If you provide a file handle to the new() method, it will read parameters
 from the file (or STDIN, or whatever). The file can be in any of the forms
@@ -262,7 +259,7 @@ This will (re)initialize the default CGI object from the indicated file handle.
 
 You can also initialize the query object from a hash reference:
 
-    my $query = CGI->new( {
+    my $q = CGI->new( {
         'dinosaur' => 'barney',
         'song'     => 'I love you',
         'friends'  => [ qw/ Jessica George Nancy / ]
@@ -270,7 +267,7 @@ You can also initialize the query object from a hash reference:
 
 or from a properly formatted, URL-escaped query string:
 
-    my $query = CGI->new('dinosaur=barney&color=purple');
+    my $q = CGI->new('dinosaur=barney&color=purple');
 
 or from a previously existing CGI object (currently this clones the parameter
 list, but none of the other object-specific fields, such as autoescaping):
@@ -288,16 +285,16 @@ To create an empty query, initialize it from an empty string or hash:
 
 ## Fetching a list of keywords from the query
 
-    my @keywords = $query->keywords
+    my @keywords = $q->keywords
 
 If the script was invoked as the result of an ISINDEX search, the parsed
 keywords can be obtained as an array using the keywords() method.
 
 ## Fetching the names of all the parameters passed to your script
 
-    my @names = $query->multi_param
+    my @names = $q->multi_param
 
-    my @names = $query->param
+    my @names = $q->param
 
 If the script was invoked with a parameter list
 (e.g. "name1=value1&name2=value2&name3=value3"), the param() / multi\_param()
@@ -313,11 +310,11 @@ and so isn't guaranteed).
 
 ## Fetching the value or values of a single named parameter
 
-    my @values = $query->multi_param('foo');
+    my @values = $q->multi_param('foo');
 
         -or-
 
-    my $value = $query->param('foo');
+    my $value = $q->param('foo');
 
 Pass the param() / multi\_param() method a single argument to fetch the value
 of the named parameter. If the parameter is multivalued (e.g. from multiple
@@ -336,13 +333,13 @@ into the hash:
 
     my %user_info = (
         id   => 1,
-        name => $query->param('name'),
+        name => $q->param('name'),
     );
 
 The fix for the above is to force scalar context on the call to ->param by
 prefixing it with "scalar"
 
-    name => scalar $query->param('name'),
+    name => scalar $q->param('name'),
 
 If you call param() in list context with an argument a warning will be raised
 by CGI.pm, you can disable this warning by setting $CGI::LIST\_CONTEXT\_WARN to 0
@@ -356,7 +353,7 @@ context, and the empty list in a list context.
 
 ## Setting the value(s) of a named parameter
 
-    $query->param('foo','an','array','of','values');
+    $q->param('foo','an','array','of','values');
 
 This sets the value for the named parameter 'foo' to an array of values. This
 is one way to change the value of a field AFTER the script has been invoked
@@ -365,21 +362,21 @@ once before.
 param() also recognizes a named parameter style of calling described in more
 detail later:
 
-    $query->param(
+    $q->param(
         -name   => 'foo',
         -values => ['an','array','of','values'],
     );
 
                 -or-
 
-    $query->param(
+    $q->param(
         -name  => 'foo',
         -value => 'the value',
     );
 
 ## Appending additional values to a named parameter
 
-    $query->append(
+    $q->append(
         -name   =>'foo',
         -values =>['yet','more','values'],
     );
@@ -391,7 +388,7 @@ calling syntax.
 
 ## Importing all parameters into a namespace
 
-    $query->import_names('R');
+    $q->import_names('R');
 
 This creates a series of variables in the 'R' namespace. For example, $R::foo,
 @R:foo. For keyword lists, a variable @R::keywords will appear. If no namespace
@@ -408,7 +405,7 @@ and security risks.
 
 ## Deleting a parameter completely
 
-    $query->delete('foo','bar','baz');
+    $q->delete('foo','bar','baz');
 
 This completely clears a list of parameters. It sometimes useful for resetting
 parameters that you don't want passed down between script invocations.
@@ -418,7 +415,7 @@ conflicts with perl's built-in delete operator.
 
 ## Deleting all parameters
 
-    $query->delete_all();
+    $q->delete_all();
 
 This clears the CGI object completely. It might be useful to ensure that all
 the defaults are taken when you create a fill-out form.
@@ -432,11 +429,11 @@ multipart/form-data, then the POSTed data will not be processed, but instead
 be returned as-is in a parameter named POSTDATA. To retrieve it, use code like
 this:
 
-    my $data = $query->param('POSTDATA');
+    my $data = $q->param('POSTDATA');
 
 Likewise if PUTed data can be retrieved with code like this:
 
-    my $data = $query->param('PUTDATA');
+    my $data = $q->param('PUTDATA');
 
 (If you don't know what the preceding means, worry not. It only affects people
 trying to use CGI for XML processing and other specialized tasks)
@@ -490,7 +487,7 @@ calls (also see the section on CGI-LIB compatibility).
 
 ## Saving the state of the script to a file
 
-    $query->save(\*FILEHANDLE)
+    $q->save(\*FILEHANDLE)
 
 This will write the current state of the form to the provided filehandle. You
 can read it back in by providing a filehandle to the new() method. Note that
@@ -827,8 +824,10 @@ identity of the user.
 The redirect() method redirects the browser to a different URL. If you use
 redirection like this, you should **not** print out a header as well.
 
-You should always use full URLs (including the http: or ftp: part) in
-redirection requests. Relative URLs will not work correctly.
+You are advised to use full URLs (absolute with respect to current URL or even
+including the http: or ftp: part) in redirection requests as relative URLs
+are resolved by the user agent of the client so may not do what you want or
+expect them to do.
 
 You can also use named arguments:
 
@@ -1020,8 +1019,8 @@ file handle, CGI.pm unlinks (deletes) the temporary file. If you need to you
 can access the temporary file directly. You can access the temp file for a file
 upload by passing the file name to the tmpFileName() method:
 
-    my $filehandle  = $query->upload( 'uploaded_file' );
-    my $tmpfilename = $query->tmpFileName( $filehandle );
+    my $filehandle  = $q->upload( 'uploaded_file' );
+    my $tmpfilename = $q->tmpFileName( $filehandle );
 
 As with ->uploadInfo, using the reference returned by ->upload or ->param is
 preferred, although unlike ->uploadInfo, plain filenames also work if possible
@@ -1265,7 +1264,7 @@ To retrieve a cookie, request it by name by calling cookie() method without the
 **-value** parameter. This example uses the object-oriented form:
 
     my $riddle  = $q->cookie('riddle_name');
-    my %answers = $query->cookie('answers');
+    my %answers = $q->cookie('answers');
 
 Cookies created with a single scalar value, such as the "riddle\_name" cookie,
 will be returned in that form. Cookies with array and hash values can also be
