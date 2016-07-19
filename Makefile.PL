@@ -51,12 +51,19 @@ WriteMakefile(
         ? ()
         : (
             META_MERGE => {
-                requires  => { perl => '5.008001' },
-                resources => {
+                'meta-spec' => { version => 2 },
+                requires    => { perl    => '5.008001' },
+                resources   => {
                     license    => 'http://dev.perl.org/licenses/',
                     homepage   => 'https://metacpan.org/module/CGI',
-                    repository => 'https://github.com/leejo/CGI.pm',
-                    bugtracker => 'https://github.com/leejo/CGI.pm/issues',
+                    repository => {
+                        url  => 'https://github.com/leejo/CGI.pm',
+                        web  => 'https://github.com/leejo/CGI.pm',
+                        type => 'git',
+                    },
+                    bugtracker => {
+                        web => 'https://github.com/leejo/CGI.pm/issues',
+                    }
                 },
                 no_index => { directory => [qw/t/] },
             },
