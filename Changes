@@ -1,3 +1,13 @@
+4.32 2016-07-19
+
+    [ DOCUMENTATION ]
+    - make perldoc CGI object consistent (GH #205)
+    - clarify reason for absolute URLs (GH #206)
+
+    [ INTERNALS ]
+    - tweak dependency defs in Makefile.PL (GH #207, GH #208)
+    - (thanks to karenetheridge and kentfredric)
+
 4.31 2016-06-14
 
     [ FEATURES ]
