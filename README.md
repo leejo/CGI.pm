@@ -316,10 +316,15 @@ and so isn't guaranteed).
 
     my $value = $q->param('foo');
 
+        -or-
+
+    my @values = $q->param('foo'); # list context, discouraged and will raise
+                                   # a warning (use ->multi_param instead)
+
 Pass the param() / multi\_param() method a single argument to fetch the value
-of the named parameter. If the parameter is multivalued (e.g. from multiple
-selections in a scrolling list), you can ask to receive an array. Otherwise
-the method will return a single value.
+of the named parameter. When calling param() If the parameter is multivalued
+(e.g. from multiple selections in a scrolling list), you can ask to receive
+an array. Otherwise the method will return the **first** value.
 
 **Warning** - calling param() in list context can lead to vulnerabilities if
 you do not sanitise user input as it is possible to inject other param
@@ -1533,7 +1538,7 @@ hurt anything if you do.
 
 CGI.pm provides four simple functions for producing multipart documents of the
 type needed to implement server push. These functions were graciously provided
-by Ed Jordan &lt;ed@fidalgo.net>. To import these into your namespace, you must
+by Ed Jordan <ed@fidalgo.net>. To import these into your namespace, you must
 import the ":push" set. You are also advised to put the script into NPH mode
 and to set $| to 1 to avoid buffering problems.
 
@@ -1734,7 +1739,7 @@ Thanks very much to:
 - Mark Stosberg (mark@stosberg.com)
 - Matt Heffron (heffron@falstaff.css.beckman.com)
 - James Taylor (james.taylor@srs.gov)
-- Scott Anguish &lt;sanguish@digifix.com>
+- Scott Anguish (sanguish@digifix.com)
 - Mike Jewell (mlj3u@virginia.edu)
 - Timothy Shimmin (tes@kbs.citri.edu.au)
 - Joergen Haegg (jh@axis.se)

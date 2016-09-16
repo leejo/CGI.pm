@@ -315,10 +315,15 @@ and so isn't guaranteed).
 
     my $value = $q->param('foo');
 
+        -or-
+
+    my @values = $q->param('foo'); # list context, discouraged and will raise
+                                   # a warning (use ->multi_param instead)
+
 Pass the param() / multi_param() method a single argument to fetch the value
-of the named parameter. If the parameter is multivalued (e.g. from multiple
-selections in a scrolling list), you can ask to receive an array. Otherwise
-the method will return a single value.
+of the named parameter. When calling param() If the parameter is multivalued
+(e.g. from multiple selections in a scrolling list), you can ask to receive
+an array. Otherwise the method will return the B<first> value.
 
 B<Warning> - calling param() in list context can lead to vulnerabilities if
 you do not sanitise user input as it is possible to inject other param
@@ -1774,7 +1779,7 @@ Thanks very much to:
 
 =item James Taylor (james.taylor@srs.gov)
 
-=item Scott Anguish <sanguish@digifix.com>
+=item Scott Anguish (sanguish@digifix.com)
 
 =item Mike Jewell (mlj3u@virginia.edu)
 

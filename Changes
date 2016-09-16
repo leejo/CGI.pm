@@ -1,3 +1,9 @@
+4.33 2016-09-16
+
+    [ DOCUMENTATION ]
+    - clarify that ->param will return the first value if there are
+      multiple values (when not called in list context)
+
 4.32 2016-07-19
 
     [ DOCUMENTATION ]
