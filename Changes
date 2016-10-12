@@ -1,3 +1,9 @@
+(future version) 2016-10-12
+
+    [ ENHANCEMENT ]
+    - If running from the command line, url_param now picks up
+      parameters given on then command line or on stdin (GH #210)
+
 4.11 2014-12-02
 
     [ SPEC / BUG FIXES ]

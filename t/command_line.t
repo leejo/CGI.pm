@@ -83,6 +83,6 @@ is run('@p = CGI::param(); @p = sort @p; print "@p"', $arg), 'game weather', 'na
 is run('print CGI::header()'), "Content-Type: text/html; charset=ISO-8859-1\r\n\r\n", 'header';
 is run('print CGI::h1("hi")'), '<h1>hi</h1>', 'h1';
 
-# Test the peculiarities of command line mode - no request method, and for now, no URL parameters.
+# Test the peculiarities of command line mode - no request method, and url_param works the same as param.
 is run('$r = CGI::request_method(); print defined $r ? 1 : 0'), '0', 'request_method is undef';
-is run('$r = CGI::url_param("game"); print defined $r ? 1 : 0', $arg), '0', 'url_param returns undef';
+is run('$r = CGI::url_param("game"); print $r', $arg), 'chess', 'url_param works';
