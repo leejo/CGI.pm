@@ -7636,8 +7636,8 @@ Newer browsers do not report the user name for privacy reasons!
 
 =item B<request_method()>
 
-Returns the method used to access your script, usually
-one of 'POST', 'GET' or 'HEAD'.
+Returns the method used to access your script, usually one of 'POST',
+'GET' or 'HEAD'.  If running from tne command line it will be undef.
 
 =item B<content_type()>
 
