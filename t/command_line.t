@@ -6,7 +6,7 @@ use warnings;
 
 use File::Temp qw(tempfile);
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -76,13 +76,18 @@ END
 
 my $arg = 'game=chess&game=checkers&weather=dull';
 
-# First some basic tests of ordinary functionality.
-is run('$r = CGI::param("game"); print $r', $arg), 'chess', 'get first param';
-is run('@p = CGI::param(); print scalar @p', $arg), 2, 'number of params';
-is run('@p = CGI::param(); @p = sort @p; print "@p"', $arg), 'game weather', 'names of params';
+
+
+# Test ordinary functionality.
 is run('print CGI::header()'), "Content-Type: text/html; charset=ISO-8859-1\r\n\r\n", 'header';
 is run('print CGI::h1("hi")'), '<h1>hi</h1>', 'h1';
 
-# Test the peculiarities of command line mode - no request method, and url_param works the same as param.
+# Test that request_method returns undef as documented.
 is run('$r = CGI::request_method(); print defined $r ? 1 : 0'), '0', 'request_method is undef';
-is run('$r = CGI::url_param("game"); print $r', $arg), 'chess', 'url_param works';
+
+# Now test parameter fetching.  url_param should work the same as param.
+foreach my $fn (qw(param url_param)) {
+    is run(sprintf('$r = CGI::%s("game"); print $r', $fn), $arg), 'chess', "get first $fn";
+    is run(sprintf('@p = CGI::%s(); print scalar @p', $fn), $arg), 2, "number of ${fn}s";
+    is run(sprintf('@p = CGI::%s(); @p = sort @p; print "@p"', $fn), $arg), 'game weather', "names of ${fn}s";
+}
