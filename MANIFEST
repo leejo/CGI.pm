@@ -40,6 +40,7 @@ t/carp.t
 t/changes.t
 t/charset.t
 t/checkbox_group.t
+t/command_line.t
 t/compiles_pod.t
 t/cookie.t
 t/delete.t
