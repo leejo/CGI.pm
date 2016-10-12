@@ -5642,11 +5642,14 @@ parameters, call the B<url_param()> method.  Use it in the same way as
 B<param()>.  The main difference is that it allows you to read the
 parameters, but not set them.
 
-
 Under no circumstances will the contents of the URL query string
 interfere with similarly-named CGI parameters in POSTed forms.  If you
 try to mix a URL query string with a form submitted with the GET
 method, the results will not be what you expect.
+
+If running from the command line, C<url_param> will not pick up any
+parameters given on the command line.  This will change in a future
+version.
 
 =head1 CREATING STANDARD HTML ELEMENTS:
 
