@@ -1,3 +1,9 @@
+4.35 2016-10-13
+
+    [ FIX ]
+    - revert changes from 4.34 as they broke stuff
+
+
 4.34 2016-10-13
 
     [ ENHANCEMENT ]

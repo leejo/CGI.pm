@@ -1,14 +1,7 @@
 I'm happy to accept pull requests and issue reports
 
 Please note that CGI.pm is now considered done. See also "mature" and "legacy".
-Feature requests and non-critical issues will probably be rejected, although
-pull requests will be accepted if they are small in scope and included tests
-and perldoc. So if you want a shiny new feature you're going to have to add it
-yourself and submit a pull request.
-
-The one exception to accepting pull requests is for any HTML functionality in
-the module - these methods are considered deprecated. There will be no changes
-to them or pull requests accepted for them no matter how trivial.
+Feature requests and non-critical issues will probably be rejected.
 
 When sending bug reports please provide the version of CGI.pm, the version of
 perl, the name and version of your Web server, and the name and version of the

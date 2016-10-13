@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.34';
+$CGI::VERSION='4.35';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1339,10 +1339,6 @@ sub version {
 ####
 sub url_param {
     my ($self,@p) = self_or_default(@_);
-    if (not defined $self->request_method) {
-        # Running from command line.
-        return $self->param(@p);
-    }
     my $name = shift(@p);
     return undef unless exists($ENV{QUERY_STRING});
     unless (exists($self->{'.url_param'})) {
