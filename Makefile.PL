@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 my $mm = $ExtUtils::MakeMaker::VERSION;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+# the contents of the Makefile that is written. 
 WriteMakefile(
     INSTALLDIRS      => ( $] >= 5.012 ? 'site' : 'perl' ),
     ABSTRACT_FROM    => 'lib/CGI.pod',
