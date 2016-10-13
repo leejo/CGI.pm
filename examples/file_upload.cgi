@@ -15,6 +15,8 @@ my $template_vars = {
 # Process the form if there is a file name entered
 if ( my $file = $cgi->param( 'filename' ) ) {
 
+	die "filename passed as ARG" if $file =~ /ARG/;
+
     my $tmpfile  = $cgi->tmpFileName( $file );
     my $mimetype = $cgi->uploadInfo( $file )->{'Content-Type'} || '';
 

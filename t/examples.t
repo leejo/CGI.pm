@@ -52,7 +52,7 @@ foreach my $example ( sort keys( %examples ) ) {
 	foreach my $args ( sort keys( %{ $examples{$example} } ) ) {
 		foreach my $regexp ( @{ $examples{$example}{$args} } ) {
 			stdout_like(
-				"$^X $Bin/../examples/$example $args",
+				"$^X -T $Bin/../examples/$example $args",
 				$regexp,
 				$example
 			);
