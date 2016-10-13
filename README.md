@@ -964,7 +964,7 @@ similarly-named CGI parameters in POSTed forms. If you try to mix a URL query
 string with a form submitted with the GET method, the results will not be what
 you expect.
 
-If running from the command line, C<url_param> will pick up all
+If running from the command line, `url_param` will pick up all
 parameters given on the command line or (with -debug) on standard
 input.  (It might change in future to return only command line
 parameters in this case.)
