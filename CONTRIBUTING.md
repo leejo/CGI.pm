@@ -1,7 +1,7 @@
-I'm happy to accept pull requests and issue reports
+I'm happy to with pull requests or issue reports that address critical problems.
 
 Please note that CGI.pm is now considered done. See also "mature" and "legacy".
-Feature requests and non-critical issues will probably be rejected.
+Feature requests and non-critical issues will be rejected.
 
 When sending bug reports please provide the version of CGI.pm, the version of
 perl, the name and version of your Web server, and the name and version of the
