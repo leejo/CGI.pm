@@ -1,4 +1,4 @@
-I'm happy to with pull requests or issue reports that address critical problems.
+I'm happy with pull requests or issue reports that address critical problems.
 
 Please note that CGI.pm is now considered done. See also "mature" and "legacy".
 Feature requests and non-critical issues will be rejected.
