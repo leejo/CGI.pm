@@ -1484,7 +1484,7 @@ techniques. May not work in all browsers.
 =item B<request_method()>
 
 Returns the method used to access your script, usually one of 'POST', 'GET'
-or 'HEAD'.
+or 'HEAD'.  If running from the command line it will be undef.
 
 =item B<content_type()>
 
