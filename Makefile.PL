@@ -37,6 +37,7 @@ WriteMakefile(
         'Test::Deep'       => 0.11,
         'Test::More'       => 0.98,
         'Test::Warn'       => 0.30,
+        'Test::NoWarnings' => 0,
     },
     test    => { TESTS    => 't/*.t t/headers/*.t' },
     linkext => { LINKTYPE => '' }, # no link needed
