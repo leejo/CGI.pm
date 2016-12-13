@@ -975,9 +975,6 @@ similarly-named CGI parameters in POSTed forms. If you try to mix a URL query
 string with a form submitted with the GET method, the results will not be what
 you expect.
 
-If running from the command line, C<url_param> will not pick up any
-parameters given on the command line.
-
 =head2 Processing a file upload field
 
 =head3 Basics
@@ -1487,7 +1484,7 @@ techniques. May not work in all browsers.
 =item B<request_method()>
 
 Returns the method used to access your script, usually one of 'POST', 'GET'
-or 'HEAD'.  If running from the command line it will be undef.
+or 'HEAD'.
 
 =item B<content_type()>
 
