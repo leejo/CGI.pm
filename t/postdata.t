@@ -7,7 +7,7 @@
 #################################################################
 
 use strict;
-use Test::More tests => 28;
+use Test::More tests => 42;
 
 use CGI;
 $CGI::DEBUG=1;
@@ -59,7 +59,7 @@ END {
 
 
 
-for my $pdata ( qw' POST PUT ' ){
+for my $pdata ( qw' POST PUT PATCH' ){
     local $ENV{REQUEST_METHOD} = $pdata;
     my $pdata = $pdata.'DATA';
     CGI::initialize_globals();  #### IMPORTANT
@@ -74,7 +74,7 @@ for my $pdata ( qw' POST PUT ' ){
     ok( "GIF89a\1\0\1\0\x90\0\0\xFF\0\0\0\0\0,\0\0\0\0\1\0\1\0\0\2\2\4\1\0;" eq  $q->param( $pdata  ), "and the value isn't corrupted" );
 }
 
-for my $pdata ( qw' POST PUT ' ){
+for my $pdata ( qw' POST PUT PATCH' ){
     local $ENV{REQUEST_METHOD} = $pdata;
     my $pdata = $pdata.'DATA';
     local *STDIN;
@@ -98,7 +98,7 @@ for my $pdata ( qw' POST PUT ' ){
 }
 
 
-for my $pdata ( qw' POST PUT ' ){
+for my $pdata ( qw' POST PUT PATCH' ){
     local $ENV{REQUEST_METHOD} = $pdata;
     my $pdata = $pdata.'DATA';
     local *STDIN;

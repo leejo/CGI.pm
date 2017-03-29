@@ -1,3 +1,8 @@
+4.36 2017-03-29
+
+    [ ENHANCEMENT ]
+    - Support PATCH HTTP method (thanks to GovtGeek for the... patch)
+
 4.35 2016-10-13
 
     [ FIX ]

@@ -435,14 +435,16 @@ this:
 
     my $data = $q->param('POSTDATA');
 
-Likewise if PUTed data can be retrieved with code like this:
+Likewise if PUTed and PATCHed data can be retrieved with code like this:
 
     my $data = $q->param('PUTDATA');
+
+    my $data = $q->param('PATCHDATA');
 
 (If you don't know what the preceding means, worry not. It only affects people
 trying to use CGI for XML processing and other specialized tasks)
 
-PUTDATA/POSTDATA are also available via
+PUTDATA/POSTDATA/PATCHDATA are also available via
 L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
 and as L<file uploads|/Processing a file upload field> via L</-putdata_upload>
 option.
@@ -651,13 +653,13 @@ expected to return utf-8 strings and convert them using code like this:
     my $param = $cgi->param('foo');
     $param    = decode( 'UTF-8',$param );
 
-=item -putdata_upload
+=item -putdata_upload / -postdata_upload / -patchdata_upload
 
-Makes C<<< $cgi->param('PUTDATA'); >>> and C<<< $cgi->param('POSTDATA'); >>>
-act like file uploads named PUTDATA and POSTDATA. See
-L</Handling non-urlencoded arguments> and L</Processing a file upload field>
-PUTDATA/POSTDATA are also available via
-L<upload_hook|/Progress bars for file uploads and avoiding temp files>.
+Makes C<<< $cgi->param('PUTDATA'); >>>, C<<< $cgi->param('PATCHDATA'); >>>,
+and C<<< $cgi->param('POSTDATA'); >>> act like file uploads named PUTDATA,
+PATCHDATA, and POSTDATA. See L</Handling non-urlencoded arguments> and
+L</Processing a file upload field> PUTDATA/POSTDATA/PATCHDATA are also available
+via L<upload_hook|/Progress bars for file uploads and avoiding temp files>.
 
 =item -nph
 
