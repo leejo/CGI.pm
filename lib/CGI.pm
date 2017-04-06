@@ -2755,8 +2755,8 @@ sub url {
 ####
 sub cookie {
     my($self,@p) = self_or_default(@_);
-    my($name,$value,$path,$domain,$secure,$expires,$httponly) =
-	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY],@p);
+    my($name,$value,$path,$domain,$secure,$expires,$httponly,$max_age,$samesite) =
+	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY,'MAX-AGE',SAMESITE],@p);
 
     require CGI::Cookie;
 
@@ -2784,6 +2784,8 @@ sub cookie {
     push(@param,'-expires'=>$expires) if $expires;
     push(@param,'-secure'=>$secure) if $secure;
     push(@param,'-httponly'=>$httponly) if $httponly;
+    push(@param,'-max_age'=>$max_age) if $max_age;
+    push(@param,'-samesite'=>$samesite) if $samesite;
 
     return CGI::Cookie->new(@param);
 }
