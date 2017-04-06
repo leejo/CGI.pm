@@ -6,9 +6,12 @@ use warnings;
 
 use File::Temp qw(tempfile);
 
-use Test::More tests => 8;
+use Test::More;
 use Test::Deep;
-use Test::NoWarnings;
+
+if ( $^O =~ /^MSWin/i ) {
+  plan skip_all => "No relevant to Windows";
+}
 
 # We don't need to import CGI here since it's the perl subprocess that loads it.
 
@@ -86,3 +89,5 @@ is run('print CGI::h1("hi")'), '<h1>hi</h1>', 'h1';
 # Test the peculiarities of command line mode - no request method, and for now, no URL parameters.
 is run('$r = CGI::request_method(); print defined $r ? 1 : 0'), '0', 'request_method is undef';
 is run('$r = CGI::url_param("game"); print defined $r ? 1 : 0', $arg), '0', 'url_param returns undef';
+
+done_testing();
