@@ -2,6 +2,11 @@
 
     [ ENHANCEMENT ]
     - Support PATCH HTTP method (thanks to GovtGeek for the... patch)
+    - pass through max_age and samesite to CGI::Cookie->new in the call
+      in CGI->cookie (GH #220)
+
+    [ FIX ]
+    - skip t/command_line.t on windows as it doesn't work
 
 4.35 2016-10-13
 
