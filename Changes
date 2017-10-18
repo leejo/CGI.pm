@@ -1,3 +1,9 @@
+4.37 2017-11-01
+
+    [ FIX ]
+    - Fix incorrect quoting of ? in ->url (GH #112, GH #222, with
+      thanks to Reuben Thomas)
+
 4.36 2017-03-29
 
     [ ENHANCEMENT ]
