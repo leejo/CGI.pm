@@ -95,6 +95,18 @@ subtest 'IIS PATH_INFO eq SCRIPT_NAME' => sub {
     is( $q->url,'http://example.com/hello+world','PATH_INFO being the same as SCRIPT_NAME');
 };
 
+subtest 'Escaped question marks preserved' => sub {
+    local $ENV{HTTP_X_FORWARDED_HOST} = undef;
+    local $ENV{HTTP_HOST}           = 'example.com';
+    local $ENV{PATH_INFO}           = '/path/info';
+    local $ENV{REQUEST_URI}         = '/real/path/info%3F';
+    local $ENV{SCRIPT_NAME}         = '/real/cgi-bin/dispatch.cgi';
+    local $ENV{SCRIPT_FILENAME}     = '/home/mark/real/path/cgi-bin/dispatch.cgi';
+
+    my $q = CGI->new;
+    is( $q->url(-absolute=>1), '/real/path/info?' );
+};
+
 done_testing();
 
 
