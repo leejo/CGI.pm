@@ -931,7 +931,7 @@ sub _setup_symbols {
 
 	if ( /^[:-]any$/ ) {
 		warn "CGI -any pragma has been REMOVED. You should audit your code for any use "
-			. "of none supported / incorrectly spelled tags and remove them"
+			. "of unsupported/incorrectly-spelled tags and remove them"
 		;
 		next;
 	}
