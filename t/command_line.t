@@ -22,8 +22,10 @@ $| = 1;
 ######################### End of black magic.
 
 my @cmd_base = ($^X);
-push @cmd_base, "-I$_" foreach @INC;
 push @cmd_base, '-MCGI', '-e';
+
+require Config;
+my $inc = join($Config::Config{path_sep}, @INC) || '';
 
 # Run a string of Perl code using a command line CGI invocation.
 # Takes the code and any additional command line arguments.
@@ -38,6 +40,7 @@ sub run {
     open my $old_stderr, '>&STDERR' or die "cannot dup stderr: $!";
     open STDOUT, '>&', $stdout_fh or die "cannot redirect stdout: $!";
     open STDERR, '>&', $stderr_fh or die "cannot redirect stderr: $!";
+    local $ENV{PERL5LIB} = $inc;
     my $r = system(@cmd);
     my $system_status = $?;
     open STDOUT, '>&', $old_stdout or die "cannot restore stdout: $!";
