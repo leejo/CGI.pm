@@ -1,3 +1,8 @@
+4.38 2017-12-01
+
+    [ TESTING ]
+    - command_line.t: Avoid -I for libs (GH #224, thanks to cpansprout)
+
 4.37 2017-11-01
 
     [ FIX ]

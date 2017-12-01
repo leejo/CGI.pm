@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.37';
+$CGI::VERSION='4.38';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
