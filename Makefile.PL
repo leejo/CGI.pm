@@ -1,5 +1,4 @@
 use ExtUtils::MakeMaker;
-my $mm = $ExtUtils::MakeMaker::VERSION;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -12,6 +11,10 @@ WriteMakefile(
     LICENSE          => 'perl_5',
     VERSION_FROM     => 'lib/CGI.pm',
     MIN_PERL_VERSION => '5.8.1',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'   => '6.64',
+        'File::Spec::Functions' => '0',
+    },
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
@@ -47,27 +50,21 @@ WriteMakefile(
         ZIP      => '/usr/bin/zip',
         ZIPFLAGS => '-rl'
     },
-    (
-        $mm < 6.46
-        ? ()
-        : (
-            META_MERGE => {
-                'meta-spec' => { version => 2 },
-                requires    => { perl    => '5.008001' },
-                resources   => {
-                    license    => 'http://dev.perl.org/licenses/',
-                    homepage   => 'https://metacpan.org/module/CGI',
-                    repository => {
-                        url  => 'https://github.com/leejo/CGI.pm',
-                        web  => 'https://github.com/leejo/CGI.pm',
-                        type => 'git',
-                    },
-                    bugtracker => {
-                        web => 'https://github.com/leejo/CGI.pm/issues',
-                    }
-                },
-                no_index => { directory => [qw/t/] },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        requires    => { perl    => '5.008001' },
+        resources   => {
+            license    => 'http://dev.perl.org/licenses/',
+            homepage   => 'https://metacpan.org/module/CGI',
+            repository => {
+                url  => 'https://github.com/leejo/CGI.pm',
+                web  => 'https://github.com/leejo/CGI.pm',
+                type => 'git',
             },
-        )
-    ),
+            bugtracker => {
+                web => 'https://github.com/leejo/CGI.pm/issues',
+            }
+        },
+        no_index => { directory => [qw/t/] },
+    },
 );
