@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile(
+my %WriteMakefileArgs = (
     INSTALLDIRS      => ( $] >= 5.012 ? 'site' : 'perl' ),
     ABSTRACT_FROM    => 'lib/CGI.pod',
     VERSION_FROM     => 'lib/CGI.pm',
@@ -11,10 +11,6 @@ WriteMakefile(
     LICENSE          => 'perl_5',
     VERSION_FROM     => 'lib/CGI.pm',
     MIN_PERL_VERSION => '5.8.1',
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker'   => '6.64',
-        'File::Spec::Functions' => '0',
-    },
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
@@ -68,3 +64,24 @@ WriteMakefile(
         no_index => { directory => [qw/t/] },
     },
 );
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.64) } ) {
+	my $req = delete $WriteMakefileArgs{'TEST_REQUIRES'};
+	@{ $WriteMakefileArgs{'BUILD_REQUIRES'} }{ keys %$req } = values %$req;
+}
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.5503) } ) {
+	my $req = delete $WriteMakefileArgs{'BUILD_REQUIRES'};
+	@{ $WriteMakefileArgs{'PREREQ_PM'} }{ keys %$req } = values %$req;
+}
+
+delete $WriteMakefileArgs{'MIN_PERL_VERSION'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.48) };
+
+delete $WriteMakefileArgs{'META_MERGE'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.46) };
+
+delete $WriteMakefileArgs{'LICENSE'}
+	unless eval { ExtUtils::MakeMaker->VERSION(6.31) };
+
+WriteMakefile(%WriteMakefileArgs);
