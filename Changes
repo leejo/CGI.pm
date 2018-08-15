@@ -1,3 +1,9 @@
+4.40 2018-08-15
+
+    [ FIX / TESTING ]
+    - support perls < 5.10.1 in Makefile.PL by being more dynamic
+      (GH #229, GH #230, thanks to Aristotle)
+
 4.39 2018-08-13
 
     [ FIX / TESTING ]

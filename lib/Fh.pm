@@ -5,6 +5,6 @@ package Fh;
 use strict;
 use warnings;
 
-$Fh::VERSION = '4.39';
+$Fh::VERSION = '4.40';
 
 1;
