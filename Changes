@@ -1,3 +1,8 @@
+4.42 2019-03-26
+
+    [ DOCUMENTATION ]
+    - clarify licence also in Makefile.PL (GH #232)
+
 4.41 2019-03-26
 
     [ DOCUMENTATION ]
