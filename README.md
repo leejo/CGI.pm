@@ -436,14 +436,16 @@ this:
 
     my $data = $q->param('POSTDATA');
 
-Likewise if PUTed data can be retrieved with code like this:
+Likewise if PUTed and PATCHed data can be retrieved with code like this:
 
     my $data = $q->param('PUTDATA');
+
+    my $data = $q->param('PATCHDATA');
 
 (If you don't know what the preceding means, worry not. It only affects people
 trying to use CGI for XML processing and other specialized tasks)
 
-PUTDATA/POSTDATA are also available via
+PUTDATA/POSTDATA/PATCHDATA are also available via
 [upload\_hook](#progress-bars-for-file-uploads-and-avoiding-temp-files),
 and as [file uploads](#processing-a-file-upload-field) via ["-putdata\_upload"](#putdata_upload)
 option.
@@ -646,13 +648,13 @@ The current list of pragmas is as follows:
         my $param = $cgi->param('foo');
         $param    = decode( 'UTF-8',$param );
 
-- -putdata\_upload
+- -putdata\_upload / -postdata\_upload / -patchdata\_upload
 
-    Makes `$cgi->param('PUTDATA');` and `$cgi->param('POSTDATA');`
-    act like file uploads named PUTDATA and POSTDATA. See
-    ["Handling non-urlencoded arguments"](#handling-non-urlencoded-arguments) and ["Processing a file upload field"](#processing-a-file-upload-field)
-    PUTDATA/POSTDATA are also available via
-    [upload\_hook](#progress-bars-for-file-uploads-and-avoiding-temp-files).
+    Makes `$cgi->param('PUTDATA');`, `$cgi->param('PATCHDATA');`,
+    and `$cgi->param('POSTDATA');` act like file uploads named PUTDATA,
+    PATCHDATA, and POSTDATA. See ["Handling non-urlencoded arguments"](#handling-non-urlencoded-arguments) and
+    ["Processing a file upload field"](#processing-a-file-upload-field) PUTDATA/POSTDATA/PATCHDATA are also available
+    via [upload\_hook](#progress-bars-for-file-uploads-and-avoiding-temp-files).
 
 - -nph
 
@@ -963,6 +965,9 @@ Under no circumstances will the contents of the URL query string interfere with
 similarly-named CGI parameters in POSTed forms. If you try to mix a URL query
 string with a form submitted with the GET method, the results will not be what
 you expect.
+
+If running from the command line, `url_param` will not pick up any
+parameters given on the command line.
 
 ## Processing a file upload field
 
@@ -1463,7 +1468,7 @@ interface. The methods are as follows:
 - **request\_method()**
 
     Returns the method used to access your script, usually one of 'POST', 'GET'
-    or 'HEAD'.
+    or 'HEAD'.  If running from the command line it will be undef.
 
 - **content\_type()**
 
@@ -1729,7 +1734,7 @@ available for your use:
 # LICENSE
 
 The CGI.pm distribution is copyright 1995-2007, Lincoln D. Stein. It is
-distributed under GPL and the Artistic License 2.0. It is currently maintained
+distributed under the Artistic License 2.0. It is currently maintained
 by Lee Johnson (LEEJO) with help from many contributors.
 
 # CREDITS
