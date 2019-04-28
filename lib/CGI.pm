@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.42';
+$CGI::VERSION='4.43';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -3343,7 +3343,7 @@ sub read_multipart {
 
 	$header{'Content-Disposition'} ||= ''; # quench uninit variable warning
 
-	my($param)= $header{'Content-Disposition'}=~/[\s;]name="([^"]*)"/;
+	my $param = _mp_value_parse( $header{'Content-Disposition'},'name' );
         $param .= $TAINTED;
 
         # See RFC 1867, 2183, 2045
@@ -3448,6 +3448,28 @@ sub read_multipart {
 	  push(@{$self->{param}{$param}},$filehandle);
       }
     }
+}
+
+sub _mp_value_parse {
+	my ( $string,$field ) = @_;
+
+	my $is_quoted = $string =~/[\s;]$field="/ ? 1 : 0;
+	my $param;
+
+	if ( $is_quoted ) {
+		# a quoted token cannot contain anything but an unescaped quote
+		($param) = $string =~/[\s;]$field="((?:\\"|[^"])*)"/;
+	} else {
+		# a plain token cannot contain any reserved characters
+		# https://tools.ietf.org/html/rfc2616#section-2.2
+		# separators     = "(" | ")" | "<" | ">" | "@"
+		#                | "," | ";" | ":" | "\" | <">
+		#                | "/" | "[" | "]" | "?" | "="
+		#                | "{" | "}" | SP | HT
+		($param) = $string =~/[\s;]$field=([^\(\)<>\@,;:\\"\/\[\]\?=\{\} \015\n\t]*)/;
+	}
+
+	return $param;
 }
 
 #####

@@ -1,3 +1,8 @@
+4.43 2019-05-01
+
+    [ FIX / TESTING ]
+    - support unquoted multipart/form-data name values (GH #234)
+
 4.42 2019-03-26
 
     [ DOCUMENTATION ]

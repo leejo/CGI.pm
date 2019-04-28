@@ -1,0 +1,27 @@
+------MyGreatBoundary
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=code
+
+4019300163786
+------MyGreatBoundary
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name="word"
+
+squeaky
+------MyGreatBoundary
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name="why do \"this\""
+
+because
+------MyGreatBoundary
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name="hate ()<>@,;:[]?={}	/\""
+
+really hateful
+------MyGreatBoundary
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=éttu
+
+oui
+------MyGreatBoundary--
+
