@@ -1,3 +1,8 @@
+4.44 2019-06-03
+
+    [ ENHANCEMENT ]
+    - Replace only use of "base" with "parent" (GH #235)
+
 4.43 2019-05-01
 
     [ FIX / TESTING ]
