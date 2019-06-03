@@ -1,5 +1,5 @@
 package CGI::Util;
-use base 'Exporter';
+use parent 'Exporter';
 require 5.008001;
 use strict;
 use if $] >= 5.019, 'deprecate';

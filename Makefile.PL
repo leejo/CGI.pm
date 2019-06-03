@@ -14,7 +14,6 @@ my %WriteMakefileArgs = (
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
-        'base'           => 0,     # base was first released with perl 5.00405
         'overload'       => 0,     # overload was first released with perl 5.002
         'strict'         => 0,     # strict was first released with perl 5
         'utf8'           => 0,     # utf8 was first released with perl v5.6.0
