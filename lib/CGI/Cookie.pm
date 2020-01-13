@@ -230,7 +230,7 @@ sub httponly { # HttpOnly
     return $self->{'httponly'};
 }
 
-my %_legal_samesite = ( Strict => 1, Lax => 1 );
+my %_legal_samesite = ( Strict => 1, Lax => 1, None => 1 );
 sub samesite { # SameSite
     my $self = shift;
     my $samesite = ucfirst lc +shift if @_; # Normalize casing.
