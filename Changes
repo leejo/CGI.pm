@@ -1,3 +1,8 @@
+4.45 2019-06-03
+
+    [ ENHANCEMENT ]
+    - Add support for SameSite=None cookies (GH #237, thanks to Dur09)
+
 4.44 2019-06-03
 
     [ ENHANCEMENT ]
