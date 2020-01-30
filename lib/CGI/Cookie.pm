@@ -392,8 +392,9 @@ cookie only when a cryptographic protocol is in use.
 B<-httponly> if set to a true value, the cookie will not be accessible
 via JavaScript.
 
-B<-samesite> may be C<Lax> or C<Strict> and is an evolving part of the
-standards for cookies. Please refer to current documentation regarding it.
+B<-samesite> may be C<Lax>, C<Strict>, or C<None> and is an evolving part
+of the standards for cookies. Please refer to current documentation
+regarding it.
 
 For compatibility with Apache::Cookie, you may optionally pass in
 a mod_perl request object as the first argument to C<new()>. It will
