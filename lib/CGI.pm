@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.46';
+$CGI::VERSION='4.47';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -1009,8 +1009,7 @@ sub read_postdata_putdata {
         # skip the file if uploads disabled
         if ($DISABLE_UPLOADS) {
             
-            #	      while (defined($data = $buffer->read)) { }
-            my $buff;
+            my $buf;
             my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
             my $len  = $content_length;
             while ( $len > 0 ) {
