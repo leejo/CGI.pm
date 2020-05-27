@@ -427,7 +427,7 @@ APACHEREQ: {
     isa_ok $c, 'CGI::Cookie';
     ok $c->bake($r), 'Bake the cookie';
     ok eq_array( $r->{check}, [ 'Set-Cookie', $c->as_string ]),
-        'bake() should call headers_out->set()';
+        'bake() should call err_headers_out->add()';
 
     $r = Apache2::Faker->new;
     isa_ok $r, 'Apache2::RequestReq';
@@ -439,7 +439,7 @@ APACHEREQ: {
     isa_ok $c, 'CGI::Cookie';
     ok $c->bake($r), 'Bake the cookie';
     ok eq_array( $r->{check}, [ 'Set-Cookie', $c->as_string ]),
-        'bake() should call headers_out->set()';
+        'bake() should call err_headers_out->add()';
 }
 
 
@@ -449,7 +449,7 @@ sub isa {
     my ($self, $pkg) = @_;
     return $pkg eq 'Apache';
 }
-sub headers_out { shift }
+sub err_headers_out { shift }
 sub add { shift->{check} = \@_; }
 
 package Apache2::Faker;
@@ -458,5 +458,5 @@ sub isa {
     my ($self, $pkg) = @_;
     return $pkg eq 'Apache2::RequestReq';
 }
-sub headers_out { shift }
+sub err_headers_out { shift }
 sub add { shift->{check} = \@_; }
