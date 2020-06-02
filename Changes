@@ -1,3 +1,9 @@
+4.48 2020-06-02
+
+    [ FIX ]
+    - fix CGI::Cookie->bake() doesn't work with mod_perl redirects (GH #240)
+    - thanks to sherrardb for the PR (GH #241)
+
 4.47 2020-05-01
 
     [ FIX / TESTING ]
