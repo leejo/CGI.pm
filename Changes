@@ -1,3 +1,8 @@
+4.49 2020-06-08
+
+    [ FIX ]
+    - remove deprecation warning as no longer in core (GH #221)
+
 4.48 2020-06-02
 
     [ FIX ]

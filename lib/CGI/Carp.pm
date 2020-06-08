@@ -1,5 +1,4 @@
 package CGI::Carp;
-use if $] >= 5.019, 'deprecate';
 
 my $appease_cpants_kwalitee = q/
 use strict;
@@ -327,7 +326,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION     = '4.48';
+$CGI::Carp::VERSION     = '4.49';
 $CGI::Carp::CUSTOM_MSG  = undef;
 $CGI::Carp::DIE_HANDLER = undef;
 $CGI::Carp::TO_BROWSER  = 1;

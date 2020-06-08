@@ -1,12 +1,11 @@
 package CGI::Push;
-use if $] >= 5.019, 'deprecate';
 
 my $appease_cpants_kwalitee = q/
 use strict;
 use warnings;
 #/;
 
-$CGI::Push::VERSION='4.48';
+$CGI::Push::VERSION='4.49';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');
