@@ -1718,6 +1718,22 @@ However it isn't clear that any browser currently knows what to do with this
 status code. It might be better just to create a page that warns the user of
 the problem.
 
+=head1 MODULE FLAGS
+
+There are a number of global module flags which affect how CGI.pm operates.
+
+=over 4
+
+=item B<$CGI::APPEND_QUERY_STRING>
+
+If set to a non-zero value, this will add query string parameters to a POST
+forms parameters hence allowing I<param()> to return values from the query
+string as well as from the decoded POST request instead of having to use
+I<url_param> instead. This makes it easier to get the value of a parameter
+when you don't know the source.
+
+=back
+
 =head1 COMPATIBILITY WITH CGI-LIB.PL
 
 To make it easier to port existing programs that use cgi-lib.pl the
