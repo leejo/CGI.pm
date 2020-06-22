@@ -24,6 +24,7 @@ README.md
 t/Dump.t
 t/arbitrary_handles.t
 t/autoescape.t
+t/append_query.t
 t/can.t
 t/carp.t
 t/cgi.t
