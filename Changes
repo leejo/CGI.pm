@@ -1,3 +1,10 @@
+7.00 2021-01-01
+
+    [ ENHANCEMENT ]
+    - Enable strict and warnings through distribution
+        - This may break your code, but hopefully not
+        - More documentation TBD
+
 4.50 2019-06-22
 
     [ ENHANCEMENT ]

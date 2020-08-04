@@ -1,17 +1,20 @@
 package CGI;
+
+use strict;
+use warnings;
+
+no strict 'refs'; # compat with all sorts of shenanigans here
+no strict 'subs'; # compat with the rearrange implementation
+
 require 5.008001;
 use Carp 'croak';
 
-my $appease_cpants_kwalitee = q/
-use strict;
-use warnings;
-#/;
-
-$CGI::VERSION='4.50';
+our $VERSION='7.00';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
-$_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
+our $TAINTED;
+our $_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
 
 {
@@ -19,17 +22,34 @@ $_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
   $TAINTED = substr("$0$^X",0,0);
 }
 
-$MOD_PERL            = 0; # no mod_perl by default
+our $MOD_PERL            = 0; # no mod_perl by default
 
 #global settings
-$POST_MAX            = -1; # no limit to uploaded files
-$DISABLE_UPLOADS     = 0;
-$UNLINK_TMP_FILES    = 1;
-$LIST_CONTEXT_WARN   = 1;
-$ENCODE_ENTITIES     = q{&<>"'};
-$ALLOW_DELETE_CONTENT = 0;
+our $POST_MAX            = -1; # no limit to uploaded files
+our $DISABLE_UPLOADS     = 0;
+our $UNLINK_TMP_FILES    = 1;
+our $LIST_CONTEXT_WARN   = 1;
+our $ENCODE_ENTITIES     = q{&<>"'};
+our $ALLOW_DELETE_CONTENT = 0;
 
-@SAVED_SYMBOLS = ();
+our @SAVED_SYMBOLS = ();
+
+our (
+	$XHTML,$DEFAULT_DTD,$NOSTICKY,$NPH,$DEBUG,$TABINDEX,$CLOSE_UPLOAD_FILES,
+	$EBCDIC,$HEADERS_ONCE,$USE_PARAM_SEMICOLONS,$NO_UNDEF_PARAMS,$PARAM_UTF8,
+	$PUTDATA_UPLOAD,$APPEND_QUERY_STRING,$BEEN_THERE,$DTD_PUBLIC_IDENTIFIER,
+	@QUERY_PARAM,%QUERY_PARAM,$Q,$OS,%EXPORT,%EXPORT_OK,$QUERY_CHARSET,
+	%QUERY_FIELDNAMES,%QUERY_TMPFILES,
+
+	$symbol,@symbol,%symbol,
+
+	%in,
+
+	$FILLUNIT,
+	$INITIAL_FILLUNIT,
+	$TIMEOUT,
+	$SPIN_LOOP_MAX,
+);
 
 # >>>>> Here are some globals that you might want to adjust <<<<<<
 sub initialize_globals {
@@ -143,14 +163,15 @@ if ($OS =~ /^MSWin/i) {
 }
 
 # Some OS logic.  Binary mode enabled on DOS, NT and VMS
-$needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin|CYGWIN|NETWARE)/;
+our $needs_binmode = $OS=~/^(WINDOWS|DOS|OS2|MSWin|CYGWIN|NETWARE)/;
 
 # This is the default class for the CGI object to use when all else fails.
+our $DefaultClass;
 $DefaultClass = 'CGI' unless defined $CGI::DefaultClass;
 
 # The path separator is a slash, backslash or semicolon, depending
 # on the platform.
-$SL = {
+our $SL = {
      UNIX    => '/',  OS2 => '\\', EPOC      => '/', CYGWIN => '/', NETWARE => '/',
      WINDOWS => '\\', DOS => '\\', MACINTOSH => ':', VMS    => '/'
     }->{$OS};
@@ -158,9 +179,11 @@ $SL = {
 # This no longer seems to be necessary
 # Turn on NPH scripts by default when running under IIS server!
 # $NPH++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
+our $IIS = 0;
 $IIS++ if defined($ENV{'SERVER_SOFTWARE'}) && $ENV{'SERVER_SOFTWARE'}=~/IIS/;
 
 # Turn on special checking for ActiveState's PerlEx
+our $PERLEX = 0;
 $PERLEX++ if defined($ENV{'GATEWAY_INTERFACE'}) && $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-PerlEx/;
 
 # Turn on special checking for Doug MacEachern's modperl
@@ -188,12 +211,11 @@ if (exists $ENV{MOD_PERL} && ! $PERLEX) {
 # use ASCII, so \015\012 means something different.  I find this all 
 # really annoying.
 $EBCDIC = "\t" ne "\011";
+our $CRLF = "\015\012";
 if ($OS eq 'VMS') {
   $CRLF = "\n";
 } elsif ($EBCDIC) {
   $CRLF= "\r\n";
-} else {
-  $CRLF = "\015\012";
 }
 
 _set_binmode() if ($needs_binmode);
@@ -223,7 +245,7 @@ sub _set_binmode {
 	}
 }
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
 	':html2' => [ 'h1' .. 'h6', qw/
 		p br hr ol ul li dl dt dd menu code var strong em
 		tt u i b blockquote pre img a address cite samp dfn html head
@@ -286,7 +308,7 @@ sub import {
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
     my @packages = ($self,@{"$self\:\:ISA"});
-    for $sym (keys %EXPORT) {
+    for my $sym (keys %EXPORT) {
 	my $pck;
 	my $def = $DefaultClass;
 	for $pck (@packages) {
@@ -1133,7 +1155,7 @@ sub read_from_client {
 sub delete {
     my($self,@p) = self_or_default(@_);
     my(@names) = rearrange([NAME],@p);
-    my @to_delete = ref($names[0]) eq 'ARRAY' ? @$names[0] : @names;
+    my @to_delete = ref($names[0]) eq 'ARRAY' ? @{ $names[0] } : @names;
     my %to_delete;
     for my $name (@to_delete)
     {
@@ -1471,7 +1493,7 @@ sub multipart_init {
 
     $self->{'separator'} = "$CRLF--$boundary$CRLF";
     $self->{'final_separator'} = "$CRLF--$boundary--$CRLF";
-    $type = SERVER_PUSH($boundary);
+    my $type = SERVER_PUSH($boundary);
     return $self->header(
 	-nph => 0,
 	-type => $type,
@@ -1686,7 +1708,7 @@ sub start_html {
     $self->element_id(0);
     $self->element_tab(0);
 
-    $encoding = lc($self->charset) unless defined $encoding;
+    $encoding = lc($self->charset || '') unless defined $encoding;
 
     # Need to sort out the DTD before it's okay to call escapeHTML().
     my(@result,$xml_dtd);
@@ -1829,7 +1851,7 @@ sub _style {
        }
 
       } else {
-           my $src = $s;
+           my $src = $s || '';
            push(@result,$XHTML ? qq(<link rel="$rel" type="$type" href="$src" $other/>)
                                : qq(<link rel="$rel" type="$type" href="$src"$other>));
       }
@@ -1843,7 +1865,7 @@ sub _script {
 
     my (@scripts) = ref($script) eq 'ARRAY' ? @$script : ($script);
     for $script (@scripts) {
-    my($src,$code,$language,$charset);
+    my($src,$code,$type,$language,$charset);
     if (ref($script)) { # script is a hash
         ($src,$code,$type,$charset) =
         rearrange(['SRC','CODE',['LANGUAGE','TYPE'],'CHARSET'],
@@ -1904,6 +1926,7 @@ sub isindex {
     my($action,@other) = rearrange([ACTION],@p);
     $action = qq/ action="$action"/ if $action;
     my($other) = @other ? " @other" : '';
+    $action = defined $action ? $action : '';
     return $XHTML ? "<isindex$action$other />" : "<isindex$action$other>";
 }
 
@@ -2204,6 +2227,7 @@ sub checkbox {
                    [OVERRIDE,FORCE],TABINDEX],@p);
 
     $value = defined $value ? $value : 'on';
+	$name = defined $name ? $name : '';
 
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined $self->param($name))) {
@@ -2348,6 +2372,7 @@ sub _box_group {
     my %checked = $self->previous_or_default($name,$defaults,$override);
 
     # If no check array is specified, check the first by default
+	$values[0] = defined $values[0] ? $values[0] : '';
     $checked{$values[0]}++ if $box_type eq 'radio' && !%checked;
 
     $name=$self->_maybe_escapeHTML($name);
@@ -2399,6 +2424,7 @@ sub _box_group {
 	$_=$self->_maybe_escapeHTML($_);
 
         if ($XHTML) {
+           $name = defined $name ? $name : '';
            push @elements,
               CGI::label($labelattributes,
                    qq(<input type="$box_type" name="$name" value="$_" $checkit$other$tab$attribs$disable/>$label)).${break};
@@ -2501,7 +2527,7 @@ sub popup_menu {
 ####
 sub optgroup {
     my($self,@p) = self_or_default(@_);
-    my($name,$values,$attributes,$labeled,$noval,$labels,@other)
+    my($name,$values,$attributes,$labeled,$novals,$labels,@other)
         = rearrange([NAME,[VALUES,VALUE],ATTRIBUTES,LABELED,NOVALS,LABELS],@p);
 
     my($result,@values);
@@ -2513,8 +2539,14 @@ sub optgroup {
     for (@values) {
         if (/<optgroup/) {
             for (split(/\n/)) {
-                my $selectit = $XHTML ? 'selected="selected"' : 'selected';
-                s/(value="$selected")/$selectit $1/ if defined $selected;
+				# this looks like a bug - $selected is never scoped here as anywhere else
+				# it is defined is not available to this scope, and since it's not defined
+				# here this substitution can never work. possibly this is a copy/paste bug
+				# from when the function was originally added, so the code is commented out
+				# until someone/thing tells me otherwise (it's html functions so it needs
+				# to go anyway)
+				# my $selectit = $XHTML ? 'selected="selected"' : 'selected';
+				# s/(value="$selected")/$selectit $1/ if defined $selected;
                 $result .= "$_\n";
             }
         }
@@ -2573,6 +2605,7 @@ sub scrolling_list {
 
     $name=$self->_maybe_escapeHTML($name);
     $tabindex = $self->element_tab($tabindex);
+    $name = defined $name ? $name : '';
     $result = qq/<select name="$name" $tabindex$has_size$is_multiple$other>\n/;
     for (@values) {
         if (/<optgroup/) {
@@ -2619,7 +2652,7 @@ sub hidden {
 	rearrange([NAME,[DEFAULT,VALUE,VALUES],[OVERRIDE,FORCE]],@p);
 
     my $do_override = 0;
-    if ( ref($p[0]) || substr($p[0],0,1) eq '-') {
+    if ( $p[0] && (ref($p[0]) || substr($p[0],0,1) eq '-')) {
 	@value = ref($default) ? @{$default} : $default;
 	$do_override = $override;
     } else {
@@ -2659,6 +2692,8 @@ sub image_button {
     my($align) = $alignment ? " align=\L\"$alignment\"" : '';
     my($other) = @other ? " @other" : '';
     $name=$self->_maybe_escapeHTML($name);
+    $name = defined $name ? $name : '';
+    $src = defined $src ? $src : '';
     return $XHTML ? qq(<input type="image" name="$name" src="$src"$align$other />)
                   : qq/<input type="image" name="$name" src="$src"$align$other>/;
 }
@@ -3172,7 +3207,7 @@ sub https {
 sub protocol {
     local($^W)=0;
     my $self = shift;
-    return 'https' if uc($self->https()) eq 'ON'; 
+    return 'https' if uc($self->https() || '') eq 'ON'; 
     return 'https' if $self->server_port == 443;
     my $prot = $self->server_protocol;
     my($protocol,$version) = split('/',$prot);
@@ -3272,6 +3307,8 @@ sub previous_or_default {
     my($self,$name,$defaults,$override) = @_;
     my(%selected);
 
+	$name = defined $name ? $name : '';
+
     if (!$override && ($self->{'.fieldnames'}->{$name} || 
 		       defined($self->param($name)) ) ) {
 	$selected{$_}++ for $self->param($name);
@@ -3287,6 +3324,7 @@ sub previous_or_default {
 
 sub register_parameter {
     my($self,$param) = @_;
+	$param = defined $param ? $param : '';
     $self->{'.parametersToAdd'}->{$param}++;
 }
 
@@ -3306,7 +3344,7 @@ sub read_from_cmdline {
     } elsif ($DEBUG > 1) {
 	require Text::ParseWords;
 	print STDERR "(offline mode: enter name=value pairs on standard input; press ^D or ^Z when done)\n";
-	chomp(@lines = <STDIN>); # remove newlines
+	chomp(my @lines = <STDIN>); # remove newlines
 	$input = join(" ",@lines);
 	@words = &Text::ParseWords::old_shellwords($input);    
     }
@@ -3388,7 +3426,7 @@ sub read_multipart {
 
 	  # skip the file if uploads disabled
 	  if ($DISABLE_UPLOADS) {
-	      while (defined($data = $buffer->read)) { }
+	      while (defined(my $data = $buffer->read)) { }
 	      last UPLOADS;
 	  }
 
@@ -3526,7 +3564,7 @@ sub read_multipart_related {
 
 	  # skip the file if uploads disabled
 	  if ($DISABLE_UPLOADS) {
-	      while (defined($data = $buffer->read)) { }
+	      while (defined(my $data = $buffer->read)) { }
 	      last UPLOADS;
 	  }
 
@@ -3632,7 +3670,7 @@ sub _set_attributes {
     my $self = shift;
     my($element, $attributes) = @_;
     return '' unless defined($attributes->{$element});
-    $attribs = ' ';
+    my $attribs = ' ';
     for my $attrib (keys %{$attributes->{$element}}) {
         (my $clean_attrib = $attrib) =~ s/^-//;
         $attribs .= "@{[lc($clean_attrib)]}=\"$attributes->{$element}{$attrib}\" ";
@@ -3649,14 +3687,18 @@ sub _set_attributes {
 
 package CGI::MultipartBuffer;
 
-$_DEBUG = 0;
+our $_DEBUG = 0;
 
 # how many bytes to read at a time.  We use
 # a 4K buffer by default.
-$MultipartBuffer::INITIAL_FILLUNIT ||= 1024 * 4;
-$MultipartBuffer::TIMEOUT          ||= 240*60; # 4 hour timeout for big files
-$MultipartBuffer::SPIN_LOOP_MAX    ||= 2000;   # bug fix for some Netscape servers
-$MultipartBuffer::CRLF             ||= $CGI::CRLF;
+$CGI::MultipartBuffer::INITIAL_FILLUNIT =
+	$MultipartBuffer::INITIAL_FILLUNIT ||= 1024 * 4;
+$CGI::MultipartBuffer::TIMEOUT          =
+	$MultipartBuffer::TIMEOUT          ||= 240*60; # 4 hour timeout for big files
+$CGI::MultipartBuffer::SPIN_LOOP_MAX    =
+	$MultipartBuffer::SPIN_LOOP_MAX    ||= 2000;   # bug fix for some Netscape servers
+$CGI::MultipartBuffer::CRLF             =
+	$MultipartBuffer::CRLF             ||= $CGI::CRLF;
 
 $INITIAL_FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
 $TIMEOUT          = $MultipartBuffer::TIMEOUT;
@@ -3666,6 +3708,7 @@ $CRLF             = $MultipartBuffer::CRLF;
 sub new {
     my($package,$interface,$boundary,$length) = @_;
     $FILLUNIT = $INITIAL_FILLUNIT;
+	my $IN;
     $CGI::DefaultClass->binmode($IN); # if $CGI::needs_binmode;  # just do it always
 
     # If the user types garbage into the file upload field,
@@ -3882,25 +3925,6 @@ sub eof {
     return 1 if (length($self->{BUFFER}) == 0)
 		 && ($self->{LENGTH} <= 0);
     undef;
-}
-
-1;
-
-package CGI;
-
-# We get a whole bunch of warnings about "possibly uninitialized variables"
-# when running with the -w switch.  Touch them all once to get rid of the
-# warnings.  This is ugly and I hate it.
-if ($^W) {
-    $CGI::CGI = '';
-    $CGI::CGI=<<EOF;
-    $CGI::VERSION;
-    $CGI::MultipartBuffer::SPIN_LOOP_MAX;
-    $CGI::MultipartBuffer::CRLF;
-    $CGI::MultipartBuffer::TIMEOUT;
-    $CGI::MultipartBuffer::INITIAL_FILLUNIT;
-EOF
-    ;
 }
 
 1;
