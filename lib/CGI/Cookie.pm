@@ -337,7 +337,7 @@ See these URLs for more information:
 
 =item B<6. samesite flag>
 
-Allowed settings are C<Strict> and C<Lax>.
+Allowed settings are C<Strict>, C<Lax> and C<None>.
 
 As of June 2016, support is limited to recent releases of Chrome and Opera.
 
