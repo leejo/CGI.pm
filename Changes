@@ -1,4 +1,9 @@
-4.50 2019-06-22
+4.51 2020-10-01
+
+    [ DOCUMENTATION ]
+    - Document support for SameSite=None cookies in CGI::Cookie (GH #244)
+
+4.50 2020-06-22
 
     [ ENHANCEMENT ]
     - Add APPEND_QUERY_STRING option (GH #243, thanks to stevenh)
