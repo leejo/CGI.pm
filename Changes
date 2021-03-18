@@ -1,3 +1,7 @@
+(upcoming) 2021-03-18
+    [ FIX ]
+    - sort hash keys for deterministic behaviour (GH #245)
+
 4.51 2020-10-01
 
     [ DOCUMENTATION ]
