@@ -3624,7 +3624,7 @@ sub _set_values_and_labels {
     $$l = $v if ref($v) eq 'HASH' && !ref($$l);
     return $self->param($n) if !defined($v);
     return $v if !ref($v);
-    return ref($v) eq 'HASH' ? keys %$v : @$v;
+    return ref($v) eq 'HASH' ? sort keys %$v : @$v;
 }
 
 # internal routine, don't use
