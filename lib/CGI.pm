@@ -7,7 +7,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.51';
+$CGI::VERSION='4.52';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -286,7 +286,7 @@ sub import {
     # To allow overriding, search through the packages
     # Till we find one in which the correct subroutine is defined.
     my @packages = ($self,@{"$self\:\:ISA"});
-    for $sym (keys %EXPORT) {
+    for $sym (sort keys %EXPORT) {
 	my $pck;
 	my $def = $DefaultClass;
 	for $pck (@packages) {
@@ -609,7 +609,7 @@ sub init {
 	      last METHOD;
 	  }
 	  if (ref($initializer) && ref($initializer) eq 'HASH') {
-	      for (keys %$initializer) {
+	      for (sort keys %$initializer) {
 		  $self->param('-name'=>$_,'-value'=>$initializer->{$_});
 	      }
 	      last METHOD;
@@ -1155,7 +1155,7 @@ sub import_names {
     die "Can't import names into \"main\"\n" if \%{"${namespace}::"} == \%::;
     if ($delete || $MOD_PERL || exists $ENV{'FCGI_ROLE'}) {
 	# can anyone find an easier way to do this?
-	for (keys %{"${namespace}::"}) {
+	for (sort keys %{"${namespace}::"}) {
 	    local *symbol = "${namespace}::${_}";
 	    undef $symbol;
 	    undef @symbol;
@@ -1428,7 +1428,7 @@ sub save {
 	        if length($escaped_param) or length($value);
 	}
     }
-    for (keys %{$self->{'.fieldnames'}}) {
+    for (sort keys %{$self->{'.fieldnames'}}) {
           print $filehandle ".cgifields=",escape("$_"),"\n";
     }
     print $filehandle "=\n";    # end of record
@@ -2456,7 +2456,7 @@ sub popup_menu {
         if (/<optgroup/) {
             for my $v (split(/\n/)) {
                 my $selectit = $XHTML ? 'selected="selected"' : 'selected';
-		for my $selected (keys %selected) {
+		for my $selected (sort keys %selected) {
 		    $v =~ s/(value="\Q$selected\E")/$selectit $1/;
 		}
                 $result .= "$v\n";
@@ -2578,7 +2578,7 @@ sub scrolling_list {
         if (/<optgroup/) {
             for my $v (split(/\n/)) {
                 my $selectit = $XHTML ? 'selected="selected"' : 'selected';
-		for my $selected (keys %selected) {
+		for my $selected (sort keys %selected) {
 		    $v =~ s/(value="$selected")/$selectit $1/;
 		}
                 $result .= "$v\n";
@@ -2943,7 +2943,7 @@ sub query_string {
            push(@pairs,"$eparam=$value");
        }
     }
-    for (keys %{$self->{'.fieldnames'}}) {
+    for (sort keys %{$self->{'.fieldnames'}}) {
       push(@pairs,".cgifields=".escape("$_"));
     }
     return join($USE_PARAM_SEMICOLONS ? ';' : '&',@pairs);
@@ -2991,7 +2991,7 @@ sub Accept {
     return $prefs{$search} if $prefs{$search};
 
     # Didn't get it, so try pattern matching.
-    for (keys %prefs) {
+    for (sort keys %prefs) {
 	next unless /\*/;       # not a pattern match
 	($pat = $_) =~ s/([^\w*])/\\$1/g; # escape meta characters
 	$pat =~ s/\*/.*/g; # turn it into a pattern
@@ -3144,7 +3144,7 @@ sub http {
         }
         return $ENV{"HTTP_$parameter"};
     }
-    return grep { /^HTTP(?:_|$)/ } keys %ENV;
+    return grep { /^HTTP(?:_|$)/ } sort keys %ENV;
 }
 
 #### Method: https
@@ -3162,7 +3162,7 @@ sub https {
         return $ENV{"HTTPS_$parameter"};
     }
     return wantarray
-        ? grep { /^HTTPS(?:_|$)/ } keys %ENV
+        ? grep { /^HTTPS(?:_|$)/ } sort keys %ENV
         : $ENV{'HTTPS'};
 }
 
@@ -3293,7 +3293,7 @@ sub register_parameter {
 sub get_fields {
     my($self) = @_;
     return $self->CGI::hidden('-name'=>'.cgifields',
-			      '-values'=>[keys %{$self->{'.parametersToAdd'}}],
+			      '-values'=>[sort keys %{$self->{'.parametersToAdd'}}],
 			      '-override'=>1);
 }
 
@@ -3415,7 +3415,7 @@ sub read_multipart {
 	  # together with the body for later parsing with an external
 	  # MIME parser module
 	  if ( $multipart ) {
-	      for ( keys %header ) {
+	      for ( sort keys %header ) {
 		  print $filehandle "$_: $header{$_}${CRLF}";
 	      }
 	      print $filehandle "${CRLF}";
@@ -3624,7 +3624,7 @@ sub _set_values_and_labels {
     $$l = $v if ref($v) eq 'HASH' && !ref($$l);
     return $self->param($n) if !defined($v);
     return $v if !ref($v);
-    return ref($v) eq 'HASH' ? keys %$v : @$v;
+    return ref($v) eq 'HASH' ? sort keys %$v : @$v;
 }
 
 # internal routine, don't use
@@ -3633,7 +3633,7 @@ sub _set_attributes {
     my($element, $attributes) = @_;
     return '' unless defined($attributes->{$element});
     $attribs = ' ';
-    for my $attrib (keys %{$attributes->{$element}}) {
+    for my $attrib (sort keys %{$attributes->{$element}}) {
         (my $clean_attrib = $attrib) =~ s/^-//;
         $attribs .= "@{[lc($clean_attrib)]}=\"$attributes->{$element}{$attrib}\" ";
     }
