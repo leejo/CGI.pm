@@ -7,7 +7,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.52';
+$CGI::VERSION='4.53';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -2793,7 +2793,7 @@ sub cookie {
     push(@param,'-expires'=>$expires) if $expires;
     push(@param,'-secure'=>$secure) if $secure;
     push(@param,'-httponly'=>$httponly) if $httponly;
-    push(@param,'-max_age'=>$max_age) if $max_age;
+    push(@param,'-max-age'=>$max_age) if $max_age;
     push(@param,'-samesite'=>$samesite) if $samesite;
 
     return CGI::Cookie->new(@param);
