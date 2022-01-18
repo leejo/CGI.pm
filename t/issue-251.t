@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-use Test::More tests => 4;
+use Test::More tests => 2;
 
 use CGI::Cookie ();
 use CGI ();
@@ -20,11 +20,26 @@ local *CGI::Cookie::fetch = sub {
     goto &$fetch_orig_sub;
 };
 
-my $q = CGI->new;
+subtest 'cookie cache disabled' => sub {
+    plan tests => 4;
+    $fetch_counter = 0;
+    $CGI::COOKIE_CACHE = 0;
 
-is($q->cookie('cookie1'), 'value1', 'cookie1 is correct');
-is($q->cookie('cookie2'), 'value2', 'cookie2 is correct');
-is($q->cookie('cookie3'), 'value3', 'cookie3 is correct');
+    my $q = CGI->new;
+    is($q->cookie('cookie1'), 'value1', 'cookie1 is correct');
+    is($q->cookie('cookie2'), 'value2', 'cookie2 is correct');
+    is($q->cookie('cookie3'), 'value3', 'cookie3 is correct');
+    is($fetch_counter, 3, 'cookies were fetched on each `cookie` call');
+};
 
-is($fetch_counter, 1, 'cookies were fetched only once');
+subtest 'cookie cache enabled' => sub {
+    plan tests => 4;
+    $fetch_counter = 0;
+    $CGI::COOKIE_CACHE = 1;
 
+    my $q = CGI->new;
+    is($q->cookie('cookie1'), 'value1', 'cookie1 is correct');
+    is($q->cookie('cookie2'), 'value2', 'cookie2 is correct');
+    is($q->cookie('cookie3'), 'value3', 'cookie3 is correct');
+    is($fetch_counter, 1, 'cookies were fetched only once');
+};
