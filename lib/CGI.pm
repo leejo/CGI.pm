@@ -2773,7 +2773,7 @@ sub cookie {
     # value of the cookie, if any.  For efficiency, we cache the parsed
     # cookies in our state variables.
     unless ( defined($value) ) {
-	$self->{'.cookies'} = CGI::Cookie->fetch;
+	$self->{'.cookies'} = CGI::Cookie->fetch unless exists $self->{'.cookies'};
 	
 	# If no name is supplied, then retrieve the names of all our cookies.
 	return () unless $self->{'.cookies'};
