@@ -28,6 +28,7 @@ $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
 $ENCODE_ENTITIES     = q{&<>"'};
 $ALLOW_DELETE_CONTENT = 0;
+$COOKIE_CACHE        = 0;  # backcompat: cache was broken for years
 
 @SAVED_SYMBOLS = ();
 
@@ -2773,7 +2774,7 @@ sub cookie {
     # value of the cookie, if any.  For efficiency, we cache the parsed
     # cookies in our state variables.
     unless ( defined($value) ) {
-	$self->{'.cookies'} = CGI::Cookie->fetch;
+	$self->{'.cookies'} = CGI::Cookie->fetch unless $COOKIE_CACHE && exists $self->{'.cookies'};
 	
 	# If no name is supplied, then retrieve the names of all our cookies.
 	return () unless $self->{'.cookies'};
