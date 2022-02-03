@@ -1317,6 +1317,16 @@ the names of all cookies passed to your script:
 See the B<cookie.cgi> example script for some ideas on how to use cookies
 effectively.
 
+=over 4
+
+=item B<$CGI::COOKIE_CACHE>
+
+If set to a non-negative integer, this variable will cause CGI.pm to use the
+cached cookie details from the previous call to cookie(). By default this
+cache is off to retain backwards compatibility.
+
+=back
+
 =head1 DEBUGGING
 
 If you are running the script from the command line or in the perl debugger,

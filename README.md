@@ -71,7 +71,7 @@ is has now been removed from the perl core...
 If you upgrade to a new version of perl or if you rely on a
 system or vendor perl and get an updated version of perl through a system
 update, then you will have to install CGI.pm yourself with cpan/cpanm/a vendor
-package/manually. To make this a little easier the [CGI::Fast](https://metacpan.org/pod/CGI::Fast) module has been
+package/manually. To make this a little easier the [CGI::Fast](https://metacpan.org/pod/CGI%3A%3AFast) module has been
 split into its own distribution, meaning you do not need access to a compiler
 to install CGI.pm
 
@@ -79,7 +79,7 @@ The rationale for this decision is that CGI.pm is no longer considered good
 practice for developing web applications, **including** quick prototyping and
 small web scripts. There are far better, cleaner, quicker, easier, safer,
 more scalable, more extensible, more modern alternatives available at this point
-in time. These will be documented with [CGI::Alternatives](https://metacpan.org/pod/CGI::Alternatives).
+in time. These will be documented with [CGI::Alternatives](https://metacpan.org/pod/CGI%3A%3AAlternatives).
 
 For more discussion on the removal of CGI.pm from core please see:
 
@@ -101,15 +101,15 @@ they relate to fundamentally broken page rendering.
 The rationale for this is that the HTML generation functions of CGI.pm
 are an obfuscation at best and a maintenance nightmare at worst. You
 should be using a template engine for better separation of concerns.
-See [CGI::Alternatives](https://metacpan.org/pod/CGI::Alternatives) for an example of using CGI.pm with the
-[Template::Toolkit](https://metacpan.org/pod/Template::Toolkit) module.
+See [CGI::Alternatives](https://metacpan.org/pod/CGI%3A%3AAlternatives) for an example of using CGI.pm with the
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit) module.
 
 These functions, and perldoc for them, are considered deprecated, they
 are no longer being maintained and no fixes or features for them will be
 accepted. They will, however, continue to exist in CGI.pm without any
 deprecation warnings ("soft" deprecation) so you can continue to use
 them if you really want to. All documentation for these functions has
-been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI::HTML::Functions).
+been moved to [CGI::HTML::Functions](https://metacpan.org/pod/CGI%3A%3AHTML%3A%3AFunctions).
 
 # Programming style
 
@@ -973,7 +973,7 @@ parameters given on the command line.
 
 ### Basics
 
-When the form is processed, you can retrieve an [IO::File](https://metacpan.org/pod/IO::File) compatible handle
+When the form is processed, you can retrieve an [IO::File](https://metacpan.org/pod/IO%3A%3AFile) compatible handle
 for a file upload field like this:
 
     use autodie;
@@ -1088,9 +1088,9 @@ upload hook. You can use this feature to completely turn off the temp file
 storage of file uploads, or potentially write your own file upload progress
 meter.
 
-This is much like the UPLOAD\_HOOK facility available in [Apache::Request](https://metacpan.org/pod/Apache::Request),
+This is much like the UPLOAD\_HOOK facility available in [Apache::Request](https://metacpan.org/pod/Apache%3A%3ARequest),
 with the exception that the first argument to the callback is an
-[Apache::Upload](https://metacpan.org/pod/Apache::Upload) object, here it's the remote filename.
+[Apache::Upload](https://metacpan.org/pod/Apache%3A%3AUpload) object, here it's the remote filename.
 
     my $q = CGI->new( \&hook [,$data [,$use_tempfile]] );
 
@@ -1138,7 +1138,7 @@ param() is not a filehandle at all, but a string.
 To solve this problem the upload() method was added, which always returns a
 lightweight filehandle. This generally works well, but will have trouble
 interoperating with some other modules because the file handle is not derived
-from [IO::File](https://metacpan.org/pod/IO::File). So that brings us to current recommendation given above,
+from [IO::File](https://metacpan.org/pod/IO%3A%3AFile). So that brings us to current recommendation given above,
 which is to call the handle() method on the file handle returned by upload().
 That upgrades the handle to an IO::File. It's a big win for compatibility for
 a small penalty of loading IO::File the first time you call it.
@@ -1297,6 +1297,12 @@ the names of all cookies passed to your script:
 
 See the **cookie.cgi** example script for some ideas on how to use cookies
 effectively.
+
+- **$CGI::COOKIE\_CACHE**
+
+    If set to a non-negative integer, this variable will cause CGI.pm to use the
+    cached cookie details from the previous call to cookie(). By default this
+    cache is off to retain backwards compatibility.
 
 # DEBUGGING
 
@@ -1683,6 +1689,18 @@ However it isn't clear that any browser currently knows what to do with this
 status code. It might be better just to create a page that warns the user of
 the problem.
 
+# MODULE FLAGS
+
+There are a number of global module flags which affect how CGI.pm operates.
+
+- **$CGI::APPEND\_QUERY\_STRING**
+
+    If set to a non-zero value, this will add query string parameters to a POST
+    forms parameters hence allowing _param()_ to return values from the query
+    string as well as from the decoded POST request instead of having to use
+    _url\_param_ instead. This makes it easier to get the value of a parameter
+    when you don't know the source.
+
 # COMPATIBILITY WITH CGI-LIB.PL
 
 To make it easier to port existing programs that use cgi-lib.pl the
@@ -1778,6 +1796,6 @@ The original bug tracker can be found at:
 
 # SEE ALSO
 
-[CGI::Carp](https://metacpan.org/pod/CGI::Carp) - provides [Carp](https://metacpan.org/pod/Carp) implementation tailored to the CGI environment.
+[CGI::Carp](https://metacpan.org/pod/CGI%3A%3ACarp) - provides [Carp](https://metacpan.org/pod/Carp) implementation tailored to the CGI environment.
 
-[CGI::Fast](https://metacpan.org/pod/CGI::Fast) - supports running CGI applications under FastCGI
+[CGI::Fast](https://metacpan.org/pod/CGI%3A%3AFast) - supports running CGI applications under FastCGI

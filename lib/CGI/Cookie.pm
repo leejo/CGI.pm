@@ -3,7 +3,7 @@ package CGI::Cookie;
 use strict;
 use warnings;
 
-our $VERSION='4.53';
+our $VERSION='4.54';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;

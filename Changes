@@ -1,3 +1,9 @@
+4.54 2022-02-03
+
+    [ FIX ]
+    - fix use of cache when calling ->cookie (GH #252)
+    - thanks to Sergey Panteleev for the PR
+
 4.53 2021-06-03
 
     [ FIX ]
