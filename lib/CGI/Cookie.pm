@@ -42,7 +42,7 @@ sub fetch {
    my $raw_cookie = get_raw_cookie(@_) or return;
    my %results;
    my($key,$value);
-   
+
    my @pairs = split("[;,] ?",$raw_cookie);
   for my $pair ( @pairs ) {
     $pair =~ s/^\s+|\s+$//g;    # trim leading trailing whitespace
@@ -56,15 +56,15 @@ sub fetch {
 
 sub get_raw_cookie {
   my $r = shift;
-  $r ||= eval { $MOD_PERL == 2                    ? 
+  $r ||= eval { $MOD_PERL == 2                    ?
                   Apache2::RequestUtil->request() :
                   Apache->request } if $MOD_PERL;
 
   return $r->headers_in->{'Cookie'} if $r;
 
-  die "Run $r->subprocess_env; before calling fetch()" 
+  die "Run $r->subprocess_env; before calling fetch()"
     if $MOD_PERL and !exists $ENV{REQUEST_METHOD};
-    
+
   return $ENV{HTTP_COOKIE} || $ENV{COOKIE};
 }
 
@@ -104,13 +104,14 @@ sub new {
   # Ignore mod_perl request object--compatibility with Apache::Cookie.
   shift if ref $params[0]
         && eval { $params[0]->isa('Apache::Request::Req') || $params[0]->isa('Apache') };
-  my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly, $samesite )
+  my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly, $samesite, $priority )
    = rearrange(
     [
       'NAME', [ 'VALUE', 'VALUES' ],
       'PATH',   'DOMAIN',
       'SECURE', 'EXPIRES',
-      'MAX-AGE','HTTPONLY','SAMESITE'
+      'MAX-AGE','HTTPONLY','SAMESITE',
+      'PRIORITY',
     ],
     @params
    );
@@ -127,6 +128,7 @@ sub new {
   $self->max_age( $max_age )   if defined $max_age;
   $self->httponly( $httponly ) if defined $httponly;
   $self->samesite( $samesite ) if defined $samesite;
+  $self->priority( $priority ) if defined $priority;
   return $self;
 }
 
@@ -147,6 +149,7 @@ sub as_string {
     push @cookie,"secure"                    if $self->secure;
     push @cookie,"HttpOnly"                  if $self->httponly;
     push @cookie,"SameSite=".$self->samesite if $self->samesite;
+    push @cookie,"Priority=".$self->priority if $self->priority;
 
     return join "; ", @cookie;
 }
@@ -236,6 +239,16 @@ sub samesite { # SameSite
     return $self->{'samesite'};
 }
 
+my %_legal_priority = ( Low => 1, Medium => 1, High => 1 );
+sub priority {
+    my $self = shift;
+    my $priority = ucfirst lc +shift if @_;
+    if ($priority && $_legal_priority{$priority}) {
+        $self->{'priority'} = $priority;
+    }
+    return $self->{'priority'};
+}
+
 1;
 
 =head1 NAME
@@ -251,7 +264,7 @@ CGI::Cookie - Interface to HTTP Cookies
     $cookie1 = CGI::Cookie->new(-name=>'ID',-value=>123456);
     $cookie2 = CGI::Cookie->new(-name=>'preferences',
                                -value=>{ font => Helvetica,
-                                         size => 12 } 
+                                         size => 12 }
                                );
     print header(-cookie=>[$cookie1,$cookie2]);
 
@@ -270,7 +283,7 @@ the browser's side of the connection.  Although CGI::Cookie is
 intended to be used in conjunction with CGI.pm (and is in fact used by
 it internally), you can use this module independently.
 
-For full information on cookies see 
+For full information on cookies see
 
     https://tools.ietf.org/html/rfc6265
 
@@ -296,11 +309,11 @@ the user quits the browser.
 
 =item B<2. domain>
 
-This is a partial or complete domain name for which the cookie is 
+This is a partial or complete domain name for which the cookie is
 valid.  The browser will return the cookie to any host that matches
 the partial domain name.  For example, if you specify a domain name
 of ".capricorn.com", then the browser will return the cookie to
-Web servers running on any of the machines "www.capricorn.com", 
+Web servers running on any of the machines "www.capricorn.com",
 "ftp.capricorn.com", "feckless.capricorn.com", etc.  Domain names
 must contain at least two periods to prevent attempts to match
 on top level domains like ".edu".  If no domain is specified, then
