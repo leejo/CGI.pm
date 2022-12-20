@@ -3,7 +3,7 @@ package CGI::Cookie;
 use strict;
 use warnings;
 
-our $VERSION='4.54';
+our $VERSION='4.55';
 
 use CGI::Util qw(rearrange unescape escape);
 use overload '""' => \&as_string, 'cmp' => \&compare, 'fallback' => 1;
@@ -356,6 +356,12 @@ As of June 2016, support is limited to recent releases of Chrome and Opera.
 
 L<https://tools.ietf.org/html/draft-west-first-party-cookies-07>
 
+=item B<7. priority flag>
+
+Allowed settings are C<Low>, C<Medium> and C<High>.
+
+Support is limited to recent releases of Chrome.
+
 =back
 
 =head2 Creating New Cookies
@@ -367,7 +373,8 @@ L<https://tools.ietf.org/html/draft-west-first-party-cookies-07>
                              -domain  =>  '.capricorn.com',
                              -path    =>  '/cgi-bin/database',
                              -secure  =>  1,
-                             -samesite=>  "Lax"
+                             -samesite=>  "Lax",
+                             -priority=>  "High",
 	                    );
 
 Create cookies from scratch with the B<new> method.  The B<-name> and
