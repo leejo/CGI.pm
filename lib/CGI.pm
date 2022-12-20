@@ -43,13 +43,13 @@ sub initialize_globals {
 		     'http://www.w3.org/TR/html4/loose.dtd' ] ;
 
     # Set this to 1 to enable NOSTICKY scripts
-    # or: 
+    # or:
     #    1) use CGI '-nosticky';
     #    2) $CGI::NOSTICKY = 1;
     $NOSTICKY = 0;
 
     # Set this to 1 to enable NPH scripts
-    # or: 
+    # or:
     #    1) use CGI qw(-nph)
     #    2) CGI::nph(1)
     #    3) print header(-nph=>1)
@@ -186,7 +186,7 @@ if (exists $ENV{MOD_PERL} && ! $PERLEX) {
 # of "\n" is different on different OS's (sometimes it generates CRLF, sometimes LF
 # and sometimes CR).  The most popular VMS web server
 # doesn't accept CRLF -- instead it wants a LR.  EBCDIC machines don't
-# use ASCII, so \015\012 means something different.  I find this all 
+# use ASCII, so \015\012 means something different.  I find this all
 # really annoying.
 $EBCDIC = "\t" ne "\011";
 if ($OS eq 'VMS') {
@@ -331,7 +331,7 @@ sub new {
 	 )) {
     $self->r(shift @initializer);
   }
- if (ref($initializer[0]) 
+ if (ref($initializer[0])
      && (UNIVERSAL::isa($initializer[0],'CODE'))) {
     $self->upload_hook(shift @initializer, shift @initializer);
     $self->{'use_tempfile'} = shift @initializer if (@initializer > 0);
@@ -419,7 +419,7 @@ sub param {
 
     my($name,$value,@other);
 
-    # For compatibility between old calling style and use_named_parameters() style, 
+    # For compatibility between old calling style and use_named_parameters() style,
     # we have to special case for a single parameter present.
     if (@p > 1) {
 	($name,$value,@other) = rearrange([NAME,[DEFAULT,VALUE,VALUES]],@p);
@@ -466,7 +466,7 @@ sub _decode_utf8 {
 
 sub self_or_default {
     return @_ if defined($_[0]) && (!ref($_[0])) &&($_[0] eq 'CGI');
-    unless (defined($_[0]) && 
+    unless (defined($_[0]) &&
 	    (ref($_[0]) eq 'CGI' || UNIVERSAL::isa($_[0],'CGI')) # slightly optimized for common case
 	    ) {
 	$Q = $CGI::DefaultClass->new unless defined($Q);
@@ -478,7 +478,7 @@ sub self_or_default {
 sub self_or_CGI {
     local $^W=0;                # prevent a warning
     if (defined($_[0]) &&
-	(substr(ref($_[0]),0,3) eq 'CGI' 
+	(substr(ref($_[0]),0,3) eq 'CGI'
 	 || UNIVERSAL::isa($_[0],'CGI'))) {
 	return @_;
     } else {
@@ -520,7 +520,7 @@ sub init {
             $self->param('-name'=>$name,'-value'=> $val);
             if (defined $val and ref $val eq 'ARRAY') {
                 for my $fh (grep {defined($_) && ref($_) && defined(fileno($_))} @$val) {
-                   seek($fh,0,0); # reset the filehandle.  
+                   seek($fh,0,0); # reset the filehandle.
                 }
 
             }
@@ -564,7 +564,7 @@ sub init {
 	    $query_string .= (length($query_string) ? '&' : '') . $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
 	  }
 	  last METHOD;
-      } 
+      }
 
       # Process XForms postings. We know that we have XForms in the
       # following cases:
@@ -720,7 +720,7 @@ sub init {
     for ($self->param('.cgifields')) {
 	$self->{'.fieldnames'}->{$_}++;
     }
-    
+
     # Clear out our default submission button flag if present
     $self->delete('.submit');
     $self->delete('.cgifields');
@@ -770,7 +770,7 @@ sub to_filehandle {
     if (!ref($thingy)) {
 	my $caller = 1;
 	while (my $package = caller($caller++)) {
-	    my($tmp) = $thingy=~/[\':]/ ? $thingy : "$package\:\:$thingy"; 
+	    my($tmp) = $thingy=~/[\':]/ ? $thingy : "$package\:\:$thingy";
 	    return $tmp if defined(fileno($tmp));
 	}
     }
@@ -830,7 +830,7 @@ sub parse_params {
 sub add_parameter {
     my($self,$param)=@_;
     return unless defined $param;
-    push (@{$self->{'.parameters'}},$param) 
+    push (@{$self->{'.parameters'}},$param)
 	unless defined($self->{param}{$param});
 }
 
@@ -910,7 +910,7 @@ sub _tag_func {
     } else {
 	    return $XHTML ? "<$tagname$attr />" : "<$tagname$attr>" unless @rest;
 	    my($tag,$untag) = ("<$tagname$attr>","</$tagname>");
-	    my @result = map { "$tag$_$untag" } 
+	    my @result = map { "$tag$_$untag" }
                               (ref($rest[0]) eq 'ARRAY') ? @{$rest[0]} : "@rest";
 	    return "@result";
     }
@@ -960,7 +960,7 @@ sub _setup_symbols {
 	$TABINDEX++,             next if /^[:-]tabindex$/;
 	$CLOSE_UPLOAD_FILES++,   next if /^[:-]close_upload_files$/;
 	$NO_UNDEF_PARAMS++,      next if /^[:-]no_undef_params$/;
-	
+
 	for (&expand_tags($_)) {
 	    tr/a-zA-Z0-9_//cd;  # don't allow weird function names
 	    $EXPORT{$_}++;
@@ -992,13 +992,13 @@ sub element_tab {
 
 #####
 # subroutine: read_postdata_putdata
-# 
+#
 # Unless file uploads are disabled
 # Reads BODY of POST/PUT request and stuffs it into tempfile
 # accessible as param POSTDATA/PUTDATA
-# 
+#
 # Also respects      upload_hook
-# 
+#
 # based on subroutine read_multipart_related
 #####
 sub read_postdata_putdata {
@@ -1009,8 +1009,8 @@ sub read_postdata_putdata {
     my $param = $postOrPut;
     # add this parameter to our list
     $self->add_parameter($param);
-    
-    
+
+
   UPLOADS: {
 
         # If we get here, then we are dealing with a potentially large
@@ -1019,7 +1019,7 @@ sub read_postdata_putdata {
 
         # skip the file if uploads disabled
         if ($DISABLE_UPLOADS) {
-            
+
             my $buf;
             my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
             my $len  = $content_length;
@@ -1057,7 +1057,7 @@ sub read_postdata_putdata {
 
         while( $len > 0 )
         {
-            
+
             my $bytesRead = $self->read_from_client( \$data, $unit, 0 );
             $len -= $bytesRead ;
 
@@ -1071,7 +1071,7 @@ sub read_postdata_putdata {
             } else {
                 $ZERO_LOOP_COUNTER = 0;
             }
-            
+
             if ( defined $self->{'.upload_hook'} ) {
                 $totalbytes += length($data);
                 &{ $self->{'.upload_hook'} }( $param, $data, $totalbytes,
@@ -1177,7 +1177,7 @@ sub import_names {
 
 #### Method: keywords
 # Keywords acts a bit differently.  Calling it in a list context
-# returns the list of keywords.  
+# returns the list of keywords.
 # Calling it in a scalar context gives you the size of the list.
 ####
 sub keywords {
@@ -1379,8 +1379,8 @@ sub url_param {
 }
 
 #### Method: Dump
-# Returns a string in which all the known parameter/value 
-# pairs are represented as nested lists, mainly for the purposes 
+# Returns a string in which all the known parameter/value
+# pairs are represented as nested lists, mainly for the purposes
 # of debugging.
 ####
 sub Dump {
@@ -1541,7 +1541,7 @@ sub header {
 
     return "" if $self->{'.header_printed'}++ and $HEADERS_ONCE;
 
-    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) = 
+    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) =
 	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
 			    'STATUS',['COOKIE','COOKIES','SET-COOKIE'],'TARGET',
                             'EXPIRES','NPH','CHARSET',
@@ -1564,13 +1564,13 @@ sub header {
             # followed  by  a  LWSP-char  as equivalent to the LWSP-char.
             $header =~ s/$CRLF(\s)/$1/g;
 
-            # All other uses of newlines are invalid input. 
+            # All other uses of newlines are invalid input.
             if ($header =~ m/$CRLF|\015|\012/) {
                 # shorten very long values in the diagnostic
                 $header = substr($header,0,72).'...' if (length $header > 72);
                 die "Invalid header value contains a newline not followed by whitespace: $header";
             }
-        } 
+        }
    }
 
     $nph     ||= $NPH;
@@ -1641,7 +1641,7 @@ sub cache {
 ####
 sub redirect {
     my($self,@p) = self_or_default(@_);
-    my($url,$target,$status,$cookie,$nph,@other) = 
+    my($url,$target,$status,$cookie,$nph,@other) =
          rearrange([[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES','SET-COOKIE'],NPH],@p);
     $status = '302 Found' unless defined $status;
     $url ||= $self->self_url;
@@ -1665,7 +1665,7 @@ sub redirect {
 # $title -> (optional) The title for this HTML document (-title)
 # $author -> (optional) e-mail address of the author (-author)
 # $base -> (optional) if set to true, will enter the BASE address of this document
-#          for resolving relative references (-base) 
+#          for resolving relative references (-base)
 # $xbase -> (optional) alternative base at some remote location (-xbase)
 # $target -> (optional) target window to load all links into (-target)
 # $script -> (option) Javascript code (-script)
@@ -1680,7 +1680,7 @@ sub redirect {
 sub start_html {
     my($self,@p) = &self_or_default(@_);
     my($title,$author,$base,$xbase,$script,$noscript,
-        $target,$meta,$head,$style,$dtd,$lang,$encoding,$declare_xml,@other) = 
+        $target,$meta,$head,$style,$dtd,$lang,$encoding,$declare_xml,@other) =
 	rearrange([TITLE,AUTHOR,BASE,XBASE,SCRIPT,NOSCRIPT,TARGET,
                    META,HEAD,STYLE,DTD,LANG,ENCODING,DECLARE_XML],@p);
 
@@ -1728,7 +1728,7 @@ sub start_html {
     }
 
     my $lang_bits = $lang ne '' ? qq( lang="$lang" xml:lang="$lang") : '';
-    my $meta_bits = qq(<meta http-equiv="Content-Type" content="text/html; charset=$encoding" />) 
+    my $meta_bits = qq(<meta http-equiv="Content-Type" content="text/html; charset=$encoding" />)
                     if $XHTML && $encoding && !$declare_xml;
 
     push(@result,$XHTML ? qq(<html xmlns="http://www.w3.org/1999/xhtml"$lang_bits>\n<head>\n<title>$title</title>)
@@ -1746,7 +1746,7 @@ sub start_html {
     }
 
     if ($meta && ref($meta) && (ref($meta) eq 'HASH')) {
-	for (sort keys %$meta) { push(@result,$XHTML ? qq(<meta name="$_" content="$meta->{$_}" />) 
+	for (sort keys %$meta) { push(@result,$XHTML ? qq(<meta name="$_" content="$meta->{$_}" />)
 			: qq(<meta name="$_" content="$meta->{$_}">)); }
     }
 
@@ -1917,7 +1917,7 @@ sub isindex {
 sub start_form {
     my($self,@p) = self_or_default(@_);
 
-    my($method,$action,$enctype,@other) = 
+    my($method,$action,$enctype,@other) =
 	rearrange([METHOD,ACTION,ENCTYPE],@p);
 
     $method  = $self->_maybe_escapeHTML(lc($method || 'post'));
@@ -1946,7 +1946,7 @@ sub start_multipart_form {
     if (defined($p[0]) && substr($p[0],0,1) eq '-') {
       return $self->start_form(-enctype=>&MULTIPART,@p);
     } else {
-	my($method,$action,@other) = 
+	my($method,$action,@other) =
 	    rearrange([METHOD,ACTION],@p);
 	return $self->start_form($method,$action,&MULTIPART,@other);
     }
@@ -1977,10 +1977,10 @@ sub end_multipart_form {
 
 sub _textfield {
     my($self,$tag,@p) = self_or_default(@_);
-    my($name,$default,$size,$maxlength,$override,$tabindex,@other) = 
+    my($name,$default,$size,$maxlength,$override,$tabindex,@other) =
 	rearrange([NAME,[DEFAULT,VALUE,VALUES],SIZE,MAXLENGTH,[OVERRIDE,FORCE],TABINDEX],@p);
 
-    my $current = $override ? $default : 
+    my $current = $override ? $default :
 	(defined($self->param($name)) ? $self->param($name) : $default);
 
     $current = defined($current) ? $self->_maybe_escapeHTML($current,1) : '';
@@ -1992,7 +1992,7 @@ sub _textfield {
     # and WebTV -- not sure it won't break stuff
     my($value) = $current ne '' ? qq(value="$current") : '';
     $tabindex = $self->element_tab($tabindex);
-    return $XHTML ? qq(<input type="$tag" name="$name" $tabindex$value$s$m$other />) 
+    return $XHTML ? qq(<input type="$tag" name="$name" $tabindex$value$s$m$other />)
                   : qq(<input type="$tag" name="$name" $value$s$m$other>);
 }
 
@@ -2206,7 +2206,7 @@ sub checkbox {
 
     $value = defined $value ? $value : 'on';
 
-    if (!$override && ($self->{'.fieldnames'}->{$name} || 
+    if (!$override && ($self->{'.fieldnames'}->{$name} ||
 		       defined $self->param($name))) {
 	$checked = grep($_ eq $value,$self->param($name)) ? $self->_checked(1) : '';
     } else {
@@ -2314,7 +2314,7 @@ sub radio_group {
 #             then this will be used to decide which
 #             checkboxes to turn on by default.
 #             2. If a scalar, will be assumed to hold the
-#             value of a single checkbox in the group to turn on. 
+#             value of a single checkbox in the group to turn on.
 #   $linebreak -> (optional) Set to true to place linebreaks
 #             between the buttons.
 #   $labels -> (optional)
@@ -2438,8 +2438,8 @@ sub popup_menu {
     if (!$override && defined($self->param($name))) {
 	$selected{$self->param($name)}++;
     } elsif (defined $default) {
-	%selected = map {$_=>1} ref($default) eq 'ARRAY' 
-                                ? @$default 
+	%selected = map {$_=>1} ref($default) eq 'ARRAY'
+                                ? @$default
                                 : $default;
     }
     $name=$self->_maybe_escapeHTML($name);
@@ -2616,7 +2616,7 @@ sub hidden {
     # this is the one place where we departed from our standard
     # calling scheme, so we have to special-case (darn)
     my(@result,@value);
-    my($name,$default,$override,@other) = 
+    my($name,$default,$override,@other) =
 	rearrange([NAME,[DEFAULT,VALUE,VALUES],[OVERRIDE,FORCE]],@p);
 
     my $do_override = 0;
@@ -2687,7 +2687,7 @@ sub state {
 ####
 sub url {
     my($self,@p) = self_or_default(@_);
-    my ($relative,$absolute,$full,$path_info,$query,$base,$rewrite) = 
+    my ($relative,$absolute,$full,$path_info,$query,$base,$rewrite) =
 	rearrange(['RELATIVE','ABSOLUTE','FULL',['PATH','PATH_INFO'],['QUERY','QUERY_STRING'],'BASE','REWRITE'],@p);
     my $url  = '';
     $full++      if $base || !($relative || $absolute);
@@ -2757,7 +2757,7 @@ sub url {
 # Usual rules apply to the stickiness of -value.
 #  Parameters:
 #   -name -> name for this cookie (optional)
-#   -value -> value of this cookie (scalar, array or hash) 
+#   -value -> value of this cookie (scalar, array or hash)
 #   -path -> paths for which this cookie is valid (optional)
 #   -domain -> internet domain in which this cookie is valid (optional)
 #   -secure -> if true, cookie only passed through secure channel (optional)
@@ -2765,8 +2765,8 @@ sub url {
 ####
 sub cookie {
     my($self,@p) = self_or_default(@_);
-    my($name,$value,$path,$domain,$secure,$expires,$httponly,$max_age,$samesite) =
-	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY,'MAX-AGE',SAMESITE],@p);
+    my($name,$value,$path,$domain,$secure,$expires,$httponly,$max_age,$samesite, $priority) =
+	rearrange([NAME,[VALUE,VALUES],PATH,DOMAIN,SECURE,EXPIRES,HTTPONLY,'MAX-AGE',SAMESITE, PRIORITY],@p);
 
     require CGI::Cookie;
 
@@ -2775,7 +2775,7 @@ sub cookie {
     # cookies in our state variables.
     unless ( defined($value) ) {
 	$self->{'.cookies'} = CGI::Cookie->fetch unless $COOKIE_CACHE && exists $self->{'.cookies'};
-	
+
 	# If no name is supplied, then retrieve the names of all our cookies.
 	return () unless $self->{'.cookies'};
 	return keys %{$self->{'.cookies'}} unless $name;
@@ -2796,6 +2796,7 @@ sub cookie {
     push(@param,'-httponly'=>$httponly) if $httponly;
     push(@param,'-max-age'=>$max_age) if $max_age;
     push(@param,'-samesite'=>$samesite) if $samesite;
+    push(@param,'-priority'=>$priority) if $priority;
 
     return CGI::Cookie->new(@param);
 }
@@ -2817,7 +2818,7 @@ sub param_fetch {
 	$self->add_parameter($name);
 	$self->{param}{$name} = [];
     }
-    
+
     return $self->{param}{$name};
 }
 
@@ -2880,7 +2881,7 @@ sub _name_and_path_from_env {
 
     if ( $IIS ) {
       # IIS doesn't set $ENV{PATH_INFO} correctly. It sets it to
-      # $ENV{SCRIPT_NAME}path_info 
+      # $ENV{SCRIPT_NAME}path_info
       # IIS also doesn't set $ENV{REQUEST_URI} so we don't want to do
       # the test below, hence this comes first
       $path_info =~ s/^\Q$script_name\E(.*)/$1/;
@@ -2968,8 +2969,8 @@ sub env_query_string {
 sub Accept {
     my($self,$search) = self_or_CGI(@_);
     my(%prefs,$type,$pref,$pat);
-    
-    my(@accept) = defined $self->http('accept') 
+
+    my(@accept) = defined $self->http('accept')
                 ? split(',',$self->http('accept'))
                 : ();
 
@@ -2981,7 +2982,7 @@ sub Accept {
     }
 
     return keys %prefs unless $search;
-    
+
     # if a search type is provided, we may need to
     # perform a pattern matching operation.
     # The MIME types use a glob mechanism, which
@@ -3053,7 +3054,7 @@ sub virtual_host {
 # purposes.
 ####
 sub remote_host {
-    return $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} 
+    return $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'}
     || 'localhost';
 }
 
@@ -3173,7 +3174,7 @@ sub https {
 sub protocol {
     local($^W)=0;
     my $self = shift;
-    return 'https' if uc($self->https()) eq 'ON'; 
+    return 'https' if uc($self->https()) eq 'ON';
     return 'https' if $self->server_port == 443;
     my $prot = $self->server_protocol;
     my($protocol,$version) = split('/',$prot);
@@ -3273,10 +3274,10 @@ sub previous_or_default {
     my($self,$name,$defaults,$override) = @_;
     my(%selected);
 
-    if (!$override && ($self->{'.fieldnames'}->{$name} || 
+    if (!$override && ($self->{'.fieldnames'}->{$name} ||
 		       defined($self->param($name)) ) ) {
 	$selected{$_}++ for $self->param($name);
-    } elsif (defined($defaults) && ref($defaults) && 
+    } elsif (defined($defaults) && ref($defaults) &&
 	     (ref($defaults) eq 'ARRAY')) {
 	$selected{$_}++ for @{$defaults};
     } else {
@@ -3309,11 +3310,11 @@ sub read_from_cmdline {
 	print STDERR "(offline mode: enter name=value pairs on standard input; press ^D or ^Z when done)\n";
 	chomp(@lines = <STDIN>); # remove newlines
 	$input = join(" ",@lines);
-	@words = &Text::ParseWords::old_shellwords($input);    
+	@words = &Text::ParseWords::old_shellwords($input);
     }
     for (@words) {
 	s/\\=/%3D/g;
-	s/\\&/%26/g;	    
+	s/\\&/%26/g;
     }
 
     if ("@words"=~/=/) {
@@ -3409,7 +3410,7 @@ sub read_multipart {
       );
 	  $filehandle->_mp_filename( $filename );
 
-	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
+	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode
                      && defined fileno($filehandle);
 
 	  # if this is an multipart/mixed attachment, save the header
@@ -3542,7 +3543,7 @@ sub read_multipart_related {
 	  );
 	  $filehandle->_mp_filename( $filehandle->filename );
 
-	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode 
+	  $CGI::DefaultClass->binmode($filehandle) if $CGI::needs_binmode
                      && defined fileno($filehandle);
 
 	  my ($data);
@@ -3680,7 +3681,7 @@ sub new {
     my $boundary_read = 0;
     if ($boundary) {
 
-	# Under the MIME spec, the boundary consists of the 
+	# Under the MIME spec, the boundary consists of the
 	# characters "--" PLUS the Boundary string
 
 	# BUG: IE 3.01 on the Macintosh uses just the boundary -- not
@@ -3732,7 +3733,7 @@ sub readHeader {
 	$ok++ if $self->{BUFFER} eq '';
 	$bad++ if !$ok && $self->{LENGTH} <= 0;
 	# this was a bad idea
-	# $FILLUNIT *= 2 if length($self->{BUFFER}) >= $FILLUNIT; 
+	# $FILLUNIT *= 2 if length($self->{BUFFER}) >= $FILLUNIT;
     } until $ok || $bad;
     return () if $bad;
 
@@ -3838,7 +3839,7 @@ sub read {
 
     my $returnval=substr($self->{BUFFER},0,$bytesToReturn);
     substr($self->{BUFFER},0,$bytesToReturn)='';
-    
+
     # If we hit the boundary, remove the CRLF from the end.
     return ($bytesToReturn==$start)
            ? substr($returnval,0,-2) : $returnval;
