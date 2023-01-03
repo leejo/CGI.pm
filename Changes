@@ -1,3 +1,8 @@
+4.55 2023-01-03
+
+    [ TESTING ]
+    - remove dependency on Test::Deep (GH #254)
+
 4.54 2022-02-03
 
     [ FIX ]
