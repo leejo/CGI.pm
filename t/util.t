@@ -6,7 +6,6 @@
 $| = 1;
 
 use Test::More tests => 80;
-use Test::Deep;
 use Config;
 use_ok ( 'CGI::Util', qw(
 	escape
@@ -68,7 +67,7 @@ for ( 1 .. 20 ) {
 		%args,
 	);
 
-	cmp_deeply(
+	is_deeply(
 		[ @ordered ],
 		[
 			'text/html; charset=iso-8859-1',

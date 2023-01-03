@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Deep;
 use Test::Warn;
 
 use CGI ();
@@ -33,7 +32,7 @@ warnings_are
 
 warning_like
 	{ @params = $q->param('game') }
-	qr/CGI::param called in list context from .+param_list_context\.t line 35, this can lead to vulnerabilities/,
+	qr/CGI::param called in list context from .+param_list_context\.t line 34, this can lead to vulnerabilities/,
     "calling ->param with args in list context warns"
 ;
 
@@ -43,7 +42,7 @@ warnings_are
     " ... but we only warn once",
 ;
 
-cmp_deeply(
+is_deeply(
 	[ sort @params ],
 	[ qw/ checkers chess / ],
 	'CGI::param()',
@@ -55,7 +54,7 @@ warnings_are
 	"no warnings calling multi_param"
 ;
 
-cmp_deeply(
+is_deeply(
 	[ sort @params ],
 	[ qw/ checkers chess / ],
 	'CGI::multi_param'

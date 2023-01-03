@@ -7,7 +7,6 @@ use warnings;
 use File::Temp qw(tempfile);
 
 use Test::More;
-use Test::Deep;
 
 if ( $^O =~ /^MSWin/i ) {
   plan skip_all => "No relevant to Windows";
