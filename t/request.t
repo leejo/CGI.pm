@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 71;
-use Test::Deep;
 
 use CGI ();
 use Config;
@@ -124,7 +123,7 @@ $q->_reset_globals;
 		$q = CGI->new;
 		$ENV{QUERY_STRING} = 'p1=1&&&;;&;&&;;p2;p3;p4=4&=p5';
 		ok $q->url_param, 'url_param() is true if parameters';
-		cmp_deeply( [ $q->url_param ],bag( qw/p1 p2 p3 p4/,'' ),'url_param' );
+		is_deeply( [ sort $q->url_param ], [ '', qw/p1 p2 p3 p4/ ], 'url_param' );
 	}
 }
 

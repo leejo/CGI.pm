@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 25;
-use Test::Deep;
 
 use CGI ();
 
@@ -27,7 +26,7 @@ is( $q->PrintHeader,$q->header,'PrintHeader' );
 is( $q->HtmlTop,$q->start_html,'HtmlTop' );
 is( $q->HtmlBot,$q->end_html,'HtmlBot' );
 
-cmp_deeply(
+is_deeply(
 	[ my @params = CGI::SplitParam( "foo\0bar" ) ],
 	[ qw/ foo bar /],
 	'SplitParam'
@@ -60,7 +59,7 @@ $CGI::CLOSE_UPLOAD_FILES = 0;
 ok( $q->close_upload_files( 1 ),'close_upload_files' );
 is( $CGI::CLOSE_UPLOAD_FILES,1,' ... sets $CGI::CLOSE_UPLOAD_FILES' );
 
-cmp_deeply(
+is_deeply(
 	$q->default_dtd,
 	[
 		'-//W3C//DTD HTML 4.01 Transitional//EN',

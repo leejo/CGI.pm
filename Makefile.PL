@@ -32,7 +32,6 @@ my %WriteMakefileArgs = (
         'IO::File'         => 0,    # IO::File was first released with perl 5.00307
         'IO::Handle'       => 0,    # IO::Handle was first released with perl 5.00307
         'File::Find'       => 0,    # File::Find was first released with perl 5
-        'Test::Deep'       => 0.11,
         'Test::More'       => 0.98,
         'Test::Warn'       => 0.30,
         'Test::NoWarnings' => 0,
