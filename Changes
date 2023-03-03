@@ -1,3 +1,8 @@
+4.56 2023-03-01
+
+    [ TESTING ]
+    - add new cookie field 'Priority' to CGI::Cookie code (GH #253, thanks to Pavel)
+
 4.55 2023-01-03
 
     [ TESTING ]

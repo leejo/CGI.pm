@@ -157,7 +157,8 @@ my @test_cookie = (
                -path    => '/cgi-bin/database',
                -secure  => 1,
                -httponly=> 1,
-               -samesite=> 'Lax'
+               -samesite=> 'Lax',
+               -priority=> 'High',
               );
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'foo',               'name is correct');
@@ -168,6 +169,7 @@ my @test_cookie = (
   ok($c->secure , 'secure attribute is set');
   ok( $c->httponly, 'httponly attribute is set' );
   is( $c->samesite, 'Lax', 'samesite attribute is correct' );
+  is( $c->priority, 'High', 'priority attribute is correct' );
 
   # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Cookie->new(-name    =>  'baz',
@@ -216,7 +218,8 @@ my @test_cookie = (
                -path    => '/',
                -secure  => 1,
                -httponly=> 1,
-               -samesite=> 'strict'
+               -samesite=> 'strict',
+               -priority=> 'high',
               );
 
   my $name = $c->name;
@@ -245,6 +248,9 @@ my @test_cookie = (
   like( $c->as_string, '/SameSite=Strict/',
     "Stringified cookie contains normalized SameSite" );
 
+  like( $c->as_string, '/Priority=High/',
+    "Stringified cookie contains normalized Priority" );
+
   $c = CGI::Cookie->new(-name    =>  'Hamster-Jam',
             -value   =>  'Tulip',
                );
@@ -271,6 +277,9 @@ my @test_cookie = (
 
   ok( $c->as_string !~ /SameSite/,
     "Stringified cookie does not contain SameSite" );
+
+  ok( $c->as_string !~ /Priority/,
+    "Stringified cookie does not contain Priority" );
 }
 
 #-----------------------------------------------------------------------------
@@ -332,7 +341,8 @@ my @test_cookie = (
                -domain  => '.pie-shop.com',
                -path    => '/',
                -secure  => 1,
-               -samesite=> "strict"
+               -samesite=> "strict",
+               -priority=> "low"
                );
 
   is($c->name,          'Jam',   'name is correct');
@@ -373,6 +383,13 @@ my @test_cookie = (
 
   is($c->samesite('Bad'), 'None', 'SameSite unknown values ignored');
   is($c->samesite,        'None', 'SameSite returns previous value');
+
+  is($c->priority,              'Low',      'Priority is correct');
+  is($c->priority('Medium'),    'Medium',   'Priority is set correctly');
+  is($c->priority,              'Medium',   'Priority now returns updated value');
+
+  is($c->priority('Bad'), 'Medium', 'Priority unknown values ignored');
+  is($c->priority,        'Medium', 'Priority returns previous value');
 }
 
 #----------------------------------------------------------------------------
