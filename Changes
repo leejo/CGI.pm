@@ -1,3 +1,8 @@
+4.57 2023-05-01
+
+    [ DOCUMENTATION ]
+    - Documentation tweaks around uploadInfo() and hooks (GH #256, thanks to rlauer6)
+
 4.56 2023-03-01
 
     [ TESTING ]

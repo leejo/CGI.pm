@@ -1000,10 +1000,11 @@ is always the name of the file on the _user's_ machine, and is unrelated to
 the name of the temporary file that CGI.pm creates during upload spooling
 (see below).
 
-When a file is uploaded the browser usually sends along some information along
-with it in the format of headers. The information usually includes the MIME
-content type. To retrieve this information, call uploadInfo(). It returns a
-reference to a hash containing all the document headers.
+When a file is uploaded the browser usually sends along some
+information along with it in the Content-Type (MIME type) and
+Content-Disposition (filename) headers.  To retrieve this information,
+call uploadInfo(). It returns a reference to a hash containing all the
+document headers.
 
     my $filehandle = $q->upload( 'uploaded_file' );
     my $type       = $q->uploadInfo( $filehandle )->{'Content-Type'};
@@ -1016,6 +1017,16 @@ uploadInfo as internally this is represented as a File::Temp object (which is
 what will be returned by ->upload or ->param). When using ->Vars you will get
 the literal filename rather than the File::Temp object, which will not return
 anything when passed to uploadInfo. So don't use ->Vars.
+
+When uploading multiple files, call ->param() in list context to
+retrieve a list of filehandles that you can use when calling ->uploadInfo.
+
+    my @filehandles = $q->param('uploaded_file');
+
+    for my $fh (@filehandles) {
+      my $info = $q->uploadInfo($fh);
+      ...
+    }
 
 If you are using a machine that recognizes "text" and "binary" data modes, be
 sure to understand when and how to use them (see the Camel book). Otherwise
@@ -1102,10 +1113,27 @@ with the exception that the first argument to the callback is an
 The `$data` field is optional; it lets you pass configuration information
 (e.g. a database handle) to your hook callback.
 
-The `$use_tempfile` field is a flag that lets you turn on and off CGI.pm's
-use of a temporary disk-based file during file upload. If you set this to a
-FALSE value (default true) then $q->param('uploaded\_file') will no longer work,
-and the only way to get at the uploaded data is via the hook you provide.
+The `$use_tempfile` field is a flag that lets you turn on and off
+CGI.pm's use of a temporary disk-based file during file upload. If you
+set this to a FALSE value (default true) then
+`$q->param('uploaded_file')` will still return a typeglob that can be
+used to access a filehandle and the filename of the uploaded file,
+however the filehandle will be a handle to an empty file. Existence of
+your hook causes CGI.pm to bypass writing to that filehandle (which is
+probably what you intended when you set `$use_tempfile` off).
+
+The `uploadInfo()` method can be used on the typeglob returned to
+you when you called `$q->param('upload_file')` to return
+information about the uploaded file(s). For multiple file uploads, use
+the ` param() ` method in list context to retrieve all of the
+typeglobs.
+
+    my (@filehandles) = $cgi->param('upfile');
+
+    foreach my $fh (@filehandles) {
+      my $info = $cgi->uploadInfo($fh);
+      ...
+    }
 
 If using the function-oriented interface, call the CGI::upload\_hook() method
 before calling param() or any other CGI functions:
