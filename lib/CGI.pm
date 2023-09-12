@@ -1607,9 +1607,9 @@ sub header {
     # if the user indicates an expiration time, then we need
     # both an Expires and a Date header (so that the browser is
     # uses OUR clock)
-    push(@header,"Expires: " . expires($expires,'http'))
+    push(@header,"Expires: " . expires($expires))
 	if $expires;
-    push(@header,"Date: " . expires(0,'http')) if $expires || $cookie || $nph;
+    push(@header,"Date: " . expires(0)) if $expires || $cookie || $nph;
     push(@header,"Pragma: no-cache") if $self->cache();
     push(@header,"Content-Disposition: attachment; filename=\"$attachment\"") if $attachment;
     push(@header,map {ucfirst $_} @other);
@@ -2761,7 +2761,7 @@ sub url {
 #   -path -> paths for which this cookie is valid (optional)
 #   -domain -> internet domain in which this cookie is valid (optional)
 #   -secure -> if true, cookie only passed through secure channel (optional)
-#   -expires -> expiry date in format Wdy, DD-Mon-YYYY HH:MM:SS GMT (optional)
+#   -expires -> expiry date in format Wdy, DD Mon YYYY HH:MM:SS GMT (optional)
 ####
 sub cookie {
     my($self,@p) = self_or_default(@_);
