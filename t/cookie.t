@@ -163,7 +163,7 @@ my @test_cookie = (
   is(ref($c), 'CGI::Cookie', 'new returns objects of correct type');
   is($c->name   , 'foo',               'name is correct');
   is($c->value  , 'bar',               'value is correct');
-  like($c->expires, '/^[a-z]{3},\s*\d{2}-[a-z]{3}-\d{4}/i', 'expires in correct format');
+  like($c->expires, '/^[a-z]{3},\s*\d{2}\s[a-z]{3}\s\d{4}/i', 'expires in correct format');
   is($c->domain , '.capricorn.com',    'domain is correct');
   is($c->path   , '/cgi-bin/database', 'path is correct');
   ok($c->secure , 'secure attribute is set');
@@ -357,9 +357,9 @@ my @test_cookie = (
   is($c->value,           'Gerbil',  'value now returns updated value');
 
   my $exp = $c->expires;
-  like($c->expires,         '/^[a-z]{3},\s*\d{2}-[a-z]{3}-\d{4}/i', 'expires is correct');
-  like($c->expires('+12h'), '/^[a-z]{3},\s*\d{2}-[a-z]{3}-\d{4}/i', 'expires is set correctly');
-  like($c->expires,         '/^[a-z]{3},\s*\d{2}-[a-z]{3}-\d{4}/i', 'expires now returns updated value');
+  like($c->expires,         '/^[a-z]{3},\s*\d{2}\s[a-z]{3}\s\d{4}/i', 'expires is correct');
+  like($c->expires('+12h'), '/^[a-z]{3},\s*\d{2}\s[a-z]{3}\s\d{4}/i', 'expires is set correctly');
+  like($c->expires,         '/^[a-z]{3},\s*\d{2}\s[a-z]{3}\s\d{4}/i', 'expires now returns updated value');
   isnt($c->expires, $exp, "Expiry time has changed");
 
   is($c->domain,                  '.pie-shop.com', 'domain is correct');
@@ -398,7 +398,7 @@ my @test_cookie = (
 
 MAX_AGE: {
     my $cookie = CGI::Cookie->new( -name=>'a', value=>'b', '-expires' => 'now',);
-    is $cookie->expires, 'Thu, 01-Jan-1970 00:01:40 GMT', 'expires is correct';
+    is $cookie->expires, 'Thu, 01 Jan 1970 00:01:40 GMT', 'expires is correct';
     is $cookie->max_age => undef, 'max-age is undefined when setting expires';
 
     $cookie = CGI::Cookie->new( -name=>'a', 'value'=>'b' );

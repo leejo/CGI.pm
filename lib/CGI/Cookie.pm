@@ -209,7 +209,7 @@ sub secure {
 
 sub expires {
     my ( $self, $expires ) = @_;
-    $self->{'expires'} = CGI::Util::expires($expires,'cookie') if defined $expires;
+    $self->{'expires'} = CGI::Util::expires($expires) if defined $expires;
     return $self->{'expires'};
 }
 
