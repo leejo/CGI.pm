@@ -1,3 +1,8 @@
+4.60 2023-11-01
+
+    [ TESTING ]
+    - move t/changes.t to xt/ as is now broken by the recent rewrite of Test::CPAN::Changes (GH #260)
+
 4.59 2023-10-02
 
     [ FIX ]

@@ -28,7 +28,6 @@ t/append_query.t
 t/can.t
 t/carp.t
 t/cgi.t
-t/changes.t
 t/charset.t
 t/checkbox_group.t
 t/command_line.t
