@@ -1,3 +1,8 @@
+4.61 2024-01-08
+
+    [ ENHANCEMENT ]
+    - Support Paritioned cookies in CGI::Cookie (GH #262, thanks to dakkar)
+
 4.60 2023-11-01
 
     [ TESTING ]
