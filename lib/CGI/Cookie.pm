@@ -104,14 +104,14 @@ sub new {
   # Ignore mod_perl request object--compatibility with Apache::Cookie.
   shift if ref $params[0]
         && eval { $params[0]->isa('Apache::Request::Req') || $params[0]->isa('Apache') };
-  my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly, $samesite, $priority )
+  my ( $name, $value, $path, $domain, $secure, $expires, $max_age, $httponly, $samesite, $priority, $partitioned )
    = rearrange(
     [
       'NAME', [ 'VALUE', 'VALUES' ],
       'PATH',   'DOMAIN',
       'SECURE', 'EXPIRES',
       'MAX-AGE','HTTPONLY','SAMESITE',
-      'PRIORITY',
+      'PRIORITY', 'PARTITIONED',
     ],
     @params
    );
@@ -121,14 +121,15 @@ sub new {
   $self->name( $name );
   $self->value( $value );
   $path ||= "/";
-  $self->path( $path )         if defined $path;
-  $self->domain( $domain )     if defined $domain;
-  $self->secure( $secure )     if defined $secure;
-  $self->expires( $expires )   if defined $expires;
-  $self->max_age( $max_age )   if defined $max_age;
-  $self->httponly( $httponly ) if defined $httponly;
-  $self->samesite( $samesite ) if defined $samesite;
-  $self->priority( $priority ) if defined $priority;
+  $self->path( $path )               if defined $path;
+  $self->domain( $domain )           if defined $domain;
+  $self->secure( $secure )           if defined $secure;
+  $self->expires( $expires )         if defined $expires;
+  $self->max_age( $max_age )         if defined $max_age;
+  $self->httponly( $httponly )       if defined $httponly;
+  $self->samesite( $samesite )       if defined $samesite;
+  $self->priority( $priority )       if defined $priority;
+  $self->partitioned( $partitioned ) if defined $partitioned;
   return $self;
 }
 
@@ -150,6 +151,7 @@ sub as_string {
     push @cookie,"HttpOnly"                  if $self->httponly;
     push @cookie,"SameSite=".$self->samesite if $self->samesite;
     push @cookie,"Priority=".$self->priority if $self->priority;
+    push @cookie,"Partitioned"               if $self->partitioned;
 
     return join "; ", @cookie;
 }
@@ -229,6 +231,12 @@ sub httponly { # HttpOnly
     my ( $self, $httponly ) = @_;
     $self->{'httponly'} = $httponly if defined $httponly;
     return $self->{'httponly'};
+}
+
+sub partitioned { # Partitioned
+    my ( $self, $partitioned ) = @_;
+    $self->{'partitioned'} = $partitioned if defined $partitioned;
+    return $self->{'partitioned'};
 }
 
 my %_legal_samesite = ( Strict => 1, Lax => 1, None => 1 );
