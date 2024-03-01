@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
         'HTML::Entities' => 3.69,
         'Encode'         => 0,    # Encode was first released with perl v5.7.3
         'Config'         => 0,    # Config was first released with perl 5.00307
+        'URI'            => 1.76,
     },
     TEST_REQUIRES   => {
         'Cwd'              => 0,     # Cwd was first released with perl 5

@@ -1,3 +1,8 @@
+4.61 2024-03-01
+
+    [ FIX ]
+    -  ->url now returns the correct thing for ipv6 brackets (GH #259, thanks to eserte)
+
 4.61 2024-01-08
 
     [ ENHANCEMENT ]

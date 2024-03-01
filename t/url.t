@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use utf8;
 
 use CGI ':all';
 
@@ -107,6 +108,35 @@ subtest 'Escaped question marks preserved' => sub {
     is( $q->url(-absolute=>1), '/real/path/info?' );
 };
 
+subtest 'ipv6' => sub {
+
+    delete( $ENV{$_} ) for qw/
+        HTTP_X_FORWARDED_HOST
+        SERVER_PROTOCOL
+        SERVER_PORT
+        SERVER_NAME
+    /;
+
+    local $ENV{HTTP_HOST} = '[::1]:5000';
+
+    my $cgi = CGI->new;
+    is( $cgi->http('HTTP_HOST'), '[::1]:5000', 'HTTP_HOST' );
+    is( $cgi->url, 'http://[::1]:5000', 'url'  );
+};
+
+subtest 'complex and utf8' => sub {
+
+    local $ENV{HTTP_HOST}   = 'foo:bärbaz@boz.com:8000';
+    local $ENV{REQUEST_URI} = '/biz/blap.cgi?boz=biz&buz=1#/!%?@3';
+
+    my $cgi = CGI->new;
+    is(
+        $cgi->url,
+        'http://foo:b%E4rbaz@boz.com:8000/biz/blap.cgi',
+        '->url'
+    );
+
+
+};
+
 done_testing();
-
-
