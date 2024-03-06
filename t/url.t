@@ -5,6 +5,7 @@ use Test::More;
 use utf8;
 
 use CGI ':all';
+use CGI::Util qw/ unescape /;
 
 delete( $ENV{SCRIPT_NAME} ); # Win32 fix, see RT 89992
 $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:8484';
@@ -129,14 +130,28 @@ subtest 'complex and utf8' => sub {
     local $ENV{HTTP_HOST}   = 'foo:bärbaz@boz.com:8000';
     local $ENV{REQUEST_URI} = '/biz/blap.cgi?boz=biz&buz=1#/!%?@3';
 
+    my $expect = 'http://foo:b%E4rbaz@boz.com:8000/biz/blap.cgi';
+    my $expect_ue = 'http://foo:bärbaz@boz.com:8000/biz/blap.cgi';
     my $cgi = CGI->new;
-    is(
-        $cgi->url,
-        'http://foo:b%E4rbaz@boz.com:8000/biz/blap.cgi',
-        '->url'
-    );
 
+    is( $cgi->url,$expect,'->url' );
+	is( $cgi->unescape($cgi->url),$expect_ue,'->url via unescape' );
+	is( CGI::Util::unescape($cgi->url),$expect_ue,'->url via unescape' );
+	is( unescape($cgi->url),$expect_ue,'->url via unescape' );
+};
 
+subtest 'unescape' => sub {
+
+    local $ENV{HTTP_HOST} = 'example.com';
+    local $ENV{PATH_INFO} = '/path/info';
+
+	my $expect = 'http://example.com';
+    my $cgi = CGI->new;
+
+    is( $cgi->url,$expect,'->url' );
+	is( $cgi->unescape($cgi->url),$expect,'->url via unescape' );
+	is( CGI::Util::unescape($cgi->url),$expect,'->url via unescape' );
+	is( unescape($cgi->url),$expect,'->url via unescape' );
 };
 
 done_testing();

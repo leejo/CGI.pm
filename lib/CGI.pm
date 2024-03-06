@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.62';
+$CGI::VERSION='4.63';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -2749,7 +2749,7 @@ sub url {
     $url .= "?$query_str" if $query     and $query_str ne '';
     $url ||= '';
 
-	$url = URI->new( $url )->canonical;
+	$url = URI->new( $url )->canonical->as_string;
 	$url =~ s!/$!!;
 	return $url
 }
