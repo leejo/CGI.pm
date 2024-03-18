@@ -43,7 +43,8 @@ my %WriteMakefileArgs = (
         COMPRESS => 'gzip -9f',
         SUFFIX   => 'gz',
         ZIP      => '/usr/bin/zip',
-        ZIPFLAGS => '-rl'
+        ZIPFLAGS => '-rl',
+		TARFLAGS => '-c -v --no-xattrs -f',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

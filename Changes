@@ -1,12 +1,17 @@
+4.64 2024-03-18
+
+   [ META ]
+    - pass --no-xattrs to tar in Makefile to fix tar backwards compat (GH #264, thanks to ryandesign)
+
 4.63 2024-03-01
 
     [ FIX ]
-    -  ->url returns a string in all cases (GH #263, thanks to Sketch6307)
+    - ->url returns a string in all cases (GH #263, thanks to Sketch6307)
 
 4.62 2024-03-01
 
     [ FIX ]
-    -  ->url now returns the correct thing for ipv6 brackets (GH #259, thanks to eserte)
+    - ->url now returns the correct thing for ipv6 brackets (GH #259, thanks to eserte)
 
 4.61 2024-01-08
 
