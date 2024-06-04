@@ -1,3 +1,8 @@
+4.65 2024-06-04
+
+    [ TESTING ]
+    - "fix" t/url.t for older Perls (GH #266)
+
 4.64 2024-03-18
 
    [ META ]
