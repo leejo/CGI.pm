@@ -16,17 +16,17 @@ $ENV{SERVER_NAME}           = 'the.good.ship.lollypop.com';
 is virtual_port() => 8484, 'virtual_port()';
 is server_port()  => 8080, 'server_port()';
 
-is url() => 'http://proxy:8484', 'url()';
+is url() => 'http://proxy:8484/', 'url()';
 
 $ENV{HTTP_X_FORWARDED_HOST} = '192.169.1.1, proxy1:80, 127.0.0.1, proxy2:8484';
 
-is url() => 'http://proxy2:8484', 'url() with multiple proxies';
+is url() => 'http://proxy2:8484/', 'url() with multiple proxies';
 
 # let's see if we do the defaults right
 
 $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:80';
 
-is url() => 'http://proxy', 'url() with default port';
+is url() => 'http://proxy/', 'url() with default port';
 
 subtest 'rewrite_interactions' => sub {
     # Reference: RT#45019
@@ -122,7 +122,7 @@ subtest 'ipv6' => sub {
 
     my $cgi = CGI->new;
     is( $cgi->http('HTTP_HOST'), '[::1]:5000', 'HTTP_HOST' );
-    is( $cgi->url, 'http://[::1]:5000', 'url'  );
+    is( $cgi->url, 'http://[::1]:5000/', 'url'  );
 };
 
 if ( $] >= 5.018000 ) {
@@ -151,7 +151,7 @@ subtest 'unescape' => sub {
     local $ENV{HTTP_HOST} = 'example.com';
     local $ENV{PATH_INFO} = '/path/info';
 
-	my $expect = 'http://example.com';
+	my $expect = 'http://example.com/';
     my $cgi = CGI->new;
 
     is( $cgi->url,$expect,'->url' );

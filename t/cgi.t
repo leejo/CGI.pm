@@ -45,7 +45,7 @@ is( $q->version,$CGI::VERSION,'version' );
 is( $q->as_string,'<ul></ul>','as_string' );
 
 is( ( $q->_style )[0],'<link rel="stylesheet" type="text/css" href="" />','_style' );
-is( $q->state,'http://localhost','state' );
+is( $q->state,'http://localhost/','state' );
 
 $CGI::NOSTICKY = 0;
 ok( $q->nosticky( 1 ),'nosticky' );
