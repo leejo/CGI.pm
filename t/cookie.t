@@ -24,6 +24,8 @@ my @test_cookie = (
            'foo=vixen; bar=cow; baz=bitch; qux=politician',
            'foo=a%20phrase; bar=yes%2C%20a%20phrase; baz=%5Ewibble; qux=%27',
            'foo=a%20phrase, bar=yes%2C%20a%20phrase; baz=%5Ewibble; qux=%27; expires=Mon, 07 Apr 2025 21:32:31 GMT;',
+           'foo="a b, c; d ; e "; expires="Mon, 07 Apr 2025 21:32:31 GMT"; qux=a1',
+           'foo="wee \"some stuff, more\" \\\\oops"; qux=a1',
            );
 
 #-----------------------------------------------------------------------------
@@ -52,6 +54,15 @@ my @test_cookie = (
   is( $result{baz}->value, '^wibble', "cookie baz is correct" );
   is( $result{qux}->value, "'",     "cookie qux is correct" );
   is( $result{expires}->value, 'Mon, 07 Apr 2025 21:32:31 GMT', "expires is correct" );
+
+  %result = CGI::Cookie->parse($test_cookie[5]);
+  is($result{foo}->value, 'a b, c; d ; e', "embedded separators");
+  is($result{expires}->value, 'Mon, 07 Apr 2025 21:32:31 GMT', "cookie expires is correct");
+  is($result{qux}->value, 'a1', "cookie qux is correct");
+
+  %result = CGI::Cookie->parse($test_cookie[6]);
+  is($result{foo}->value, 'wee "some stuff, more" \\oops', "escaping");
+  is($result{qux}->value, 'a1', "cookie qux is correct");
 
   my @array   = CGI::Cookie->parse('');
   my $scalar  = CGI::Cookie->parse('');

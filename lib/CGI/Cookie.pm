@@ -73,7 +73,7 @@ sub parse {
   my ($self,$raw_cookie) = @_;
   return wantarray ? () : {} unless $raw_cookie;
 
-  my ($expires_name, $expires_value) = $raw_cookie =~ /(expires)=([^;]+)/ixsm;
+  my ($expires_name, $expires_value) = $raw_cookie =~ /(expires)=([^";]+)/ixsm;
 
   my %results;
 
@@ -82,9 +82,48 @@ sub parse {
     $results{$expires_name} = $self->new(-name => $expires_name, -value => $expires_value);
   }
 
+  # process the entire cookie string one char at a time rather than
+  # trying to use a messy regexp. given the max size of a cookie
+  # string is 4k this isn't going to be a bottleneck
+  my @chars = split('',$raw_cookie);
+  my ($in_quotes,$escaped,$cookie_pair,@pairs) = (0,0,'');
 
-  my @pairs = split("[;,] ?",$raw_cookie);
+  CHAR: foreach my $char (@chars) {
+
+    # cater for escaping
+    if (!$escaped && $char eq '\\') {
+      $escaped = 1;
+      next CHAR;
+    }
+
+    # if we hit a double quote then flip the flag that
+    # tells us if we're in a quoted string
+    if (!$escaped && $char eq '"') {
+      $in_quotes = ! $in_quotes;
+      next CHAR;
+    }
+
+    $escaped = 0;
+
+    # if we're outside a quoted string and hit the separator then
+    # push the pair onto the array and start on the next
+    if (! $in_quotes && $char =~ /[;,]/) {
+      push(@pairs,$cookie_pair);
+      $cookie_pair = '';
+      next CHAR;
+    }
+
+    $cookie_pair .= $char;
+  }
+
+  # don't forget the final pair
+  push(@pairs,$cookie_pair)
+    if $cookie_pair;
+
   for (@pairs) {
+
+    # we will lose leading and trailing space in those values
+    # that were quoted, you'll just have to deal with that...
     s/^\s+//;
     s/\s+$//;
 
@@ -93,15 +132,11 @@ sub parse {
     # Some foreign cookies are not in name=value format, so ignore
     # them.
     next if !defined($value);
-    my @values = ();
-    if ($value ne '') {
-      @values = map unescape($_),split(/[&;]/,$value.'&dmy');
-      pop @values;
-    }
+
     $key = unescape($key);
     # A bug in Netscape can cause several cookies with same name to
     # appear.  The FIRST one in HTTP_COOKIE is the most recent version.
-    $results{$key} ||= $self->new(-name=>$key,-value=>\@values);
+    $results{$key} ||= $self->new(-name=>$key,-value=>[unescape($value)]);
   }
   return wantarray ? %results : \%results;
 }
