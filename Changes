@@ -1,3 +1,8 @@
+4.67 2025-01-08
+
+    [ FIX ]
+    - correctly parse unquoted expires cookie values containing embedded commas (GH #268, thanks to rlauer6 for the patch)
+
 4.66 2024-06-04
 
     [ FIX ]
