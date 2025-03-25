@@ -1,3 +1,8 @@
+4.68 2025-04-01
+
+    [ FIX ]
+    - handle passing of hash keys as args with a mix of dashed and non dashed (GH #270, thanks to kocoureasy for the patch)
+
 4.67 2025-01-08
 
     [ FIX ]

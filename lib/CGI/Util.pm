@@ -3,7 +3,7 @@ use parent 'Exporter';
 require 5.008001;
 use strict;
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
-        expires ebcdic2ascii ascii2ebcdic);
+        expires ebcdic2ascii ascii2ebcdic check_hash_param);
 
 our $VERSION = '4.67';
 
@@ -102,7 +102,7 @@ sub _rearrange_params {
     @param = %{$param[0]};
     } else {
     return \@param 
-        unless (defined($param[0]) && substr($param[0],0,1) eq '-');
+        unless (defined($param[0]) && check_hash_param(@param));
     }
 
     # map parameters into positional indices
@@ -305,6 +305,19 @@ sub ascii2ebcdic {
   my $data = shift;
   $data =~ s/(.)/chr $A2E[ord($1)]/ge;
   $data;
+}
+
+sub check_hash_param {
+   my $cnt = scalar(@_);
+   return 0 unless $cnt;
+   if ($cnt < 2 || $cnt % 2) {
+       return substr($_[0], 0, 1) eq '-' ? 1 : 0;
+   }
+   my %h = @_;
+   foreach (keys %h) {
+	    return 1 if substr($_, 0, 1) eq '-';
+   }
+   return 0;
 }
 
 1;

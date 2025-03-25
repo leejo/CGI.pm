@@ -38,6 +38,7 @@ t/end_form.t
 t/form.t
 t/function.t
 t/gh-155.t
+t/hash_param.t
 t/headers.t
 t/headers/attachment.t
 t/headers/charset.t
