@@ -8,9 +8,9 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.68';
+$CGI::VERSION='4.69';
 
-use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic check_hash_param);
+use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
 $_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
                            'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'];
@@ -426,7 +426,7 @@ sub param {
 	($name,$value,@other) = rearrange([NAME,[DEFAULT,VALUE,VALUES]],@p);
 	my(@values);
 
-	if (check_hash_param(@p)) {
+	if (substr($p[0],0,1) eq '-') {
 	    @values = defined($value) ? (ref($value) && ref($value) eq 'ARRAY' ? @{$value} : $value) : ();
 	} else {
 	    for ($value,@other) {
@@ -1944,7 +1944,7 @@ sub start_form {
 #### Method: start_multipart_form
 sub start_multipart_form {
     my($self,@p) = self_or_default(@_);
-    if (defined($p[0]) && check_hash_param(@p)) {
+    if (defined($p[0]) && substr($p[0],0,1) eq '-') {
       return $self->start_form(-enctype=>&MULTIPART,@p);
     } else {
 	my($method,$action,@other) = 
@@ -2621,7 +2621,7 @@ sub hidden {
 	rearrange([NAME,[DEFAULT,VALUE,VALUES],[OVERRIDE,FORCE]],@p);
 
     my $do_override = 0;
-    if ( ref($p[0]) || check_hash_param(@p)) {
+    if ( ref($p[0]) || substr($p[0],0,1) eq '-') {
 	@value = ref($default) ? @{$default} : $default;
 	$do_override = $override;
     } else {
