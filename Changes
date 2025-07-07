@@ -1,3 +1,9 @@
+4.70 2025-06-11
+
+    [ META ]
+    - remove github/coveralls/travis badges, no meaningful any more
+    - add github actions for CI (GH #273, thanks to esabol)
+
 4.69 2025-06-11
 
     [ REVERT ]
