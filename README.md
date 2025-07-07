@@ -9,7 +9,7 @@ CGI - Handle Common Gateway Interface requests and responses
 
     use CGI;
 
-        # create a CGI object (query) for use
+    # create a CGI object (query) for use
     my $q = CGI->new;
 
     # Process an HTTP request
@@ -86,7 +86,7 @@ module. If you plan to upgrade to v4.00 and beyond you should read the Changes
 file for more information and **test your code** against CGI.pm before deploying
 it.
 
-# HTML Generation functions should no longer be used
+# HTML generation functions should no longer be used
 
 **All** HTML generation functions within CGI.pm are no longer being
 maintained. Any issues, bugs, or patches will be rejected unless
