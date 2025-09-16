@@ -1032,7 +1032,7 @@ When processing an uploaded file, CGI.pm creates a temporary file on your hard
 disk and passes you a file handle to that file. After you are finished with the
 file handle, CGI.pm unlinks (deletes) the temporary file. If you need to you
 can access the temporary file directly. You can access the temp file for a file
-upload by passing the file name to the tmpFileName() method:
+upload by passing the file handle to the tmpFileName() method:
 
     my $filehandle  = $q->upload( 'uploaded_file' );
     my $tmpfilename = $q->tmpFileName( $filehandle );

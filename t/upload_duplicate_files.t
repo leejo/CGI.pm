@@ -63,7 +63,7 @@ my $q;
 # Check that the file names retrieved by CGI are correct.
 #-----------------------------------------------------------------------------
 
-{ 
+{
     my $test = "multiple file names are handled right with same-named upload fields";
     my @hello_names = $q->param('hello_world');
     is ($hello_names[0],'hello_world.txt',$test. "...first file");
@@ -74,6 +74,23 @@ my $q;
 {
     my $test = "file handles have expected length for multi-valued field. ";
     my ($goodbye_fh,$hello_fh) = $q->upload('hello_world');
+
+    isnt(
+        $q->tmpFileName( $goodbye_fh ),
+        $q->tmpFileName( $hello_fh ),
+        'temp file names unique',
+    );
+
+    ok( $q->tmpFileName( 'hello_world.txt' ),'tmpFileName on file name' );
+
+    isnt(
+        my $gb = $q->uploadInfo( $goodbye_fh ),
+        my $hl = $q->uploadInfo( $hello_fh ),
+        'uploadInfo distinct'
+    );
+
+    is( $gb->{'Content-Length'},15,'Content-Length for first file');
+    is( $hl->{'Content-Length'},13,'Content-Length for second file');
 
 		is( <$goodbye_fh>,"Goodbye World!\n",'content of first file' );
 		is( <$hello_fh>,"Hello World!\n",'content of second file' );
