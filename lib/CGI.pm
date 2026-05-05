@@ -3606,6 +3606,7 @@ sub tmpFileName {
     # one of our filenames when compared as strings
     foreach my $param_name ($self->param) {
         foreach my $filehandle ($self->multi_param($param_name)) {
+            next unless ref($filehandle);
             if ($filehandle eq $filename) {
                 return $self->{'.tmpfiles'}->{$filehandle->filename . $filehandle}->{name} || '';
             }
