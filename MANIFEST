@@ -78,6 +78,7 @@ t/sorted.t
 t/start_end_asterisk.t
 t/start_end_end.t
 t/start_end_start.t
+t/tmpfilename_string_arg.t
 t/unescapeHTML.t
 t/upload.t
 t/uploadInfo.t
