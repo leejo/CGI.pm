@@ -76,7 +76,9 @@ sub parse {
   my %results;
 
   if ( $raw_cookie =~ /(expires)=([^;]+)/ixsm ) {
-    my ($expires_name, $expires_value) = ($1, $2);
+    # regex captures are untainted, so carry over the taint of the source
+    my $tainted = substr( $raw_cookie, 0, 0 );
+    my ($expires_name, $expires_value) = ($1 . $tainted, $2 . $tainted);
     # remove the matched expires pair by position - the value is client
     # supplied so must never be interpolated into a pattern
     substr( $raw_cookie, $-[0], $+[0] - $-[0] ) = '';

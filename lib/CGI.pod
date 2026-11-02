@@ -1039,6 +1039,11 @@ Content-Disposition (filename) headers.  To retrieve this information,
 call uploadInfo(). It returns a reference to a hash containing all the
 document headers.
 
+When running under taint mode (C<-T>) the header values, like the uploaded
+file's name and all other request data, are tainted (prior to v5.00 the
+filename and header values were not). Note that the header I<names> are hash
+keys, which perl never taints, so must be treated with care if you use them.
+
     my $filehandle = $q->upload( 'uploaded_file' );
     my $type       = $q->uploadInfo( $filehandle )->{'Content-Type'};
     if ( $type ne 'text/html' ) {

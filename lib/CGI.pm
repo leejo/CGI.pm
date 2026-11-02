@@ -1425,7 +1425,8 @@ sub url_param {
 	    $self->{'.url_param'}{'keywords'} = \@keywords if @keywords;
 	}
     }
-    return keys %{$self->{'.url_param'}} unless defined($name);
+    # hash keys are never tainted
+    return map { $_ . $TAINTED } keys %{$self->{'.url_param'}} unless defined($name);
     return () unless $self->{'.url_param'}->{$name};
     return wantarray ? @{$self->{'.url_param'}->{$name}}
                      : $self->{'.url_param'}->{$name}->[0];
@@ -2872,7 +2873,8 @@ sub cookie {
 	
 	# If no name is supplied, then retrieve the names of all our cookies.
 	return () unless $self->{'.cookies'};
-	return keys %{$self->{'.cookies'}} unless $name;
+	# hash keys are never tainted
+	return map { $_ . $TAINTED } keys %{$self->{'.cookies'}} unless $name;
 	return () unless $self->{'.cookies'}->{$name};
 	return $self->{'.cookies'}->{$name}->value if defined($name) && $name ne '';
     }
@@ -2989,7 +2991,8 @@ sub _name_and_path_from_env {
             # REQUEST_URI and SCRIPT_NAME . PATH_INFO only differ by the
             # numer of consecutive slashes, so we can extract the info from
             # REQUEST_URI:
-            ($script_name, $path_info) = ($1, $2);
+            # (regex captures are untainted)
+            ($script_name, $path_info) = ($1 . $TAINTED, $2 . $TAINTED);
         }
     }
     return ($script_name,$path_info);
@@ -3086,10 +3089,11 @@ sub Accept {
 	($pref) = /q=(\d\.\d+|\d+)/;
 	($type) = m#(\S+/[^;]+)#;
 	next unless $type;
-	$prefs{$type}=$pref || 1;
+	$prefs{$type}=$pref ? $pref . $TAINTED : 1; # captures are untainted
     }
 
-    return keys %prefs unless $search;
+    # hash keys are never tainted
+    return map { $_ . $TAINTED } keys %prefs unless $search;
     
     # if a search type is provided, we may need to
     # perform a pattern matching operation.
@@ -3493,6 +3497,7 @@ sub read_multipart {
 	$filename ||= ''; # quench uninit variable warning
 
         $filename =~ s/^"([^"]*)"$/$1/;
+        $filename .= $TAINTED; # regex captures are untainted
 	# Test for Opera's multiple upload feature
 	my($multipart) = ( defined( $header{'Content-Type'} ) &&
 		$header{'Content-Type'} =~ /multipart\/mixed/ ) ?
@@ -3923,7 +3928,7 @@ sub readHeader {
     while ($header=~/($token+):\s+([^$CRLF]*)/mgox) {
         my ($field_name,$field_value) = ($1,$2);
 	$field_name =~ s/\b(\w)/uc($1)/eg; #canonicalize
-	$return{$field_name}=$field_value;
+	$return{$field_name}=$field_value . $CGI::TAINTED; # captures are untainted
     }
     return %return;
 }

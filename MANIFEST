@@ -82,6 +82,7 @@ t/rt_75628.txt
 t/save_read_roundtrip.t
 t/scrolling_list.t
 t/sorted.t
+t/taint.t
 t/start_end_asterisk.t
 t/start_end_end.t
 t/start_end_start.t
