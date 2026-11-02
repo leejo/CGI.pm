@@ -1543,16 +1543,8 @@ sub multipart_init {
 sub multipart_start {
     my(@header);
     my($self,@p) = self_or_default(@_);
-    my($type,$charset,@other) = rearrange([TYPE,CHARSET],@p);
+    my($type,$charset,@other) = _header_params([TYPE,CHARSET],@p);
     $type = $type || 'text/html';
-
-    # rearrange() was designed for the HTML portion, so we
-    # need to fix it up a little.
-    for (@other) {
-        # Don't use \s because of perl bug 21951
-        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
-        ($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.$self->unescapeHTML($value)/e;
-    }
 
     _check_header_values($type,$charset,@other);
 
@@ -1564,6 +1556,39 @@ sub multipart_start {
     push(@header,@other);
     my $header = join($CRLF,@header)."${CRLF}${CRLF}";
     return $header;
+}
+
+# Like rearrange(), but for HTTP headers. rearrange() was designed for HTML
+# attributes so it HTML escapes any extra named parameters (when autoEscape
+# is on), which used to be unescaped again by the callers - but that also
+# decoded entities in values that had never been escaped, turning e.g. an
+# app validated header value or redirect URL of "/&#47evil" into "//evil".
+# Instead the extra parameters are taken as given and returned, after the
+# positional ones, as "Name: value" header lines.
+sub _header_params {
+    my ( $order,@param ) = @_;
+    my ( $result,$leftover ) = CGI::Util::_rearrange_params( $order,@param );
+    my @named = @{$result}[ 0 .. $#$order ];
+    my @lines;
+
+    # extra positional parameters, which may be given as name=value
+    for my $line ( @{$result}[ scalar( @$order ) .. $#$result ] ) {
+        next unless defined $line;
+        # Don't use \s because of perl bug 21951
+        if ( my ( $name,$value ) = $line =~ /([^ \r\n\t=]+)=\"?(.+?)\"?$/s ) {
+            $line = ucfirst( lc( $name ) ) . ": $value";
+        }
+        push( @lines,$line );
+    }
+
+    # extra named parameters, -x_foo => 'bar' becomes "X-foo: bar"
+    for my $name ( sort keys %{ $leftover || {} } ) {
+        next unless defined $leftover->{$name};
+        ( my $header = lc( $name ) ) =~ tr/_/-/;
+        push( @lines,ucfirst( $header ) . ": $leftover->{$name}" );
+    }
+
+    return ( @named,@lines );
 }
 
 # CR escaping for header values, per RFC 822. Values are modified in
@@ -1617,8 +1642,8 @@ sub header {
 
     return "" if $self->{'.header_printed'}++ and $HEADERS_ONCE;
 
-    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) = 
-	rearrange([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
+    my($type,$status,$cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) =
+	_header_params([['TYPE','CONTENT_TYPE','CONTENT-TYPE'],
 			    'STATUS',['COOKIE','COOKIES','SET-COOKIE'],'TARGET',
                             'EXPIRES','NPH','CHARSET',
                             'ATTACHMENT','P3P'],@p);
@@ -1631,15 +1656,6 @@ sub header {
         push(@cookie,$cs) if defined $cs and $cs ne '';
     }
     $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
-
-    # rearrange() was designed for the HTML portion, so we
-    # need to fix it up a little. This must happen before the
-    # CR escaping below, as unescapeHTML can produce newlines.
-    for (@other) {
-        # Don't use \s because of perl bug 21951
-        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
-        ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
-    }
 
     _check_header_values($type,$status,@cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other);
 
@@ -1703,21 +1719,28 @@ sub cache {
 ####
 sub redirect {
     my($self,@p) = self_or_default(@_);
-    my($url,$target,$status,$cookie,$nph,@other) = 
-         rearrange([[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES','SET-COOKIE'],NPH],@p);
+    # values are passed on to header() as given - they used to be HTML
+    # unescaped, which decoded entities in the (possibly app validated)
+    # Location, e.g. turning "/&#47evil.example/" into "//evil.example/"
+    my ($result,$leftover) = CGI::Util::_rearrange_params(
+        [[LOCATION,URI,URL],TARGET,STATUS,['COOKIE','COOKIES','SET-COOKIE'],NPH],@p
+    );
+    my($url,$target,$status,$cookie,$nph,@other) = @$result;
     $status = '302 Found' unless defined $status;
     $url ||= $self->self_url;
     my(@o);
+    # extra positional parameters, given as name=value
     for (@other) { tr/\"//d; push(@o,split("=",$_,2)); }
+    # extra named parameters
+    push(@o,map { ("-$_" => $leftover->{$_}) } sort keys %{ $leftover || {} });
     unshift(@o,
 	 '-Status'  => $status,
 	 '-Location'=> $url,
 	 '-nph'     => $nph);
     unshift(@o,'-Target'=>$target) if $target;
     unshift(@o,'-Type'=>'');
-    my @unescaped;
-    unshift(@unescaped,'-Cookie'=>$cookie) if $cookie;
-    return $self->header((map {$self->unescapeHTML($_)} @o),@unescaped);
+    unshift(@o,'-Cookie'=>$cookie) if $cookie;
+    return $self->header(@o);
 }
 
 #### Method: start_html

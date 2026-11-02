@@ -840,6 +840,12 @@ including the http: or ftp: part) in redirection requests as relative URLs
 are resolved by the user agent of the client so may not do what you want or
 expect them to do.
 
+The URL is used exactly as given. Prior to v5.00 HTML entities in it (and in
+any other header values) were decoded, so C</&#47;evil.example/> became
+C<//evil.example/> after any validation your application had done. If you were
+relying on this to pass an HTML escaped URL (e.g. C</x?a=1&amp;b=2>) you should
+pass the unescaped URL instead.
+
 You can also use named arguments:
 
     print $q->redirect(

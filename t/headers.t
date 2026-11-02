@@ -73,9 +73,27 @@ for my $escape ( 1, 0 ) {
     my $cgi = CGI->new('');
     local $CGI::Q = $cgi;
     $cgi->autoEscape(0);
-    eval { $cgi->header( -foobar => "bar&#13;&#10;Set-Cookie: evil=1" ) };
-    like($@,qr/contains a newline/,'entity encoded CRLF in unknown header blows up with autoEscape off');
+    # header values are no longer HTML unescaped at all, so entities are
+    # passed through as given rather than becoming newlines
+    like eval { $cgi->header( -foobar => "bar&#13;&#10;Set-Cookie: evil=1" ) } // "died: $@",
+        qr#^Foobar: bar&\#13;&\#10;Set-Cookie: evil=1\r?$#m, 'entity encoded CRLF in unknown header is passed through literally with autoEscape off';
+}
 
-    like $cgi->header( -foobar => "bar&#13;&#10; continued" ),
-        qr#Foobar: bar continued#, 'entity encoded CRLF followed by whitespace is unfolded';
+# header and redirect values are passed through as given: they used to be
+# HTML unescaped, which turned an app validated value into something else
+for my $escape ( 1, 0 ) {
+    my $cgi = CGI->new('');
+    local $CGI::Q = $cgi;
+    $cgi->autoEscape($escape);
+
+    for my $url ( '/&#47evil.example/', '/&#x2f;evil.example/', 'https://victim.example&#64;evil.example/', '/x?a=1&amp;b=2' ) {
+        like( $cgi->redirect( $url ), qr/^Location: \Q$url\E\r?$/m, "autoEscape($escape): redirect Location is not unescaped: $url" );
+        like( $cgi->redirect( -uri => '/ok', -x_foo => $url ), qr/^X-foo: \Q$url\E\r?$/m, " ... nor are extra redirect headers" );
+        like( $cgi->header( -x_foo => $url ), qr/^X-foo: \Q$url\E\r?$/m, " ... nor are extra header() headers" );
+        like( $cgi->multipart_start( -x_foo => $url ), qr/^X-foo: \Q$url\E\r?$/m, " ... nor are extra multipart_start() headers" );
+    }
+
+    like( $cgi->redirect( -uri => '/ok', -status => '301 Moved&#32;Permanently' ), qr/^Status: 301 Moved&#32;Permanently\r?$/m, " ... nor is the redirect status" );
+    like( $cgi->header( -x_foo => '' ), qr/^X-foo: \r?$/m, "autoEscape($escape): empty extra header value is empty" );
+    like( $cgi->header( -x_foo => 'say "hi"' ), qr/^X-foo: say "hi"\r?$/m, " ... and quotes in values are kept" );
 }
