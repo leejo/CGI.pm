@@ -86,6 +86,7 @@ t/tmpfilename_string_arg.t
 t/unescapeHTML.t
 t/upload.t
 t/uploadInfo.t
+t/upload_filename.t
 t/upload_post_text.txt
 t/upload_post_quoted_unquoted.txt
 t/upload_quoted_unquoted.t

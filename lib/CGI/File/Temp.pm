@@ -30,8 +30,9 @@ sub compare {
 
 sub _mp_filename {
 	my ( $self,$filename ) = @_;
+	# not just "if $filename" so that a file named "0" keeps its name
 	${*$self}->{ _mp_filename } = $filename
-		if $filename;
+		if defined $filename && length $filename;
 	return ${*$self}->{_mp_filename};
 }
 

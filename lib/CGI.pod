@@ -1001,12 +1001,22 @@ If you want the entered file name for the file, you can just call param():
 
     my $filename = $q->param('field_name');
 
-Different browsers will return slightly different things for the name. Some
-browsers return the filename only. Others return the full path to the file,
-using the path conventions of the user's machine. Regardless, the name returned
-is always the name of the file on the I<user's> machine, and is unrelated to
-the name of the temporary file that CGI.pm creates during upload spooling
-(see below).
+The name returned is the name of the file on the I<user's> machine, and is
+unrelated to the name of the temporary file that CGI.pm creates during upload
+spooling (see below).
+
+As the name is supplied by the client it cannot be trusted. Since v5.00 CGI.pm
+removes any directory part from it (splitting on both C</> and C<\>, as some
+browsers send the full path to the file using the path conventions of the
+user's machine) along with any control characters. If nothing usable remains
+(e.g. the name was C<..>) the name C<upload> is used instead. The name may still
+contain other characters that are unsafe for your use, so you should validate
+it, or better generate your own name, before using it to save the file.
+
+The raw value sent by the client is still available in the Content-Disposition
+header returned by uploadInfo() (see below). If you need the previous behaviour
+of returning the raw value you can set L</$CGI::SANITIZE_UPLOAD_FILENAMES> to 0,
+but you should then make sure you never use it as a path.
 
 When a file is uploaded the browser usually sends along some
 information along with it in the Content-Type (MIME type) and
@@ -1771,6 +1781,14 @@ the problem.
 There are a number of global module flags which affect how CGI.pm operates.
 
 =over 4
+
+=item B<$CGI::SANITIZE_UPLOAD_FILENAMES>
+
+Defaults to 1, which removes any directory part and control characters from
+the client supplied filename of file uploads (see
+L</Processing a file upload field>). Set this to 0 to get the raw value sent by
+the client, which was the behaviour prior to v5.00. Doing so is not recommended
+as the raw value can contain a path, such as C<../../etc/passwd>.
 
 =item B<$CGI::APPEND_QUERY_STRING>
 

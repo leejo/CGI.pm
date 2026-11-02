@@ -26,6 +26,7 @@ $MOD_PERL            = 0; # no mod_perl by default
 $POST_MAX            = 1024 * 1024 * 128; # 128MB, set to -1 for no limit
 my $POST_MAX_EXCEEDED = "CGI.pm: 413 Request entity too large\n";
 $DISABLE_UPLOADS     = 0;
+$SANITIZE_UPLOAD_FILENAMES = 1; # set to 0 for the raw client filename
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
 $ENCODE_ENTITIES     = q{&<>"'};
@@ -3452,6 +3453,10 @@ sub read_multipart {
 	    next;
 	}
 
+	# the filename is client supplied, so remove any path from it
+	$filename = _sanitize_upload_filename( $filename )
+	    if $SANITIZE_UPLOAD_FILENAMES && $filename ne '';
+
       UPLOADS: {
 	  # If we get here, then we are dealing with a potentially large
 	  # uploaded form.  Save the data to a temporary file, then open
@@ -3528,6 +3533,22 @@ sub read_multipart {
 	  push(@{$self->{param}{$param}},$filehandle);
       }
     }
+}
+
+# The upload filename is client supplied and may contain a path (older
+# browsers send the full path, and an attacker can send anything), so it
+# must not be usable for path traversal if an application uses it when
+# saving the upload. Remove control characters and any directory part,
+# splitting on both / and \ so Windows paths are handled too. The raw
+# value remains available via uploadInfo()->{'Content-Disposition'}.
+sub _sanitize_upload_filename {
+    my ( $filename ) = @_;
+    $filename =~ s/[\x00-\x1f\x7f]//g;
+    $filename =~ s/.*[\/\\]//s;
+    # nothing usable left, but this is still a file upload so must have a
+    # (true) name - see the overloaded stringification in CGI::File::Temp
+    $filename = 'upload' if $filename eq '' || $filename eq '.' || $filename eq '..';
+    return $filename;
 }
 
 sub _mp_value_parse {
