@@ -1230,6 +1230,9 @@ sub import_names {
     if ($delete || $MOD_PERL || exists $ENV{'FCGI_ROLE'}) {
 	# can anyone find an easier way to do this?
 	for (sort keys %{"${namespace}::"}) {
+	    # nested packages (e.g. Config:: for Q::Config) are not imported
+	    # names, and undefining their hash would wipe the whole package
+	    next if /::\z/;
 	    local *symbol = "${namespace}::${_}";
 	    undef $symbol;
 	    undef @symbol;
