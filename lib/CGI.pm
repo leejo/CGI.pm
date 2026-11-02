@@ -2843,6 +2843,10 @@ sub url {
     }
 
 	$url = URI->new( $url )->canonical->as_string;
+    # canonical() decodes %27 (an RFC 2396 unreserved character) back to a
+    # quote - and a raw quote may be in the request URI - which would let
+    # request data break out of a single quoted attribute or JS string
+    $url =~ s/'/%27/g;
 	return $url
 }
 
