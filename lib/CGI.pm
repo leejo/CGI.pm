@@ -3485,18 +3485,17 @@ sub read_multipart {
 
 	$header{'Content-Disposition'} ||= ''; # quench uninit variable warning
 
-	my $param = _mp_value_parse( $header{'Content-Disposition'},'name' );
+	my $disposition = _mp_disposition_params( $header{'Content-Disposition'} );
+	my $param = _mp_value_parse( $disposition,'name' );
         $param .= $TAINTED;
 
         # See RFC 1867, 2183, 2045
         # NB: File content will be loaded into memory should
         # content-disposition parsing fail.
-        my ($filename) = $header{'Content-Disposition'}
-	               =~/ filename=(("[^"]*")|([a-z\d!\#'\*\+,\.^_\`\{\}\|\~]*))/i;
+        my $filename = _mp_value_parse( $disposition,'filename' );
 
 	$filename ||= ''; # quench uninit variable warning
 
-        $filename =~ s/^"([^"]*)"$/$1/;
         $filename .= $TAINTED; # regex captures are untainted
 	# Test for Opera's multiple upload feature
 	my($multipart) = ( defined( $header{'Content-Type'} ) &&
@@ -3613,26 +3612,57 @@ sub _sanitize_upload_filename {
     return $filename;
 }
 
+# Split a Content-Disposition value into its parameters, left to right, so
+# that a quoted value is skipped as a whole - searching the whole string
+# for e.g. "name=" found it inside another parameter's quoted value, so
+# filename="x;name=admin"; name=user gave a field name of "admin", and
+# name="x filename=y" made a plain field an upload. Returns a list of
+# [ name, raw value (quotes included, undef if there is no =) ].
+sub _mp_disposition_params {
+	my ( $string ) = @_;
+	my @params;
+	$string = '' unless defined $string;
+	$string =~ /\G[^;]*/gc; # the disposition type
+	while ( $string =~ /\G;[ \t]*/gc ) {
+		$string =~ /\G([^\s=;"]*)/gc;
+		my ( $name,$value ) = ( $1 );
+		if ( $string =~ /\G=/gc ) {
+			# a quoted string (which may be unterminated), else up to the next ;
+			$string =~ /\G("(?:\\"|[^"])*"?|[^;]*)/gc;
+			$value = $1;
+		}
+		push( @params,[ $name,$value ] );
+		$string =~ /\G[^;]*/gc; # skip anything else up to the next ;
+	}
+	return \@params;
+}
+
+# Get the value of the name or filename parameter (the first occurrence)
+# from the output of _mp_disposition_params
 sub _mp_value_parse {
-	my ( $string,$field ) = @_;
+	my ( $params,$field ) = @_;
 
-	my $is_quoted = $string =~/[\s;]$field="/ ? 1 : 0;
-	my $param;
+	my ( $raw ) = map { $_->[1] } grep {
+		defined $_->[1] && ( $field eq 'filename' ? lc( $_->[0] ) eq $field : $_->[0] eq $field )
+	} @$params;
+	return undef unless defined $raw;
 
-	if ( $is_quoted ) {
-		# a quoted token cannot contain anything but an unescaped quote
-		($param) = $string =~/[\s;]$field="((?:\\"|[^"])*)"/;
-	} else {
-		# a plain token cannot contain any reserved characters
-		# https://tools.ietf.org/html/rfc2616#section-2.2
-		# separators     = "(" | ")" | "<" | ">" | "@"
-		#                | "," | ";" | ":" | "\" | <">
-		#                | "/" | "[" | "]" | "?" | "="
-		#                | "{" | "}" | SP | HT
-		($param) = $string =~/[\s;]$field=([^\(\)<>\@,;:\\"\/\[\]\?=\{\} \015\n\t]*)/;
+	if ( $field eq 'filename' ) {
+		return $1 if $raw =~ /\A"([^"]*)"/;
+		return '' if $raw =~ /\A"/;
+		return ( $raw =~ /\A([a-z\d!\#'\*\+,\.^_\`\{\}\|\~]*)/i )[0];
 	}
 
-	return $param;
+	# a quoted token cannot contain anything but an unescaped quote
+	return $1 if $raw =~ /\A"((?:\\"|[^"])*)"/;
+	return undef if $raw =~ /\A"/; # unterminated
+	# a plain token cannot contain any reserved characters
+	# https://tools.ietf.org/html/rfc2616#section-2.2
+	# separators     = "(" | ")" | "<" | ">" | "@"
+	#                | "," | ";" | ":" | "\" | <">
+	#                | "/" | "[" | "]" | "?" | "="
+	#                | "{" | "}" | SP | HT
+	return ( $raw =~ /\A([^\(\)<>\@,;:\\"\/\[\]\?=\{\} \015\n\t]*)/ )[0];
 }
 
 #####
