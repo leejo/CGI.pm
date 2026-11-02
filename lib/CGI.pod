@@ -801,7 +801,8 @@ The B<-attachment> parameter can be used to turn the page into an attachment.
 Instead of displaying the page, some browsers will prompt the user to save it
 to disk. The value of the argument is the suggested name for the saved file. In
 order for this to work, you may have to set the B<-type> to
-"application/octet-stream".
+"application/octet-stream". Any C<"> or C<\> in the name is backslash escaped
+(since v5.00) as required for the quoted filename parameter.
 
 The B<-p3p> parameter will add a P3P tag to the outgoing header. The parameter
 can be an arrayref or a space-delimited string of P3P tags. For example:

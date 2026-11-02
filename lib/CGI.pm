@@ -1703,7 +1703,13 @@ sub header {
 	if $expires;
     push(@header,"Date: " . expires(0)) if $expires || $cookie || $nph;
     push(@header,"Pragma: no-cache") if $self->cache();
-    push(@header,"Content-Disposition: attachment; filename=\"$attachment\"") if $attachment;
+    if ($attachment) {
+        # the filename is a quoted-string (RFC 9110 5.6.4), so a " or \ in it
+        # must be escaped - an unescaped " would end it, allowing other
+        # parameters to be injected (e.g. 'x.html"; filename*=...')
+        (my $filename = $attachment) =~ s/(["\\])/\\$1/g;
+        push(@header,"Content-Disposition: attachment; filename=\"$filename\"");
+    }
     push(@header,map {ucfirst $_} @other);
     push(@header,"Content-Type: $type") if $type ne '';
     my $header = join($CRLF,@header)."${CRLF}${CRLF}";
