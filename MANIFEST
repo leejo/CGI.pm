@@ -79,6 +79,7 @@ t/pretty.t
 t/push.t
 t/query_string.t
 t/redirect_query_string.t
+t/reserved_params.t
 t/request.t
 t/request_method_unknown.t
 t/rt-31107.t

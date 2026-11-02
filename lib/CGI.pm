@@ -25,6 +25,10 @@ $MOD_PERL            = 0; # no mod_perl by default
 #global settings
 $POST_MAX            = 1024 * 1024 * 128; # 128MB, set to -1 for no limit
 my $POST_MAX_EXCEEDED = "CGI.pm: 413 Request entity too large\n";
+# params that CGI.pm sets itself to the raw request body (or XForms model),
+# which must not be settable by the client via the query string or a form
+# field, as an app couldn't then tell them apart from the real body
+my %RESERVED_PARAM = map { $_ => 1 } qw/ POSTDATA PUTDATA PATCHDATA XForms:Model /;
 $DISABLE_UPLOADS     = 0;
 $SANITIZE_UPLOAD_FILENAMES = 1; # set to 0 for the raw client filename
 $UNLINK_TMP_FILES    = 1;
@@ -739,7 +743,9 @@ sub init {
     # different things for keyword lists and parameter lists.
     if (defined $query_string && length $query_string) {
 	if ($query_string =~ /[&=;]/) {
-	    $self->parse_params($query_string);
+	    # client sent params can't use the reserved names, an app's own
+	    # initializer (e.g. restoring saved state) can
+	    $self->parse_params($query_string,!defined($initializer));
 	} else {
 	    $self->add_parameter('keywords');
 	    $self->{param}{'keywords'} = [$self->parse_keywordlist($query_string)];
@@ -869,7 +875,7 @@ sub save_request {
 }
 
 sub parse_params {
-    my($self,$tosplit) = @_;
+    my($self,$tosplit,$from_request) = @_;
     my(@pairs) = split(/[&;]/,$tosplit);
     my($param,$value);
     for (@pairs) {
@@ -879,6 +885,7 @@ sub parse_params {
 	$value = '' unless defined $value;
 	$param = unescape($param);
 	$value = unescape($value);
+	next if $from_request && $RESERVED_PARAM{$param};
 	$self->add_parameter($param);
 	push (@{$self->{param}{$param}},$value);
     }
@@ -3530,6 +3537,12 @@ sub read_multipart {
 		$header{'Content-Type'} =~ /multipart\/mixed/ ) ?
 		1 : 0;
 
+	# skip a field using one of the names reserved for the request body
+	if ( $RESERVED_PARAM{$param} ) {
+	    while ( defined( $buffer->read ) ) { }
+	    next;
+	}
+
 	# add this parameter to our list
 	$self->add_parameter($param);
 
@@ -3725,6 +3738,12 @@ sub read_multipart_related {
 	if ( $param eq $start ) {
 	    $returnvalue = $buffer->readBody;
             $returnvalue .= $TAINTED;
+	    next;
+	}
+
+	# skip a part using one of the names reserved for the request body
+	if ( $RESERVED_PARAM{$param} ) {
+	    while ( defined( $buffer->read ) ) { }
 	    next;
 	}
 

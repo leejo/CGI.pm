@@ -446,6 +446,13 @@ L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
 and as L<file uploads|/Processing a file upload field> via L</-putdata_upload>
 option.
 
+Since v5.00 parameters named POSTDATA, PUTDATA, PATCHDATA or XForms:Model sent
+by the client (in the query string, a form field, or a multipart part) are
+ignored, so these parameters only ever contain the request body. Prior to this
+a client could set them, e.g. with C<?POSTDATA=...> or a plain HTML form, and an
+application could not tell that apart from the body. You should still check
+the request's content type is what you expect.
+
 =head2 Direct access to the parameter list
 
     $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
