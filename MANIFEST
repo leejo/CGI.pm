@@ -75,6 +75,7 @@ t/rt-84767.t
 t/rt_31107.txt
 t/rt_75628.txt
 t/save_read_roundtrip.t
+t/scrolling_list.t
 t/sorted.t
 t/start_end_asterisk.t
 t/start_end_end.t

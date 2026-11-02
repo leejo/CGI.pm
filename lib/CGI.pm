@@ -2590,7 +2590,7 @@ sub scrolling_list {
             for my $v (split(/\n/)) {
                 my $selectit = $XHTML ? 'selected="selected"' : 'selected';
 		for my $selected (sort keys %selected) {
-		    $v =~ s/(value="$selected")/$selectit $1/;
+		    $v =~ s/(value="\Q$selected\E")/$selectit $1/;
 		}
                 $result .= "$v\n";
             }
