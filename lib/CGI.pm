@@ -601,8 +601,13 @@ sub init {
                         if $content_length > 0;
                       push (@{$self->{param}{$param}},$value);
                       $is_xforms = 1;
-              } elsif ($ENV{'CONTENT_TYPE'} =~ /multipart\/related.+boundary=\"?([^\";,]+)\"?.+start=\"?\<?([^\"\>]+)\>?\"?/) {
-                      my($boundary,$start) = ($1,$2);
+              } elsif ($ENV{'CONTENT_TYPE'} =~ m|^multipart/related\b|
+                  # separate (linear) matches for each parameter - a single
+                  # pattern with .+ between them backtracks in cubic time on
+                  # a crafted Content-Type, and parameters can be in any order
+                  and my ($boundary) = $ENV{'CONTENT_TYPE'} =~ /[;\s]boundary=\"?([^\";,]+)\"?/
+                  and my ($start)    = $ENV{'CONTENT_TYPE'} =~ /[;\s]start=\"?\<?([^\"\>]+)\>?\"?/
+              ) {
                       my($param) = 'XForms:Model';
                       $self->add_parameter($param);
                       my($value);
