@@ -697,12 +697,18 @@ sub init {
 	  last METHOD;
       }
 
-      # If $meth is not of GET, POST, PUT or HEAD, assume we're
-      #   being debugged offline.
+      # If there is no request at all (no REQUEST_METHOD, and not running
+      #   under a web server), assume we're being debugged offline.
       # Check the command line and then the standard input for data.
       # We use the shellwords package in order to behave the way that
-      # UN*X programmers expect.
-      if ($DEBUG)
+      # UN*X programmers expect. This must not happen for a request with
+      # some other method (e.g. OPTIONS, or "post"), which a client can
+      # send, as the process' own command line would become the params.
+      if ($DEBUG
+          && !defined $ENV{'REQUEST_METHOD'}
+          && !defined $ENV{'GATEWAY_INTERFACE'}
+          && !exists $ENV{'FCGI_ROLE'}
+          && !$MOD_PERL)
       {
           my $cmdline_ret = read_from_cmdline();
           $query_string = $cmdline_ret->{'query_string'};
