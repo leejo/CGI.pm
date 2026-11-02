@@ -3757,6 +3757,7 @@ $MultipartBuffer::SPIN_LOOP_MAX    ||= 2000;   # bug fix for some Netscape serve
 $MultipartBuffer::CRLF             ||= $CGI::CRLF;
 
 $INITIAL_FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
+$MAX_BOUNDARY_LINE = 1024; # when the boundary is read from the body
 $TIMEOUT          = $MultipartBuffer::TIMEOUT;
 $SPIN_LOOP_MAX    = $MultipartBuffer::SPIN_LOOP_MAX;
 $CRLF             = $MultipartBuffer::CRLF;
@@ -3775,9 +3776,11 @@ sub new {
     # Netscape seems to be a little bit unreliable
     # about providing boundary strings.
     my $boundary_read = 0;
+    my $chunked       = !$length;
+    my $preread       = '';
     if ($boundary) {
 
-	# Under the MIME spec, the boundary consists of the 
+	# Under the MIME spec, the boundary consists of the
 	# characters "--" PLUS the Boundary string
 
 	# BUG: IE 3.01 on the Macintosh uses just the boundary -- not
@@ -3785,21 +3788,33 @@ sub new {
 	$boundary = "--$boundary" unless CGI::user_agent('MSIE\s+3\.0[12];\s*Mac|DreamPassport');
 
     } else { # otherwise we find it ourselves
-	my($old);
-	($old,$/) = ($/,$CRLF); # read a CRLF-delimited line
-	$boundary = <STDIN>;      # BUG: This won't work correctly under mod_perl
-	$length -= length($boundary);
-	chomp($boundary);               # remove the CRLF
-	$/ = $old;                      # restore old line separator
+	# read the first (boundary) line, bounded in size so that a client
+	# can't make us buffer an arbitrarily long line - RFC 2046 limits
+	# boundaries to 70 characters. anything read past the line is kept
+	# for the body.
+	my $max = $MAX_BOUNDARY_LINE;
+	$max = $length if !$chunked && $length < $max;
+	my $end;
+	while ( ( $end = index( $preread,$CRLF ) ) < 0 && length( $preread ) < $max ) {
+	    my $got = $interface->read_from_client(
+		\$preread, $max - length( $preread ), length( $preread )
+	    );
+	    last unless $got;
+	}
+	die "Malformed multipart POST: boundary line too long or missing\n"
+	    if $end < 0;
+	$length  -= length( $preread ) unless $chunked;
+	$boundary = substr( $preread,0,$end );
+	$preread  = substr( $preread,$end + length( $CRLF ) );
         $boundary_read++;
     }
 
     my $self = {LENGTH=>$length,
-		CHUNKED=>!$length,
-		TOTAL_READ=>0,
+		CHUNKED=>$chunked,
+		TOTAL_READ=>$boundary_read ? length( $boundary ) + length( $CRLF ) + length( $preread ) : 0,
 		BOUNDARY=>$boundary,
 		INTERFACE=>$interface,
-		BUFFER=>'',
+		BUFFER=>$preread,
 	    };
 
     $FILLUNIT = length($boundary)

@@ -55,6 +55,7 @@ t/init.t
 t/init_test.txt
 t/multipart_globals.t
 t/multipart_init.t
+t/multipart_no_boundary.t
 t/multipart_related.t
 t/multipart_start.t
 t/no_tabindex.t
