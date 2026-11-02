@@ -238,6 +238,14 @@ content where HTML comments are not allowed:
 Note: In this respect warningsToBrowser() differs fundamentally from
 fatalsToBrowser(), which you should never call yourself!
 
+In persistent environments (mod_perl, FastCGI, PSGI) the buffered warnings
+and the warningsToBrowser() setting are reset whenever
+C<CGI::initialize_globals()> is called, as it is between requests by mod_perl
+and CGI::Fast. Prior to v5.00 they were not, so warnings from one request
+could be emitted into the output of a later request. If you use CGI::Carp in
+a persistent environment without CGI.pm call
+C<CGI::Carp::_reset_globals()> at the start of each request.
+
 =head1 OVERRIDING THE NAME OF THE PROGRAM
 
 CGI::Carp includes the name of the program that generated the error or
@@ -504,6 +512,15 @@ sub carpout {
 sub warningsToBrowser {
     $EMIT_WARNINGS = @_ ? shift : 1;
     _warn(shift @WARNINGS) while $EMIT_WARNINGS and @WARNINGS;
+}
+
+# Reset per-request state. This is called by CGI::initialize_globals() (as
+# run between requests by mod_perl, CGI::Fast, etc) so that warnings from
+# one request are never emitted into another request's output, and so that
+# warnings aren't printed before the headers of the next request.
+sub _reset_globals {
+    @WARNINGS      = ();
+    $EMIT_WARNINGS = 0;
 }
 
 # headers

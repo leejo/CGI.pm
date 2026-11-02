@@ -27,6 +27,7 @@ t/autoescape.t
 t/append_query.t
 t/can.t
 t/carp.t
+t/carp_warnings_reset.t
 t/cgi.t
 t/charset.t
 t/checkbox_group.t

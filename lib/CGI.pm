@@ -109,6 +109,11 @@ sub initialize_globals {
     undef %QUERY_FIELDNAMES;
     undef %QUERY_TMPFILES;
 
+    # CGI::Carp buffers warnings for warningsToBrowser(), which must not be
+    # carried over into another request (and so another user's page) in a
+    # persistent environment
+    CGI::Carp::_reset_globals() if defined &CGI::Carp::_reset_globals;
+
     # prevent complaints by mod_perl
     1;
 }
