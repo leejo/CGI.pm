@@ -1093,7 +1093,7 @@ sub read_postdata_putdata {
                 # a body shorter than CONTENT_LENGTH returns 0 (EOF) or undef
                 # (error) forever, so guard against spinning as below
                 if ( ! $read ) {
-                    die "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $SPIN_LOOP_MAX;
+                    die "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $CGI::MultipartBuffer::SPIN_LOOP_MAX;
                     next;
                 }
                 $ZERO_LOOP_COUNTER = 0;
@@ -1140,7 +1140,7 @@ sub read_postdata_putdata {
             # they manage this, but the workaround is to abort if we get
             # more than SPIN_LOOP_MAX consecutive zero reads.
             if ($bytesRead <= 0) {
-                die  "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $SPIN_LOOP_MAX;
+                die  "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $CGI::MultipartBuffer::SPIN_LOOP_MAX;
             } else {
                 $ZERO_LOOP_COUNTER = 0;
             }
