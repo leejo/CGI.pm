@@ -1764,6 +1764,28 @@ The default is 128 megabytes (since v5.00, previously there was no limit). You
 should set this to a value appropriate to your application, or to -1 to remove
 the limit entirely.
 
+=item B<$CGI::MAX_PARAMS>
+
+The maximum number of parameter values in a request, counting those in the
+query string, a form encoded body, and every part of a multipart body. A
+request exceeding it is discarded with the same error as for B<$CGI::POST_MAX>.
+Without a limit a body within B<$CGI::POST_MAX> can contain millions of tiny
+parameters, taking many seconds and gigabytes of memory to parse.
+
+The default is 10,000 (since v5.00, previously there was no limit), set it to
+-1 to remove the limit.
+
+=item B<$CGI::MAX_UPLOADS>
+
+The maximum number of uploaded files in a request, as each one is saved to a
+temporary file (and its filehandle kept open, unless C<$CGI::CLOSE_UPLOAD_FILES>
+or C<close_upload_files(1)> is used). A request exceeding it is discarded with
+the same error as for B<$CGI::POST_MAX>. Note that your system may limit the
+number of open files per process to fewer than this.
+
+The default is 1,000 (since v5.00, previously there was no limit), set it to
+-1 to remove the limit.
+
 =item B<$CGI::DISABLE_UPLOADS>
 
 If set to a non-zero value, this will disable file uploads completely. Other
@@ -1784,7 +1806,8 @@ the "use" statement:
     $CGI::POST_MAX = 1024 * 1024 * 10;  # max 10MB posts
     $CGI::DISABLE_UPLOADS = 1;          # no uploads
 
-An attempt to send a POST larger than $POST_MAX bytes will cause I<param()> to
+An attempt to send a POST larger than $POST_MAX bytes (or with more than
+$MAX_PARAMS parameters or $MAX_UPLOADS uploads) will cause I<param()> to
 return an empty CGI parameter list. You can test for this event by checking
 I<cgi_error()>, either after you create the CGI object or, if you are using the
 function-oriented interface, call <param()> for the first time. If the POST was

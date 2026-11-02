@@ -24,7 +24,9 @@ $MOD_PERL            = 0; # no mod_perl by default
 
 #global settings
 $POST_MAX            = 1024 * 1024 * 128; # 128MB, set to -1 for no limit
-my $POST_MAX_EXCEEDED = "CGI.pm: 413 Request entity too large\n";
+$MAX_PARAMS          = 10_000; # param values per request, -1 for no limit
+$MAX_UPLOADS         = 1_000;  # uploaded files per request, -1 for no limit
+my $REQUEST_TOO_LARGE = "CGI.pm: 413 Request entity too large\n";
 # params that CGI.pm sets itself to the raw request body (or XForms model),
 # which must not be settable by the client via the query string or a form
 # field, as an app couldn't then tell them apart from the real body
@@ -518,7 +520,7 @@ sub init {
   my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
 
   my $is_xforms;
-  my $post_max_exceeded;
+  my $too_large;
 
   my $initializer = shift;  # for backward compatibility
   local($/) = "\n";
@@ -563,7 +565,7 @@ sub init {
       if (($POST_MAX > 0) && ($content_length > $POST_MAX)) {
 	#discard the post, unread
 	$self->cgi_error("413 Request entity too large");
-	$post_max_exceeded = 1;
+	$too_large = 1;
 	last METHOD;
       }
 
@@ -575,10 +577,10 @@ sub init {
 	  && !defined($initializer)
 	  ) {
 	  my($boundary) = $ENV{'CONTENT_TYPE'} =~ /boundary=\"?([^\";,]+)\"?/;
-	  unless ( $self->_within_post_max(
+	  unless ( $self->_within_request_limits(
 	      sub { $self->read_multipart($boundary,$content_length) }
 	  ) ) {
-	      $post_max_exceeded = 1;
+	      $too_large = 1;
 	      last METHOD;
 	  }
 	  if ($APPEND_QUERY_STRING) {
@@ -624,10 +626,10 @@ sub init {
                       my($param) = 'XForms:Model';
                       $self->add_parameter($param);
                       my($value);
-                      unless ( $self->_within_post_max(
+                      unless ( $self->_within_request_limits(
                           sub { $value = $self->read_multipart_related($start,$boundary,$content_length,0) }
                       ) ) {
-                          $post_max_exceeded = 1;
+                          $too_large = 1;
                           last METHOD;
                       }
                       push (@{$self->{param}{$param}},$value);
@@ -728,7 +730,7 @@ sub init {
   }
 
 # YL: Begin Change for XML handler 10/19/2001
-    if (!$is_xforms && !$post_max_exceeded && ($meth eq 'POST' || $meth eq 'PUT' || $meth eq 'PATCH')
+    if (!$is_xforms && !$too_large && ($meth eq 'POST' || $meth eq 'PUT' || $meth eq 'PATCH')
         && defined($ENV{'CONTENT_TYPE'})
         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
@@ -746,6 +748,9 @@ sub init {
 	    # client sent params can't use the reserved names, an app's own
 	    # initializer (e.g. restoring saved state) can
 	    $self->parse_params($query_string,!defined($initializer));
+	} elsif ( !defined($initializer)
+	    && $self->_too_many_params( ( $query_string =~ tr/+// ) + 1 ) ) {
+	    $self->_request_too_large;
 	} else {
 	    $self->add_parameter('keywords');
 	    $self->{param}{'keywords'} = [$self->parse_keywordlist($query_string)];
@@ -771,21 +776,36 @@ sub init {
     $self->save_request unless defined $initializer;
 }
 
-# Run a multipart reader, enforcing $POST_MAX while reading. Without a
-# CONTENT_LENGTH (chunked transfer encoding) the size can't be checked up
-# front, so CGI::MultipartBuffer dies with $POST_MAX_EXCEEDED once the
-# limit is passed. Returns false if the limit was exceeded.
-sub _within_post_max {
+# Run a multipart reader, enforcing $POST_MAX, $MAX_PARAMS and $MAX_UPLOADS
+# while reading. These can't all be checked up front (e.g. without a
+# CONTENT_LENGTH, with chunked transfer encoding), so the readers die with
+# $REQUEST_TOO_LARGE once a limit is passed. Returns false if one was.
+sub _within_request_limits {
     my ( $self,$reader ) = @_;
     return 1 if eval { $reader->(); 1 };
-    die $@ unless $@ eq $POST_MAX_EXCEEDED;
-    # discard anything parsed before the limit was hit, the same as when
-    # the limit is exceeded up front
+    die $@ unless $@ eq $REQUEST_TOO_LARGE;
+    $self->_request_too_large;
+    return 0;
+}
+
+# discard anything parsed so far, the same as when $POST_MAX is exceeded up
+# front, and set the error
+sub _request_too_large {
+    my ( $self ) = @_;
     $self->{param}        = {};
     $self->{'.parameters'} = [];
     $self->{'.tmpfiles'}  = {};
     $self->cgi_error("413 Request entity too large");
-    return 0;
+    return;
+}
+
+# true if $count values would exceed $MAX_PARAMS, counting those already
+# parsed from the request
+sub _too_many_params {
+    my ( $self,$count ) = @_;
+    return 0 unless $MAX_PARAMS > 0;
+    $count += @$_ for values %{ $self->{param} || {} };
+    return $count > $MAX_PARAMS;
 }
 
 sub _get_query_string_from_env {
@@ -876,6 +896,10 @@ sub save_request {
 
 sub parse_params {
     my($self,$tosplit,$from_request) = @_;
+    # count (cheaply) before splitting, so a huge number of params doesn't
+    # cost the time and memory to split and decode them all first
+    return $self->_request_too_large
+        if $from_request && $self->_too_many_params( ( $tosplit =~ tr/&;// ) + 1 );
     my(@pairs) = split(/[&;]/,$tosplit);
     my($param,$value);
     for (@pairs) {
@@ -3513,6 +3537,7 @@ sub read_multipart {
     return unless $buffer;
     my(%header,$body);
     my $filenumber = 0;
+    my ( $parts,$uploads ) = ( 0,0 );
     while (!$buffer->eof) {
 	%header = $buffer->readHeader;
 
@@ -3520,6 +3545,11 @@ sub read_multipart {
 	    $self->cgi_error("400 Bad request (malformed multipart POST)");
 	    return;
 	}
+
+	# every part costs time to parse (even those that are then skipped),
+	# and every upload a temp file, so limit their number - the reader is
+	# run by _within_request_limits
+	die $REQUEST_TOO_LARGE if $MAX_PARAMS > 0 && ++$parts > $MAX_PARAMS;
 
 	$header{'Content-Disposition'} ||= ''; # quench uninit variable warning
 
@@ -3581,6 +3611,8 @@ sub read_multipart {
 	my $tmp_dir    = $CGI::OS eq 'WINDOWS'
 		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
 		: undef; # File::Temp defaults to TMPDIR
+
+	  die $REQUEST_TOO_LARGE if $MAX_UPLOADS > 0 && ++$uploads > $MAX_UPLOADS;
 
       require CGI::File::Temp;
       my $filehandle = CGI::File::Temp->new(
@@ -3725,6 +3757,7 @@ sub read_multipart_related {
     my(%header,$body);
     my $filenumber = 0;
     my $returnvalue;
+    my ( $parts,$uploads ) = ( 0,0 );
     while (!$buffer->eof) {
 	%header = $buffer->readHeader;
 
@@ -3732,6 +3765,9 @@ sub read_multipart_related {
 	    $self->cgi_error("400 Bad request (malformed multipart POST)");
 	    return;
 	}
+
+	# limit the number of parts, as in read_multipart
+	die $REQUEST_TOO_LARGE if $MAX_PARAMS > 0 && ++$parts > $MAX_PARAMS;
 
 	my($param) = $header{'Content-ID'}=~/\<([^\>]*)\>/;
         $param .= $TAINTED;
@@ -3767,6 +3803,8 @@ sub read_multipart_related {
 	my $tmp_dir    = $CGI::OS eq 'WINDOWS'
 		? ( $ENV{TEMP} || $ENV{TMP} || ( $ENV{WINDIR} ? ( $ENV{WINDIR} . $SL . 'TEMP' ) : undef ) )
 		: undef; # File::Temp defaults to TMPDIR
+
+	  die $REQUEST_TOO_LARGE if $MAX_UPLOADS > 0 && ++$uploads > $MAX_UPLOADS;
 
       require CGI::File::Temp;
       my $filehandle = CGI::File::Temp->new(
@@ -4157,7 +4195,7 @@ sub fillBuffer {
     # enforce $POST_MAX as we read, as when there is no CONTENT_LENGTH
     # (chunked transfer encoding) it can't be checked up front
     $self->{TOTAL_READ} += $bytesRead if $bytesRead && $bytesRead > 0;
-    die $POST_MAX_EXCEEDED
+    die $REQUEST_TOO_LARGE
         if $CGI::POST_MAX > 0 && $self->{TOTAL_READ} > $CGI::POST_MAX;
 }
 
