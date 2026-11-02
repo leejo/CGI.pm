@@ -1025,8 +1025,16 @@ sub read_postdata_putdata {
             my $buf;
             my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
             my $len  = $content_length;
+            my $ZERO_LOOP_COUNTER = 0;
             while ( $len > 0 ) {
                 my $read = $self->read_from_client( \$buf, $unit, 0 );
+                # a body shorter than CONTENT_LENGTH returns 0 (EOF) or undef
+                # (error) forever, so guard against spinning as below
+                if ( ! $read ) {
+                    die "CGI.pm: Server closed socket during read_postdata_putdata (client aborted?).\n" if $ZERO_LOOP_COUNTER++ >= $SPIN_LOOP_MAX;
+                    next;
+                }
+                $ZERO_LOOP_COUNTER = 0;
                 $len -= $read;
             }
             last UPLOADS;
