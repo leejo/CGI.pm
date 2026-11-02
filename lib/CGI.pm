@@ -23,7 +23,8 @@ $_XHTML_DTD = ['-//W3C//DTD XHTML 1.0 Transitional//EN',
 $MOD_PERL            = 0; # no mod_perl by default
 
 #global settings
-$POST_MAX            = -1; # no limit to uploaded files
+$POST_MAX            = 1024 * 1024 * 128; # 128MB, set to -1 for no limit
+my $POST_MAX_EXCEEDED = "CGI.pm: 413 Request entity too large\n";
 $DISABLE_UPLOADS     = 0;
 $UNLINK_TMP_FILES    = 1;
 $LIST_CONTEXT_WARN   = 1;
@@ -506,6 +507,7 @@ sub init {
   my($query_string,$meth,$content_length,$fh,@lines) = ('','','','');
 
   my $is_xforms;
+  my $post_max_exceeded;
 
   my $initializer = shift;  # for backward compatibility
   local($/) = "\n";
@@ -547,6 +549,7 @@ sub init {
       if (($POST_MAX > 0) && ($content_length > $POST_MAX)) {
 	#discard the post, unread
 	$self->cgi_error("413 Request entity too large");
+	$post_max_exceeded = 1;
 	last METHOD;
       }
 
@@ -558,7 +561,12 @@ sub init {
 	  && !defined($initializer)
 	  ) {
 	  my($boundary) = $ENV{'CONTENT_TYPE'} =~ /boundary=\"?([^\";,]+)\"?/;
-	  $self->read_multipart($boundary,$content_length);
+	  unless ( $self->_within_post_max(
+	      sub { $self->read_multipart($boundary,$content_length) }
+	  ) ) {
+	      $post_max_exceeded = 1;
+	      last METHOD;
+	  }
 	  if ($APPEND_QUERY_STRING) {
 	    # Some people want to have their cake and eat it too!
 	    # Set $APPEND_QUERY_STRING = 1 to have the contents of the query string
@@ -596,7 +604,13 @@ sub init {
                       my($boundary,$start) = ($1,$2);
                       my($param) = 'XForms:Model';
                       $self->add_parameter($param);
-                      my($value) = $self->read_multipart_related($start,$boundary,$content_length,0);
+                      my($value);
+                      unless ( $self->_within_post_max(
+                          sub { $value = $self->read_multipart_related($start,$boundary,$content_length,0) }
+                      ) ) {
+                          $post_max_exceeded = 1;
+                          last METHOD;
+                      }
                       push (@{$self->{param}{$param}},$value);
 					  $query_string = $self->_get_query_string_from_env;
                       $is_xforms = 1;
@@ -689,7 +703,7 @@ sub init {
   }
 
 # YL: Begin Change for XML handler 10/19/2001
-    if (!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT' || $meth eq 'PATCH')
+    if (!$is_xforms && !$post_max_exceeded && ($meth eq 'POST' || $meth eq 'PUT' || $meth eq 'PATCH')
         && defined($ENV{'CONTENT_TYPE'})
         && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded|
 	&& $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| ) {
@@ -728,6 +742,23 @@ sub init {
     $self->delete('.cgifields');
 
     $self->save_request unless defined $initializer;
+}
+
+# Run a multipart reader, enforcing $POST_MAX while reading. Without a
+# CONTENT_LENGTH (chunked transfer encoding) the size can't be checked up
+# front, so CGI::MultipartBuffer dies with $POST_MAX_EXCEEDED once the
+# limit is passed. Returns false if the limit was exceeded.
+sub _within_post_max {
+    my ( $self,$reader ) = @_;
+    return 1 if eval { $reader->(); 1 };
+    die $@ unless $@ eq $POST_MAX_EXCEEDED;
+    # discard anything parsed before the limit was hit, the same as when
+    # the limit is exceeded up front
+    $self->{param}        = {};
+    $self->{'.parameters'} = [];
+    $self->{'.tmpfiles'}  = {};
+    $self->cgi_error("413 Request entity too large");
+    return 0;
 }
 
 sub _get_query_string_from_env {
@@ -3739,6 +3770,7 @@ sub new {
 
     my $self = {LENGTH=>$length,
 		CHUNKED=>!$length,
+		TOTAL_READ=>0,
 		BOUNDARY=>$boundary,
 		INTERFACE=>$interface,
 		BUFFER=>'',
@@ -3915,6 +3947,12 @@ sub fillBuffer {
     }
 
     $self->{LENGTH} -= $bytesRead if !$self->{CHUNKED} && $bytesRead;
+
+    # enforce $POST_MAX as we read, as when there is no CONTENT_LENGTH
+    # (chunked transfer encoding) it can't be checked up front
+    $self->{TOTAL_READ} += $bytesRead if $bytesRead && $bytesRead > 0;
+    die $POST_MAX_EXCEEDED
+        if $CGI::POST_MAX > 0 && $self->{TOTAL_READ} > $CGI::POST_MAX;
 }
 
 # Return true when we've finished reading

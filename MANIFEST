@@ -63,6 +63,7 @@ t/popup_menu.t
 t/postdata.t
 t/postdata_chunked_read.t
 t/postdata_short_body.t
+t/post_max.t
 t/pretty.t
 t/push.t
 t/query_string.t

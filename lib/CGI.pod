@@ -1709,19 +1709,22 @@ with built-in facilities to accomplish this. In other cases, you can use the
 shell I<limit> or I<ulimit> commands to put ceilings on CGI resource usage.
 
 CGI.pm also has some simple built-in protections against denial of service
-attacks, but you must activate them before you can use them. These take the
-form of two global variables in the CGI name space:
+attacks. These take the form of two global variables in the CGI name space:
 
 =over 4
 
 =item B<$CGI::POST_MAX>
 
-If set to a non-negative integer, this variable puts a ceiling on the size of
+If set to a positive integer, this variable puts a ceiling on the size of
 POSTings, in bytes. If CGI.pm detects a POST that is greater than the ceiling,
-it will immediately exit with an error message. This value will affect both
+it will discard it and set an error (see below). This value will affect both
 ordinary POSTs and multipart POSTs, meaning that it limits the maximum size of
-file uploads as well. You should set this to a reasonably high
-value, such as 10 megabytes.
+file uploads as well. The limit is also enforced while reading multipart POSTs
+that have no Content-Length (i.e. chunked transfer encoding).
+
+The default is 128 megabytes (since v5.00, previously there was no limit). You
+should set this to a value appropriate to your application, or to -1 to remove
+the limit entirely.
 
 =item B<$CGI::DISABLE_UPLOADS>
 
@@ -1747,7 +1750,8 @@ An attempt to send a POST larger than $POST_MAX bytes will cause I<param()> to
 return an empty CGI parameter list. You can test for this event by checking
 I<cgi_error()>, either after you create the CGI object or, if you are using the
 function-oriented interface, call <param()> for the first time. If the POST was
-intercepted, then cgi_error() will return the message "413 POST too large".
+intercepted, then cgi_error() will return the message "413 Request entity too
+large".
 
 This error message is actually defined by the HTTP protocol, and is designed to
 be returned to the browser as the CGI script's status code. For example:
