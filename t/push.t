@@ -1,6 +1,6 @@
 #!./perl -wT
 
-use Test::More tests => 12; 
+use Test::More tests => 14; 
 
 use_ok( 'CGI::Push' );
 
@@ -37,6 +37,11 @@ is( ($$out =~ s/last page//g), 1, 'last_page callback called appropriately' );
 $$out = '';
 $q->do_push(%vars, -type => 'fake' );
 like( $$out, '/Content-[Tt]ype: fake/', 'set custom Content-type' );
+
+$$out = '';
+eval { $q->do_push(%vars, -type => "text/plain\015\012X-Evil: 1" ) };
+like( $@, qr/contains a newline/, 'do_push with CRLF in type blows up' );
+unlike( $$out, qr/^X-Evil/m, ' ... and does not output the injected header' );
 
 # use our own counter, as $COUNTER in CGI::Push is now off
 my $i;

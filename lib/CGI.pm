@@ -1502,11 +1502,6 @@ sub multipart_start {
     my($self,@p) = self_or_default(@_);
     my($type,$charset,@other) = rearrange([TYPE,CHARSET],@p);
     $type = $type || 'text/html';
-    if ($charset) {
-        push(@header,"Content-Type: $type; charset=$charset");
-    } else {
-        push(@header,"Content-Type: $type");
-    }
 
     # rearrange() was designed for the HTML portion, so we
     # need to fix it up a little.
@@ -1515,9 +1510,37 @@ sub multipart_start {
         next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/;
         ($_ = $header) =~ s/^(\w)(.*)/$1 . lc ($2) . ': '.$self->unescapeHTML($value)/e;
     }
+
+    _check_header_values($type,$charset,@other);
+
+    if ($charset) {
+        push(@header,"Content-Type: $type; charset=$charset");
+    } else {
+        push(@header,"Content-Type: $type");
+    }
     push(@header,@other);
     my $header = join($CRLF,@header)."${CRLF}${CRLF}";
     return $header;
+}
+
+# CR escaping for header values, per RFC 822. Values are modified in
+# place (via @_ aliasing) to unfold continuation lines, and we die if
+# any other newline remains as that would allow header injection.
+sub _check_header_values {
+    for my $header (@_) {
+        next unless defined $header;
+        # From RFC 822:
+        # Unfolding  is  accomplished  by regarding   CRLF   immediately
+        # followed  by  a  LWSP-char  as equivalent to the LWSP-char.
+        $header =~ s/$CRLF(\s)/$1/g;
+
+        # All other uses of newlines are invalid input.
+        if ($header =~ m/$CRLF|\015|\012/) {
+            # shorten very long values in the diagnostic
+            $header = substr($header,0,72).'...' if (length $header > 72);
+            die "Invalid header value contains a newline not followed by whitespace: $header";
+        }
+    }
 }
 
 #### Method: multipart_end
@@ -1566,22 +1589,16 @@ sub header {
     }
     $p3p = join ' ',@$p3p if ref($p3p) eq 'ARRAY';
 
-    # CR escaping for values, per RFC 822
-    for my $header ($type,$status,@cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other) {
-        if (defined $header) {
-            # From RFC 822:
-            # Unfolding  is  accomplished  by regarding   CRLF   immediately
-            # followed  by  a  LWSP-char  as equivalent to the LWSP-char.
-            $header =~ s/$CRLF(\s)/$1/g;
+    # rearrange() was designed for the HTML portion, so we
+    # need to fix it up a little. This must happen before the
+    # CR escaping below, as unescapeHTML can produce newlines.
+    for (@other) {
+        # Don't use \s because of perl bug 21951
+        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
+        ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
+    }
 
-            # All other uses of newlines are invalid input. 
-            if ($header =~ m/$CRLF|\015|\012/) {
-                # shorten very long values in the diagnostic
-                $header = substr($header,0,72).'...' if (length $header > 72);
-                die "Invalid header value contains a newline not followed by whitespace: $header";
-            }
-        } 
-   }
+    _check_header_values($type,$status,@cookie,$target,$expires,$nph,$charset,$attachment,$p3p,@other);
 
     $nph     ||= $NPH;
 
@@ -1589,14 +1606,6 @@ sub header {
 
     # sets if $charset is given, gets if not
     $charset = $self->charset( $charset );
-
-    # rearrange() was designed for the HTML portion, so we
-    # need to fix it up a little.
-    for (@other) {
-        # Don't use \s because of perl bug 21951
-        next unless my($header,$value) = /([^ \r\n\t=]+)=\"?(.+?)\"?$/s;
-        ($_ = $header) =~ s/^(\w)(.*)/"\u$1\L$2" . ': '.$self->unescapeHTML($value)/e;
-    }
 
     $type .= "; charset=$charset"
       if     $type ne ''

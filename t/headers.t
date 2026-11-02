@@ -52,3 +52,30 @@ like($@,qr/contains a newline/,'redirect with leading newlines blows up');
 }
 
 
+
+# extra header values are HTML unescaped, so entity encoded newlines must
+# be caught too - rearrange() only escapes & when autoEscape is on
+for my $escape ( 1, 0 ) {
+    my $cgi = CGI->new('');
+    local $CGI::Q = $cgi;
+    $cgi->autoEscape($escape);
+
+    for my $nl ( '&#13;&#10;', '&#10;', '&#x0d;&#x0a;', "\015\012" ) {
+        my $out = eval { $cgi->header( -foobar => "bar${nl}Set-Cookie: evil=1" ) };
+        unlike( $out // '', qr/^Set-Cookie: evil/m, "autoEscape($escape): header does not inject a header via '$nl'" );
+
+        $out = eval { $cgi->redirect( -uri => '/x', -foobar => "bar${nl}Set-Cookie: evil=1" ) };
+        unlike( $out // '', qr/^Set-Cookie: evil/m, "autoEscape($escape): redirect does not inject a header via '$nl'" );
+    }
+}
+
+{
+    my $cgi = CGI->new('');
+    local $CGI::Q = $cgi;
+    $cgi->autoEscape(0);
+    eval { $cgi->header( -foobar => "bar&#13;&#10;Set-Cookie: evil=1" ) };
+    like($@,qr/contains a newline/,'entity encoded CRLF in unknown header blows up with autoEscape off');
+
+    like $cgi->header( -foobar => "bar&#13;&#10; continued" ),
+        qr#Foobar: bar continued#, 'entity encoded CRLF followed by whitespace is unfolded';
+}
