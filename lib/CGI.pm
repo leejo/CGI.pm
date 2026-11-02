@@ -30,6 +30,7 @@ $LIST_CONTEXT_WARN   = 1;
 $ENCODE_ENTITIES     = q{&<>"'};
 $ALLOW_DELETE_CONTENT = 0;
 $COOKIE_CACHE        = 0;  # backcompat: cache was broken for years
+$TRUST_X_FORWARDED_HOST = 0; # set to 1 if behind a proxy that sets it
 
 @SAVED_SYMBOLS = ();
 
@@ -2723,9 +2724,7 @@ sub url {
     if ($full) {
         my $protocol = $self->protocol();
         $url = "$protocol://";
-        my $vh = http('x_forwarded_host') || http('host') || '';
-			$vh =~ s/^.*,\s*//; # x_forwarded_host may be a comma-separated list (e.g. when the request has
-                                # passed through multiple reverse proxies. Take the last one.
+        my $vh = _valid_http_host() || '';
             $vh =~ s/\:\d+$//;  # some clients add the port number (incorrectly). Get rid of it.
 
         $url .= $vh || server_name();
@@ -3044,9 +3043,28 @@ sub raw_cookie {
 # is not always the same as the server
 ######
 sub virtual_host {
-    my $vh = http('x_forwarded_host') || http('host') || server_name();
+    my $vh = _valid_http_host() || server_name();
     $vh =~ s/:\d+$//;		# get rid of port number
     return $vh;
+}
+
+# Return the Host header if it is a syntactically valid host[:port], else
+# undef. The header is client supplied so anything else (userinfo, paths,
+# quotes, whitespace, etc) is rejected. X-Forwarded-Host is not consulted
+# by default as it can be set by any client and is not part of cache keys,
+# unless $TRUST_X_FORWARDED_HOST is set, in which case it is preferred
+# (the last entry if it is a list, i.e. the one added by the nearest proxy)
+# but must still be a valid host[:port].
+sub _valid_http_host {
+    my $host = $ENV{'HTTP_HOST'};
+    if ( $TRUST_X_FORWARDED_HOST && defined $ENV{'HTTP_X_FORWARDED_HOST'}
+        && length $ENV{'HTTP_X_FORWARDED_HOST'} ) {
+        ( $host = $ENV{'HTTP_X_FORWARDED_HOST'} ) =~ s/^.*,\s*//s;
+        $host =~ s/\s+\z//;
+    }
+    return undef unless defined $host;
+    return $host if $host =~ /\A(?:[A-Za-z0-9_.-]+|\[[0-9A-Fa-f:.]+\])(?::\d{1,5})?\z/;
+    return undef;
 }
 
 #### Method: remote_host
@@ -3112,7 +3130,7 @@ sub server_software {
 ####
 sub virtual_port {
     my($self) = self_or_default(@_);
-    my $vh = $self->http('x_forwarded_host') || $self->http('host');
+    my $vh = _valid_http_host();
     my $protocol = $self->protocol;
     if ($vh) {
         return ($vh =~ /:(\d+)$/)[0] || ($protocol eq 'https' ? 443 : 80);

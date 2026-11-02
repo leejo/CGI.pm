@@ -1493,6 +1493,15 @@ Returns the name of the server, usually the machine's host name.
 When using virtual hosts, returns the name of the host that the browser
 attempted to contact
 
+This is taken from the Host header if it is a syntactically valid
+C<host[:port]>, otherwise from server_name(). The X-Forwarded-Host header
+is B<not> used (since v5.00) as it can be set by any client; if you are
+behind a reverse proxy, configure the proxy or web server to pass the
+correct Host header or SERVER_NAME instead. If that is not possible, and all
+requests come through a proxy that sets the header, you can opt back in by
+setting L</$CGI::TRUST_X_FORWARDED_HOST>. The same applies to url(),
+self_url() and virtual_port().
+
 =item B<server_port()>
 
 Return the port that the server is listening on.
@@ -1766,6 +1775,18 @@ forms parameters hence allowing I<param()> to return values from the query
 string as well as from the decoded POST request instead of having to use
 I<url_param> instead. This makes it easier to get the value of a parameter
 when you don't know the source.
+
+=item B<$CGI::TRUST_X_FORWARDED_HOST>
+
+Defaults to 0, meaning the X-Forwarded-Host header is ignored when determining
+the host name for url(), self_url(), virtual_host() and virtual_port() (see
+L</virtual_host()>). Set this to 1 to use it in preference to the Host header,
+which was the behaviour prior to v5.00. If it contains a list of hosts the last
+one is used, and it must still be a valid C<host[:port]>.
+
+Only do this if B<all> requests reach your application through a reverse proxy
+that sets (or removes) this header, as otherwise any client can set it to
+control the host name in generated URLs.
 
 =back
 

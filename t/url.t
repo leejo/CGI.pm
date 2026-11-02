@@ -8,25 +8,105 @@ use CGI ':all';
 use CGI::Util qw/ unescape /;
 
 delete( $ENV{SCRIPT_NAME} ); # Win32 fix, see RT 89992
-$ENV{HTTP_X_FORWARDED_HOST} = 'proxy:8484';
 $ENV{SERVER_PROTOCOL}       = 'HTTP/1.0';
 $ENV{SERVER_PORT}           = 8080;
 $ENV{SERVER_NAME}           = 'the.good.ship.lollypop.com';
 
-is virtual_port() => 8484, 'virtual_port()';
+is virtual_port() => 8080, 'virtual_port()';
 is server_port()  => 8080, 'server_port()';
 
-is url() => 'http://proxy:8484/', 'url()';
+is url() => 'http://the.good.ship.lollypop.com:8080/', 'url()';
 
-$ENV{HTTP_X_FORWARDED_HOST} = '192.169.1.1, proxy1:80, 127.0.0.1, proxy2:8484';
+subtest 'X-Forwarded-Host is ignored' => sub {
+    # client supplied, so trusting it allowed open redirects, <base>
+    # hijacking, form action hijacking and cache poisoning
+    for my $xfh (
+        'evil.example',
+        'evil.example:8484',
+        '192.169.1.1, proxy1:80, 127.0.0.1, evil.example:8484',
+    ) {
+        local $ENV{HTTP_X_FORWARDED_HOST} = $xfh;
+        is url()          => 'http://the.good.ship.lollypop.com:8080/', "url() ignores X-Forwarded-Host: $xfh";
+        is virtual_host() => 'the.good.ship.lollypop.com', ' ... virtual_host()';
+        is virtual_port() => 8080, ' ... virtual_port()';
 
-is url() => 'http://proxy2:8484/', 'url() with multiple proxies';
+        local $ENV{HTTP_HOST} = 'example.com';
+        is url()          => 'http://example.com/', ' ... url() uses Host';
+        is virtual_host() => 'example.com', ' ... virtual_host() uses Host';
+        is virtual_port() => 80, ' ... virtual_port() uses Host';
+    }
 
-# let's see if we do the defaults right
+    local $ENV{HTTP_X_FORWARDED_HOST} = 'evil.example';
+    local $ENV{HTTP_HOST}             = 'example.com';
+    local $ENV{SCRIPT_NAME}           = '/app.cgi';
+    local $ENV{REQUEST_URI};
+    my $q = CGI->new('');
+    like( $q->redirect, qr{^Location: http://example\.com/app\.cgi}m, 'default redirect location ignores X-Forwarded-Host' );
+    like( $q->start_html( -base => 1 ), qr{<base href="http://example\.com/app\.cgi"}, '<base href> ignores X-Forwarded-Host' );
+    like( $q->start_form, qr{action="http://example\.com/app\.cgi"}, 'default form action ignores X-Forwarded-Host' );
+};
 
-$ENV{HTTP_X_FORWARDED_HOST} = 'proxy:80';
+subtest 'TRUST_X_FORWARDED_HOST opt out' => sub {
+    ok( ! $CGI::TRUST_X_FORWARDED_HOST, 'TRUST_X_FORWARDED_HOST is off by default' );
 
-is url() => 'http://proxy/', 'url() with default port';
+    local $CGI::TRUST_X_FORWARDED_HOST = 1;
+    local $ENV{HTTP_HOST} = 'example.com';
+
+    # the pre v5.00 behaviour
+    local $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:8484';
+    is virtual_port() => 8484, 'virtual_port()';
+    is virtual_host() => 'proxy', 'virtual_host()';
+    is url() => 'http://proxy:8484/', 'url()';
+
+    $ENV{HTTP_X_FORWARDED_HOST} = '192.169.1.1, proxy1:80, 127.0.0.1, proxy2:8484';
+    is url() => 'http://proxy2:8484/', 'url() with multiple proxies uses the last';
+    is virtual_host() => 'proxy2', ' ... as does virtual_host()';
+    is virtual_port() => 8484, ' ... and virtual_port()';
+
+    $ENV{HTTP_X_FORWARDED_HOST} = 'proxy:80';
+    is url() => 'http://proxy/', 'url() with default port';
+
+    $ENV{HTTP_X_FORWARDED_HOST} = '';
+    is url() => 'http://example.com/', 'url() with empty X-Forwarded-Host uses Host';
+
+    delete $ENV{HTTP_X_FORWARDED_HOST};
+    is url() => 'http://example.com/', 'url() without X-Forwarded-Host uses Host';
+
+    # but it must still be a valid host[:port]
+    for my $xfh ( 'evil.example/path', 'user@evil.example', 'evil.example"><script>', "evil.example\r\nX-Injected: 1" ) {
+        local $ENV{HTTP_X_FORWARDED_HOST} = $xfh;
+        ( my $label = $xfh ) =~ s/([^ -~])/sprintf('\\x%02x',ord $1)/ge;
+        is url() => 'http://the.good.ship.lollypop.com:8080/', "url() rejects X-Forwarded-Host: '$label'";
+        is virtual_host() => 'the.good.ship.lollypop.com', ' ... virtual_host()';
+    }
+};
+
+subtest 'invalid Host header falls back to SERVER_NAME' => sub {
+    for my $host (
+        'evil.example/path',
+        'user@evil.example',
+        'example.com@evil.example',
+        'evil.example"><script>',
+        'evil.example, other.example',
+        "evil.example\r\nX-Injected: 1",
+        'evil.example:80:80',
+        'evil.example:notaport',
+        ' example.com',
+        '',
+    ) {
+        local $ENV{HTTP_HOST} = $host;
+        ( my $label = $host ) =~ s/([^ -~])/sprintf('\\x%02x',ord $1)/ge;
+        is url()          => 'http://the.good.ship.lollypop.com:8080/', "url() rejects Host: '$label'";
+        is virtual_host() => 'the.good.ship.lollypop.com', ' ... virtual_host()';
+        is virtual_port() => 8080, ' ... virtual_port()';
+    }
+
+    for my $host ( 'example.com', 'example.com:8000', 'my_host.local', '127.0.0.1:81', '[::1]', '[::1]:5000' ) {
+        local $ENV{HTTP_HOST} = $host;
+        ( my $expect = $host ) =~ s/:\d+$//;
+        is virtual_host() => $expect, "virtual_host() accepts Host: $host";
+    }
+};
 
 subtest 'rewrite_interactions' => sub {
     # Reference: RT#45019
@@ -132,11 +212,15 @@ if ( $] >= 5.018000 ) {
 	# themselves and submit a PR as i'm not interested in fixing this
 	subtest 'complex and utf8' => sub {
 
+		# userinfo is not valid in a Host header so is rejected, falling
+		# back to SERVER_NAME - the path is still URI encoded
 		local $ENV{HTTP_HOST}   = 'foo:bärbaz@boz.com:8000';
-		local $ENV{REQUEST_URI} = '/biz/blap.cgi?boz=biz&buz=1#/!%?@3';
+		local $ENV{SERVER_NAME} = 'boz.com';
+		local $ENV{SERVER_PORT} = 8000;
+		local $ENV{REQUEST_URI} = '/biz/bläp.cgi?boz=biz&buz=1#/!%?@3';
 
-		my $expect = 'http://foo:b%E4rbaz@boz.com:8000/biz/blap.cgi';
-		my $expect_ue = 'http://foo:bärbaz@boz.com:8000/biz/blap.cgi';
+		my $expect = 'http://boz.com:8000/biz/bl%E4p.cgi';
+		my $expect_ue = 'http://boz.com:8000/biz/bläp.cgi';
 		my $cgi = CGI->new;
 
 		is( $cgi->url,$expect,'->url' );
