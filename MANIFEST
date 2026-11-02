@@ -63,6 +63,7 @@ t/multipart_no_boundary.t
 t/multipart_related.t
 t/multipart_start.t
 t/multipart_user_agent.t
+t/new_replay.t
 t/no_tabindex.t
 t/param_fetch.t
 t/param_list_context.t

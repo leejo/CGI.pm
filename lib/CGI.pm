@@ -106,6 +106,7 @@ sub initialize_globals {
     undef %QUERY_PARAM;
     undef %EXPORT;
     undef $QUERY_CHARSET;
+    undef $QUERY_CGI_ERROR;
     undef %QUERY_FIELDNAMES;
     undef %QUERY_TMPFILES;
 
@@ -536,6 +537,9 @@ sub init {
             }
         }
         $self->charset($QUERY_CHARSET);
+        # so an error parsing the request (e.g. a malformed or too large
+        # body) is seen by every object, not just the first
+        $self->cgi_error($QUERY_CGI_ERROR) if defined $QUERY_CGI_ERROR;
         $self->{'.fieldnames'} = {%QUERY_FIELDNAMES};
         $self->{'.tmpfiles'}   = {%QUERY_TMPFILES};
         return;
@@ -854,9 +858,12 @@ sub save_request {
     @QUERY_PARAM = $self->param; # save list of parameters
     for (@QUERY_PARAM) {
       next unless defined $_;
-      $QUERY_PARAM{$_}=$self->{param}{$_};
+      # a copy, so that later changes to this object's params (append,
+      # param_fetch, etc) don't change those of objects created later
+      $QUERY_PARAM{$_}=[ @{ $self->{param}{$_} || [] } ];
     }
     $QUERY_CHARSET = $self->charset;
+    $QUERY_CGI_ERROR  = $self->{'.cgi_error'};
     %QUERY_FIELDNAMES = %{$self->{'.fieldnames'}};
     %QUERY_TMPFILES   = %{ $self->{'.tmpfiles'} || {} };
 }
