@@ -1027,7 +1027,7 @@ sub read_postdata_putdata {
             my $len  = $content_length;
             my $ZERO_LOOP_COUNTER = 0;
             while ( $len > 0 ) {
-                my $read = $self->read_from_client( \$buf, $unit, 0 );
+                my $read = $self->read_from_client( \$buf, $len < $unit ? $len : $unit, 0 );
                 # a body shorter than CONTENT_LENGTH returns 0 (EOF) or undef
                 # (error) forever, so guard against spinning as below
                 if ( ! $read ) {
@@ -1062,13 +1062,14 @@ sub read_postdata_putdata {
         my $totalbytes;
         my $unit = $CGI::MultipartBuffer::INITIAL_FILLUNIT;
         my $len  = $content_length;
-        $unit = $len;
         my $ZERO_LOOP_COUNTER =0;
 
         while( $len > 0 )
         {
             
-            my $bytesRead = $self->read_from_client( \$data, $unit, 0 );
+            # read in chunks (never past CONTENT_LENGTH) rather than slurping
+            # the whole body into memory at once
+            my $bytesRead = $self->read_from_client( \$data, $len < $unit ? $len : $unit, 0 );
             $len -= $bytesRead ;
 
             # An apparent bug in the Apache server causes the read()
