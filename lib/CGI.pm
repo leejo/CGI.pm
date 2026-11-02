@@ -2622,7 +2622,7 @@ sub popup_menu {
 ####
 sub optgroup {
     my($self,@p) = self_or_default(@_);
-    my($name,$values,$attributes,$labeled,$noval,$labels,@other)
+    my($name,$values,$attributes,$labeled,$novals,$labels,@other)
         = rearrange([NAME,[VALUES,VALUE],ATTRIBUTES,LABELED,NOVALS,LABELS],@p);
 
     my($result,@values);
@@ -2633,11 +2633,11 @@ sub optgroup {
     $result = qq/<optgroup label="$name"$other>\n/;
     for (@values) {
         if (/<optgroup/) {
-            for (split(/\n/)) {
-                my $selectit = $XHTML ? 'selected="selected"' : 'selected';
-                s/(value="$selected")/$selectit $1/ if defined $selected;
-                $result .= "$_\n";
-            }
+            # a nested optgroup, passed through as is (there used to be code
+            # here to mark a selected value, using a $selected that was never
+            # set - unlike popup_menu() / scrolling_list(), optgroup() doesn't
+            # know which values are selected)
+            $result .= "$_\n" for split(/\n/);
         }
         else {
             my $attribs = $self->_set_attributes($_, $attributes);
