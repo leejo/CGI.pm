@@ -3826,7 +3826,10 @@ sub tmpFileName {
 
 sub uploadInfo {
     my($self,$filename) = self_or_default(@_);
-    return if ! defined $$filename;
+    # only an upload filehandle - anything else (e.g. a plain filename from
+    # Vars, or a param value of "0") was dereferenced as a symbolic ref, and
+    # then a method called on it, which died
+    return unless ref($filename) && UNIVERSAL::can($filename,'filename');
     return $self->{'.tmpfiles'}->{$filename->filename . $filename}->{info};
 }
 

@@ -112,3 +112,20 @@ my $q2 = CGI->new;
     is( $q2->uploadInfo($fh)->{'Content-Type'}, "image/gif", $test);
 }
 
+
+{
+    # anything other than an upload filehandle returns nothing - plain
+    # strings were dereferenced as symbolic refs, so e.g. a param value of
+    # "0" (which names $0) then died calling a method on the string
+    for my $not_an_upload ( '0', 'VERSION', 'ENV', 'INC', 'x.txt', '', undef, [], {}, \'0', $q ) {
+        my $label = defined $not_an_upload ? ( ref $not_an_upload ? ref $not_an_upload : "'$not_an_upload'" ) : 'undef';
+        my $info = eval { $q->uploadInfo( $not_an_upload ) };
+        is( $@, '', "uploadInfo($label) does not die" );
+        ok( ! $info, ' ... and returns nothing' );
+    }
+
+    local $CGI::LIST_CONTEXT_WARN = 0;
+    my $from_query = CGI->new('upload=0');
+    my $info = eval { $from_query->uploadInfo( $from_query->param('upload') ) };
+    is( $@, '', 'uploadInfo of a param value of "0" from the request does not die' );
+}
