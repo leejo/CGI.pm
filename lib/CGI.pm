@@ -3872,6 +3872,7 @@ sub new {
 		BOUNDARY=>$boundary,
 		INTERFACE=>$interface,
 		BUFFER=>$preread,
+		AT_LINE_START=>1, # the start of the body, or after the boundary line
 	    };
 
     $FILLUNIT = length($boundary)
@@ -3910,6 +3911,7 @@ sub readHeader {
 
     my($header) = substr($self->{BUFFER},0,$end+2);
     substr($self->{BUFFER},0,$end+4) = '';
+    $self->{AT_LINE_START} = 1; # the part's content starts on a new line
     my %return;
 
     if ($CGI::EBCDIC) {
@@ -3969,8 +3971,20 @@ sub read {
     my $boundary_start = $CGI::EBCDIC ? CGI::Util::ebcdic2ascii($self->{BOUNDARY})      : $self->{BOUNDARY};
     my $boundary_end   = $CGI::EBCDIC ? CGI::Util::ebcdic2ascii($self->{BOUNDARY}.'--') : $self->{BOUNDARY}.'--';
 
-    # Find the boundary in the buffer (it may not be there).
-    my $start = index($self->{BUFFER},$boundary_start);
+    # Find the boundary in the buffer (it may not be there). Per RFC 2046 it
+    # is only a delimiter at the start of a line - at the start of the body
+    # or a part's content, or following a CRLF (which belongs to the
+    # delimiter, and is stripped from the content below). Matching it
+    # anywhere else would let content such as "x--BOUNDARY" start a new
+    # part, and so parse differently to other (e.g. a filtering proxy's)
+    # parsers.
+    my $crlf  = "\015\012"; # always this on the wire
+    my $start = -1;
+    if ( $self->{AT_LINE_START} && index($self->{BUFFER},$boundary_start) == 0 ) {
+        $start = 0;
+    } elsif ( ( $start = index($self->{BUFFER},$crlf . $boundary_start) ) >= 0 ) {
+        $start += length($crlf);
+    }
 
     warn "boundary=$self->{BOUNDARY} length=$self->{LENGTH} start=$start\n" if $_DEBUG;
 
@@ -3993,6 +4007,7 @@ sub read {
 	# just remove the boundary.
 	substr($self->{BUFFER},0,length($boundary_start))='';
         $self->{BUFFER} =~ s/^\012\015?//;
+	$self->{AT_LINE_START} = 0;
 	return undef;
     }
 
@@ -4008,8 +4023,10 @@ sub read {
 
     my $returnval=substr($self->{BUFFER},0,$bytesToReturn);
     substr($self->{BUFFER},0,$bytesToReturn)='';
-    
-    # If we hit the boundary, remove the CRLF from the end.
+
+    # If we hit the boundary, remove the CRLF from the end - the buffer
+    # then starts with the boundary, at the start of a line.
+    $self->{AT_LINE_START} = $bytesToReturn == $start ? 1 : 0;
     return ($bytesToReturn==$start)
            ? substr($returnval,0,-2) : $returnval;
 }
