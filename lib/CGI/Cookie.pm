@@ -208,9 +208,21 @@ sub value {
   return wantarray ? @{ $self->{'value'} } : $self->{'value'}->[0];
 }
 
+# attribute values are not escaped, so must be checked: per RFC 6265 they
+# can't contain ";" or control characters (anything else would allow
+# other attributes, e.g. "/; Domain=example.com", to be injected)
+sub _check_attribute {
+    my ( $attribute,$value,$valid ) = @_;
+    $valid ||= qr/\A[^;\x00-\x1f\x7f]*\z/;
+    return $value if $value =~ $valid;
+    ( my $shown = $value ) =~ s/([^\x20-\x7e])/sprintf( '\\x%02x',ord $1 )/ge;
+    die "Invalid cookie $attribute (contains ';' or invalid characters): $shown\n";
+}
+
 sub domain {
     my ( $self, $domain ) = @_;
-    $self->{'domain'} = lc $domain if defined $domain;
+    $self->{'domain'} = lc _check_attribute( domain => $domain,qr/\A\.?[A-Za-z0-9._-]*\z/ )
+        if defined $domain;
     return $self->{'domain'};
 }
 
@@ -222,7 +234,9 @@ sub secure {
 
 sub expires {
     my ( $self, $expires ) = @_;
-    $self->{'expires'} = CGI::Util::expires($expires) if defined $expires;
+    # CGI::Util::expires passes through anything it doesn't understand
+    $self->{'expires'} = _check_attribute( expires => CGI::Util::expires($expires) )
+        if defined $expires;
     return $self->{'expires'};
 }
 
@@ -234,7 +248,7 @@ sub max_age {
 
 sub path {
     my ( $self, $path ) = @_;
-    $self->{'path'} = $path if defined $path;
+    $self->{'path'} = _check_attribute( path => $path ) if defined $path;
     return $self->{'path'};
 }
 
@@ -422,6 +436,11 @@ B<-path> points to a partial URL on the current server.  The cookie
 will be returned to all URLs beginning with the specified path.  If
 not specified, it defaults to '/', which returns the cookie to all
 pages at your site.
+
+Unlike the name and value, which are URL escaped, the B<-path>, B<-domain>
+and B<-expires> values are used as given, so since v5.00 CGI::Cookie dies if
+they contain a ";" or control characters (which would allow other attributes
+to be injected), or if B<-domain> isn't a valid host name.
 
 B<-secure> if set to a true value instructs the browser to return the
 cookie only when a cryptographic protocol is in use.
