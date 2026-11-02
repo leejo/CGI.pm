@@ -94,6 +94,7 @@ t/upload_post_text.txt
 t/upload_post_quoted_unquoted.txt
 t/upload_quoted_unquoted.t
 t/url.t
+t/url_request_uri.t
 t/user_agent.t
 t/utf8.t
 t/util-58.t

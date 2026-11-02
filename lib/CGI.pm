@@ -2017,7 +2017,7 @@ sub start_form {
        $action = $self->_maybe_escapeHTML($action);
     }
     else {
-       $action = $self->_maybe_escapeHTML($self->request_uri || $self->self_url);
+       $action = $self->_maybe_escapeHTML($self->_request_uri_path || $self->self_url);
     }
     $action = qq(action="$action");
     my($other) = @other ? " @other" : '';
@@ -2780,12 +2780,14 @@ sub url {
 
     my $path        =  $self->path_info;
     my $script_name =  $self->script_name;
-    my $request_uri =  $self->request_uri || '';
+    my $request_uri =  $self->_request_uri_path || '';
     my $query_str   =  $query ? $self->query_string : '';
 
     $script_name    =~ s/\?.*$//s; # remove query string
     $request_uri    =~ s/\?.*$//s; # remove query string
     $request_uri    =  unescape($request_uri);
+    # unescaping %2F / %5C may have produced a leading // or \ again
+    $request_uri    =~ s{^[/\\]+}{/};
 
     my $uri         =  $rewrite && $request_uri ? $request_uri : $script_name;
 
@@ -2830,6 +2832,14 @@ sub url {
     $url .= $path         if $path_info and defined $path;
     $url .= "?$query_str" if $query     and $query_str ne '';
     $url ||= '';
+
+    unless ($full) {
+        # a URL that isn't full must not be protocol relative (// or \,
+        # which browsers treat as /), which would be another host, nor
+        # look like it has a scheme (e.g. relative "javascript:alert(1)")
+        $url =~ s{^[/\\]{2,}}{/};
+        $url = "./$url" if $url =~ m{^[^/?#]*:};
+    }
 
 	$url = URI->new( $url )->canonical->as_string;
 	return $url
@@ -3012,6 +3022,20 @@ sub path_translated {
 ####
 sub request_uri {
     return (defined $ENV{'REQUEST_URI'}) ? $ENV{'REQUEST_URI'} : undef;
+}
+
+# REQUEST_URI is the raw request-target, so is client controlled and may be
+# in absolute-form (http://host/path) or start with multiple slashes (or
+# backslashes, which browsers treat as slashes) - any of which would make a
+# URL built from it point at another host. Reduce it to a path on this host.
+sub _request_uri_path {
+    my ($self) = @_;
+    my $uri = $self->request_uri;
+    return undef unless defined $uri && length $uri;
+    $uri =~ s{^[A-Za-z][A-Za-z0-9+.-]*://[^/?#]*}{}; # absolute-form
+    $uri =~ s{^[/\\]+}{/};
+    $uri = "/$uri" unless $uri =~ m{^/};
+    return $uri;
 }
 
 #### Method: query_string

@@ -959,9 +959,18 @@ If Apache's mod_rewrite is turned on, then the script name and path info
 probably won't match the request that the user sent. Set -rewrite => 1 (default)
 to return URLs that match what the user sent (the original request URI). Set
 -rewrite => 0 to return URLs that match the URL after the mod_rewrite rules have
-run. 
+run.
 
 =back
+
+The request URI is supplied by the client, so since v5.00 it is reduced to a
+path on this host before it is used: any scheme and host (an absolute-form
+request such as C<GET http://other.example/x>) are removed, and leading
+slashes or backslashes are collapsed to a single slash, so that an absolute or
+relative URL can never point at another host. A relative URL that would
+otherwise look like it has a scheme (e.g. C<javascript:...>) is prefixed with
+C<./>. The same applies to the default action of start_form(). request_uri()
+still returns the literal value.
 
 =head2 Mixing post and url parameters
 
