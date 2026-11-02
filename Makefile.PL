@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
     DISTNAME         => 'CGI',
     LICENSE          => 'artistic_2',
     VERSION_FROM     => 'lib/CGI.pm',
-    MIN_PERL_VERSION => '5.8.1',
+    MIN_PERL_VERSION => '5.010',
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        requires    => { perl    => '5.008001' },
+        requires    => { perl    => '5.010' },
         resources   => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/CGI',

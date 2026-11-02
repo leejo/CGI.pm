@@ -1,5 +1,5 @@
 package CGI;
-require 5.008001;
+require 5.010;
 use Carp 'croak';
 use URI;
 

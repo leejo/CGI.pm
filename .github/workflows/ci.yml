@@ -31,7 +31,6 @@ jobs:
           - '5.14'
           - '5.12'
           - '5.10'
-          # - '5.8' # Fails due to missing HTML::Tagset dependency
     container:
       image: perldocker/perl-tester:${{ matrix.perl-version }}     # https://hub.docker.com/r/perldocker/perl-tester
     name: Perl ${{ matrix.perl-version }}

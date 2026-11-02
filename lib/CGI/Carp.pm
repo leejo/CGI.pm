@@ -318,7 +318,7 @@ L<CGI::MiniSvr>, L<CGI::Form>, L<CGI::Response>.
 
 =cut
 
-require 5.000;
+require 5.010;
 use Exporter;
 #use Carp;
 BEGIN { 

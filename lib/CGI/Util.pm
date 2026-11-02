@@ -1,6 +1,6 @@
 package CGI::Util;
 use parent 'Exporter';
-require 5.008001;
+require 5.010;
 use strict;
 our @EXPORT_OK = qw(rearrange rearrange_header make_attributes unescape escape
         expires ebcdic2ascii ascii2ebcdic);
