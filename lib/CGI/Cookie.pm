@@ -73,12 +73,13 @@ sub parse {
   my ($self,$raw_cookie) = @_;
   return wantarray ? () : {} unless $raw_cookie;
 
-  my ($expires_name, $expires_value) = $raw_cookie =~ /(expires)=([^;]+)/ixsm;
-
   my %results;
 
-  if ( $expires_name ) {
-    $raw_cookie =~ s/$expires_name=$expires_value//xsm;
+  if ( $raw_cookie =~ /(expires)=([^;]+)/ixsm ) {
+    my ($expires_name, $expires_value) = ($1, $2);
+    # remove the matched expires pair by position - the value is client
+    # supplied so must never be interpolated into a pattern
+    substr( $raw_cookie, $-[0], $+[0] - $-[0] ) = '';
     $results{$expires_name} = $self->new(-name => $expires_name, -value => $expires_value);
   }
 
