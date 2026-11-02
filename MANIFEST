@@ -54,6 +54,7 @@ t/html_functions.t
 t/http.t
 t/init.t
 t/init_test.txt
+t/multipart_boundary_length.t
 t/multipart_boundary_line_start.t
 t/multipart_globals.t
 t/multipart_init.t

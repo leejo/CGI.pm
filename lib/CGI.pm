@@ -3815,6 +3815,7 @@ $MultipartBuffer::CRLF             ||= $CGI::CRLF;
 
 $INITIAL_FILLUNIT = $MultipartBuffer::INITIAL_FILLUNIT;
 $MAX_BOUNDARY_LINE = 1024; # when the boundary is read from the body
+$MAX_BOUNDARY_LENGTH = 200; # RFC 2046 says 70, allow some slack
 $TIMEOUT          = $MultipartBuffer::TIMEOUT;
 $SPIN_LOOP_MAX    = $MultipartBuffer::SPIN_LOOP_MAX;
 $CRLF             = $MultipartBuffer::CRLF;
@@ -3865,6 +3866,13 @@ sub new {
 	$preread  = substr( $preread,$end + length( $CRLF ) );
         $boundary_read++;
     }
+
+    # RFC 2046 boundaries are 1 to 70 characters, longer ones (allowing
+    # some slack) are rejected - a boundary approaching the read size
+    # (INITIAL_FILLUNIT) corrupted and merged parts in read()
+    die "Malformed multipart POST: invalid boundary\n"
+        unless $boundary =~ /\A--./s
+            && length( $boundary ) - 2 <= $MAX_BOUNDARY_LENGTH;
 
     my $self = {LENGTH=>$length,
 		CHUNKED=>$chunked,
