@@ -3838,11 +3838,11 @@ sub new {
     if ($boundary) {
 
 	# Under the MIME spec, the boundary consists of the
-	# characters "--" PLUS the Boundary string
-
-	# BUG: IE 3.01 on the Macintosh uses just the boundary -- not
-	# the two extra hyphens.  We do a special case here on the user-agent!!!!
-	$boundary = "--$boundary" unless CGI::user_agent('MSIE\s+3\.0[12];\s*Mac|DreamPassport');
+	# characters "--" PLUS the Boundary string. (There used to be a special
+	# case here for IE 3.01 on the Mac, based on the client controlled
+	# User-Agent, which any client could use to change how the body was
+	# parsed - e.g. to smuggle extra fields past a filtering proxy)
+	$boundary = "--$boundary";
 
     } else { # otherwise we find it ourselves
 	# read the first (boundary) line, bounded in size so that a client
