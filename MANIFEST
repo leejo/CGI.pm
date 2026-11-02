@@ -31,6 +31,7 @@ t/carp_warnings_reset.t
 t/cgi.t
 t/charset.t
 t/checkbox_group.t
+t/comment.t
 t/command_line.t
 t/compiles_pod.t
 t/cookie.t

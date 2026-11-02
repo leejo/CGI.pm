@@ -2287,7 +2287,12 @@ sub defaults {
 # Parameters: a string
 sub comment {
     my($self,@p) = self_or_CGI(@_);
-    return "<!-- @p -->";
+    my $text = "@p";
+    # the text must not be able to end the comment ("-->", "--!>") or start
+    # a nested one ("<!--"), all of which contain "--" - the surrounding
+    # spaces deal with the other cases the HTML spec disallows
+    1 while $text =~ s/--/- -/g;
+    return "<!-- $text -->";
 }
 
 #### Method: checkbox

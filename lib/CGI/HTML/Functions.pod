@@ -564,6 +564,9 @@ like
 
     print comment('here is my comment');
 
+Since v5.00 any C<--> in the text has a space inserted (C<- ->) so that the
+text can't end the comment (or start a nested one) and inject markup.
+
 Because of conflicts with built-in perl functions, the following functions
 begin with initial caps:
 
