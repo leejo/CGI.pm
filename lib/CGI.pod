@@ -446,6 +446,13 @@ L<upload_hook|/Progress bars for file uploads and avoiding temp files>,
 and as L<file uploads|/Processing a file upload field> via L</-putdata_upload>
 option.
 
+Since v5.00 parameters named POSTDATA, PUTDATA, PATCHDATA or XForms:Model sent
+by the client (in the query string, a form field, or a multipart part) are
+ignored, so these parameters only ever contain the request body. Prior to this
+a client could set them, e.g. with C<?POSTDATA=...> or a plain HTML form, and an
+application could not tell that apart from the body. You should still check
+the request's content type is what you expect.
+
 =head2 Direct access to the parameter list
 
     $q->param_fetch('address')->[1] = '1313 Mockingbird Lane';
@@ -801,7 +808,8 @@ The B<-attachment> parameter can be used to turn the page into an attachment.
 Instead of displaying the page, some browsers will prompt the user to save it
 to disk. The value of the argument is the suggested name for the saved file. In
 order for this to work, you may have to set the B<-type> to
-"application/octet-stream".
+"application/octet-stream". Any C<"> or C<\> in the name is backslash escaped
+(since v5.00) as required for the quoted filename parameter.
 
 The B<-p3p> parameter will add a P3P tag to the outgoing header. The parameter
 can be an arrayref or a space-delimited string of P3P tags. For example:
@@ -839,6 +847,12 @@ You are advised to use full URLs (absolute with respect to current URL or even
 including the http: or ftp: part) in redirection requests as relative URLs
 are resolved by the user agent of the client so may not do what you want or
 expect them to do.
+
+The URL is used exactly as given. Prior to v5.00 HTML entities in it (and in
+any other header values) were decoded, so C</&#47;evil.example/> became
+C<//evil.example/> after any validation your application had done. If you were
+relying on this to pass an HTML escaped URL (e.g. C</x?a=1&amp;b=2>) you should
+pass the unescaped URL instead.
 
 You can also use named arguments:
 
@@ -953,9 +967,18 @@ If Apache's mod_rewrite is turned on, then the script name and path info
 probably won't match the request that the user sent. Set -rewrite => 1 (default)
 to return URLs that match what the user sent (the original request URI). Set
 -rewrite => 0 to return URLs that match the URL after the mod_rewrite rules have
-run. 
+run.
 
 =back
+
+The request URI is supplied by the client, so since v5.00 it is reduced to a
+path on this host before it is used: any scheme and host (an absolute-form
+request such as C<GET http://other.example/x>) are removed, and leading
+slashes or backslashes are collapsed to a single slash, so that an absolute or
+relative URL can never point at another host. A relative URL that would
+otherwise look like it has a scheme (e.g. C<javascript:...>) is prefixed with
+C<./>. The same applies to the default action of start_form(). request_uri()
+still returns the literal value.
 
 =head2 Mixing post and url parameters
 
@@ -1001,18 +1024,33 @@ If you want the entered file name for the file, you can just call param():
 
     my $filename = $q->param('field_name');
 
-Different browsers will return slightly different things for the name. Some
-browsers return the filename only. Others return the full path to the file,
-using the path conventions of the user's machine. Regardless, the name returned
-is always the name of the file on the I<user's> machine, and is unrelated to
-the name of the temporary file that CGI.pm creates during upload spooling
-(see below).
+The name returned is the name of the file on the I<user's> machine, and is
+unrelated to the name of the temporary file that CGI.pm creates during upload
+spooling (see below).
+
+As the name is supplied by the client it cannot be trusted. Since v5.00 CGI.pm
+removes any directory part from it (splitting on both C</> and C<\>, as some
+browsers send the full path to the file using the path conventions of the
+user's machine) along with any control characters. If nothing usable remains
+(e.g. the name was C<..>) the name C<upload> is used instead. The name may still
+contain other characters that are unsafe for your use, so you should validate
+it, or better generate your own name, before using it to save the file.
+
+The raw value sent by the client is still available in the Content-Disposition
+header returned by uploadInfo() (see below). If you need the previous behaviour
+of returning the raw value you can set L</$CGI::SANITIZE_UPLOAD_FILENAMES> to 0,
+but you should then make sure you never use it as a path.
 
 When a file is uploaded the browser usually sends along some
 information along with it in the Content-Type (MIME type) and
 Content-Disposition (filename) headers.  To retrieve this information,
 call uploadInfo(). It returns a reference to a hash containing all the
 document headers.
+
+When running under taint mode (C<-T>) the header values, like the uploaded
+file's name and all other request data, are tainted (prior to v5.00 the
+filename and header values were not). Note that the header I<names> are hash
+keys, which perl never taints, so must be treated with care if you use them.
 
     my $filehandle = $q->upload( 'uploaded_file' );
     my $type       = $q->uploadInfo( $filehandle )->{'Content-Type'};
@@ -1493,6 +1531,15 @@ Returns the name of the server, usually the machine's host name.
 When using virtual hosts, returns the name of the host that the browser
 attempted to contact
 
+This is taken from the Host header if it is a syntactically valid
+C<host[:port]>, otherwise from server_name(). The X-Forwarded-Host header
+is B<not> used (since v5.00) as it can be set by any client; if you are
+behind a reverse proxy, configure the proxy or web server to pass the
+correct Host header or SERVER_NAME instead. If that is not possible, and all
+requests come through a proxy that sets the header, you can opt back in by
+setting L</$CGI::TRUST_X_FORWARDED_HOST>. The same applies to url(),
+self_url() and virtual_port().
+
 =item B<server_port()>
 
 Return the port that the server is listening on.
@@ -1700,19 +1747,44 @@ with built-in facilities to accomplish this. In other cases, you can use the
 shell I<limit> or I<ulimit> commands to put ceilings on CGI resource usage.
 
 CGI.pm also has some simple built-in protections against denial of service
-attacks, but you must activate them before you can use them. These take the
-form of two global variables in the CGI name space:
+attacks. These take the form of two global variables in the CGI name space:
 
 =over 4
 
 =item B<$CGI::POST_MAX>
 
-If set to a non-negative integer, this variable puts a ceiling on the size of
+If set to a positive integer, this variable puts a ceiling on the size of
 POSTings, in bytes. If CGI.pm detects a POST that is greater than the ceiling,
-it will immediately exit with an error message. This value will affect both
+it will discard it and set an error (see below). This value will affect both
 ordinary POSTs and multipart POSTs, meaning that it limits the maximum size of
-file uploads as well. You should set this to a reasonably high
-value, such as 10 megabytes.
+file uploads as well. The limit is also enforced while reading multipart POSTs
+that have no Content-Length (i.e. chunked transfer encoding).
+
+The default is 128 megabytes (since v5.00, previously there was no limit). You
+should set this to a value appropriate to your application, or to -1 to remove
+the limit entirely.
+
+=item B<$CGI::MAX_PARAMS>
+
+The maximum number of parameter values in a request, counting those in the
+query string, a form encoded body, and every part of a multipart body. A
+request exceeding it is discarded with the same error as for B<$CGI::POST_MAX>.
+Without a limit a body within B<$CGI::POST_MAX> can contain millions of tiny
+parameters, taking many seconds and gigabytes of memory to parse.
+
+The default is 10,000 (since v5.00, previously there was no limit), set it to
+-1 to remove the limit.
+
+=item B<$CGI::MAX_UPLOADS>
+
+The maximum number of uploaded files in a request, as each one is saved to a
+temporary file (and its filehandle kept open, unless C<$CGI::CLOSE_UPLOAD_FILES>
+or C<close_upload_files(1)> is used). A request exceeding it is discarded with
+the same error as for B<$CGI::POST_MAX>. Note that your system may limit the
+number of open files per process to fewer than this.
+
+The default is 1,000 (since v5.00, previously there was no limit), set it to
+-1 to remove the limit.
 
 =item B<$CGI::DISABLE_UPLOADS>
 
@@ -1734,11 +1806,13 @@ the "use" statement:
     $CGI::POST_MAX = 1024 * 1024 * 10;  # max 10MB posts
     $CGI::DISABLE_UPLOADS = 1;          # no uploads
 
-An attempt to send a POST larger than $POST_MAX bytes will cause I<param()> to
+An attempt to send a POST larger than $POST_MAX bytes (or with more than
+$MAX_PARAMS parameters or $MAX_UPLOADS uploads) will cause I<param()> to
 return an empty CGI parameter list. You can test for this event by checking
 I<cgi_error()>, either after you create the CGI object or, if you are using the
 function-oriented interface, call <param()> for the first time. If the POST was
-intercepted, then cgi_error() will return the message "413 POST too large".
+intercepted, then cgi_error() will return the message "413 Request entity too
+large".
 
 This error message is actually defined by the HTTP protocol, and is designed to
 be returned to the browser as the CGI script's status code. For example:
@@ -1759,6 +1833,14 @@ There are a number of global module flags which affect how CGI.pm operates.
 
 =over 4
 
+=item B<$CGI::SANITIZE_UPLOAD_FILENAMES>
+
+Defaults to 1, which removes any directory part and control characters from
+the client supplied filename of file uploads (see
+L</Processing a file upload field>). Set this to 0 to get the raw value sent by
+the client, which was the behaviour prior to v5.00. Doing so is not recommended
+as the raw value can contain a path, such as C<../../etc/passwd>.
+
 =item B<$CGI::APPEND_QUERY_STRING>
 
 If set to a non-zero value, this will add query string parameters to a POST
@@ -1766,6 +1848,18 @@ forms parameters hence allowing I<param()> to return values from the query
 string as well as from the decoded POST request instead of having to use
 I<url_param> instead. This makes it easier to get the value of a parameter
 when you don't know the source.
+
+=item B<$CGI::TRUST_X_FORWARDED_HOST>
+
+Defaults to 0, meaning the X-Forwarded-Host header is ignored when determining
+the host name for url(), self_url(), virtual_host() and virtual_port() (see
+L</virtual_host()>). Set this to 1 to use it in preference to the Host header,
+which was the behaviour prior to v5.00. If it contains a list of hosts the last
+one is used, and it must still be a valid C<host[:port]>.
+
+Only do this if B<all> requests reach your application through a reverse proxy
+that sets (or removes) this header, as otherwise any client can set it to
+control the host name in generated URLs.
 
 =back
 

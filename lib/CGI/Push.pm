@@ -5,7 +5,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::Push::VERSION='4.72';
+$CGI::Push::VERSION='5.01';
 use CGI;
 use CGI::Util 'rearrange';
 @ISA = ('CGI');
@@ -27,6 +27,8 @@ sub do_push {
     my (@header);
     my ($type,$callback,$delay,$last_page,$cookie,$target,$expires,$nph,@other) = rearrange([TYPE,NEXT_PAGE,DELAY,LAST_PAGE,[COOKIE,COOKIES],TARGET,EXPIRES,NPH],@p);
     $type = 'text/html' unless $type;
+    # $type is printed directly in each part's header, so check it here
+    CGI::_check_header_values($type);
     $callback = \&simple_counter unless $callback && ref($callback) eq 'CODE';
     $delay = 1 unless defined($delay);
     $self->push_delay($delay);

@@ -53,6 +53,32 @@ my @test_cookie = (
   is( $result{qux}->value, "'",     "cookie qux is correct" );
   is( $result{expires}->value, 'Mon, 07 Apr 2025 21:32:31 GMT', "expires is correct" );
 
+  # expires value is client supplied, so regex metacharacters in it must
+  # be treated literally (no die on invalid patterns, no backtracking)
+  for my $expires ( '(', '[', '.*', '(a|aa|aaa)*\1b', '\\' ) {
+    my %r = eval { CGI::Cookie->parse( "a=1; expires=$expires; b=2" ) };
+    is( $@, '', "parse does not die with expires=$expires" );
+    is( $r{expires} && $r{expires}->value, $expires, " ... expires value is literal" );
+    is( $r{a} && $r{a}->value, '1', " ... cookie a is correct" );
+    is( $r{b} && $r{b}->value, '2', " ... cookie b is correct" );
+  }
+
+  SKIP: {
+    skip "alarm not available on $^O", 2 if $^O eq 'MSWin32';
+    my %r = eval {
+      local $SIG{ALRM} = sub { die "timeout\n" };
+      alarm 10;
+      my %parsed = CGI::Cookie->parse(
+        'expires=(a|aa|aaa)*\1b; y=expires=' . ( 'a' x 40 )
+      );
+      alarm 0;
+      %parsed;
+    };
+    alarm 0;
+    is( $@, '', "pathological expires value is not executed as a pattern" );
+    is( $r{y} && $r{y}->value, 'expires=' . ( 'a' x 40 ), " ... cookie y is correct" );
+  }
+
   my @array   = CGI::Cookie->parse('');
   my $scalar  = CGI::Cookie->parse('');
   is_deeply(\@array, [], " parse('') returns an empty array   in list context   (undocumented)");
