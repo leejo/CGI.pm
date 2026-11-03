@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
     DISTNAME         => 'CGI',
     LICENSE          => 'artistic_2',
     VERSION_FROM     => 'lib/CGI.pm',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.008001',
     PREREQ_PM        => {
         'Carp'           => 0,     # Carp was first released with perl 5
         'Exporter'       => 0,     # Exporter was first released with perl 5
@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
         'warnings'       => 0,     # warnings was first released with perl v5.6.0
         'File::Spec'     => 0.82,
         'if'             => 0,     # core in 5.6.2 and later, for deprecate.pm
-        'parent'         => 0.225, # parent was first released with perl v5.10.1
         'File::Temp'     => 0.17,  # 0.17 for seekable file handles
         'HTML::Entities' => 3.69,
         'Encode'         => 0,    # Encode was first released with perl v5.7.3
@@ -48,7 +47,7 @@ my %WriteMakefileArgs = (
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        requires    => { perl    => '5.010' },
+        requires    => { perl    => '5.008001' },
         resources   => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/CGI',

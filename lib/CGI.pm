@@ -1,5 +1,5 @@
 package CGI;
-require 5.010;
+require 5.008001;
 use Carp 'croak';
 use URI;
 
@@ -8,7 +8,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='5.01';
+$CGI::VERSION='5.02';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 

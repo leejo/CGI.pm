@@ -5,7 +5,7 @@ use warnings;
 
 use CGI ();
 
-$CGI::Pretty::VERSION = '5.01';
+$CGI::Pretty::VERSION = '5.02';
 $CGI::DefaultClass = __PACKAGE__;
 @CGI::Pretty::ISA = qw( CGI );
 

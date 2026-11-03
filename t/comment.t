@@ -37,8 +37,8 @@ for my $text (
     my ( $inner ) = $html =~ /\A<!-- (.*) -->\z/s;
     ok( defined $inner, "comment('$text') is a single comment: $html" );
     is_deeply( parsed( $html ), [ 'comment' ], ' ... when parsed as HTML' );
-    unlike( $inner // '', qr/--/, ' ... with no -- inside it' );
-    ( my $squashed = $inner // '' ) =~ s/ //g;
+    unlike( defined $inner ? $inner : '', qr/--/, ' ... with no -- inside it' );
+    ( my $squashed = defined $inner ? $inner : '' ) =~ s/ //g;
     ( my $expect = $text ) =~ s/ //g;
     is( $squashed, $expect, ' ... and only spaces added to the text' );
 }

@@ -30,7 +30,7 @@ sub recipient_filename {
         push @filenames, $value if $name eq 'filename';
     }
     # anything left over means the header didn't parse as a single filename
-    return ( pos( $params ) // 0 ) == length( $params ) ? @filenames : ( @filenames, 'UNPARSED' );
+    return ( defined pos( $params ) ? pos( $params ) : 0 ) == length( $params ) ? @filenames : ( @filenames, 'UNPARSED' );
 }
 
 for my $name (

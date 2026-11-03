@@ -1,4 +1,4 @@
-5.01 2026-11-03
+5.02 2026-11-03
 
     [ RELEASE NOTES ]
     - this is a security release fixing a large number of vulnerabilities,
@@ -8,7 +8,8 @@
       below - most changes only affect malicious or malformed requests, but
       please read them before upgrading. where a change could reasonably
       affect a legitimate application an opt out or migration path is given
-    - the minimum supported perl version is now 5.10
+    - the minimum *supported* perl version is now 5.10, however the dist
+      will still install for 5.8 (no guarantees about tests passing however)
 
     [ SECURITY ]
     - denial of service:
@@ -133,7 +134,6 @@
     - an empty extra header() value came out as a lone "
 
     [ META ]
-    - minimum perl version is now 5.10
     - all modules are now version 5.00, including CGI::Cookie (was 4.59)
 
     [ TESTING ]

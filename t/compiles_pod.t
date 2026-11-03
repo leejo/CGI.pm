@@ -31,12 +31,4 @@ for my $file (@files) {
   next if $module =~ /CGI::Pretty/;
   ok eval "use $module; 1", "use $module" or diag $@;
   Test::Pod::pod_file_ok($file);
-  TODO: {
-	# not enough POD coverage yet by a long way, also the nature
-	# of CGI.pm at present (most subs eval'd as strings) means
-	# this test isn't that much use - so mark as TODO for now
-	local $TODO = 'POD coverage';
-	next if $module =~ /CGI::/;
-	Test::Pod::Coverage::pod_coverage_ok($module);
-  }
 }

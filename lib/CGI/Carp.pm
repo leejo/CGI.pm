@@ -318,7 +318,7 @@ L<CGI::MiniSvr>, L<CGI::Form>, L<CGI::Response>.
 
 =cut
 
-require 5.010;
+require 5.008001;
 use Exporter;
 #use Carp;
 BEGIN { 
@@ -334,7 +334,7 @@ use File::Spec;
 
 $main::SIG{__WARN__}=\&CGI::Carp::warn;
 
-$CGI::Carp::VERSION     = '5.01';
+$CGI::Carp::VERSION     = '5.02';
 $CGI::Carp::CUSTOM_MSG  = undef;
 $CGI::Carp::DIE_HANDLER = undef;
 $CGI::Carp::TO_BROWSER  = 1;

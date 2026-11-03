@@ -47,7 +47,7 @@ sub is_within {
     my $n = 0;
     $n += @$_ for values %{ $q->{param} };
     ok( ! $q->cgi_error && $n == $values, "$label: within the limit" )
-        or diag( "cgi_error=" . ( $q->cgi_error // 'undef' ) . " values=$n" );
+        or diag( "cgi_error=" . ( defined $q->cgi_error ? $q->cgi_error : 'undef' ) . " values=$n" );
 }
 
 sub is_too_large {

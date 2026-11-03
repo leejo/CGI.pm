@@ -47,7 +47,7 @@ like( $@, qr/contains a newline/, 'multipart_start with CRLF in unknown header b
     for my $escape ( 1, 0 ) {
         $q->autoEscape($escape);
         my $out = eval { $q->multipart_start( -foobar => "bar&#13;&#10;X-Evil: 1" ) };
-        unlike( $out // '', qr/^X-Evil/m, "autoEscape($escape): multipart_start does not inject a header via entity encoded CRLF" );
+        unlike( defined $out ? $out : '', qr/^X-Evil/m, "autoEscape($escape): multipart_start does not inject a header via entity encoded CRLF" );
     }
     $q->autoEscape(1);
 }

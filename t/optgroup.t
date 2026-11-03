@@ -52,7 +52,7 @@ is(
     local $CGI::selected = '(';
     my $html = eval { CGI::optgroup( -name => 'outer', -values => [ $inner ] ) };
     is( $@, '', 'a stray $CGI::selected is not used as a pattern' );
-    unlike( $html // '', qr/selected/, ' ... nor marks anything selected' );
+    unlike( defined $html ? $html : '', qr/selected/, ' ... nor marks anything selected' );
 }
 
 done_testing();

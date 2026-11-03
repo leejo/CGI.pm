@@ -62,10 +62,10 @@ for my $escape ( 1, 0 ) {
 
     for my $nl ( '&#13;&#10;', '&#10;', '&#x0d;&#x0a;', "\015\012" ) {
         my $out = eval { $cgi->header( -foobar => "bar${nl}Set-Cookie: evil=1" ) };
-        unlike( $out // '', qr/^Set-Cookie: evil/m, "autoEscape($escape): header does not inject a header via '$nl'" );
+        unlike( defined $out ? $out : '', qr/^Set-Cookie: evil/m, "autoEscape($escape): header does not inject a header via '$nl'" );
 
         $out = eval { $cgi->redirect( -uri => '/x', -foobar => "bar${nl}Set-Cookie: evil=1" ) };
-        unlike( $out // '', qr/^Set-Cookie: evil/m, "autoEscape($escape): redirect does not inject a header via '$nl'" );
+        unlike( defined $out ? $out : '', qr/^Set-Cookie: evil/m, "autoEscape($escape): redirect does not inject a header via '$nl'" );
     }
 }
 
@@ -75,8 +75,9 @@ for my $escape ( 1, 0 ) {
     $cgi->autoEscape(0);
     # header values are no longer HTML unescaped at all, so entities are
     # passed through as given rather than becoming newlines
-    like eval { $cgi->header( -foobar => "bar&#13;&#10;Set-Cookie: evil=1" ) } // "died: $@",
-        qr#^Foobar: bar&\#13;&\#10;Set-Cookie: evil=1\r?$#m, 'entity encoded CRLF in unknown header is passed through literally with autoEscape off';
+    my $hdr = eval { $cgi->header( -foobar => "bar&#13;&#10;Set-Cookie: evil=1" ) };
+    like( defined $hdr ? $hdr : "died: $@",
+        qr#^Foobar: bar&\#13;&\#10;Set-Cookie: evil=1\r?$#m, 'entity encoded CRLF in unknown header is passed through literally with autoEscape off');
 }
 
 # header and redirect values are passed through as given: they used to be
